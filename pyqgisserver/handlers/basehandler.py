@@ -10,17 +10,16 @@ from tornado.web import HTTPError
 from ..version import __version__
 from ..runtime import HTTPError2
 
-LOGGER = logging.getLogger("QGSSRV")
-
+LOGGER = logging.getLogger('QGSRV')
 
 class BaseHandler(tornado.web.RequestHandler):
     """ Base class for HTTP request hanlers
     """
     def initialize(self):
-        super(BaseHandler,self).initialize()
+        super().initialize()
         self._links    = []
-        self.logger    = LOGGER
         self.connection_closed = False
+        self.logger = LOGGER
 
     def compute_etag(self):
         # Disable etag computation

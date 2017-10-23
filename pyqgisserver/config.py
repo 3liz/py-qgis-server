@@ -9,9 +9,9 @@ import logging
 
 CONFIG = None
 
-LOGGER = logging.getLogger("QGSSRV")
-
 getenv = os.environ.get
+
+LOGGER = logging.getLogger('QGSRV')
 
 def get_config(section):
     """ Return the configuration section

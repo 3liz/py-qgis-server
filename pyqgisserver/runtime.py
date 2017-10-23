@@ -8,7 +8,6 @@ from tornado.ioloop import IOLoop
 
 import tornado.web
 import tornado.process
-import tornado.platform.asyncio
 
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
@@ -20,7 +19,7 @@ from contextlib import contextmanager
 from .logger import log_request, log_rrequest, setup_log_handler
 from .config import get_config, load_configuration, read_config_file, read_config_dict
 
-LOGGER = logging.getLogger('QGSSRV')
+LOGGER=logging.getLogger('QGSSRV')
 
 def print_version(config):
     from .version import __version__
@@ -131,7 +130,7 @@ def setuid(username):
     pw = getpwnam(username)
     os.setgid(pw.pw_gid)
     os.setuid(pw.pw_uid)
-    logging.info("Setuid to user {} ({}:{})".format(getpwuid(os.getuid()).pw_name, os.getuid(), os.getgid()))
+    LOGGER.info("Setuid to user {} ({}:{})".format(getpwuid(os.getuid()).pw_name, os.getuid(), os.getgid()))
 
 
 def set_signal_handlers():
@@ -154,7 +153,7 @@ class Application(tornado.web.Application):
         from tornado.netutil import bind_sockets
         from tornado.httpserver import HTTPServer
 
-        logging.info('Binding on port %s:%s' % (address or '*', port))
+        LOGGER.info('Binding on port %s:%s' % (address or '*', port))
         sockets = bind_sockets(port, address=address)
 
         if user:
@@ -165,14 +164,16 @@ class Application(tornado.web.Application):
             tornado.process.fork_processes(jobs, max_restarts=3)
             task_id = tornado.process.task_id()
         else:
-            task_id = os.getpid()
+            task_id = 0
+
+        # Install asyncio event loop
+        import tornado.platform.asyncio
+        tornado.platform.asyncio.AsyncIOMainLoop().install()
 
         # Return a kickstart callable
         # that must be started after fork
         if task_id is not None:
             def kickstart():
-                # Install asyncio event loop
-                tornado.platform.asyncio.AsyncIOMainLoop().install()
                 server = HTTPServer(self)
                 server.add_sockets(sockets)
                 asyncio.get_event_loop().run_forever()

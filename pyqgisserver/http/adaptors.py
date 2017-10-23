@@ -1,21 +1,29 @@
 """ Http qgis requests interfare to tornado requests handlers
 """
+import logging
+import traceback
+
 from qgis.PyQt.QtCore import QBuffer, QIODevice
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
+
 class Request(QgsServerRequest):
-    
-    def __init__(self, handler, headers=None, method=QgsServerRequest.GetMethod ):
+
+    def __init__(self, handler, headers=None, method='GET' ):
         """ Create a new QgsServerRequest from tornado handler request
         """
         self._request = handler.request
         if headers is None:
             # Transform request headers in single valued dict
             hdrs = self._request.headers
-            headers = { k:hdrs[k] for k in hdrs.keys() } 
-    
-        super().__init__(handler.request.uri, method=method, headers=headers)
+            headers = { k:hdrs[k].upper() for k in hdrs.keys() }
+
+        super().__init__(handler.request.uri, method={
+            'GET' : QgsServerRequest.GetMethod,
+            'PUT' : QgsServerRequest.PutMethod,
+            'POST': QgsServerRequest.PostMethod,
+            }[method], headers=headers)
        
     def data(self): 
         """ Return post/put data a QByteArray
@@ -54,8 +62,15 @@ class Response(QgsServerResponse):
         # it will automatically called at the end of the request
         # process
         self.flush()
-        if self.on_finish is not None:
-            self.on_finish(self)
+        if self._on_finish is not None:
+            try:
+                # XXX Take care not to raise python
+                # exception inside Qgis code
+                self._on_finish(self)
+            except Exception as e:
+                logging.error("Exception %s" % e)
+                traceback.print_exc()
+                self._handler.send_error()
 
     def flush(self):
         """ Write the data to the handler buffer 
@@ -91,7 +106,7 @@ class Response(QgsServerResponse):
             by setHeader, do not touch defaults headers
         """
         if key in self._headers:
-            def self._headers[key]
+            del self._headers[key]
             self._handler.clear_header(key)
    
     def sendError(self, code, message=None):
@@ -100,14 +115,14 @@ class Response(QgsServerResponse):
         self._handler.send_error(status_code=code, reason=message)
 
     def setHeader( self, key, value):
-        self._handler.setHeader(key, value)
+        self._handler.set_header(key, value)
 
-    def data(self)
+    def data(self):
         """ Return buffer data
         """
         return self._buffer.data()
 
-    def _clearHeader(self):
+    def _clearHeaders(self):
         """ Clear headers set so far
         """
         for k in self._headers:
@@ -117,9 +132,9 @@ class Response(QgsServerResponse):
  
     def clear(self):
         self._clearHeaders()
-        self._truncate()
+        self.truncate()
 
-    def headerSent(self):
+    def headersSent(self):
         return self._header_written
         
     def truncate(self):

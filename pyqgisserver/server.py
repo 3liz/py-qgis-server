@@ -1,20 +1,22 @@
 import os
+import traceback
+import logging
 from tornado.web import StaticFileHandler
 from .runtime import read_configuration, run_application_context
 from .version import __description__, __version__
 from .config import get_config, validate_config_path
 
-from qgistools.app import start_qgis_application, setup_qgis_paths
+from qgistools.app import start_qgis_application
 
 def configure_handlers():
     """
     """
-    from .handlers import (RootHandler)
+    from .handlers import (RootHandler, QgsServerHandler)
     handlers = []
 
-
     handlers.extend([
-        (r"/", RootHandler),
+        (r"/"   , RootHandler),
+        (r"/wms", QgsServerHandler)
     ])
 
     return handlers
