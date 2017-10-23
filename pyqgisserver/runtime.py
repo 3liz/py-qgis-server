@@ -19,7 +19,7 @@ from contextlib import contextmanager
 from .logger import log_request, log_rrequest, setup_log_handler
 from .config import get_config, load_configuration, read_config_file, read_config_dict
 
-LOGGER=logging.getLogger('QGSSRV')
+LOGGER=logging.getLogger('QGSRV')
 
 def print_version(config):
     from .version import __version__

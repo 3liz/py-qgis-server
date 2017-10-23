@@ -7,6 +7,9 @@ from qgis.PyQt.QtCore import QBuffer, QIODevice
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
+from contextlib import contextmanager
+
+LOGGER = logging.getLogger('QGSRV')
 
 class Request(QgsServerRequest):
 
@@ -29,6 +32,8 @@ class Request(QgsServerRequest):
         """ Return post/put data a QByteArray
         """
         return QByteArray(self._request.body)
+
+
 
 
 class Response(QgsServerResponse):
@@ -57,20 +62,25 @@ class Response(QgsServerResponse):
     def statusCode(self):
         return self._handler.get_status()
 
+    @contextmanager
+    def _catch(self):
+        # XXX Take care not to raise python
+        # exception inside Qgis code
+        try:
+            yield
+        except Exception as e:
+            LOGGER.error("Caught Exception: %s" % e)
+            traceback.print_exc()
+            self._handler.send_error()
+
     def finish(self):
         # Do not call handler.finish() because
         # it will automatically called at the end of the request
         # process
         self.flush()
         if self._on_finish is not None:
-            try:
-                # XXX Take care not to raise python
-                # exception inside Qgis code
-                self._on_finish(self)
-            except Exception as e:
-                logging.error("Exception %s" % e)
-                traceback.print_exc()
-                self._handler.send_error()
+            with self._catch():
+               self._on_finish(self)
 
     def flush(self):
         """ Write the data to the handler buffer 
@@ -79,10 +89,12 @@ class Response(QgsServerResponse):
         self._buffer.seek(0)
         bytesAvail = self._buffer.bytesAvailable()
         if bytesAvail:
-            self._handler.write(str(self._buffer.data()))
-            self._buffer.buffer().clear()
-        self._handler.flush()
-        self._header_written = True
+            with self._catch():
+                self._handler.write( bytes(self._buffer.data()) )
+                self._buffer.buffer().clear()
+                self._handler.flush()
+                self._header_written = True
+
 
     def header(self, key):
         return self._headers.get(key)
