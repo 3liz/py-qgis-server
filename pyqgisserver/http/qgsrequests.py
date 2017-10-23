@@ -1,0 +1,129 @@
+""" Http qgis requests interfare to tornado requests handlers
+"""
+from qgis.PyQt.QtCore import QBuffer, QIODevice
+from qgis.server import (QgsServerRequest,
+                         QgsServerResponse)
+
+class Request(QgsServerRequest):
+    
+    def __init__(self, handler, headers=None, method=QgsServerRequest.GetMethod ):
+        """ Create a new QgsServerRequest from tornado handler request
+        """
+        self._request = handler.request
+        if headers is None:
+            # Transform request headers in single valued dict
+            hdrs = self._request.headers
+            headers = { k:hdrs[k] for k in hdrs.keys() } 
+    
+        super().__init__(handler.request.uri, method=method, headers=headers)
+       
+    def data(self): 
+        """ Return post/put data a QByteArray
+        """
+        return QByteArray(self._request.body)
+
+
+class Response(QgsServerResponse):
+    """ Adaptor to Tornado handler response
+
+        We keep our own buffer because we do not have
+        acces to the handler internal buffer.
+
+        The date is written at 'flush()' call.
+    """
+
+    def __init__(self, handler, on_finish=None):
+        super().__init__()
+        self._handler = handler
+        self._buffer = QBuffer()
+        self._buffer.open(QIODevice.ReadWrite)
+        self._on_finish = on_finish
+
+        # keep track of header sets
+        self._headers = {}
+        self._header_written = False
+
+    def setStatusCode(self, code):
+        self._handler.set_status(code)
+
+    def statusCode(self):
+        return self._handler.get_status()
+
+    def finish(self):
+        # Do not call handler.finish() because
+        # it will automatically called at the end of the request
+        # process
+        self.flush()
+        if self.on_finish is not None:
+            self.on_finish(self)
+
+    def flush(self):
+        """ Write the data to the handler buffer 
+            and flush the socket
+        """
+        self._buffer.seek(0)
+        bytesAvail = self._buffer.bytesAvailable()
+        if bytesAvail:
+            self._handler.write(str(self._buffer.data()))
+            self._buffer.buffer().clear()
+        self._handler.flush()
+        self._header_written = True
+
+    def header(self, key):
+        return self._headers.get(key)
+
+    def headers(self):
+        """ Return headers as dict
+        """
+        return self._headers
+        
+    def io(self):
+        return self._buffer
+
+    def setHeader(self, key, value):
+        self._headers[key] = value
+        self._handler.set_header(key,value)
+
+    def removeHeader(self, key):
+        """ Remove header
+
+            Remove only header which has been set
+            by setHeader, do not touch defaults headers
+        """
+        if key in self._headers:
+            def self._headers[key]
+            self._handler.clear_header(key)
+   
+    def sendError(self, code, message=None):
+        """
+        """
+        self._handler.send_error(status_code=code, reason=message)
+
+    def setHeader( self, key, value):
+        self._handler.setHeader(key, value)
+
+    def data(self)
+        """ Return buffer data
+        """
+        return self._buffer.data()
+
+    def _clearHeader(self):
+        """ Clear headers set so far
+        """
+        for k in self._headers:
+            self._handler.clear_header(key)
+        # Reset headers
+        self._headers = {}
+ 
+    def clear(self):
+        self._clearHeaders()
+        self._truncate()
+
+    def headerSent(self):
+        return self._header_written
+        
+    def truncate(self):
+        self._buffer.seek(0)
+        self._buffer.buffer().clear()
+
+
