@@ -40,16 +40,19 @@ test:
 
 
 PIP_CONFIG_FILE:=pip.conf
-TEST_COMMAND:=./run_tests.sh
+BECOME_USER:=$(shell id -u)
 
 docker-test:
+	mkdir -p $(HOME)/.local
 	docker run --rm --name qgis3-py-server-test-$(COMMITID) -w /src \
+		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
+		-v $(HOME)/.local:/.local \
 		-v $(HOME)/.config/pip:/.pipconf  \
 		-v $(HOME)/.cache/pip:/.pipcache \
 		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
 		-e PIP_CACHE_DIR=/.pipcache \
-		$(QGIS_IMAGE) $(TEST_COMMAND)
+		$(QGIS_IMAGE) ./run_tests.sh
 
 WORKERS:=1
 
