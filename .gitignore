@@ -25,4 +25,6 @@ __output__
 *.orig
 .coverage
 
+# Test log
+docker-test.log
 

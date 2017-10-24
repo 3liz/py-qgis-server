@@ -40,7 +40,7 @@ test:
 
 
 PIP_CONFIG_FILE:=pip.conf
-TEST_COMMAND:=run_tests.sh
+TEST_COMMAND:=./run_tests.sh
 
 docker-test:
 	docker run --rm --name qgis3-py-server-test-$(COMMITID) -w /src \

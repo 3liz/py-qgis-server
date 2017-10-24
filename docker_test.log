@@ -1,0 +1,66 @@
+Log level set to DEBUG
+
+2017-10-24 13:32:16,592	INFO	[31]	Binding on port 127.0.0.1:8080
+WARNING: Auth db query exec() FAILED
+/usr/lib/python3/dist-packages/osgeo/__init__.py:8: PendingDeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses
+  import imp
+2017-10-24 13:32:17,423	REQ	[34]	127.0.0.1	200	GET	/	0	340	python-requests/2.18.4	
+ERROR 6: No translation for an empty SRS to PROJ.4 format is known.
+ERROR 6: No translation for an empty SRS to PROJ.4 format is known.
+ERROR 6: No translation for an empty SRS to PROJ.4 format is known.
+Initializing server modules from  "/usr/lib/qgis/server" 
+
+"Checking /usr/lib/qgis/server for native services modules"
+"Loading native module /usr/lib/qgis/server/libdummy.so"
+Qgis: : Adding service SampleService 1.0
+"Loading native module /usr/lib/qgis/server/libwcs.so"
+Qgis: : Adding service WCS 1.0.0
+"Loading native module /usr/lib/qgis/server/libwfs.so"
+Qgis: : Adding service WFS 1.1.0
+"Loading native module /usr/lib/qgis/server/libwms.so"
+Qgis: : Adding service WMS 1.3.0
+Qgis: : Capabilities document not found in cache
+QUrl: QUrl::FullyDecoded is not permitted when reconstructing the full URL
+QUrl: QUrl::FullyDecoded is not permitted when reconstructing the full URL
+QUrl: QUrl::FullyDecoded is not permitted when reconstructing the full URL
+2017-10-24 13:32:17,497	REQ	[34]	127.0.0.1	200	GET	/wms?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities	67	-1	python-requests/2.18.4	
+QUrl: QUrl::FullyDecoded is not permitted when reconstructing the full URL
+2017-10-24 13:32:17,504	REQ	[34]	127.0.0.1	200	GET	/wms?MAP=france_parts.qgs&SERVICE=WFS&request=GetCapabilities	1	-1	python-requests/2.18.4	
+ERROR 6: No translation for an empty SRS to PROJ.4 format is known.
+ERROR 6: No translation for an empty SRS to PROJ.4 format is known.
+ERROR 6: No translation for an empty SRS to PROJ.4 format is known.
+Initializing server modules from  "/usr/lib/qgis/server" 
+
+"Checking /usr/lib/qgis/server for native services modules"
+"Loading native module /usr/lib/qgis/server/libdummy.so"
+/usr/lib/python3/dist-packages/osgeo/__init__.py:8: PendingDeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses
+  import imp
+Qgis: : Adding service SampleService 1.0
+"Loading native module /usr/lib/qgis/server/libwcs.so"
+Qgis: : Adding service WCS 1.0.0
+"Loading native module /usr/lib/qgis/server/libwfs.so"
+Qgis: : Adding service WFS 1.1.0
+"Loading native module /usr/lib/qgis/server/libwms.so"
+Qgis: : Adding service WMS 1.3.0
+QUrl: QUrl::FullyDecoded is not permitted when reconstructing the full URL
+2017-10-24 13:32:17,576	REQ	[35]	127.0.0.1	200	GET	/wms?MAP=france_parts.qgs&SERVICE=WCS&request=GetCapabilities	67	-1	python-requests/2.18.4	
+35: Caught signal 15
+35: Worker 1 stopped
+34: Caught signal 15
+34: Worker 0 stopped
+Application state:
+QGIS_PREFIX_PATH env var:		
+Prefix:		/usr
+Plugin Path:		/usr/lib/qgis/plugins
+Package Data Path:	/usr/share/qgis
+Active Theme Name:	
+Active Theme Path:	/root/.local/share/profiles/default//themes//icons/
+Default Theme Path:	:/images/themes/default/
+SVG Search Paths:	/usr/share/qgis/svg/
+		/root/.local/share/profiles/default/svg/
+User DB Path:	/usr/share/qgis/resources/qgis.db
+Auth DB Path:	/root/.local/share/profiles/default/qgis-auth.db
+
+Terminating child processes.
+31: Caught signal 15
+Server shutdown

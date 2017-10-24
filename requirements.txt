@@ -1,6 +1,4 @@
 tornado >= 4.3
-pyproj
-gdal
 
 qgis-python-tools
 
