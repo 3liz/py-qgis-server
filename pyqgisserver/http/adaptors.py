@@ -1,4 +1,4 @@
-""" Http qgis requests interfare to tornado requests handlers
+""" Http qgis requests/response adaptors to tornado requests handlers
 """
 import logging
 import traceback
@@ -34,8 +34,6 @@ class Request(QgsServerRequest):
         return QByteArray(self._request.body)
 
 
-
-
 class Response(QgsServerResponse):
     """ Adaptor to Tornado handler response
 
@@ -43,6 +41,12 @@ class Response(QgsServerResponse):
         acces to the handler internal buffer.
 
         The date is written at 'flush()' call.
+
+        The adaptor keep track of headers set
+        from the qgis server: only those headers 
+        can be set/unset by the caller. 
+        That way we do not stomp on specific  headers
+        sets by the framework
     """
 
     def __init__(self, handler, on_finish=None):
@@ -148,9 +152,12 @@ class Response(QgsServerResponse):
 
     def headersSent(self):
         return self._header_written
-        
+
     def truncate(self):
+        """ Truncate buffer
+        """
         self._buffer.seek(0)
         self._buffer.buffer().clear()
+
 
 

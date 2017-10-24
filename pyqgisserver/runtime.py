@@ -42,7 +42,7 @@ def read_configuration(service_name, args=None, cli_parser=None):
     load_configuration()
 
     if cli_parser:
-        conf = get_config('server')
+        conf  = get_config('server')
         cli_parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], 
                 default=get_config('logging')['level'].lower(), help="set log level")
         cli_parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
@@ -53,7 +53,7 @@ def read_configuration(service_name, args=None, cli_parser=None):
         cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=conf['interfaces'], help="Interface to bind to", dest='interface')
         cli_parser.add_argument('-w','--workers' , metavar='NUM', default=conf.getint('workers'), help="Num workers", dest='workers')
         cli_parser.add_argument('-u','--setuid'  , default='', help="uid to switch to", dest='setuid')
-        cli_parser.add_argument('--rootdir', default=conf['rootdir'], metavar='PATH', help='Path to qgis projects')
+        cli_parser.add_argument('--rootdir', default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
 
         args = cli_parser.parse_args()
 
@@ -74,7 +74,9 @@ def read_configuration(service_name, args=None, cli_parser=None):
                 'interfaces': str(args.interface),
                 'workers'   : str(args.workers),
                 'setuid'    : args.setuid,
-                'rootdir'   : args.rootdir
+            },
+            'cache': {
+                'rootdir': args.rootdir,
             },
             'logging':{
                 'level': args.logging.upper()
@@ -155,6 +157,8 @@ class Application(tornado.web.Application):
 
         LOGGER.info('Binding on port %s:%s' % (address or '*', port))
         sockets = bind_sockets(port, address=address)
+        
+        self.server = None
 
         if user:
             setuid(user)
@@ -174,8 +178,8 @@ class Application(tornado.web.Application):
         # that must be started after fork
         if task_id is not None:
             def kickstart():
-                server = HTTPServer(self)
-                server.add_sockets(sockets)
+                self.server = HTTPServer(self)
+                self.server.add_sockets(sockets)
                 asyncio.get_event_loop().run_forever()
 
             kickstart.task_id = task_id
@@ -185,6 +189,19 @@ class Application(tornado.web.Application):
         """ Write HTTP requet to the logs
         """
         log_request(handler, logger=LOGGER)        
+
+    def teardown(self):
+        """ Release resources
+        """
+        # Close sockets
+        if self.server is not None:
+            self.server.stop()
+            self.server = None
+
+        # Close event loop
+        loop = asyncio.get_event_loop()
+        if not loop.is_closed():
+            loop.close()
 
 
 @contextmanager
@@ -217,6 +234,8 @@ def run_application_context( handlers, **settings ):
    
     except SystemExit as e:
         sys.stderr.write("%s\n" % e)
+
+    app.teardown()
 
     if run is not None:
         sys.stderr.write("{}: Worker {} stopped\n".format(os.getpid(), run.task_id))

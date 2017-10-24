@@ -39,17 +39,22 @@ test:
 	cd tests && py.test -v
 
 
+PIP_CONFIG_FILE:=pip.conf
+TEST_COMMAND:=run_tests.sh
+
 docker-test:
 	docker run --rm --name qgis3-py-server-test-$(COMMITID) -w /src \
 		-v $(shell pwd):/src \
 		-v $(HOME)/.config/pip:/.pipconf  \
 		-v $(HOME)/.cache/pip:/.pipcache \
-		-e PIP_CONFIG_FILE=/.pipconf/pip.conf \
+		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
 		-e PIP_CACHE_DIR=/.pipcache \
-		$(QGIS_IMAGE) /src/run_tests.sh
+		$(QGIS_IMAGE) $(TEST_COMMAND)
+
+WORKERS:=1
 
 run:
-	qgisserver -b 127.0.0.1:8085 --rootdir=$HOME/tests/data
+	qgisserver -b 127.0.0.1 -p 8080 --rootdir=$(shell pwd)/tests/data -w $(WORKERS)
 
 # Build dependencies
 deps: dirs

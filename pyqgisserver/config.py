@@ -41,10 +41,13 @@ def load_configuration():
     CONFIG.set('server', 'port'      , getenv('QGSRV_SERVER_HTTP_PORT', '8080'))
     CONFIG.set('server', 'interfaces', getenv('QGSRV_SERVER_INTERFACES', '*'))
     CONFIG.set('server', 'workers'   , getenv('QGSRV_SERVER_WORKERS', '2'))
-    CONFIG.set('server', 'rootdir'   , getenv('QGSRV_SERVER_ROOTDIR', ''))
 
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))
+
+    CONFIG.add_section('cache')
+    CONFIG.set('cache', 'size'    , os.environ.get('QGSRV_CACHE_SIZE','10' ))
+    CONFIG.set('cache', 'rootdir' , os.environ.get('QGSRV_CACHE_ROOTDIR',''))
 
 
 def read_config_dict( userdict ):
