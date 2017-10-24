@@ -35,8 +35,10 @@ manifest:
 		echo buildid=$(BUILDID)   >> $(MANIFEST) && \
 		echo commitid=$(COMMITID) >> $(MANIFEST)
 
+SERVER_HOST:=localhost:8080
+
 test:
-	cd tests && py.test -v
+	cd tests && py.test -v --host=$(SERVER_HOST)
 
 
 PIP_CONFIG_FILE:=pip.conf

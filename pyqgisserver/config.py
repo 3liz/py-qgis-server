@@ -39,7 +39,7 @@ def load_configuration():
 
     CONFIG.add_section('server')
     CONFIG.set('server', 'port'      , getenv('QGSRV_SERVER_HTTP_PORT', '8080'))
-    CONFIG.set('server', 'interfaces', getenv('QGSRV_SERVER_INTERFACES', '*'))
+    CONFIG.set('server', 'interfaces', getenv('QGSRV_SERVER_INTERFACES', '0.0.0.0'))
     CONFIG.set('server', 'workers'   , getenv('QGSRV_SERVER_WORKERS', '2'))
 
     CONFIG.add_section('logging')

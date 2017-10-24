@@ -5,7 +5,7 @@ import logging
 from tornado.web import StaticFileHandler
 from .runtime import read_configuration, run_application_context
 from .version import __description__, __version__
-from .config import get_config, validate_config_path
+from .config import get_config, validate_config_path, read_config_dict
 
 from qgistools.app import start_qgis_application
 
@@ -46,7 +46,12 @@ def main():
 
     version_tag = "Qgis WMS/WFS server/{}".format(__version__)
 
-    read_configuration("qgisserver", cli_parser=argparse.ArgumentParser(description=__description__))
+    parser = argparse.ArgumentParser(description=__description__)
+    parser.add_argument('--rootdir', default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
+
+    args = read_configuration(cli_parser=parser)
+    read_config_dict({'cache': { 'rootdir': args.rootdir }})
+
     handlers = configure_handlers()
 
     validate_config_path('cache','rootdir')

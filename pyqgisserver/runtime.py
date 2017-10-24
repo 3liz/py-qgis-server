@@ -21,23 +21,20 @@ from .config import get_config, load_configuration, read_config_file, read_confi
 
 LOGGER=logging.getLogger('QGSRV')
 
+
 def print_version(config):
     from .version import __version__
     program = os.path.basename(sys.argv[0])
     print("{name} {version}".format(name=program, version=__version__))
 
 
-cli_arguments = None
-
-
-def read_configuration(service_name, args=None, cli_parser=None):
+def read_configuration(args=None, cli_parser=None):
     """ Parse command line and read configuration file
     """
     if args is None:
         args = sys.argv
 
     config_file = None
-    cli_config  = None
 
     load_configuration()
 
@@ -53,16 +50,12 @@ def read_configuration(service_name, args=None, cli_parser=None):
         cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=conf['interfaces'], help="Interface to bind to", dest='interface')
         cli_parser.add_argument('-w','--workers' , metavar='NUM', default=conf.getint('workers'), help="Num workers", dest='workers')
         cli_parser.add_argument('-u','--setuid'  , default='', help="uid to switch to", dest='setuid')
-        cli_parser.add_argument('--rootdir', default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
 
         args = cli_parser.parse_args()
 
         if args.version:
             print_version(config)
             sys.exit(1)
-
-        global cli_arguments
-        cli_arguments = args
 
         log_level = args.logging
         if args.config:
@@ -75,22 +68,20 @@ def read_configuration(service_name, args=None, cli_parser=None):
                 'workers'   : str(args.workers),
                 'setuid'    : args.setuid,
             },
-            'cache': {
-                'rootdir': args.rootdir,
-            },
             'logging':{
                 'level': args.logging.upper()
             }
         }
 
+        # read configuration dict
+        read_config_dict(cli_config)
+
     # set log level
     setup_log_handler(log_level, logger=LOGGER)
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
 
-    # read configuration file
-    read_config_dict(cli_config)
-
-
+    return args
+    
 
 class HTTPError2(tornado.web.HTTPError):
     def __init__(self, status_code=500, log_message=None, *args, **kwargs):
