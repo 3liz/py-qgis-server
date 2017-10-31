@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 from qgistools.cache.filecache import FileCache
 from qgistools.utils import singleton
 
+from .runtime import HTTPError2
 from .config import get_config
 
 LOGGER = logging.getLogger('QGSSRV')
@@ -39,7 +40,9 @@ class _Cache(FileCache):
 
 def cache_lookup( path ):
     c = _Cache()
-    return c.lookup(path)
-
+    try:
+        return c.lookup(path)
+    except FileNotFoundError:
+        raise HTTPError2(404, "map '%s' no found" % path) 
 
 
