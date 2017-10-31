@@ -1,4 +1,4 @@
-""" Http qgis requests/response adaptors to tornado requests handlers
+""" Http qgis requests/response adapters to tornado http requests handlers
 """
 import logging
 import traceback

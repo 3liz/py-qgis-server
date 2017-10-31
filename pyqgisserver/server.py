@@ -18,8 +18,8 @@ def configure_handlers():
     handlers = []
 
     handlers.extend([
-        (r"/"   , RootHandler),
-        (r"/wms", QgsServerHandler)
+        (r"/"    , RootHandler),
+        (r"/services/", QgsServerHandler)
     ])
 
     return handlers
@@ -51,10 +51,10 @@ def main():
 
     args = read_configuration(cli_parser=parser)
     read_config_dict({'cache': { 'rootdir': args.rootdir }})
+    validate_config_path('cache','rootdir')
 
     handlers = configure_handlers()
 
-    validate_config_path('cache','rootdir')
     try:
         with run_application_context(handlers) as task_id:
             if task_id is not None:

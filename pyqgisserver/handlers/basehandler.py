@@ -67,7 +67,7 @@ class BaseHandler(tornado.web.RequestHandler):
                errid = "http_error"
             else:
                 errid   = "exception"
-                message = message or "{}".format(exception)
+            message = "{}".format(exception)
         else:
             errid = kwargs.get("id","unknown_error")
                

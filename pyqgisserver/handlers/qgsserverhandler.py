@@ -23,19 +23,19 @@ from qgistools.utils import singleton
 #
 
 @singleton 
-class Adaptors:
+class Adapters:
     def __init__(self):
-        from pyqgisserver.http import adaptors
+        from pyqgisserver.http import adapters
         from qgis.server import QgsServer
         
         self.server = QgsServer()
         
-        def _make_adaptors(handler, method):
-            return adaptors.Request(handler, method=method), adaptors.Response(handler)
-        self._make_adaptors = _make_adaptors
+        def _make_adapters(handler, method):
+            return adapters.Request(handler, method=method), adapters.Response(handler)
+        self._make_adapters = _make_adapters
 
     def __call__(self, handler, method, project=None):
-        self.server.handleRequest(*self._make_adaptors(handler, method), project=project)
+        self.server.handleRequest(*self._make_adapters(handler, method), project=project)
 
 
 class QgsServerHandler(BaseHandler):
@@ -44,14 +44,14 @@ class QgsServerHandler(BaseHandler):
     """
     def initialize(self):
         super().initialize()
-
         self.conf = get_config('server')
         
+    def prepare(self):
         project = cache_lookup( self.get_query_argument('MAP'))
 
-        adaptors = Adaptors()
-        self.handleRequest = lambda m: adaptors(self,m,project)
-       
+        adapters = Adapters()
+        self.handleRequest = lambda m: adapters(self,m,project)
+
     def get(self):
         """ Handle Get method
         """
