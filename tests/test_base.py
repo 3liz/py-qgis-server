@@ -40,6 +40,16 @@ def test_map_not_found_return_404( host ):
     rv = requests.get("http://{}/services/?MAP=i_do_not_exists.qgs&SERVICE=WFS&request=GetCapabilities".format( host ))
     assert rv.status_code == 404
 
+def test_protocol_resolution( host ):
+    """ Test that custom protocol is correctly resolved
+    """
+    rv = requests.get("http://{}/services/?MAP=test:france_parts.qgs&SERVICE=WFS&request=GetCapabilities".format( host ))
+    assert rv.status_code == 200
 
+def test_unknown_protocol_is_404( host ):
+    """ Test that custom protocol is correctly resolved
+    """
+    rv = requests.get("http://{}/services/?MAP=fail:france_parts.qgs&SERVICE=WFS&request=GetCapabilities".format( host ))
+    assert rv.status_code == 404
 
 

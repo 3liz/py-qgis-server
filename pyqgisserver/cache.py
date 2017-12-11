@@ -14,7 +14,7 @@ from qgistools.utils import singleton
 from .runtime import HTTPError2
 from .config import get_config
 
-LOGGER = logging.getLogger('QGSSRV')
+LOGGER = logging.getLogger('QGSRV')
 
 @singleton
 class _Cache(FileCache):
@@ -24,10 +24,40 @@ class _Cache(FileCache):
         cachesize = config.getint('size')
         rootdir   = Path(config['rootdir'])
 
+        protocols = {}
+
+        def get_protocol_path(scheme):
+            """ Resolve protocol path
+            """
+            LOGGER.debug("Resolving '%s' protocol", scheme)
+            rootpath = protocols.get(scheme)
+            if not rootpath:
+                varname  = "QGSRV_%s_PROTOCOL" % scheme.replace('-','_').upper()
+                LOGGER.debug("Lookup scheme '%s' in variable variable %s", scheme, varname) 
+                rootpath = os.environ.get(varname)
+                if not rootpath:
+                    LOGGER.error('Undefined protocol %s' % scheme)
+                    raise FileNotFoundError(scheme)
+                rootpath = Path(rootpath)
+                # XXX Security concern
+                if not rootpath.is_absolute():
+                    raise ValueError("protocol path must be absolute not %s" % rootpath)
+                protocols[scheme] = rootpath
+            return rootpath
+
         class _Store:
             def getpath(self, key, exists=False):
-                path = rootdir / key
-                if not path.exists():
+                
+                key = urlparse(key)
+                if not key.scheme or key.scheme == 'file':
+                    rootpath = rootdir
+                else:
+                    rootpath = get_protocol_path(key.scheme)
+                
+                key = key.path.strip('/')
+                path = rootpath / key
+                path = path.with_suffix('.qgs')
+                if not path.is_file():
                     raise FileNotFoundError(str(path))
 
                 # Get modification time for the file

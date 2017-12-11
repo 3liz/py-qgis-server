@@ -4,12 +4,9 @@ import sys
 
 import asyncio
 
-from tornado.ioloop import IOLoop
-
 import tornado.web
 import tornado.process
 
-from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 
 import logging
@@ -206,7 +203,6 @@ def run_application_context( handlers, **settings ):
     """
     import traceback
 
-    task_id = None
     app = Application(handlers, **settings)
     config = get_config('server')
 

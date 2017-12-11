@@ -1,4 +1,3 @@
-.PHONY: tests
 # 
 # qgis server makefile
 #
@@ -54,7 +53,22 @@ docker-test:
 		-v $(HOME)/.cache/pip:/.pipcache \
 		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
 		-e PIP_CACHE_DIR=/.pipcache \
+		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		$(QGIS_IMAGE) ./run_tests.sh
+
+docker-run:
+	mkdir -p $(HOME)/.local
+	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis3-py-server-run-$(COMMITID) -w /src \
+		-u $(BECOME_USER) \
+		-v $(shell pwd):/src \
+		-v $(HOME)/.local:/.local \
+		-v $(HOME)/.config/pip:/.pipconf  \
+		-v $(HOME)/.cache/pip:/.pipcache \
+		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
+		-e PIP_CACHE_DIR=/.pipcache \
+		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		$(QGIS_IMAGE) ./run_setup.sh
+
 
 WORKERS:=1
 
