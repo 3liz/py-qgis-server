@@ -19,7 +19,7 @@ def configure_handlers():
 
     handlers.extend([
         (r"/"    , RootHandler),
-        (r"/services/", QgsServerHandler)
+        (r"/ows/", QgsServerHandler)
     ])
 
     return handlers
