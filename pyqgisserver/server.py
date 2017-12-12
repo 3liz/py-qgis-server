@@ -44,7 +44,6 @@ def main():
     """
     import argparse
 
-    version_tag = "Qgis WMS/WFS server/{}".format(__version__)
 
     parser = argparse.ArgumentParser(description=__description__)
     parser.add_argument('--rootdir', default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')

@@ -19,7 +19,7 @@ from .config import get_config, load_configuration, read_config_file, read_confi
 LOGGER=logging.getLogger('QGSRV')
 
 
-def print_version(config):
+def print_version():
     from .version import __version__
     program = os.path.basename(sys.argv[0])
     print("{name} {version}".format(name=program, version=__version__))
@@ -51,7 +51,7 @@ def read_configuration(args=None, cli_parser=None):
         args = cli_parser.parse_args()
 
         if args.version:
-            print_version(config)
+            print_version()
             sys.exit(1)
 
         log_level = args.logging
@@ -72,6 +72,8 @@ def read_configuration(args=None, cli_parser=None):
 
         # read configuration dict
         read_config_dict(cli_config)
+
+    print_version()
 
     # set log level
     setup_log_handler(log_level, logger=LOGGER)
