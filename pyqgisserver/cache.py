@@ -67,6 +67,9 @@ class _Cache(FileCache):
         # Init FileCache
         super().__init__(size=cachesize, store=_Store())  
 
+    def on_cache_update(self, key, path):
+        LOGGER.info("Cache '%s' updated with path: %s" % (key,path)) 
+
 
 def cache_lookup( path ):
     c = _Cache()

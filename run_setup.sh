@@ -2,6 +2,10 @@
 
 set -e
 
+# Uninstall this in order to get
+# latest commit
+pip3 uninstall -y qgis-python-tools
+
 pip3 install -U --user setuptools
 pip3 install -U --user -r requirements.pip
 pip3 install -U --user -r requirements.txt

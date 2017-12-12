@@ -3,6 +3,8 @@
 import logging
 import traceback
 
+from urllib.parse import urlparse
+
 from qgis.PyQt.QtCore import QBuffer, QIODevice
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
@@ -17,12 +19,20 @@ class Request(QgsServerRequest):
         """ Create a new QgsServerRequest from tornado handler request
         """
         self._request = handler.request
+        location = self._request.headers.get('X-Proxy-Location')
+        if location:
+            location += '?'+self._request.query
+        else:
+            location = self._request.full_url()
+
         if headers is None:
             # Transform request headers in single valued dict
             hdrs = self._request.headers
             headers = { k:hdrs[k].upper() for k in hdrs.keys() }
 
-        super().__init__(handler.request.uri, method={
+        LOGGER.debug("Using url location %s", location)
+
+        super().__init__(location, method={
             'GET' : QgsServerRequest.GetMethod,
             'PUT' : QgsServerRequest.PutMethod,
             'POST': QgsServerRequest.PostMethod,
