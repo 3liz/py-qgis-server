@@ -51,4 +51,9 @@ def test_proxy_location( host ):
     assert href.hostname == urlref.hostname
     assert href.path     == urlref.path
     
-
+def test_lower_case_query_params( host ):
+    """ Test that we support lower case query param
+    """
+    urlref = "http://{}/ows/?map=france_parts.qgs&SERVICE=WMS&request=GetCapabilities".format( host )
+    rv = requests.get( urlref )
+    assert rv.status_code == 200    

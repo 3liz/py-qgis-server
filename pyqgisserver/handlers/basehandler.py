@@ -21,6 +21,9 @@ class BaseHandler(tornado.web.RequestHandler):
         self.connection_closed = False
         self.logger = LOGGER
 
+        # Convert query arguments to upper case:
+        self.request.query_arguments.update( [(k.upper(), v) for (k,v) in self.request.query_arguments.items()] )
+
     def compute_etag(self):
         # Disable etag computation
         pass
@@ -62,7 +65,6 @@ class BaseHandler(tornado.web.RequestHandler):
             # Error was caused by a exception
             if isinstance(exception, HTTPError2):
                errid = exception.kwargs.get("id","http_error")
-               self.logger.error("%s", message)
             elif isinstance(exception, HTTPError):
                errid = "http_error"
             else:
@@ -71,6 +73,7 @@ class BaseHandler(tornado.web.RequestHandler):
         else:
             errid = kwargs.get("id","unknown_error")
                
+        self.logger.error("%s", message)
         response = dict(status="error" if status_code != 200 else "ok",
                         httpcode = status_code,
                         error    = {'id': errid, "message": message })
