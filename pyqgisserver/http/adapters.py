@@ -65,6 +65,8 @@ class Response(QgsServerResponse):
         self._buffer = QBuffer()
         self._buffer.open(QIODevice.ReadWrite)
         self._on_finish = on_finish
+        self._numbytes = 0
+        self._finish = False
 
         # keep track of header sets
         self._headers = {}
@@ -91,6 +93,9 @@ class Response(QgsServerResponse):
         # Do not call handler.finish() because
         # it will automatically called at the end of the request
         # process
+        if not self._header_written:
+            self._finish = True
+            self._handler.set_header('Content-Length', self._numbytes)
         self.flush()
         if self._on_finish is not None:
             with self._catch():
@@ -103,6 +108,9 @@ class Response(QgsServerResponse):
         self._buffer.seek(0)
         bytesAvail = self._buffer.bytesAvailable()
         if bytesAvail:
+            self._numbytes += bytesAvail
+            if self._finish:
+                self._handler.set_header('Content-Length', self._numbytes)
             with self._catch():
                 self._handler.write( bytes(self._buffer.data()) )
                 self._buffer.buffer().clear()
