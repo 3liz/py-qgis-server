@@ -4,7 +4,7 @@
 import requests
 
 
-def test_getmay_request( host ):
+def test_getmap_request( host ):
     """ Test response from root path
     """
     url = ('/ows/?bbox=-621646.696284,5795001.359349,205707.697759,6354520.406319&crs=EPSG:3857'
