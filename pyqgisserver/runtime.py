@@ -24,7 +24,8 @@ def print_version():
     from qgistools.version import __version__ as qgistools_version
     program = os.path.basename(sys.argv[0])
     print("{name} {version} (qgis tools: {toolsversion})".format(name=program, version=__version__, 
-                                                                 toolsversion=qgistools_version))
+                                                                 toolsversion=qgistools_version), 
+                                                                 file=sys.stderr)
 
 
 def read_configuration(args=None, cli_parser=None):
