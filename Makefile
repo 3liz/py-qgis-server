@@ -67,6 +67,7 @@ docker-run:
 		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		-e QGSRV_LOGGING_LEVEL=DEBUG \
 		$(QGIS_IMAGE) ./run_setup.sh
 
 

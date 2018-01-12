@@ -25,25 +25,10 @@ def configure_handlers():
     return handlers
 
 
-def set_server_loglevel():
-    """ Set environment variable QGIS_SERVER_LOG_LEVEL
-    """
-    loglevel = LOGGER.level
-    if loglevel <= logging.DEBUG:
-        level='0'
-    elif loglevel <= logging.WARNING:
-        level='1'
-    else:
-        level=2
-        
-    os.environ['QGIS_SERVER_LOG_LEVEL'] = level
- 
-
 def main():
     """ Run server loop
     """
     import argparse
-
 
     parser = argparse.ArgumentParser(description=__description__)
     parser.add_argument('--rootdir', default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
@@ -57,9 +42,8 @@ def main():
     try:
         with run_application_context(handlers) as task_id:
             if task_id is not None:
-                # Configure extra stuff after fork
-               set_server_loglevel()
-               start_qgis_application( enable_processing=True, verbose=LOGGER.level<=logging.DEBUG)
+               # Configure extra stuff after fork
+               start_qgis_application( enable_processing=True, logger=LOGGER, verbose=LOGGER.level<=logging.DEBUG)
     finally:
         pass
 
