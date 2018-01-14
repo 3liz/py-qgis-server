@@ -1,6 +1,7 @@
 """ Qgis server handler
 """
 import os
+import logging
 
 from ..config import get_config
 from ..cache import cache_lookup
@@ -8,6 +9,8 @@ from ..cache import cache_lookup
 from .basehandler import BaseHandler
 
 from qgistools.utils import singleton
+
+LOGGER = logging.getLogger('QGSRV')
 
 # Define lazy constructor to our QgsServer
 #@singleton
@@ -42,14 +45,21 @@ class QgsServerHandler(BaseHandler):
 
     """ Proxy to Qgis server handler
     """
+
+    @staticmethod
+    def init_server():
+        LOGGER.debug("Initializing server")
+        adapters = Adapters()
+        return adapters.server
+
     def initialize(self):
         super().initialize()
         self.conf = get_config('server')
         
     def prepare(self):
-        project = cache_lookup( self.get_query_argument('MAP'))
-
         adapters = Adapters()
+        project  = cache_lookup( self.get_query_argument('MAP'))
+
         self.handleRequest = lambda m: adapters(self,m,project)
 
     def get(self):
