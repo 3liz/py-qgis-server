@@ -49,6 +49,18 @@ class QgsServerHandler(BaseHandler):
     @staticmethod
     def init_server():
         LOGGER.debug("Initializing server")
+
+        # XXX HACK issue a dummy request for initializing 
+        # network stuff
+        from qgis.core import QgsProviderRegistry
+        wmsuri = ("contextualWMSLegend=0&crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/jpeg"
+          "&layers=s2cloudless&styles&amp;tileMatrixSet=s2cloudless-wmsc-14"
+          "&url=http://localhost:8080/?" )
+       
+        # XXX This will fail with a timeout, subesquent requests should
+        # be ok then.
+        provider = QgsProviderRegistry.instance().createProvider( "wms", wmsuri )
+
         adapters = Adapters()
         return adapters.server
 
