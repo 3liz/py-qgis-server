@@ -46,8 +46,11 @@ def load_configuration():
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))
 
     CONFIG.add_section('cache')
-    CONFIG.set('cache', 'size'    , os.environ.get('QGSRV_CACHE_SIZE','10' ))
-    CONFIG.set('cache', 'rootdir' , os.environ.get('QGSRV_CACHE_ROOTDIR',''))
+    CONFIG.set('cache', 'size'    , getenv('QGSRV_CACHE_SIZE','10' ))
+    CONFIG.set('cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
+
+    CONFIG.add_section('qgis')
+    CONFIG.set('qgis', 'network_timeout', getenv('QGSRV_QGIS_NETWORK_TIMEOUT','20000'))
 
 
 def read_config_dict( userdict ):
