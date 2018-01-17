@@ -50,8 +50,9 @@ class QgsServerHandler(BaseHandler):
     def init_server():
         LOGGER.debug("Initializing server")
 
-        # XXX HACK issue a dummy request for initializing 
+        # XXX HACK issue a dummy request for initializing
         # network stuff
+        # This is a workaround to https://issues.qgis.org/issues/17866
         from qgis.core import QgsProviderRegistry
         from qgis.PyQt.QtCore import QSettings
 
