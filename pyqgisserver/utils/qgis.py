@@ -122,4 +122,30 @@ def install_logger_hook( logger, logprefix, verbose=False ):
     messageLog.messageReceived.connect( writelogmessage )
 
 
+def init_qgis_server(network_timeout=20000, **kwargs):
+    """ Init Qgis server
+    """
+    start_qgis_application(**kwargs)
+
+    # XXX HACK issue a dummy request for initializing
+    # network stuff
+    # This is a workaround to https://issues.qgis.org/issues/17866
+    from qgis.core import QgsProviderRegistry
+    from qgis.PyQt.QtCore import QSettings
+
+    wmsuri = ("contextualWMSLegend=0&crs=EPSG:4326&dpiMode=7&featureCount=10&format=image/jpeg"
+      "&layers=s2cloudless&styles&amp;tileMatrixSet=s2cloudless-wmsc-14"
+      "&url=http://localhost:8080/?" )
+   
+    # XXX This will fail with a timeout, subesquent requests should
+    # be ok then
+    s = QSettings()
+    s.setValue('/qgis/networkAndProxy/networkTimeout', 3000)
+    provider = QgsProviderRegistry.instance().createProvider( "wms", wmsuri )
+
+    # Set configuration settings
+    s.setValue( '/qgis/networkAndProxy/networkTimeout', network_timeout)
+
+    from qgis.server import QgsServer
+    return  QgsServer()
 
