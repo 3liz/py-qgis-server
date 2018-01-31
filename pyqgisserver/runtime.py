@@ -7,13 +7,11 @@ import asyncio
 import tornado.web
 import tornado.process
 
-from tornado.httpclient import AsyncHTTPClient
-
 import logging
 import signal
 
 from contextlib import contextmanager
-from .logger import log_request, log_rrequest, setup_log_handler
+from .logger import log_request, setup_log_handler
 from .config import get_config, load_configuration, read_config_file, read_config_dict
 
 LOGGER=logging.getLogger('QGSRV')
@@ -21,11 +19,8 @@ LOGGER=logging.getLogger('QGSRV')
 
 def print_version():
     from .version import __version__
-    from qgistools.version import __version__ as qgistools_version
     program = os.path.basename(sys.argv[0])
-    print("{name} {version} (qgis tools: {toolsversion})".format(name=program, version=__version__, 
-                                                                 toolsversion=qgistools_version), 
-                                                                 file=sys.stderr)
+    print("{name} {version}".format(name=program, version=__version__,file=sys.stderr))
 
 
 def read_configuration(args=None, cli_parser=None):
@@ -79,35 +74,11 @@ def read_configuration(args=None, cli_parser=None):
     print_version()
 
     # set log level
-    setup_log_handler(log_level, logger=LOGGER)
+    setup_log_handler(log_level)
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
 
     return args
     
-
-class HTTPError2(tornado.web.HTTPError):
-    def __init__(self, status_code=500, log_message=None, *args, **kwargs):
-        super(HTTPError2,self).__init__(status_code=status_code,
-                                        log_message=log_message,
-                                        *args,**kwargs)
-        self.kwargs = kwargs
-
-
-
-async def wget(url, **kwargs):
-    """ Return an async request
-    """
-    http_client = AsyncHTTPClient()
-    response = await http_client.fetch(url, raise_error=False, **kwargs)
-    log_rrequest(response)
-    links = [{"href": url}]
-    if response.code == 599:
-        raise HTTPError2(504, id="backend_timeout", links=links)  
-    elif response.code != 200:
-       raise HTTPError2(502, id="backend_error", links=links)
-
-    return response
-
 
 def terminate_handler(signum, frame):
     """ Terminate child processes """
@@ -181,7 +152,7 @@ class Application(tornado.web.Application):
     def log_request(self, handler):
         """ Write HTTP requet to the logs
         """
-        log_request(handler, logger=LOGGER)        
+        log_request(handler)        
 
     def teardown(self):
         """ Release resources

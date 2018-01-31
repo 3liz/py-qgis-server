@@ -5,10 +5,9 @@ import logging
 
 from ..config import get_config
 from ..cache import cache_lookup
+from ..utils.decorators import singleton
 
 from .basehandler import BaseHandler
-
-from qgistools.utils import singleton
 
 LOGGER = logging.getLogger('QGSRV')
 

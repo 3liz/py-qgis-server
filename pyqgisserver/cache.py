@@ -8,10 +8,10 @@ from pathlib import Path
 from datetime import datetime
 from urllib.parse import urlparse
 
-from qgistools.cache.filecache import FileCache
-from qgistools.utils import singleton
+from .utils.filecache import FileCache
+from .utils.decorators import singleton
 
-from .runtime import HTTPError2
+from .exceptions import HTTPError2
 from .config import get_config
 
 LOGGER = logging.getLogger('QGSRV')

@@ -7,7 +7,7 @@ from .runtime import read_configuration, run_application_context
 from .version import __description__, __version__
 from .config import get_config, validate_config_path, read_config_dict
 
-from qgistools.app import start_qgis_application
+from .utils.qgisapp import start_qgis_application
 from .handlers import (RootHandler, QgsServerHandler)
 
 LOGGER = logging.getLogger('QGSRV')
@@ -47,4 +47,6 @@ def main():
                QgsServerHandler.init_server()
     finally:
         pass
+
+    
 

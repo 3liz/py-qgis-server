@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import logging
 
@@ -10,13 +9,15 @@ RREQ_FORMAT = REQ_LOG_TEMPLATE
 REQ = 21
 RREQ = 22
 
-def setup_log_handler(log_level, formatstr='%(asctime)s\t%(levelname)s\t[%(process)d]\t%(message)s', logger=None):
+LOGGER=logging.getLogger('QGSRV')
+
+def setup_log_handler(log_level, formatstr='%(asctime)s\t%(levelname)s\t[%(process)d]\t%(message)s'):
     """ Initialize log handler with the given log level
     """
     logging.addLevelName(REQ, "REQ")
     logging.addLevelName(RREQ, "RREQ")
 
-    logger = logger or logging.getLogger()
+    logger = LOGGER
     logger.setLevel(getattr(logging, log_level.upper()))
     # Init the root logger
     if not logger.handlers:
@@ -57,7 +58,7 @@ def format_log_request(handler):
     return fmt, code, reqtime, length
 
 
-def log_request(handler, logger=None):
+def log_request(handler):
     """ Log the current request from the given tornado request handler
 
         :param handler: The request handler
@@ -69,8 +70,7 @@ def log_request(handler, logger=None):
             length: the size of the payload
     """
     fmt, code, reqtime, length = format_log_request(handler)
-    logger = logger or logging.getLogger()
-    logger.log(REQ, fmt)
+    LOGGER.log(REQ, fmt)
     return code, reqtime, length
 
 
@@ -107,7 +107,7 @@ def format_log_rrequest(response):
     return fmt, code, reqtime, length
 
 
-def log_rrequest(response, logger=None):
+def log_rrequest(response):
     """ Log the current response request from the given response
 
         :return A tuple (code,reqtime,length) where:
@@ -116,7 +116,6 @@ def log_rrequest(response, logger=None):
             length: the size of the payload
     """
     fmt, code, reqtime, length = format_log_rrequest(response)
-    logger = logger or logging.getLogger()
-    logger.log(RREQ, fmt)
+    LOGGER.log(RREQ, fmt)
     return code, reqtime, length
 
