@@ -99,6 +99,9 @@ def start_qgis_application(enable_gui=False, enable_processing=False, verbose=Fa
 
 def init_processing():
     from processing.core.Processing import Processing
+    from qgis.analysis import QgsNativeAlgorithms
+    from qgis.core import QgsApplication
+    QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
     Processing.initialize()
 
 
