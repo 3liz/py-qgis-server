@@ -109,7 +109,7 @@ def run_server( port, address="", jobs=1,  user=None):
                 LOGGER.debug("Initializing qgis server")
                 qgis_conf = get_config('qgis')
                 qgsserver = init_qgis_server( network_timeout=qgis_conf.getint('network_timeout'), 
-                                enable_processing=True, logger=LOGGER, verbose=LOGGER.level<=logging.DEBUG)
+                                enable_processing=False, logger=LOGGER, verbose=LOGGER.level<=logging.DEBUG)
                 # Run the server
                 server = HTTPServer(Application(qgsserver))
                 server.add_sockets(sockets)
