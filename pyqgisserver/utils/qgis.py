@@ -62,6 +62,10 @@ def start_qgis_application(enable_gui=False, enable_processing=False, verbose=Fa
 
     qgis_prefix = os.environ.get('QGIS3_HOME','/usr')
 
+    # XXX Set QGIS_PREFIX_PATH, it seems that setPrefixPath
+    # does not do the job correctly
+    os.environ['QGIS_PREFIX_PATH'] = qgis_prefix
+
     global qgis_application
 
     qgis_application = QgsApplication([], enable_gui )
