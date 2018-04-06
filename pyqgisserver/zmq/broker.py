@@ -10,7 +10,7 @@ import zmq
 import logging
 import traceback
 
-from time import sleep
+from time import time
 from collections import deque
 
 from .messages import WORKER_READY
@@ -21,7 +21,7 @@ from ..logger import setup_log_handler
 LOGGER=logging.getLogger('QGSRV')
 
 
-def run_broker( inaddr, outaddr, maxqueue=100):
+def run_broker( inaddr, outaddr, maxqueue=100, timeout=3000):
     """ Create a ROUTER-ROUTER broker
 
         :param inaddr: frontend address to bind to
@@ -29,8 +29,10 @@ def run_broker( inaddr, outaddr, maxqueue=100):
 
         If the max number of waiting request is reached: extra incoming requests will
     """
- 
-    context  = zmq.Context.instance()
+    # Convert timeout to seconds
+    timeout = timeout/1000.0
+
+    context = zmq.Context.instance()
 
     LOGGER.info("Binding frontend to %s", inaddr)
     frontend = context.socket(zmq.ROUTER)
@@ -68,17 +70,16 @@ def run_broker( inaddr, outaddr, maxqueue=100):
                         # Worker is available on new connection
                         # Mark worker as available
                         if not worker_id in workers:
-                            LOGGER.debug("### Worker ready: %s", worker_id)
+                            LOGGER.debug("READY %s", worker_id)
                             workers.add(worker_id)
                     else:
                         msgid, data = rest
                         try:
                             frontend.send_multipart([client_id, msgid, data])
-                            LOGGER.debug("SND %s -> %s : %s", worker_id, client_id, msgid)
+                            LOGGER.debug("SND worker: %s -> client: %s : %s", worker_id, client_id, msgid)
                         except zmq.ZMQError as err:
                             # ZMQ Will raise error if no client_id connected
-                            LOGGER.error("Failed to send message from worker '%s' to client '%s', errno %s", 
-                                         worker_id, client_id, err.errno)
+                            LOGGER.error("SND worker: %s -> client: %s', errno %s", worker_id, client_id, err.errno)
                 except Exception as err:
                     LOGGER.error("%s", traceback.format_exc())
 
@@ -93,32 +94,39 @@ def run_broker( inaddr, outaddr, maxqueue=100):
                         try:
                             frontend.send_multipart([client_id, msgid, b"ERR", b"509"])
                         except zmq.ZMQError as err:
-                            LOGGER.error("Failed to return message to client: %s, errno %s", client_id, err.errno)
+                            LOGGER.error("SND ERR -> client: %s, errno %s", client_id, err.errno)
                     else:
-                        waiting.appendleft((client_id, msgid, data))
+                        waiting.appendleft((time(), client_id, msgid, data))
                 except Exception as err:
                     LOGGER.error("%s", traceback.format_exc())
 
             # Handle waiting requests
             # Unavailable workers will be automatically removed from the list
-            while workers and waiting:
-                client_id, msgid, data = waiting.pop()
-                while workers:
-                    worker_id = workers.pop()
-                    try:
-                        backend.send_multipart([worker_id, client_id, msgid, data])
-                        LOGGER.debug("SND %s -> %s : %s", client_id, worker_id, msgid)
-                        break # Handle next request
-                    except zmq.ZMQError as err:
-                        LOGGER.error("Failed to send request from client '%s' to worker: '%s', errno %s", 
-                                 client_id, worker_id, err.errno)
-                        if not workers: 
-                            # No more workers available
-                            # push back the request on the queue
-                            waiting.append((client_id, msgid, data))
-                        
+            if workers and waiting:
+                now = time()
+                while workers and waiting:
+                    tm, client_id, msgid, data = waiting.pop()
+                    # Test timeout
+                    if now - tm > timeout:
+                        LOGGER.debug("DROP %s: %s", client_id, msgid)
+                        continue
+                    while workers:
+                        worker_id = workers.pop()
+                        try:
+                            backend.send_multipart([worker_id, client_id, msgid, data])
+                            LOGGER.debug("SND client: %s -> worker: %s : %s", client_id, worker_id, msgid)
+                            break # Handle next request
+                        except zmq.ZMQError as err:
+                            LOGGER.info("SND client: %s -> worker: %s, errno %s", client_id, worker_id, err.errno)
+                            if not workers: 
+                                # No more workers available
+                                # push back the request on the queue
+                                waiting.append((client_id, msgid, data))
+                            
     except (KeyboardInterrupt,SystemExit):
-        LOGGER.warning("Interrupted") 
+        LOGGER.warning("Interrupted")
+    except Exception:
+        LOGGER.critical("Uncaught Exception:\n%s", traceback.format_exc())
     finally:
         backend.close()
         frontend.close()
@@ -133,6 +141,7 @@ if __name__ == '__main__':
     parser.add_argument('--out'  , dest='outaddr', metavar='address', default='{iface}:8881', help="backend address")
     parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info', help="set log level")
     parser.add_argument('--maxqueue', metavar='NUM', type=int, default=100, help="Max waiting queue")
+    parser.add_argument('--timeout' , metavar='NUM', type=int, default=3000, help="Set timeout in ms for waiting requests")
 
     args = parser.parse_args()
 
@@ -143,6 +152,7 @@ if __name__ == '__main__':
 
     run_broker(args.inaddr.format(iface=args.iface), 
                args.outaddr.format(iface=args.iface),
-               maxqueue=args.maxqueue)
+               maxqueue=args.maxqueue,
+               timeout=args.timeout)
     print("DONE", file=sys.stderr)
 

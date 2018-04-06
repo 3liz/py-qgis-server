@@ -94,10 +94,11 @@ def run_worker(address, handler_factory, identity=None, timeout=1000):
     sock.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
     sock.setsockopt(zmq.SNDHWM, 1)      # Max 1 item on send queue
     sock.setsockopt(zmq.IMMEDIATE, 1)   # Do not queue if no peer
+    sock.setsockopt(zmq.RCVTIMEO, 1000) # Heartbeat
     sock.identity = identity or uuid.uuid1().bytes
     LOGGER.info("Identity set to %s", sock.identity)
     sock.connect(address)
-
+    
     try:
         LOGGER.info("Starting ZMQ worker loop")
         while True:
@@ -108,6 +109,9 @@ def run_worker(address, handler_factory, identity=None, timeout=1000):
                 request = pickle.loads(request)
                 handler = handler_factory(sock, client_id, corr_id, request)
                 handler.handle_message()
+            except zmq.ZMQError as err:
+                if err.errno != zmq.EAGAIN:
+                    LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
             except Exception as exc:
                 LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
     except (KeyboardInterrupt, SystemExit):
