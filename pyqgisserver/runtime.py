@@ -17,7 +17,7 @@ from .utils.qgis import init_qgis_server
 LOGGER=logging.getLogger('QGSRV')
 
 
-def configure_handlers():
+def configure_handlers( OwsServerHandler  ):
     """
     """
 
@@ -25,15 +25,19 @@ def configure_handlers():
 
     handlers.extend([
         (r"/"    , RootHandler),
-        (r"/ows/", QgsServerHandler)
+        (r"/ows/", OwsServerHandler)
     ])
 
     return handlers
 
 
-class Application(tornado.web.Application):
+class SimpleApplication(tornado.web.Application):
     
-    def __init__(self, qgsserver):
+    def __init__(self):
+       LOGGER.debug("Initializing qgis server")
+       qgis_conf = get_config('qgis')
+       qgsserver = init_qgis_server( network_timeout=qgis_conf.getint('network_timeout'), 
+                       enable_processing=False, logger=LOGGER, verbose=LOGGER.level<=logging.DEBUG)
         super().__init__(configure_handlers(), qgsserver=qgsserver)
 
     def log_request(self, handler):
@@ -41,7 +45,16 @@ class Application(tornado.web.Application):
         """
         log_request(handler)        
 
-  
+
+
+class ZMQApplication(self):
+
+    def log_request(self, handler):
+        """ Write HTTP requet to the logs
+        """
+        log_request(handler)        
+
+
 
 def terminate_handler(signum, frame):
     """ Terminate child processes """
@@ -106,10 +119,6 @@ def run_server( port, address="", jobs=1,  user=None):
         LOGGER.info("Running server on port %s:%s", address, port)
         try:
             if task_id is not None:
-                LOGGER.debug("Initializing qgis server")
-                qgis_conf = get_config('qgis')
-                qgsserver = init_qgis_server( network_timeout=qgis_conf.getint('network_timeout'), 
-                                enable_processing=False, logger=LOGGER, verbose=LOGGER.level<=logging.DEBUG)
                 # Run the server
                 server = HTTPServer(Application(qgsserver))
                 server.add_sockets(sockets)
