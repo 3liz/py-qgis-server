@@ -1,12 +1,14 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
-pip3 install -U --user setuptools
-pip3 install -U --user -r requirements.pip
-pip3 install -U --user -r requirements.txt
+PIP="pip3 install -U --user --no-index --find-links=/wheels"
 
-pip3 install --user -e ./
+$PIP setuptools
+$PIP -r requirements.pip
+$PIP -r requirements.txt
+
+pip install --user -e ./
 
 export QGIS_DISABLE_MESSAGE_HOOKS=1
 export QGIS_NO_OVERRIDE_IMPORT=1
@@ -14,9 +16,13 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 # Add /.local to path
 export PATH=$PATH:/.local/bin
 
+#ls -al /.local/bin
+
+COMMAND=${COMMAND:-qgisserver}
+
 # Run the server locally
 echo "Running server..."
-qgisserver -b 0.0.0.0 -p 8080 --rootdir=$(pwd)/tests/data -w1
+$COMMAND -b 0.0.0.0 -p 8080 --rootdir=$(pwd)/tests/data -w1
 
 
 

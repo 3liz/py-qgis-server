@@ -9,6 +9,7 @@ import asyncio
 import zmq
 import logging
 import traceback
+import signal
 
 from time import time
 from collections import deque
@@ -56,6 +57,13 @@ def run_broker( inaddr, outaddr, maxqueue=100, timeout=3000):
     waiting = deque() # Client waiting
 
     LOGGER.info("Starting ZMQ broker loop")
+
+    # Try to exit gracefully
+    def term_signal(signum,frames):
+        print("Caught signal: %s" % signum, file=sys.stderr)
+        raise SystemExit()
+
+    signal.signal(signal.SIGTERM,term_signal)
 
     try:
         while True:

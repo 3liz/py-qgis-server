@@ -34,7 +34,10 @@ setup(
     url='',
     packages=find_packages(include=['pyqgisserver','pyqgisserver.*']),
     entry_points={
-        'console_scripts': ['qgisserver = pyqgisserver.server:main'],
+        'console_scripts': [
+            'qgisserver = pyqgisserver.http.server:main',
+            'qgisserver-proxy = pyqgisserver.zmq.server:main',
+        ],
     },
     classifiers=[
         'Environment :: Web Environment',

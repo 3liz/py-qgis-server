@@ -43,7 +43,7 @@ class RequestHandler:
         self.header_written = False
 
         self._correlation_id = correlation_id
-        self._socket  = socket
+        self._socket    = socket
         self._client_id = client_id
 
     def _write( self, data ):
@@ -58,6 +58,8 @@ class RequestHandler:
         """ Send data
         """
         if not self.header_written:
+            # We letthe client know that there is more 
+            # data by setting the 206 code (partial response)
             if send_more and self.status_code==200:
                 self.status_code = 206
             # Create a Header Message
@@ -83,7 +85,7 @@ class RequestHandler:
         self.send(b"", False)
 
 
-def run_worker(address, handler_factory, identity=None, timeout=1000):
+def run_worker(address, handler_factory, identity=None):
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()
@@ -93,7 +95,7 @@ def run_worker(address, handler_factory, identity=None, timeout=1000):
     sock = ctx.socket(zmq.DEALER)
     sock.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
     sock.setsockopt(zmq.SNDHWM, 1)      # Max 1 item on send queue
-    sock.setsockopt(zmq.IMMEDIATE, 1)   # Do not queue if no peer
+    sock.setsockopt(zmq.IMMEDIATE, 1)   # Do not queue if no peer, will block on send
     sock.setsockopt(zmq.RCVTIMEO, 1000) # Heartbeat
     sock.identity = identity or uuid.uuid1().bytes
     LOGGER.info("Identity set to %s", sock.identity)

@@ -11,7 +11,6 @@ from urllib.parse import urlparse
 from .utils.filecache import FileCache
 from .utils.decorators import singleton
 
-from .exceptions import HTTPError2
 from .config import get_config
 
 LOGGER = logging.getLogger('QGSRV')
@@ -72,10 +71,6 @@ class _Cache(FileCache):
 
 
 def cache_lookup( path ):
-    c = _Cache()
-    try:
-        return c.lookup(path)
-    except FileNotFoundError:
-        raise HTTPError2(404, "map '%s' no found" % path) 
+    return _Cache().lookup(path)
 
 

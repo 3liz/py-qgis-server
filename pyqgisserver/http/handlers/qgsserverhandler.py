@@ -3,20 +3,20 @@
 import os
 import logging
 
-from ..config import get_config
-from ..cache import cache_lookup
-from ..utils.decorators import singleton
-
-from .basehandler import BaseHandler
+from ...config import get_config
+from ...cache import cache_lookup
+from ...utils.decorators import singleton
+from ...exceptions import HTTPError2
+from ...handlers.basehandler import BaseHandler
 
 LOGGER = logging.getLogger('QGSRV')
 
 @singleton 
 class Adapters:
     def __init__(self):
-        from pyqgisserver.http import adapters
+        from ..adapters import Request, Response
         def _make_adapters(handler, method):
-            return adapters.Request(handler, method=method), adapters.Response(handler)
+            return Request(handler, method=method), Response(handler)
         self._make_adapters = _make_adapters
 
     def __call__(self, handler, method, project=None):
@@ -35,7 +35,12 @@ class QgsServerHandler(BaseHandler):
         
     def prepare(self):
         adapters = Adapters()
-        project  = cache_lookup( self.get_query_argument('MAP'))
+        path     = self.get_query_argument('MAP')
+
+        try:
+            project  = cache_lookup( path )
+        except FileNotFoundError:
+            raise HTTPError2(404, "map '%s' no found" % path) 
 
         self.handleRequest = lambda m: adapters(self,m,project)
 

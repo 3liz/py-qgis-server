@@ -1,8 +1,8 @@
 
 import logging
 
-REQ_LOG_TEMPLATE = u"{ip}\t{code}\t{method}\t{url}\t{time}\t{length}\t"
-REQ_FORMAT = REQ_LOG_TEMPLATE+u'{agent}\t{referer}'
+REQ_LOG_TEMPLATE = "{ip}\t{code}\t{method}\t{url}\t{time}\t{length}\t"
+REQ_FORMAT = REQ_LOG_TEMPLATE+'{agent}\t{referer}'
 RREQ_FORMAT = REQ_LOG_TEMPLATE
 
 # Lies between warning and error
@@ -74,40 +74,34 @@ def log_request(handler):
     return code, reqtime, length
 
 
-def format_log_rrequest(response):
+def format_log_rrequest(code, method, query, reqtime, headers, addr=''):
     """ Format current r-request from the given response
 
         :param response: The response returned from the request
-        :param checksum: Add an md5 checksum for the urlS
-
         :return A tuple (fmt,code,reqtime,length) where:
             fmt: the log string
             code: the http retudn code
             reqtime: the request time
             length: the size of the payload
     """
-    request = response.request
-    code    = response.code
-    reqtime = response.request_time
-
     length = -1
     try:
-        length = response.headers['Content-Length']
+        length = headers['Content-Length']
     except KeyError:
         pass
 
     fmt = RREQ_FORMAT.format(
-        ip='',
-        method=request.method,
-        url=request.url,
+        ip=addr,
+        method=method,
+        url=query,
         code=code,
         time=int(1000.0 * reqtime),
         length=length)
 
-    return fmt, code, reqtime, length
+    return fmt
 
 
-def log_rrequest(response):
+def log_rrequest(*args, **kwargs):
     """ Log the current response request from the given response
 
         :return A tuple (code,reqtime,length) where:
@@ -115,7 +109,6 @@ def log_rrequest(response):
             reqtime: the request time
             length: the size of the payload
     """
-    fmt, code, reqtime, length = format_log_rrequest(response)
+    fmt = format_log_rrequest(*args, **kwargs)
     LOGGER.log(RREQ, fmt)
-    return code, reqtime, length
 

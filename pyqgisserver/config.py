@@ -52,6 +52,11 @@ def load_configuration():
     CONFIG.add_section('qgis')
     CONFIG.set('qgis', 'network_timeout', getenv('QGSRV_QGIS_NETWORK_TIMEOUT','20000'))
 
+    CONFIG.add_section('zmq')
+    CONFIG.set('zmq', 'identity' , getenv('QGSRV_ZMQ_IDENTITY','OWS-SERVER'))
+    CONFIG.set('zmq', 'bindaddr' , getenv('QGSRV_ZMQ_INADDR'  ,'tcp://*:18080'))
+    CONFIG.set('zmq', 'maxqueue' , getenv('QGSRV_ZMQ_MAXQUEUE','1000'))
+    CONFIG.set('zmq', 'timeout'  , getenv('QGSRV_ZMQ_TIMEOUT' ,'3000'))
 
 def read_config_dict( userdict ):
     """ Read configuration from dictionary

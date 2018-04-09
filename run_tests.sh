@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -14,9 +14,11 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 # Add /.local to path
 export PATH=$PATH:/.local/bin
 
+COMMAND=${COMMAND:-qgisserver}
+
 # Run the server locally
 echo "Running server..."
-qgisserver -b 127.0.0.1 -p 8080 --rootdir=$(pwd)/tests/data -w2 &>docker-test.log &
+$COMMAND -b 127.0.0.1 -p 8080 --rootdir=$(pwd)/tests/data -w2 &>docker-test.log &
 
 # Run new tests
 echo "Launching test"

@@ -13,6 +13,7 @@ __pycache__
 
 # Test outputs
 .cache
+.pytest_cache
 __output__
 
 # vim, mac os

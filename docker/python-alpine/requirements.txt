@@ -1,0 +1,5 @@
+pyzmq >= 17
+tornado >= 5
+pytest
+requests
+

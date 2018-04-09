@@ -10,6 +10,8 @@ from tornado.web import HTTPError
 from ..version import __version__
 from ..exceptions import HTTPError2
 
+from ..config import get_config
+
 LOGGER = logging.getLogger('QGSRV')
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -20,9 +22,10 @@ class BaseHandler(tornado.web.RequestHandler):
         self._links    = []
         self.connection_closed = False
         self.logger = LOGGER
+        self._cfg = get_config('server')
 
         # Convert query arguments to upper case:
-        self.request.query_arguments.update( [(k.upper(), v) for (k,v) in self.request.query_arguments.items()] )
+        self.request.query_arguments.update( tuple((k.upper(), v) for (k,v) in self.request.query_arguments.items()) )
 
     def compute_etag(self):
         # Disable etag computation
@@ -81,4 +84,12 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write_json(response)
         self.finish()
 
-
+    def proxy_url(self):
+        """ Return the proxy_url
+        """
+        # Replace the status url with the proxy_url if any
+        req = self.request
+        proxy_url = self._cfg.get('host_proxy') or \
+                    req.headers.get('X-Proxy-Location') or  \
+                    "{0.protocol}://{0.host}{0.path}".format(req)
+        return proxy_url                            

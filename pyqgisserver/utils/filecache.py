@@ -30,7 +30,6 @@ class FileCache():
         self.cache.clear()
 
     def validate(self, key):
-        from qgis.core import QgsProject
         # Get actual path for the project
         path, timestamp = self.store.getpath(key)
         details = self.cache.peek(key)
@@ -41,7 +40,7 @@ class FileCache():
             else:
                 return False
         # Load project
-        project = QgsProject()
+        project = self.QgsProject()
         project.read(path)
         self.cache[key] = CacheDetails(project, timestamp)
         self.on_cache_update( key, path )

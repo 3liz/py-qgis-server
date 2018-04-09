@@ -115,6 +115,8 @@ class AsyncClient:
         LOGGER.info("Starting client %s", self.identity)
 
     async def _poll(self):
+        """ Handle incoming messages
+        """
         while self._handlers:
             try:
                 correlation_id, data, *rest  = await self._socket.recv_multipart()
@@ -125,6 +127,7 @@ class AsyncClient:
                         handler._set_exception(RequestProxyError(rest[0]))
                     else:
                         handler._set_result(data)
+                    # Remove handlers from the heap if we are done
                     if handler._done():
                         self._handlers.pop(correlation_id,None)
                 except KeyError:

@@ -71,6 +71,24 @@ docker-run:
 		$(QGIS_IMAGE) ./run_setup.sh
 
 
+docker-run-proxy:
+	mkdir -p $(HOME)/.local
+	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis-py-proxy-run-$(COMMITID) -w /src \
+		-u $(BECOME_USER) \
+		-v $(shell pwd):/src \
+		-v $(HOME)/.alpine/wheels:/wheels \
+		-v $(HOME)/.alpine:/.local \
+		-v $(HOME)/.alpine/.cache:/.pipcache \
+		-v $(HOME)/.config/pip:/.pipconf  \
+		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
+		-e PIP_CACHE_DIR=/.pipcache \
+		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		-e QGSRV_LOGGING_LEVEL=DEBUG \
+		-e COMMAND=qgisserver-proxy \
+		python-gcc:3.6-alpine ./run_setup.sh
+
+
+
 WORKERS:=1
 
 run:
