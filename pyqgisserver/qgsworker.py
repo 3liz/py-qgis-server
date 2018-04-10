@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import QBuffer, QIODevice
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
-from .zeromq.worker import RequestHandler
+from .zeromq.worker import RequestHandler, run_worker
 from .cache import cache_lookup
 
 
@@ -149,8 +149,8 @@ class Response(QgsServerResponse):
 
 class QgsRequestHandler(RequestHandler):
 
-   @classmethod
-   def init_server(cls):
+    @classmethod
+    def init_server(cls):
         if not hasattr(cls, 'qgis_server' ):
             from .utils.qgis import init_qgis_server
 
@@ -160,7 +160,12 @@ class QgsRequestHandler(RequestHandler):
                                           verbose=LOGGER.level<=logging.DEBUG)
             setattr(cls, 'qgis_server' , qgsserver )
 
-   def handle_message(self):
+    @staticmethod
+    def run( router, identity=""):
+        QgsRequestHandler.init_server()
+        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')))
+
+    def handle_message(self):
         """ Override this method to handle_messages
         """
         project_location = self.request.headers.pop('X-Map-Location')
@@ -220,9 +225,7 @@ def main():
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 
-    QgsRequestHandler.init_server()
-    run_worker(args.router.format(host=args.host), QgsRequestHandler, 
-               identity=bytes(args.identity.encode('ascii')))
+    QgsRequestHandler.run(args.router.format(host=args.host), identity=args.identity)
 
     print("Qgis worker terminated", file=sys.stderr)
 

@@ -110,7 +110,6 @@ def run_worker_pool(workers):
     LOGGER.info("Starting worker pool")
     router = get_config('zmq')['bindaddr'] 
     pool = Pool(router, workers)
-    pool.start()
     return pool
 
 
@@ -187,7 +186,8 @@ def run_server( port, address="", jobs=1,  user=None, workers=0):
 
     if ppid == pid:
         if worker_pool:
-            worker.pool.terminate()
+            print("Stopping workers")
+            worker_pool.terminate()
         print("Stopping broker")
         broker_pr.terminate()
         broker_pr.join()

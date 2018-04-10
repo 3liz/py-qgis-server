@@ -40,11 +40,14 @@ class OwsHandler(BaseHandler):
             for k,v in hdrs.items():
                 self.set_header(k,v)
             self.write(response.data)
-            if response.status == 200:
-                await self.flush()
-                async for chunk in self._client.fetch_more(response):
+            if status == 200:
+                chunk = await self._client.fetch_more(response)
+                if chunk:
+                    await self.flush()
+                while chunk:
                     self.write(chunk)
                     self.flush()
+                    chunk = await self._client.fetch_more(response)
                 return
         except RequestTimeoutError:
              status, hdrs = 504,{}
@@ -53,7 +56,6 @@ class OwsHandler(BaseHandler):
 
         if self.connection_closed:
             return
-
         log_rrequest(status, method, query, time()-reqtime, hdrs)
         self.send_error(status, reason="Server busy, please retry later" if status==509 else None)
         

@@ -169,16 +169,28 @@ class AsyncClient:
             raise
 
     async def fetch_more( self, response, timeout=5 ):
-        """ Request next chunk
-        """
         try:
-            while True:
-                data = await response._next_chunk(timeout) 
-                if data == b"": break
-                yield  data
+            data = await response._next_chunk(timeout)
+            if data == b"": 
+                return None
+            else:
+                return data
         except:
             self._handlers.pop(response.correlation_id,None)
             raise
+
+    ## Cannot use generator with python 3.5
+    #async def fetch_more( self, response, timeout=5 ):
+    #    """ Request next chunk
+    #    """
+    #    try:
+    #        while True:
+    #            data = await response._next_chunk(timeout) 
+    #            if data == b"": break
+    #            yield  data
+    #    except:
+    #        self._handlers.pop(response.correlation_id,None)
+    #        raise
 
     def terminate(self):
         LOGGER.info("Terminating client %s", self.identity)
@@ -214,8 +226,10 @@ if __name__ == '__main__':
         try:
             response = await client.fetch(query="?service=WMS", data=b"Hello world from %d" % index)
             print("%d -> response = %s" % (index,response.data))
-            async for chunk in client.fetch_more(response):
+            chunk = await client.fetch_more(response)
+            while chunk:
                 print("%d -> chunk = %s" % (index,chunk))
+                chunk = await client.fetch_more(response)
         except RequestTimeoutError:
             LOGGER.error("%d -> TIMEOUT", index)
         except RequestGatewayError:
