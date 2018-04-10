@@ -36,6 +36,7 @@ setup(
     entry_points={
         'console_scripts': [
             'qgisserver = pyqgisserver.server:main',
+            'qgisserver-worker = pyqgisserver.qgsworker:main',
         ],
     },
     classifiers=[

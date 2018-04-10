@@ -42,6 +42,8 @@ class AsyncResponseHandler:
         self._future = loop.create_future()
         self._loop   = loop
         self._chunks = None
+        self._has_more = False
+        self.data = None
     
     def _set_exception(self, exc):
         self._has_more = False

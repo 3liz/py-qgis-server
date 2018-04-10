@@ -40,8 +40,10 @@ def read_configuration(args=None):
     cli_parser.add_argument('-p','--port'    , type=int, help="http port", dest='port', default=conf.getint('port'))
     cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=conf['interfaces'], help="Interface to bind to", dest='interface')
     cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=conf.getint('workers'), help="Num workers", dest='workers')
+    cli_parser.add_argument('-j','--jobs'    , metavar='NUM', type=int, default=1, help="Num server instances", dest='jobs')
     cli_parser.add_argument('-u','--setuid'  , default='', help="uid to switch to", dest='setuid')
     cli_parser.add_argument('--rootdir', default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
+    cli_parser.add_argument('--proxy'  , action='store_true', default=False, help='Run only as proxy')
 
     args = cli_parser.parse_args()
 
@@ -60,7 +62,7 @@ def read_configuration(args=None):
 
     print_version()
 
-    validate_config_path('cache','rootdir')
+    workers = args.workers
 
     # set log level
     setup_log_handler(log_level)
@@ -73,7 +75,15 @@ def main():
     """ Run the server as cli command
     """
     args = read_configuration()
-    run_server( port=args.port, address=args.interface, jobs=args.workers, user=args.setuid )
+
+    workers = args.workers
+    if not args.proxy:
+        validate_config_path('cache','rootdir')
+    else:
+        # Do not run any qgis workers
+        workers = 0
+
+    run_server( port=args.port, address=args.interface, jobs=args.jobs, user=args.setuid, workers=workers )
 
     
 

@@ -22,6 +22,12 @@ def get_config(section):
     return CONFIG[section]
 
 
+def set_config(section, name, value):
+    """ Set configuration value
+    """
+    CONFIG.set(section, name , value)
+
+
 def load_configuration():
     """ Read configuration file
 

@@ -31,16 +31,21 @@ class OwsHandler(BaseHandler):
             headers = {
                 'X-Map-Location': project_path 
             } 
-            if proxy_url: headers['X-Proxy-Location']= proxy_url
+            if proxy_url: headers['X-Proxy-Location']=proxy_url
             
             response = await self._client.fetch(query=query, method=method, headers=headers, data=data)
+            status = response.status
+            hdrs   = response.headers
+            # Set headers
+            for k,v in hdrs.items():
+                self.set_header(k,v)
+            self.write(response.data)
             if response.status == 200:
+                await self.flush()
                 async for chunk in self._client.fetch_more(response):
                     self.write(chunk)
                     self.flush()
-
-            status = response.status
-            hdrs   = response.headers
+                return
         except RequestTimeoutError:
              status, hdrs = 504,{}
         except RequestGatewayError:

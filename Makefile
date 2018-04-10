@@ -43,6 +43,7 @@ test:
 PIP_CONFIG_FILE:=pip.conf
 BECOME_USER:=$(shell id -u)
 
+
 docker-test:
 	mkdir -p $(HOME)/.local
 	docker run --rm --name qgis3-py-server-test-$(COMMITID) -w /src \
@@ -56,6 +57,7 @@ docker-test:
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		$(QGIS_IMAGE) ./run_tests.sh
 
+
 docker-run:
 	mkdir -p $(HOME)/.local
 	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis3-py-server-run-$(COMMITID) -w /src \
@@ -68,12 +70,30 @@ docker-run:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		$(QGIS_IMAGE) ./run_setup.sh
+		$(QGIS_IMAGE) ./run_server.sh
 
 
+docker-run-worker:
+	mkdir -p $(HOME)/.local
+	docker run -it --rm --net mynet --name qgis3-py-worker-run-$(COMMITID) -w /src \
+		-u $(BECOME_USER) \
+		-v $(shell pwd):/src \
+		-v $(HOME)/.local:/.local \
+		-v $(HOME)/.config/pip:/.pipconf  \
+		-v $(HOME)/.cache/pip:/.pipcache \
+		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
+		-e PIP_CACHE_DIR=/.pipcache \
+		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		-e QGSRV_LOGGING_LEVEL=DEBUG \
+		-e ROUTER_HOST=qgis-py-proxy-run-$(COMMITID) \
+		$(QGIS_IMAGE) ./run_worker.sh
+
+
+
+# Run proxy in a alpine container with precompiled wheels.
 docker-run-proxy:
 	mkdir -p $(HOME)/.local
-	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis-py-proxy-run-$(COMMITID) -w /src \
+	docker run -it --rm -p 127.0.0.1:8080:8080 --net mynet --name qgis-py-proxy-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
 		-v $(HOME)/.alpine/wheels:/wheels \
@@ -84,7 +104,7 @@ docker-run-proxy:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		python-zeromq:3.6 ./run_proxy.sh
+		python-zeromq:3.6 ./run_proxy.sh 
 
 
 

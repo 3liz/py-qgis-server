@@ -9,7 +9,8 @@ from qgis.PyQt.QtCore import QBuffer, QIODevice
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
-from .worker import RequestHandler
+from .zeromq.worker import RequestHandler
+from .cache import cache_lookup
 
 
 LOGGER = logging.getLogger('QGSRV')
@@ -122,7 +123,7 @@ class Response(QgsServerResponse):
         if not self._handler.header_written:
             LOGGER.error("%s (%s)", message, code)
             self._handler.status_code = code
-            self._handler.send(bytes(str(message).encode('ascii'))
+            self._handler.send(bytes(str(message).encode('ascii')))
             self._finish = True
         else:
             LOGGER.error("Cannot set error after header written")
@@ -151,25 +152,23 @@ class QgsRequestHandler(RequestHandler):
    @classmethod
    def init_server(cls):
         if not hasattr(cls, 'qgis_server' ):
-            from ..utils.qgis import init_qgis_server
-            from ..cache import cache_lookup
+            from .utils.qgis import init_qgis_server
 
             qgsserver = init_qgis_server( network_timeout=3000,
                                           enable_processing=False, 
                                           logger=LOGGER, 
                                           verbose=LOGGER.level<=logging.DEBUG)
             setattr(cls, 'qgis_server' , qgsserver )
-            setattr(cls, 'cache_lookup', cache_lookup )
 
    def handle_message(self):
         """ Override this method to handle_messages
         """
-        project_location = self.headers.pop('X-Map-Location')
+        project_location = self.request.headers.pop('X-Map-Location')
 
         request  = Request(self)
         response = Response(self)
         try:
-            project = self.cache_lookup(project_location)
+            project = cache_lookup(project_location)
         except FileNotFoundError:
             response.sendError(404,"Project '%s' not found" % project_location)
         else:
@@ -179,26 +178,28 @@ class QgsRequestHandler(RequestHandler):
 def main():
     """ Run as command line interface
     """
+    import os
     import sys
     import argparse
     from .zeromq.worker import run_worker
     from .version import __description__, __version__
     from .config  import (get_config, read_config_dict, validate_config_path)
+    from .logger import setup_log_handler
 
     parser = argparse.ArgumentParser(description='Qgis Server Worker')
     parser.add_argument('--host'    , metavar="host"   , default='tcp://localhost', help="router host")   
-    parser.add_argument('--router'  , metavar='address', default='{host}:8881', help="router address")
+    parser.add_argument('--router'  , metavar='address', default='tcp://{host}:18080', help="router address")
     parser.add_argument('--identity', default="", help="Set worker identity")
     parser.add_argument('--rootdir' , default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
     parser.add_argument('--version', action='store_true', default=False, help="Return version number and exit")
     parser.add_argument('--logging' , choices=['debug', 'info', 'warning', 'error'], 
             default=get_config('logging')['level'].lower(), help="set log level")
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
     def print_version():
         program = os.path.basename(sys.argv[0])
-        print("{name} {version}".format(name=program, version=__version__,file=sys.stderr))
+        print("{name} {version}".format(name=program, version=__version__), file=sys.stderr)
 
     if args.version:
         print_version()

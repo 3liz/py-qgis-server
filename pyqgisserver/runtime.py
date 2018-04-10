@@ -9,9 +9,8 @@ import traceback
 import tornado.web
 import tornado.process
 
-
 from .logger import log_request
-from .config import get_config, load_configuration
+from .config import get_config, set_config, load_configuration
 
 from .handlers import (RootHandler, OwsHandler)
 from .zeromq import client, broker
@@ -93,7 +92,6 @@ def create_broker_process( ipcaddr ):
     cfg = get_config('zmq')
 
     LOGGER.info("Starting broker process")
-    os.makedirs('/tmp/qgssrv/broker', exist_ok=True)
     p = Process(target=broker.run_broker, kwargs=dict(
             inaddr   = ipcaddr,
             outaddr  = cfg['bindaddr'],
@@ -103,7 +101,20 @@ def create_broker_process( ipcaddr ):
     p.start()
     return p
 
-def run_server( port, address="", jobs=1,  user=None):
+
+def run_worker_pool(workers):
+    """ Run a qgis worker pool
+    """
+    from .qgspool import Pool
+
+    LOGGER.info("Starting worker pool")
+    router = get_config('zmq')['bindaddr'] 
+    pool = Pool(router, workers)
+    pool.start()
+    return pool
+
+
+def run_server( port, address="", jobs=1,  user=None, workers=0):
     """ Run the server
 
         :param port: port number
@@ -114,9 +125,16 @@ def run_server( port, address="", jobs=1,  user=None):
     import traceback
     from tornado.netutil import bind_sockets
 
-    ipcaddr = "ipc:///tmp/qgssrv/broker/0"
+    # Create ipc socket path 
+    ipc_path = '/tmp/qgssrv/broker/'
+    os.makedirs(os.path.dirname(ipc_path), exist_ok=True)
+    ipcaddr = 'ipc://'+ipc_path+'0'
+    # Use ipc sockets for managed workers
+    if workers > 0:
+        set_config('zmq','bindaddr', 'ipc://'+ipc_path+'pool0')
 
-    broker_pr = create_broker_process(ipcaddr)
+    broker_pr   = create_broker_process(ipcaddr)
+    worker_pool = run_worker_pool(workers) if workers>0 else None
 
     sockets = bind_sockets(port, address=address)
 
@@ -165,9 +183,11 @@ def run_server( port, address="", jobs=1,  user=None):
         loop = asyncio.get_event_loop()
         if not loop.is_closed():
             loop.close()
-        print("{}: Worker stopped".format(pid), file=sys.stderr)
+        print("{}: Server instance stopped".format(pid), file=sys.stderr)
 
     if ppid == pid:
+        if worker_pool:
+            worker.pool.terminate()
         print("Stopping broker")
         broker_pr.terminate()
         broker_pr.join()

@@ -116,6 +116,9 @@ def run_worker(address, handler_factory, identity=None):
                     LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
             except Exception as exc:
                 LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
+                if not handler.header_written:
+                    handler.status_code = 500
+                    handler.send(bytes("Worker internal error".encode('ascii')))
     except (KeyboardInterrupt, SystemExit):
             print("Interrupted", file=sys.stderr)
    # Terminate context

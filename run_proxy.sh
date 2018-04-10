@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# This scripts is expected to be run in an python:3.6 alpine with zmq
+# installed and python requirements available as precompiled wheels.
+
 set -e
 
 PIP="pip3 install -U --user --no-index --find-links=/wheels"
@@ -17,8 +20,8 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 export PATH=$PATH:/.local/bin
 
 # Run the server locally
-echo "Running server proxy..."
-qgisserver -b 0.0.0.0 -p 8080 --proxy --rootdir=$(pwd)/tests/data -w1
+echo "Running server..."
+qgisserver -b 0.0.0.0 -p 8080 --proxy -j1
 
 
 
