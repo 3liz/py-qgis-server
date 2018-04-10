@@ -1,6 +1,7 @@
 """ Qgis worker pool
 """
 import threading
+import time
 
 from multiprocessing import Process, cpu_count
 from multiprocessing.util import Finalize

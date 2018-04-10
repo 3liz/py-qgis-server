@@ -18,7 +18,7 @@ export PATH=$PATH:/.local/bin
 
 # Run the server locally
 echo "Running server..."
-qgisserver -b 0.0.0.0 -p 8080 --rootdir=$(pwd)/tests/data
+qgisserver -b 0.0.0.0 -p 8080 --rootdir=$(pwd)/tests/data -w1
 
 
 
