@@ -1,6 +1,6 @@
 """ Qgis server request adapters
 
-    Embedded qgis server in a zmq worker 
+    Embedded qgis server in a 0MQ worker 
 """
 import logging
 import traceback
@@ -181,19 +181,20 @@ def main():
     """
     import sys
     import argparse
-    from .worker import run_worker
-    from ..version import __description__, __version__
-    from ..config  import (get_config, read_config_dict, validate_config_path)
+    from .zeromq.worker import run_worker
+    from .version import __description__, __version__
+    from .config  import (get_config, read_config_dict, validate_config_path)
 
     parser = argparse.ArgumentParser(description='Qgis Server Worker')
     parser.add_argument('--host'    , metavar="host"   , default='tcp://localhost', help="router host")   
     parser.add_argument('--router'  , metavar='address', default='{host}:8881', help="router address")
     parser.add_argument('--identity', default="", help="Set worker identity")
+    parser.add_argument('--rootdir' , default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
     parser.add_argument('--version', action='store_true', default=False, help="Return version number and exit")
     parser.add_argument('--logging' , choices=['debug', 'info', 'warning', 'error'], 
             default=get_config('logging')['level'].lower(), help="set log level")
 
-    args = parser.parse_args()
+args = parser.parse_args()
 
     def print_version():
         program = os.path.basename(sys.argv[0])

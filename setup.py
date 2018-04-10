@@ -35,8 +35,7 @@ setup(
     packages=find_packages(include=['pyqgisserver','pyqgisserver.*']),
     entry_points={
         'console_scripts': [
-            'qgisserver = pyqgisserver.http.server:main',
-            'qgisserver-proxy = pyqgisserver.zmq.server:main',
+            'qgisserver = pyqgisserver.server:main',
         ],
     },
     classifiers=[

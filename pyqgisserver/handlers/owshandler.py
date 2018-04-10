@@ -4,16 +4,15 @@ import os
 import logging
 from time import time
 
-from ...config import get_config
-from ...exceptions import HTTPError2
-from ...handlers.basehandler import BaseHandler
-from ...logger import log_rrequest
+from ..config import get_config
+from ..logger import log_rrequest
+from ..zeromq.client import RequestTimeoutError, RequestGatewayError
 
-from ..client import RequestTimeoutError, RequestGatewayError
+from .basehandler import BaseHandler, HTTPError2
 
 LOGGER = logging.getLogger('QGSRV')
 
-class OwsServerHandler(BaseHandler):
+class OwsHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """

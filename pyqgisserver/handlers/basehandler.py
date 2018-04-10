@@ -1,4 +1,4 @@
-""" Basei Request handler 
+""" Base Request handler 
 """
 import os
 import tornado.web
@@ -13,6 +13,7 @@ from ..exceptions import HTTPError2
 from ..config import get_config
 
 LOGGER = logging.getLogger('QGSRV')
+
 
 class BaseHandler(tornado.web.RequestHandler):
     """ Base class for HTTP request hanlers

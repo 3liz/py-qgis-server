@@ -10,14 +10,13 @@ import tornado.web
 import tornado.process
 
 
-from ..logger import log_request
-from ..config import get_config, load_configuration
+from .logger import log_request
+from .config import get_config, load_configuration
 
-from .handlers import (RootHandler, OwsServerHandler)
-from .client import AsyncClient
+from .handlers import (RootHandler, OwsHandler)
+from .zeromq import client, broker
 
 LOGGER=logging.getLogger('QGSRV')
-
 
 def configure_handlers( client ):
     """
@@ -25,7 +24,7 @@ def configure_handlers( client ):
     handlers = []
     handlers.extend([
         (r"/"    , RootHandler),
-        (r"/ows/", OwsServerHandler, {'client': client})
+        (r"/ows/", OwsHandler, {'client': client})
     ])
 
     return handlers
@@ -39,7 +38,7 @@ class Application(tornado.web.Application):
         identity = get_config('zmq')['identity']
         identity = "{}-{}".format(identity,os.getpid())
 
-        self._zmq_client = AsyncClient(router, bytes(identity.encode('ascii')))
+        self._zmq_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
 
         super().__init__(configure_handlers(self._zmq_client))
                 
@@ -90,13 +89,12 @@ def create_broker_process( ipcaddr ):
     """ Create a brker process
     """
     from multiprocessing import Process
-    from .broker import run_broker
 
     cfg = get_config('zmq')
 
     LOGGER.info("Starting broker process")
     os.makedirs('/tmp/qgssrv/broker', exist_ok=True)
-    p = Process(target=run_broker, kwargs=dict(
+    p = Process(target=broker.run_broker, kwargs=dict(
             inaddr   = ipcaddr,
             outaddr  = cfg['bindaddr'],
             maxqueue = cfg.getint('maxqueue'),

@@ -111,15 +111,17 @@ class AsyncClient:
 
         self._running = False
         self._handlers = {}
-        self._socket = sock
+        self._socket   = sock
+        self._polling  = False
         LOGGER.info("Starting client %s", self.identity)
 
     async def _poll(self):
         """ Handle incoming messages
         """
+        self._polling = True
         while self._handlers:
             try:
-                correlation_id, data, *rest  = await self._socket.recv_multipart()
+                correlation_id, data, *rest = await self._socket.recv_multipart()
                 # Get if there is a future pending for that message
                 try:
                     handler = self._handlers[correlation_id]
@@ -136,6 +138,7 @@ class AsyncClient:
                 LOGGER.error("%s error:  zmq error: %s (%s)", self.identity, zmq.strerror(err.errno),err.errno)
             except Exception as err:
                 LOGGER.error("%s exception %s\n%s", self.identity, err, traceback.format_exc())
+        self._polling = False
 
     async def fetch( self, query, method='GET', headers={}, data=None, timeout=5):
         """ Send a request message to the worker
@@ -153,7 +156,7 @@ class AsyncClient:
         handler = AsyncResponseHandler(correlation_id, self._loop)
         self._handlers[correlation_id] = handler
         # Run poller if needed
-        if len(self._handlers) == 1:
+        if not self._polling:
             asyncio.ensure_future(self._poll())
 
         # Wait for response

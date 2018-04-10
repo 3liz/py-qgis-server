@@ -84,8 +84,7 @@ docker-run-proxy:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		-e COMMAND=qgisserver-proxy \
-		python-gcc:3.6-alpine ./run_setup.sh
+		python-zeromq:3.6 ./run_proxy.sh
 
 
 
