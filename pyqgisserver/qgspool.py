@@ -3,6 +3,8 @@
 import threading
 import time
 
+from functools import partial
+
 from multiprocessing import Process, cpu_count
 from multiprocessing.util import Finalize
 

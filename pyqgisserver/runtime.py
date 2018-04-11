@@ -7,13 +7,15 @@ import signal
 import traceback
 
 import tornado.web
-import tornado.process
+import tornado.platform.asyncio
 
 from .logger import log_request
 from .config import get_config, set_config, load_configuration
 
 from .handlers import (RootHandler, OwsHandler)
 from .zeromq import client, broker
+
+from .utils import process
 
 LOGGER=logging.getLogger('QGSRV')
 
@@ -57,22 +59,16 @@ class Application(tornado.web.Application):
         self._zmq_client.terminate()
 
 
-def terminate_handler(signum, frame):
-    """ Terminate child processes """
-    if 'children' in frame.f_locals and signum == signal.SIGTERM:
-        sys.stderr.write("Terminating child processes.\n")
-        for p in frame.f_locals['children']:
-            os.kill(p, signal.SIGTERM)
-
-    raise SystemExit("caught signal %s", signum)
+def terminate_handler( signum, frame ):
+    if signum == signal.SIGTERM:
+        if process.task_id() is None:
+            sys.stderr.write("Terminating child processes.\n")
+            process.terminate_childs()
 
 
 def set_signal_handlers():
     signal.signal(signal.SIGTERM, terminate_handler)
-
-
-def clear_signal_handlers():
-    signal.signal(signal.SIGTERM, signal.SIG_DFL)
+    signal.signal(signal.SIGINT , terminate_handler)
 
 
 def setuid(username):
@@ -132,65 +128,80 @@ def run_server( port, address="", jobs=1,  user=None, workers=0):
     if workers > 0:
         set_config('zmq','bindaddr', 'ipc://'+ipc_path+'pool0')
 
-    broker_pr   = create_broker_process(ipcaddr)
-    worker_pool = run_worker_pool(workers) if workers>0 else None
-
-    sockets = bind_sockets(port, address=address)
-
     application = None
-    ppid = os.getpid()
 
     if user:
        setuid(user)
 
-    set_signal_handlers()
+    def close_sockets(sockets):
+        for sock in sockets:
+            sock.close()
 
-    # Fork processes
-    if jobs > 1:
-        import tornado.process
-        tornado.process.fork_processes(jobs, max_restarts=5)
-        task_id = tornado.process.task_id()
-    else:
-        task_id = ppid
-
-    # Install asyncio event loop after forking
-    # This is why we do not use server.bind/server.start
-    import tornado.platform.asyncio
-    tornado.platform.asyncio.AsyncIOMainLoop().install()
+    worker_pool = None
+    broker_pr   = None
 
     # Run
     try:
-        clear_signal_handlers()
+        # Fork processes
+        if jobs > 1:
+            sockets = bind_sockets(port, address=address)
+            if  process.fork_processes(jobs) is None: # We are in the main process
+                close_sockets(sockets)
+                broker_pr   = create_broker_process(ipcaddr)
+                worker_pool = run_worker_pool(workers) if workers>0 else None
+                set_signal_handlers()
+
+                # Note that manage_processes(...) never return in main process 
+                # and call exit(0) which will be caught by SystemExit exception
+                task_id = process.manage_processes(max_restarts=5, logger=LOGGER)
+
+                assert False, "Not Reached"
+        else:
+            broker_pr   = create_broker_process(ipcaddr)
+            worker_pool = run_worker_pool(workers) if workers>0 else None
+            sockets = bind_sockets(port, address=address)
+
+        #if True or task_id is not None:
+        # Install asyncio event loop after forking
+        # This is why we do not use server.bind/server.start
+        tornado.platform.asyncio.AsyncIOMainLoop().install()
+
         LOGGER.info("Running server on port %s:%s", address, port)
-        try:
-            if task_id is not None:
-                # Run the server
-                application = Application(ipcaddr, sockets)
-                loop = asyncio.get_event_loop()
-                loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
-                asyncio.get_event_loop().run_forever()
-        except Exception:
-            traceback.print_exc()
+        # Run the server
+        application = Application(ipcaddr, sockets)
+        loop = asyncio.get_event_loop()
+        loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
+        asyncio.get_event_loop().run_forever()
+    except Exception:
+        traceback.print_exc()
+        if process.task_id() is not None:
+            # Let a chance to the child process to 
+            # restart
+            raise
+        else: 
+            # Make sure that child processes are terminated
+            print("Terminating child processes", file=sys.stderr)
+            process.terminate_childs()
     except (KeyboardInterrupt, SystemExit) as e:
-        print("%s" % e, file=sys.stderr)
+        pass
 
     # Teardown
-    pid = os.getpid()
     if application is not None:
         application.terminate()
         application = None
         loop = asyncio.get_event_loop()
         if not loop.is_closed():
             loop.close()
-        print("{}: Server instance stopped".format(pid), file=sys.stderr)
+        print("{}: Server instance stopped".format(os.getpid()), file=sys.stderr)
 
-    if ppid == pid:
+    if process.task_id() is None:
         if worker_pool:
             print("Stopping workers")
             worker_pool.terminate()
-        print("Stopping broker")
-        broker_pr.terminate()
-        broker_pr.join()
+        if broker_pr:
+            print("Stopping broker")
+            broker_pr.terminate()
+            broker_pr.join()
         print("Server shutdown", file=sys.stderr)
 
    
