@@ -17,10 +17,10 @@ class OwsHandler(BaseHandler):
     """ Proxy to Qgis 0MQ worker
     """
 
-    def initialize(self, client):
+    def initialize(self, client, timeout):
         super().initialize()
-        self._client = client
-        self.conf = get_config('server')
+        self._client  = client
+        self._timeout = timeout
 
     async def handle_request(self, method, data=None):
         reqtime = time()
@@ -33,7 +33,8 @@ class OwsHandler(BaseHandler):
             } 
             if proxy_url: headers['X-Proxy-Location']=proxy_url
             
-            response = await self._client.fetch(query=query, method=method, headers=headers, data=data)
+            response = await self._client.fetch(query=query, method=method, headers=headers, data=data,
+                                                timeout=self._timeout)
             status = response.status
             hdrs   = response.headers
             # Set headers

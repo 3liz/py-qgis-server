@@ -47,6 +47,7 @@ def load_configuration():
     CONFIG.set('server', 'port'      , getenv('QGSRV_SERVER_HTTP_PORT', '8080'))
     CONFIG.set('server', 'interfaces', getenv('QGSRV_SERVER_INTERFACES', '0.0.0.0'))
     CONFIG.set('server', 'workers'   , getenv('QGSRV_SERVER_WORKERS', '2'))
+    CONFIG.set('server', 'timeout'   , getenv('QGSRV_SERVER_TIMEOUT', '20'))
 
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))
@@ -62,7 +63,7 @@ def load_configuration():
     CONFIG.set('zmq', 'identity' , getenv('QGSRV_ZMQ_IDENTITY','OWS-SERVER'))
     CONFIG.set('zmq', 'bindaddr' , getenv('QGSRV_ZMQ_INADDR'  ,'tcp://*:18080'))
     CONFIG.set('zmq', 'maxqueue' , getenv('QGSRV_ZMQ_MAXQUEUE','1000'))
-    CONFIG.set('zmq', 'timeout'  , getenv('QGSRV_ZMQ_TIMEOUT' ,'3000'))
+    CONFIG.set('zmq', 'timeout'  , getenv('QGSRV_ZMQ_TIMEOUT' ,'15000'))
 
 def read_config_dict( userdict ):
     """ Read configuration from dictionary

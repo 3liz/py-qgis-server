@@ -22,10 +22,15 @@ LOGGER=logging.getLogger('QGSRV')
 def configure_handlers( client ):
     """
     """
+    cfg = get_config('server')
+
     handlers = []
     handlers.extend([
         (r"/"    , RootHandler),
-        (r"/ows/", OwsHandler, {'client': client})
+        (r"/ows/", OwsHandler, {
+            'client': client, 
+            'timeout': cfg.getint('timeout'),
+        }),
     ])
 
     return handlers

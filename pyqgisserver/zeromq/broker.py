@@ -129,7 +129,7 @@ def run_broker( inaddr, outaddr, maxqueue=100, timeout=3000):
                             if not workers: 
                                 # No more workers available
                                 # push back the request on the queue
-                                waiting.append((client_id, msgid, data))
+                                waiting.append((tm, client_id, msgid, data))
                             
     except (KeyboardInterrupt,SystemExit):
         LOGGER.warning("Interrupted")

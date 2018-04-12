@@ -42,8 +42,10 @@ def read_configuration(args=None):
     cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=conf.getint('workers'), help="Num workers", dest='workers')
     cli_parser.add_argument('-j','--jobs'    , metavar='NUM', type=int, default=1, help="Num server instances", dest='jobs')
     cli_parser.add_argument('-u','--setuid'  , default='', help="uid to switch to", dest='setuid')
-    cli_parser.add_argument('--rootdir', default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
-    cli_parser.add_argument('--proxy'  , action='store_true', default=False, help='Run only as proxy')
+    cli_parser.add_argument('--rootdir'  , default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
+    cli_parser.add_argument('--proxy'    , action='store_true', default=False, help='Run only as proxy')
+    cli_parser.add_argument('--timeout'  , metavar='SECONDS', type=int, default=conf.getint('timeout'), 
+            help='Set client timeout in seconds')
 
     args = cli_parser.parse_args()
 
@@ -56,7 +58,7 @@ def read_configuration(args=None):
         read_config_file(args.config)
 
     read_config_dict({
-        'logging':{ 'level': args.logging.upper() },
+        'logging':{ 'level'  : args.logging.upper() },
         'cache'  :{ 'rootdir': args.rootdir },
     })
 
