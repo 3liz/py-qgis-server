@@ -33,8 +33,6 @@ class OwsHandler(BaseHandler):
             } 
             if proxy_url: headers['X-Proxy-Location']=proxy_url
           
-            print("######################", self._timeout)
-
             response = await self._client.fetch(query=query, method=method, headers=headers, data=data,
                                                 timeout=self._timeout)
             status = response.status
