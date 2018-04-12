@@ -38,6 +38,7 @@ class OwsHandler(BaseHandler):
             status = response.status
             hdrs   = response.headers
             # Set headers
+            self.set_status(status)
             for k,v in hdrs.items():
                 self.set_header(k,v)
             self.write(response.data)
@@ -59,8 +60,7 @@ class OwsHandler(BaseHandler):
             return
         log_rrequest(status, method, query, time()-reqtime, hdrs)
         if status == 509:
-            self.send_error(status, reason="Server busy, please retry later")
-       
+            self.send_error(status, reason="Server busy, please retry later") 
 
     async def get(self):
         """ Handle Get method
