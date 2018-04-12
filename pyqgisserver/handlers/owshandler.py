@@ -8,7 +8,7 @@ from ..config import get_config
 from ..logger import log_rrequest
 from ..zeromq.client import RequestTimeoutError, RequestGatewayError
 
-from .basehandler import BaseHandler, HTTPError2
+from .basehandler import BaseHandler, HTTPError
 
 LOGGER = logging.getLogger('QGSRV')
 
@@ -32,12 +32,17 @@ class OwsHandler(BaseHandler):
                 'X-Map-Location': project_path 
             } 
             if proxy_url: headers['X-Proxy-Location']=proxy_url
-            
+          
+            print("######################", self._timeout)
+
             response = await self._client.fetch(query=query, method=method, headers=headers, data=data,
                                                 timeout=self._timeout)
             status = response.status
             hdrs   = response.headers
-            # Set headers
+            
+            log_rrequest(status, method, query, time()-reqtime, hdrs)
+            
+            # Send response
             self.set_status(status)
             for k,v in hdrs.items():
                 self.set_header(k,v)
@@ -50,17 +55,13 @@ class OwsHandler(BaseHandler):
                     self.write(chunk)
                     self.flush()
                     chunk = await self._client.fetch_more(response)
-                return
-        except RequestTimeoutError:
-             status, hdrs = 504,{}
-        except RequestGatewayError:
-             status, hdrs = 502,{}
+            elif status == 509:
+                self.send_error(status, reason="Server busy, please retry later") 
 
-        if self.connection_closed:
-            return
-        log_rrequest(status, method, query, time()-reqtime, hdrs)
-        if status == 509:
-            self.send_error(status, reason="Server busy, please retry later") 
+        except RequestTimeoutError:
+             raise HTTPError(504)
+        except RequestGatewayError:
+             raise HTTPError(502)
 
     async def get(self):
         """ Handle Get method

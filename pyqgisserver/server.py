@@ -60,6 +60,11 @@ def read_configuration(args=None):
     read_config_dict({
         'logging':{ 'level'  : args.logging.upper() },
         'cache'  :{ 'rootdir': args.rootdir },
+        'server' :{
+            'interfaces': args.interface,
+            'port'      : str(args.port),
+            'timeout'   : str(args.timeout),
+        },
     })
 
     print_version()

@@ -8,8 +8,6 @@ import traceback
 from tornado.web import HTTPError
 
 from ..version import __version__
-from ..exceptions import HTTPError2
-
 from ..config import get_config
 
 LOGGER = logging.getLogger('QGSRV')

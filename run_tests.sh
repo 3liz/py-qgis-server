@@ -16,7 +16,7 @@ export PATH=$PATH:/.local/bin
 
 # Run the server locally
 echo "Running server..."
-qgisserver -b 127.0.0.1 -p 8080 --rootdir=$(pwd)/tests/data -w1 &>docker-test.log &
+qgisserver -b 127.0.0.1 -p 8080 --timeout=3 --rootdir=$(pwd)/tests/data -w1 &>docker-test.log &
 
 # Wait for server to start
 sleep 5
