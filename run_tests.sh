@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -16,11 +16,10 @@ export PATH=$PATH:/.local/bin
 
 # Run the server locally
 echo "Running server..."
-qgisserver -b 127.0.0.1 -p 8080 --rootdir=$(pwd)/tests/data &>docker-test.log &
+qgisserver -b 127.0.0.1 -p 8080 --rootdir=$(pwd)/tests/data -w1 &>docker-test.log &
 
 # Run new tests
-echo "Launching test"
+#echo "Launching test"
 cd tests && py.test -v
-
 kill $(jobs -p)
 
