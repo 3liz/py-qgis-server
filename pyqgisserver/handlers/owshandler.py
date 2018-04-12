@@ -58,8 +58,10 @@ class OwsHandler(BaseHandler):
         if self.connection_closed:
             return
         log_rrequest(status, method, query, time()-reqtime, hdrs)
-        self.send_error(status, reason="Server busy, please retry later" if status==509 else None)
-        
+        if status == 509:
+            self.send_error(status, reason="Server busy, please retry later")
+       
+
     async def get(self):
         """ Handle Get method
         """

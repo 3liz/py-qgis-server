@@ -131,14 +131,14 @@ class Response(QgsServerResponse):
     def _clearHeaders(self):
         """ Clear headers set so far
         """
-        self._handle.headers = {}
+        self._handler.headers = {}
  
     def clear(self):
         self._clearHeaders()
         self.truncate()
 
     def headersSent(self):
-        return self._handle.header_written
+        return self._handler.header_written
 
     def truncate(self):
         """ Truncate buffer

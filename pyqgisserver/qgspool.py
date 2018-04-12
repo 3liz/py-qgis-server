@@ -1,5 +1,6 @@
 """ Qgis worker pool
 """
+import logging
 import threading
 import time
 
@@ -14,6 +15,8 @@ RUN = 0
 CLOSE = 1
 TERMINATE = 2
 
+
+LOGGER = logging.getLogger('QGSRV')
 
 class Pool:
 
@@ -47,6 +50,8 @@ class Pool:
         for i in reversed(range(len(self._pool))):
             worker = self._pool[i]
             if worker.exitcode is not None:
+                if worker.exitcode != 0:
+                    LOGGER.warning("Qgis Worker exited with code %s", worker.exitcode) 
                 # worker exited
                 worker.join()
                 cleaned = True

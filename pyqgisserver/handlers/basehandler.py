@@ -61,26 +61,17 @@ class BaseHandler(tornado.web.RequestHandler):
     def write_error(self, status_code, **kwargs):
         """ Override, format error as json
         """
-
         message = self._reason
 
         if "exc_info" in kwargs:
             exception = kwargs['exc_info'][1]
             # Error was caused by a exception
-            if isinstance(exception, HTTPError2):
-               errid = exception.kwargs.get("id","http_error")
-            elif isinstance(exception, HTTPError):
-               errid = "http_error"
-            else:
-                errid   = "exception"
             message = "{}".format(exception)
-        else:
-            errid = kwargs.get("id","unknown_error")
                
         self.logger.error("%s", message)
         response = dict(status="error" if status_code != 200 else "ok",
                         httpcode = status_code,
-                        error    = {'id': errid, "message": message })
+                        error    = { "message": message })
 
         self.write_json(response)
         self.finish()

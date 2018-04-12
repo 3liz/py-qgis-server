@@ -116,6 +116,10 @@ def task_id():
 def terminate_childs():
     """ Terminate all childs
     """
+    if _ppid is None: 
+        # Nothing has bee started so far
+        return
+
     assert _ppid == os.getpid(), "can only terminate processes created in the current process"
     global _children
     for pid in _children:
