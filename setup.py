@@ -1,6 +1,11 @@
 from setuptools import setup, find_packages, Extension
-from pip.req import parse_requirements
 import os
+
+
+def parse_requirements( filename ):
+    with open( filename ) as fp:
+        return list(filter(None, (r.strip('\n ').partition('#')[0] for r in fp.readlines())))
+
 
 def load_source(name, path):
     from importlib.util import spec_from_file_location, module_from_spec
@@ -21,7 +26,7 @@ with open('README.md') as f:
 # Parse requirement file and transform it to setuptools requirements'''
 requirements = 'requirements.txt'
 if os.path.exists(requirements):
-    kwargs['install_requires']=list(str(ir.req) for ir in parse_requirements(requirements, session=False))
+    kwargs['install_requires']=parse_requirements(requirements)
 
 setup(
     name='py-qgis-server',
