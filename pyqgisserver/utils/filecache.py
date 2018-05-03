@@ -52,6 +52,6 @@ class FileCache():
         pass
 
     def lookup(self, key):
-        self.validate(key)
-        return self.cache[key].value
+        updated = self.validate(key)
+        return self.cache[key].value, updated
 
