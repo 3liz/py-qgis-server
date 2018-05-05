@@ -104,7 +104,7 @@ docker-run-proxy:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		python-zeromq:3.6 ./run_proxy.sh 
+		python-toolbox:3.6-alpine ./run_proxy.sh 
 
 
 
@@ -114,10 +114,10 @@ run:
 	qgisserver -b 127.0.0.1 -p 8080 --rootdir=$(shell pwd)/tests/data -w $(WORKERS)
 
 # Build dependencies
-deps: dirs
+wheel-deps: dirs
 	pip wheel -w $(DIST) -r requirements.txt
 
-wheel: deps
+wheel:
 	mkdir -p $(DIST)
 	$(PYTHON) setup.py bdist_wheel --dist-dir=$(DIST)
 
