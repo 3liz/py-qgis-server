@@ -1,18 +1,22 @@
-# QGIS embbeded WMS/WFS server in Tornado http server.
+# QGIS embbeded WMS/WFS scalable server in Tornado http server.
+
+## Description
+
+This is a asynchronous HTTP server written in python on top of the [tornado](http://www.tornadoweb.org/en/stable/) framework.
+
+The server may be run as a self-contained single service or as a proxy server with an arbitrary number of workers running
+remotely or locally. Independant workers connect automatically to the front-end proxy with no need of special configuration
+on the proxy side. Thus, this is ideal for auto-scaling configuration for use with container orchestrator as Rancher, Swarm or Kubernetes.
 
 ## Requirements:
 
-- OS: Unix/Posix variants (Linux or OSX) (Windows not supported)
+- OS: Unix/Posix variants (Linux or OSX) (Windows not officialy supported)
 - Python >= 3.5
-- QGIS3 installed
+- QGIS > 3.0 installed
 - Some python knowledge about python virtualenv and package installation.
+- libzmq >= 4.0.1 and pyzmq >= 17
 
 ## Installation
-
-*ADVICE*: You always should install in a python virtualenv. If you want to use system packages, setup your environment 
-with the `--system-site-packages` option.
-
-See the official documentation for how to setup a python virtualenv:  https://virtualenv.pypa.io/en/stable/. 
 
 ### From source 
 
@@ -21,10 +25,10 @@ Install in development mode
 pip install -e .
 ```
 
-### From python package archive
+### Version X.Y.Z From python package archive
 
 ```
-pip install py-qgis-server-0.1.4.tar.gz
+pip install py-qgis-server-X.Y.Z.tar.gz
 ```
 
 ## Running the server
@@ -39,13 +43,14 @@ For example:
 * Use the `daemon` command.
 
 
-### Usage
+### Running the server
+
 ```
 usage: qgisserver [-h] [--logging {debug,info,warning,error}] [-c [PATH]]
-                  [--version] [-p PORT] [-b IP] [-w NUM] [-u SETUID]
-                  [--rootdir PATH]
+                  [--version] [-p PORT] [-b IP] [-w NUM] [-j NUM] [-u SETUID]
+                  [--rootdir PATH] [--proxy] [--timeout SECONDS]
 
-qgis/HTTP/AMQP scalable server
+qgis/HTTP/0MQ scalable server
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -58,9 +63,25 @@ optional arguments:
   -b IP, --bind IP      Interface to bind to
   -w NUM, --workers NUM
                         Num workers
+  -j NUM, --jobs NUM    Num server instances
   -u SETUID, --setuid SETUID
                         uid to switch to
   --rootdir PATH        Path to qgis projects
+  --proxy               Run only as proxy
+  --timeout SECONDS     Set client timeout in seconds
+```
+
+By default the command will run server instances with workers and use unix sockets to communicate. This can 
+be used to run the server as a single command.
+
+#### Running proxy and workers separately
+
+If the `--proxy` option the server will act as a proxy server to talk to independant qgis workers. 
+
+Qgis workers can be run using the command:
+
+```
+qgisserver-worker --host=localhost --rootdir=path/to/projects
 ```
 
 ### Configuration
@@ -82,7 +103,8 @@ Here is a sample config file with the default values and the corresponding env v
 [server]
 port=8080          # QGSRV_SERVER_HTTP_PORT
 interfaces=0.0.0.0 # QGSRV_SERVER_INTERFACES
-workers=2          # QGSRV_SERVER_WORKERS 
+workers=2          # QGSRV_SERVER_WORKERS
+timeout=20         # QGSRV_SERVER_TIMEOUT
 
 [logging]
 level=DEBUG # QGSRV_LOGGING_LEVEL
@@ -90,7 +112,13 @@ level=DEBUG # QGSRV_LOGGING_LEVEL
 [cache]
 size=10    # QGSRV_CACHE_SIZE
 rootdir=   # QGSRV_CACHE_ROOTDIR
-```
+
+[zmq]
+identity=OWS-SERVER     # QGSRV_ZMQ_IDENTITY
+bindaddr=tcp://*:18080  # QGSRV_ZMQ_INADDR
+maxqueue=1000           # QGSRV_ZMQ_MAXQUEUE
+timeout=15000           # QGSRV_ZMQ_TIMEOUT
+````
 
 ## Logging
 

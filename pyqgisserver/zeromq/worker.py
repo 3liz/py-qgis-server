@@ -1,5 +1,6 @@
 #
 # Copyright 2018 3liz
+# Author: David Marteau
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,10 +8,8 @@
 
 """ Define Qgis Worker
 
-    We define QGis workers as REQ since we want to do load-balancing with an 
-    intermediate ROUTER-ROUTER broker.
-
-    Our workers are totally synchronous, so a REQ is appropriate here
+    We define QGis workers as DEALER configuration: it will enables
+    us to forward streamed response as chunked transfer.  
 
     1. Start qgis application
     2. Connect a REQ zmq socket to endpoint
