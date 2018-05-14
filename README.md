@@ -1,4 +1,4 @@
-# QGIS embbeded WMS/WFS scalable server in Tornado http server.
+# QGIS embbeded WMS/WFS/WCS asynchronous scalable server.
 
 ## Description
 
