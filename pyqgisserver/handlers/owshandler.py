@@ -20,11 +20,11 @@ from .basehandler import BaseHandler, HTTPError
 
 LOGGER = logging.getLogger('QGSRV')
 
+
 class OwsHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
-
     def initialize(self, client, timeout):
         super().initialize()
         self._client  = client
@@ -33,14 +33,18 @@ class OwsHandler(BaseHandler):
     async def handle_request(self, method, data=None):
         reqtime = time()
         try:
-            project_path = self.get_query_argument('MAP')
-            query        = self.request.query
+            project_path = self.get_argument('MAP')
+            query        = self.encode_arguments()
             proxy_url    = self.proxy_url()
             headers = {
                 'X-Map-Location': project_path 
             } 
             if proxy_url: headers['X-Proxy-Location']=proxy_url
-          
+            if self.url_encoded:
+                # Do not let qgis server handle url encoded prameters
+                method = 'GET'
+                data   = None
+
             response = await self._client.fetch(query=query, method=method, headers=headers, data=data,
                                                 timeout=self._timeout)
             status = response.status

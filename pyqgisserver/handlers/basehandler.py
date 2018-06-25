@@ -15,6 +15,8 @@ import json
 import traceback
 from tornado.web import HTTPError
 
+from urllib.parse import urlencode
+
 from ..version import __version__
 from ..config import get_config
 
@@ -31,8 +33,12 @@ class BaseHandler(tornado.web.RequestHandler):
         self.logger = LOGGER
         self._cfg = get_config('server')
 
-        # Convert query arguments to upper case:
-        self.request.query_arguments.update( tuple((k.upper(), v) for (k,v) in self.request.query_arguments.items()) )
+        self.url_encoded = len(self.request.body_arguments)
+        # Replace query arguments to upper case:
+        self.request.arguments = { k.upper():v for (k,v) in self.request.arguments.items() }
+
+    def encode_arguments(self):
+        return '?'+urlencode({k:v[0] for k,v in self.request.arguments.items()})
 
     def compute_etag(self):
         # Disable etag computation

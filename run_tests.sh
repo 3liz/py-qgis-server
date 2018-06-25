@@ -14,6 +14,8 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 # Add /.local to path
 export PATH=$PATH:/.local/bin
 
+export QGSRV_LOGGING_LEVEL=DEBUG
+
 # Run the server locally
 echo "Running server..."
 qgisserver -b 127.0.0.1 -p 8080 --timeout=3 --rootdir=$(pwd)/tests/data -w1 &>docker-test.log &

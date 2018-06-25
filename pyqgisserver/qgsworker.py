@@ -13,7 +13,7 @@
 import logging
 import traceback
 
-from qgis.PyQt.QtCore import QBuffer, QIODevice
+from qgis.PyQt.QtCore import QBuffer, QIODevice, QByteArray
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
