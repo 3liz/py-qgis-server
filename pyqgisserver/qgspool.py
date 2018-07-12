@@ -8,9 +8,12 @@
 
 """ Qgis worker pool
 """
+import os
+import sys
 import logging
 import threading
 import time
+import signal
 
 from functools import partial
 
@@ -52,7 +55,7 @@ class Pool:
 
     def _join_exited_workers(self):
         """Cleanup after any worker processes which have exited due to reaching
-        their specified lifetime.  Returns True if any workers were cleaned up.
+           their specified lifetime.  Returns True if any workers were cleaned up.
         """
         cleaned = False
         for i in reversed(range(len(self._pool))):
@@ -60,6 +63,10 @@ class Pool:
             if worker.exitcode is not None:
                 if worker.exitcode != 0:
                     LOGGER.warning("Qgis Worker exited with code %s", worker.exitcode) 
+                    if worker.exitcode in (99,-6):
+                        # Critical exit
+                        LOGGER.critical("Critical worker failure. Aborting...")
+                        os.kill(os.getpid(), signal.SIGABRT)
                 # worker exited
                 worker.join()
                 cleaned = True

@@ -10,6 +10,8 @@
 
     Embedded qgis server in a 0MQ worker 
 """
+import os
+import sys
 import logging
 import traceback
 
@@ -19,7 +21,6 @@ from qgis.server import (QgsServerRequest,
 
 from .zeromq.worker import RequestHandler, run_worker
 from .cache import cache_lookup
-
 
 LOGGER = logging.getLogger('QGSRV')
 
@@ -162,6 +163,7 @@ class QgsRequestHandler(RequestHandler):
         if not hasattr(cls, 'qgis_server' ):
             from .utils.qgis import init_qgis_server
 
+            LOGGER.debug("Initializing qgis server")
             qgsserver = init_qgis_server( network_timeout=3000,
                                           enable_processing=False, 
                                           logger=LOGGER, 
@@ -170,7 +172,12 @@ class QgsRequestHandler(RequestHandler):
 
     @staticmethod
     def run( router, identity=""):
-        QgsRequestHandler.init_server()
+        try:
+            QgsRequestHandler.init_server()
+        except:
+            LOGGER.critical("Qggis initialization error:\n%s", traceback.format_exc())
+            sys.exit(99)
+
         run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')))
 
     def handle_message(self):
