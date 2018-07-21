@@ -12,7 +12,6 @@ import os
 import logging
 from time import time
 
-from ..config import get_config
 from ..logger import log_rrequest
 from ..zeromq.client import RequestTimeoutError, RequestGatewayError
 

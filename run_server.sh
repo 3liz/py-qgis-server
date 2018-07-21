@@ -16,6 +16,10 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 # Add /.local to path
 export PATH=$PATH:/.local/bin
 
+if [ -e /amqp_src ]; then
+    pip3 install --user -e /amqp_src/
+fi
+
 # Run the server locally
 echo "Running server..."
 qgisserver -b 0.0.0.0 -p 8080 --timeout=3 --rootdir=$(pwd)/tests/data -w1
