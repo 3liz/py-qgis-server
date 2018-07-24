@@ -26,7 +26,7 @@ def init_logger():
     exchange = os.environ.get('AMQP_EXCHANGE','qgis_log')
 
     client = BasicPublisher(host=hosts,port=int(port),virtual_host=vhost,
-                            reconnect_delay=0,
+                            reconnect_delay=0.001,
                             logger=LOGGER)
 
     client.initialize(exchange, exchange_type='topic')
