@@ -21,7 +21,7 @@ echo "Running server..."
 qgisserver -b 127.0.0.1 -p 8080 --timeout=3 --rootdir=$(pwd)/tests/data -w1 &>docker-test.log &
 
 # Wait for server to start
-sleep 5
+sleep 7
 # Run new tests
 #echo "Launching test"
 cd tests && py.test -v
