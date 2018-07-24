@@ -64,7 +64,10 @@ class LogFilter(QgsServerFilter):
         ms = int((time() - self.t_start) * 1000.0)
         status = "error" if req.exceptionRaised() else 'ok'
         code = req.statusCode() 
-        params.update(RESPONSE_TIME=ms, RESPONSE_CODE=code, RESPONSE_STATUS=status)
+        params.update(RESPONSE_TIME=ms, 
+                      RESPONSE_CODE=code, 
+                      RESPONSE_STATUS=status, 
+                      ROUTING_KEY=self._routing_key)
         log_msg = json.dumps(params)
         self._client.publish( log_msg , 
                 routing_key  = self._routing_key,

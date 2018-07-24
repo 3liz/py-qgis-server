@@ -74,7 +74,7 @@ docker-run:
 
 
 # Run rabbitmq as
-# docker run -it --rm --name rabbitmq --net mynet rabbitmq:3.6
+# docker run -it --rm --name rabbitmq -p 127.0.0.1:5672:5672 -p 127.0.0.1:15672:15672 --net mynet rabbitmq:3.6-management
 
 docker-run-amqp:
 	mkdir -p $(HOME)/.local
