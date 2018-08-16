@@ -24,6 +24,9 @@ from .zeromq import client, broker
 
 from .utils import process
 
+from .monitor import Monitor
+
+
 LOGGER=logging.getLogger('QGSRV')
 
 def configure_handlers( client ):
@@ -31,12 +34,15 @@ def configure_handlers( client ):
     """
     cfg = get_config('server')
 
+    monitor = Monitor.initialize()
+
     handlers = []
     handlers.extend([
         (r"/"    , RootHandler),
         (r"/ows/", OwsHandler, {
             'client': client, 
             'timeout': cfg.getint('timeout'),
+            'monitor': monitor,
         }),
     ])
 

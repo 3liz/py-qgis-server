@@ -22,8 +22,6 @@ from qgis.server import (QgsServerRequest,
 from .zeromq.worker import RequestHandler, run_worker
 from .cache import cache_lookup
 
-from .filters.logger import LogFilter
-
 LOGGER = logging.getLogger('QGSRV')
 
 
@@ -171,9 +169,6 @@ class QgsRequestHandler(RequestHandler):
                                           logger=LOGGER, 
                                           verbose=LOGGER.level<=logging.DEBUG)
             setattr(cls, 'qgis_server' , qgsserver )
-
-            # Register AMQP Logger filter
-            LogFilter.register_self( qgsserver.serverInterface(), 1000)
 
     @staticmethod
     def run( router, identity=""):

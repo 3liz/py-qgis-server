@@ -8,7 +8,6 @@
 
 """ Qgis server handler
 """
-import os
 import logging
 from time import time
 
@@ -24,10 +23,11 @@ class OwsHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
-    def initialize(self, client, timeout):
+    def initialize(self, client, timeout, monitor=None):
         super().initialize()
         self._client  = client
         self._timeout = timeout
+        self._monitor = monitor
 
     async def handle_request(self, method, data=None):
         reqtime = time()
@@ -48,9 +48,13 @@ class OwsHandler(BaseHandler):
                                                 timeout=self._timeout)
             status = response.status
             hdrs   = response.headers
-            
-            log_rrequest(status, method, query, time()-reqtime, hdrs)
-            
+            delta  = time() - reqtime
+
+            log_rrequest(status, method, query, delta, hdrs)
+           
+            if self._monitor:
+                self._monitor.emit( status, self.request.arguments, delta)
+
             # Send response
             self.set_status(status)
             for k,v in hdrs.items():
