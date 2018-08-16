@@ -29,3 +29,5 @@ __output__
 # Test log
 docker-test.log
 
+.local
+

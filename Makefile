@@ -49,10 +49,8 @@ docker-test:
 	docker run --rm --name qgis3-py-server-test-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
-		-v $(HOME)/.local:/.local \
-		-v $(HOME)/.config/pip:/.pipconf  \
-		-v $(HOME)/.cache/pip:/.pipcache \
-		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
+		-v $(shell pwd)/.local:/.local \
+		-v $(shell pwd)/.cache/pip:/.pipcache \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		$(QGIS_IMAGE) ./run_tests.sh
@@ -63,10 +61,8 @@ docker-run:
 	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis3-py-server-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
-		-v $(HOME)/.local:/.local \
-		-v $(HOME)/.config/pip:/.pipconf  \
-		-v $(HOME)/.cache/pip:/.pipcache \
-		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
+		-v $(shell pwd)/.local:/.local \
+		-v $(shell pwd)/.cache/pip:/.pipcache \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
@@ -81,13 +77,11 @@ docker-run-amqp:
 	docker run -it --rm -p 127.0.0.1:8080:8080 --net mynet --name qgis3-py-server-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
-		-v $(HOME)/.local:/.local \
-		-v $(HOME)/.config/pip:/.pipconf  \
-		-v $(HOME)/.cache/pip:/.pipcache \
+		-v $(shell pwd)/.local:/.local \
+		-v $(shell pwd)/.cache/pip:/.pipcache \
 		-v $(shell realpath ../py-amqp-client):/amqp_src \
 		-e AMQP_HOST=rabbitmq \
 		-e AMQP_ROUTING=local.test \
-		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
@@ -100,10 +94,8 @@ docker-run-worker:
 	docker run -it --rm --net mynet --name qgis3-py-worker-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
-		-v $(HOME)/.local:/.local \
-		-v $(HOME)/.config/pip:/.pipconf  \
-		-v $(HOME)/.cache/pip:/.pipcache \
-		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
+		-v $(shell pwd)/.local:/.local \
+		-v $(shell pwd)/.cache/pip:/.pipcache \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
@@ -121,8 +113,7 @@ docker-run-proxy:
 		-v $(HOME)/.alpine/wheels:/wheels \
 		-v $(HOME)/.alpine:/.local \
 		-v $(HOME)/.alpine/.cache:/.pipcache \
-		-v $(HOME)/.config/pip:/.pipconf  \
-		-e PIP_CONFIG_FILE=/.pipconf/$(PIP_CONFIG_FILE) \
+		-v $(shell realpath ../py-amqp-client):/amqp_src \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
