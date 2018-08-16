@@ -43,14 +43,17 @@ test:
 PIP_CONFIG_FILE:=pip.conf
 BECOME_USER:=$(shell id -u)
 
+ifndef LOCAL_HOME
+	LOCAL_HOME=$(shell pwd)
+endif
 
 docker-test:
 	mkdir -p $(HOME)/.local
 	docker run --rm --name qgis3-py-server-test-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
-		-v $(shell pwd)/.local:/.local \
-		-v $(shell pwd)/.cache/pip:/.pipcache \
+		-v $(LOCAL_HOME)/.local:/.local \
+		-v $(LOCAL_HOME)/.cache/pip:/.pipcache \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		$(QGIS_IMAGE) ./run_tests.sh
