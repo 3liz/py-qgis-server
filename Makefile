@@ -18,7 +18,7 @@ ifdef REGISTRY_URL
 	REGISTRY_PREFIX=$(REGISTRY_URL)/
 endif
 
-QGIS_IMAGE=$(REGISTRY_PREFIX)qgis-platform:latest
+QGIS_IMAGE=$(REGISTRY_PREFIX)qgis-platform-dev:latest
 
 # This is necessary with pytest as long it is not fixed
 # see also https://github.com/qgis/QGIS/pull/5337
