@@ -40,7 +40,6 @@ test:
 	cd tests && py.test -v --host=$(SERVER_HOST)
 
 
-PIP_CONFIG_FILE:=pip.conf
 BECOME_USER:=$(shell id -u)
 
 ifndef LOCAL_HOME
