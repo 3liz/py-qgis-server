@@ -32,6 +32,7 @@ class OwsHandler(BaseHandler):
     async def handle_request(self, method, data=None):
         reqtime = time()
         try:
+            delta = None
             project_path = self.get_argument('MAP')
             query        = self.encode_arguments()
             proxy_url    = self.proxy_url()
@@ -52,15 +53,14 @@ class OwsHandler(BaseHandler):
 
             log_rrequest(status, method, query, delta, hdrs)
            
-            if self._monitor:
-                self._monitor.emit( status, self.request.arguments, delta)
-
             # Send response
-            self.set_status(status)
             for k,v in hdrs.items():
                 self.set_header(k,v)
-            self.write(response.data)
-            if status == 200:
+
+            if status == 206:
+                # Partial response
+                self.set_status(200)
+                self.write(response.data)
                 chunk = await self._client.fetch_more(response)
                 if chunk:
                     await self.flush()
@@ -68,13 +68,24 @@ class OwsHandler(BaseHandler):
                     self.write(chunk)
                     self.flush()
                     chunk = await self._client.fetch_more(response)
+                delta = time() - reqtime
             elif status == 509:
                 self.send_error(status, reason="Server busy, please retry later") 
+            else:
+                self.set_status(status)
+                self.write(response.data)
 
         except RequestTimeoutError:
-             raise HTTPError(504)
+              status = 503
+              delta = time() - reqtime
+              self.send_error(status, reason="Request timeout error")
         except RequestGatewayError:
-             raise HTTPError(502)
+              status = 502
+              delta = time() - reqtime
+              self.send_error(status, reason="Server busy, please retry later")
+
+        if self._monitor:
+              self._monitor.emit( status, self.request.arguments,  delta)
 
     async def get(self):
         """ Handle Get method

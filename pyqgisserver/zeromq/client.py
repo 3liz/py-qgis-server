@@ -65,7 +65,6 @@ class AsyncResponseHandler:
             # Create a queue to collect the remaining chunks
             if self.status == 206:
                 self._has_more = True
-                self.status = 200
                 self._chunks = asyncio.Queue(loop=self._loop)
             # Send the result
             self._future.set_result(self)
