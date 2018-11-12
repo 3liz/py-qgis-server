@@ -5,8 +5,6 @@
 BUILDID=$(shell date +"%Y%m%d%H%M")
 COMMITID=$(shell git rev-parse --short HEAD)
 
-PYPISERVER:=storage
-
 BUILDDIR=build
 DIST=${BUILDDIR}/dist
 
@@ -18,7 +16,9 @@ ifdef REGISTRY_URL
 	REGISTRY_PREFIX=$(REGISTRY_URL)/
 endif
 
-QGIS_IMAGE=$(REGISTRY_PREFIX)qgis-platform-dev:latest
+FLAVOR:=release
+
+QGIS_IMAGE=$(REGISTRY_PREFIX)qgis-platform:$(FLAVOR)
 
 # This is necessary with pytest as long it is not fixed
 # see also https://github.com/qgis/QGIS/pull/5337
