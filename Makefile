@@ -1,3 +1,4 @@
+SHELL:=bash
 # 
 # qgis server makefile
 #
