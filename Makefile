@@ -49,7 +49,7 @@ endif
 
 docker-test:
 	mkdir -p $(HOME)/.local
-	docker run --rm --name qgis3-py-server-test-$(COMMITID) -w /src \
+	docker run --rm --name qgis-py-server-test-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
 		-v $(LOCAL_HOME)/.local:/.local \
@@ -61,7 +61,7 @@ docker-test:
 
 docker-run:
 	mkdir -p $(HOME)/.local
-	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis3-py-server-run-$(COMMITID) -w /src \
+	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis-py-server-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
 		-v $(shell pwd)/.local:/.local \
@@ -94,7 +94,7 @@ docker-run-amqp:
 
 docker-run-worker:
 	mkdir -p $(HOME)/.local
-	docker run -it --rm --net mynet --name qgis3-py-worker-run-$(COMMITID) -w /src \
+	docker run -it --rm --net mynet --name qgis-py-worker-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
 		-v $(shell pwd)/.local:/.local \
