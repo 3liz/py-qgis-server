@@ -62,7 +62,8 @@ def read_configuration(args=None):
 
     log_level = args.logging
     if args.config:
-        read_config_file(args.config)
+        with open(args.config, mode='rt') as config_file:
+            read_config_file(config_file)
 
     read_config_dict({
         'logging':{ 'level'  : args.logging.upper() },
