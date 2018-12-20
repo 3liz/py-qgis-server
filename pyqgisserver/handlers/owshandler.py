@@ -23,19 +23,35 @@ class OwsHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
-    def initialize(self, client, timeout, monitor=None):
+    def initialize(self, client, timeout, monitor=None, profiles=None, map_rewrite=None, http_proxy=False):
         super().initialize()
-        self._client  = client
-        self._timeout = timeout
-        self._monitor = monitor
 
-    async def handle_request(self, method, data=None):
+        self._client      = client
+        self._timeout     = timeout
+        self._monitor     = monitor
+        self._profiles    = profiles
+        self._proxy       = http_proxy
+        if map_rewrite:
+            self._rewrite_map = lambda profile,path:map_rewrite % dict(profile=profile,path=project_path) 
+        else:
+            self._rewrite_map = None
+
+    async def handle_request(self, method, data=None, profile=None):
         reqtime = time()
         try:
+            # Handle profile
+            if self._profiles and not self._profiles.apply_profile(profile, self.request, http_proxy=self._proxy):
+                raise HTTPError(403,reason="Unauthorized profile")
+
+            proxy_url = self.proxy_url(self._proxy, profile=profile)
+
             delta = None
             project_path = self.get_argument('MAP')
             query        = self.encode_arguments()
-            proxy_url    = self.proxy_url()
+
+            if self._rewrite_map:
+                project_path = self._rewrite_map(project_path, profile)
+
             headers = {
                 'X-Map-Location': project_path 
             } 
@@ -87,15 +103,15 @@ class OwsHandler(BaseHandler):
         if self._monitor:
               self._monitor.emit( status, self.request.arguments,  delta)
 
-    async def get(self):
+    async def get(self, profile=None):
         """ Handle Get method
         """
-        await self.handle_request('GET')
+        await self.handle_request('GET', profile=profile)
           
-    async def post(self):
+    async def post(self, profile=None):
         """ Handle Post method
         """
-        await self.handle_request('POST', data=self.request.body)
+        await self.handle_request('POST', data=self.request.body, profile=profile)
         
 
 

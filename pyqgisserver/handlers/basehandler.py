@@ -88,12 +88,17 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write_json(response)
         self.finish()
 
-    def proxy_url(self):
+    def proxy_url(self, http_proxy=False, **kwargs):
         """ Return the proxy_url
         """
         # Replace the status url with the proxy_url if any
         req = self.request
-        proxy_url = self._cfg.get('host_proxy') or \
-                    req.headers.get('X-Proxy-Location') or  \
-                    "{0.protocol}://{0.host}{0.path}".format(req)
-        return proxy_url                            
+        if http_proxy:
+            proxy_url = self._cfg.get('proxy_url') or \
+                        req.headers.get('X-Proxy-Location') or \
+                        "{0.protocol}://{0.host}{0.path}".format(req) 
+            proxy_url = proxy_url.format(**kwargs)
+        else:
+            proxy_url = "{0.protocol}://{0.host}{0.path}".format(req)
+        return proxy_url
+
