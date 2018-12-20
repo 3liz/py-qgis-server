@@ -1,0 +1,9 @@
+---
+
+allow_default_profile: yes
+
+# Allow anything
+default: {}
+
+profiles: !include profiles/*.yml
+

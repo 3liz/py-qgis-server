@@ -25,6 +25,7 @@ from .zeromq import client, broker
 from .utils import process
 
 from .monitor import Monitor
+from .profiles import ProfileMngr
 
 
 LOGGER=logging.getLogger('QGSRV')
@@ -36,15 +37,24 @@ def configure_handlers( client ):
 
     monitor = Monitor.initialize()
 
-    handlers = []
-    handlers.extend([
-        (r"/"    , RootHandler),
-        (r"/ows/", OwsHandler, {
-            'client': client, 
-            'timeout': cfg.getint('timeout'),
-            'monitor': monitor,
-        }),
-    ])
+    ows_kwargs = {
+        'client'     : client,
+        'monitor'    : monitor,
+        'timeout'    : cfg.getint('timeout'),
+        'map_rewrite': cfg.get('map_rewrite'),
+        'http_proxy'  : cfg.get('http_proxy') == 'yes', 
+    }
+
+    # Load profiles
+    with_profiles = cfg.get('profiles')
+    if with_profiles:
+        ows_kwargs['profiles'] = ProfileMngr.initialize(with_profiles)
+
+    handlers =[
+        (r"/"               , RootHandler),
+        (r"/ows/p/([^\/]+)/", OwsHandler, ows_kwargs),
+        (r"/ows/"           , OwsHandler, ows_kwargs),
+    ]
 
     return handlers
 
@@ -179,7 +189,6 @@ def run_server( port, address="", jobs=1,  user=None, workers=0):
             worker_pool = run_worker_pool(workers) if workers>0 else None
             sockets = bind_sockets(port, address=address)
 
-        #if True or task_id is not None:
         # Install asyncio event loop after forking
         # This is why we do not use server.bind/server.start
         tornado.platform.asyncio.AsyncIOMainLoop().install()

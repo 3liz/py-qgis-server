@@ -51,10 +51,14 @@ def load_configuration():
     CONFIG = configparser.ConfigParser()    
 
     CONFIG.add_section('server')
-    CONFIG.set('server', 'port'      , getenv('QGSRV_SERVER_HTTP_PORT', '8080'))
-    CONFIG.set('server', 'interfaces', getenv('QGSRV_SERVER_INTERFACES', '0.0.0.0'))
-    CONFIG.set('server', 'workers'   , getenv('QGSRV_SERVER_WORKERS', '2'))
-    CONFIG.set('server', 'timeout'   , getenv('QGSRV_SERVER_TIMEOUT', '20'))
+    CONFIG.set('server', 'port'       , getenv('QGSRV_SERVER_HTTP_PORT', '8080'))
+    CONFIG.set('server', 'interfaces' , getenv('QGSRV_SERVER_INTERFACES', '0.0.0.0'))
+    CONFIG.set('server', 'workers'    , getenv('QGSRV_SERVER_WORKERS', '2'))
+    CONFIG.set('server', 'timeout'    , getenv('QGSRV_SERVER_TIMEOUT', '20'))
+    CONFIG.set('server', 'profiles'   , getenv('QGSRV_SERVER_PROFILES', ''))
+    CONFIG.set('server', 'map_rewrite', getenv('QGSRV_SERVER_MAP_REWRITE', ''))
+    CONFIG.set('server', 'http_proxy' , getenv('QGSRV_SERVER_HTTP_PROXY', 'no'))
+    CONFIG.set('server', 'proxy_url'  , getenv('QGSRV_SERVER_PROXY_URL' , ''))
 
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))

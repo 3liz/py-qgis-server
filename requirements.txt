@@ -1,3 +1,4 @@
 tornado >= 5
 pyzmq >= 17
+PyYAML
 
