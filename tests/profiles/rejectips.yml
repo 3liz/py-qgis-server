@@ -1,0 +1,10 @@
+
+### Define a simple profile
+### Allowing WMS only and overwriting the MAP parameter
+rejectips:
+  services: 
+    - WMS
+  parameters:
+    MAP: france_parts.qgs
+  allowed_ips:
+    - 192.168.2.0/24
