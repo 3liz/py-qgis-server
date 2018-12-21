@@ -1,7 +1,7 @@
 
 ### Define a simple profile
 ### Allowing WMS only and overwriting the MAP parameter
-foobar:
+wmsonly:
   services: 
     - WMS
   parameters:
