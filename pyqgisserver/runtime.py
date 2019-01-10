@@ -51,9 +51,9 @@ def configure_handlers( client ):
         ows_kwargs['profiles'] = ProfileMngr.initialize(with_profiles)
 
     handlers =[
-        (r"/"               , RootHandler),
-        (r"/ows/p/([^\/]+)/", OwsHandler, ows_kwargs),
-        (r"/ows/"           , OwsHandler, ows_kwargs),
+        (r"/"          , RootHandler),
+        (r"/ows/p/(.*)", OwsHandler, ows_kwargs),
+        (r"/ows/"      , OwsHandler, ows_kwargs),
     ]
 
     return handlers

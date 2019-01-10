@@ -53,6 +53,7 @@ class Loader(yaml.SafeLoader):
                     if not isinstance(data, dict):
                         raise Exception("Expecting 'dict', not %s" % type(data))
                     value.update(data)
+                    LOGGER.debug("Loaded profile: %s", filename)
             except Exception as err:
                 LOGGER.error("Failed to load %s: %s", filename, err)
                 raise
@@ -157,6 +158,8 @@ class ProfileMngr:
         """
         """
         try:
+            # name may be a path like string
+            if name: name = name.strip('/')
             profile = self._profiles.get(name or 'default')
             if profile is None:
                 raise ProfileError("Unknown profile")
