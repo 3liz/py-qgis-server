@@ -2,6 +2,8 @@
 
 allow_default_profile: yes
 
+autoreload: yes
+
 # Allow anything
 default: {}
 

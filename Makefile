@@ -71,6 +71,7 @@ docker-run:
 		-v $(shell pwd)/.cache/pip:/.pipcache \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
 		$(QGIS_IMAGE) ./run_server.sh
 

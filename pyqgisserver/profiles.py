@@ -27,9 +27,12 @@ import sys
 import logging
 import yaml
 import traceback
+import functools
 
 from ipaddress import ip_address, ip_network
 from glob import glob 
+
+from .watchfiles import watchfiles
 
 LOGGER = logging.getLogger('QGSRV')
 
@@ -142,6 +145,9 @@ class ProfileMngr:
             else:
                 raise
 
+    def __init__(self):
+        self._autoreload = None
+
     def load( self, profiles):
         LOGGER.info("Reading profiles %s",profiles)
         with open(profiles,'r') as f:
@@ -153,6 +159,19 @@ class ProfileMngr:
 
         self._profiles.update( (k,_Profile(v)) for k,v in config.get('profiles',{}).items() )
 
+        # Configure auto reload
+        if config.get('autoreload', False):
+            if self._autoreload is None:
+                check_time = config.get('autoreload_check_time', 3000)
+                self._autoreload = watchfiles([profiles], 
+                        lambda modified_files: self.load(profiles), 
+                        check_time=check_time)
+            if not self._autoreload.is_running():
+                LOGGER.info("Enabling profiles autoreload")
+                self._autoreload.start()
+        elif self._autoreload is not None and self._autoreload.is_running():
+            LOGGER.info("Disabling profiles autoreload")
+            self._autoreload.stop()            
 
     def apply_profile( self, name, request, http_proxy=False):
         """
