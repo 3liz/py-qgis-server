@@ -50,6 +50,11 @@ class lrucache():
         # If so we are going to replace that value with the new one.
         if key in self._table:
             del self._table[key]
+
+        # Keep size
+        while len(self._table) >= self._capacity:
+            self._table.popitem(last=False)
+
         OrderedDict.__setitem__(self._table, key, value)
 
     def __delitem__(self, key):
@@ -73,7 +78,7 @@ class lrucache():
             Items are returned  in order from the most recently to least recently used. 
             Does not modify the cache order.
         """
-        return reversed(self._tabel.items())
+        return reversed(self._table.items())
 
     def keys(self):
         """ Return an iterator that returns the keys in the cache.
