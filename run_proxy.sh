@@ -1,11 +1,8 @@
-#!/bin/sh
-
-# This scripts is expected to be run in an python:3.6 alpine with zmq
-# installed and python requirements available as precompiled wheels.
+#!/bin/bash
 
 set -e
 
-PIP="pip3 install -U --user --no-index --find-links=/wheels"
+PIP="pip3 install -U --user"
 
 $PIP setuptools
 $PIP -r requirements.pip

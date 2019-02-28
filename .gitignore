@@ -30,4 +30,5 @@ __output__
 docker-test.log
 
 .local
+.qgis-restart
 

@@ -12,6 +12,7 @@ import asyncio
 import logging
 import signal
 import traceback
+import time
 
 import tornado.web
 import tornado.platform.asyncio
@@ -26,7 +27,8 @@ from .utils import process
 
 from .monitor import Monitor
 from .profiles import ProfileMngr
-
+from .broadcast import (create_broadcast_publisher, 
+                        restart_when_modified)
 
 LOGGER=logging.getLogger('QGSRV')
 
@@ -74,7 +76,22 @@ class Application(tornado.web.Application):
         # Init HTTP server
         server = HTTPServer(self)
         server.add_sockets(sockets)
-        self._http_server = server 
+        self._http_server = server
+
+        self.init_broadcast_publisher()
+
+    def init_broadcast_publisher(self):
+
+        broadcastaddr   = get_config('zmq')['broadcastaddr']
+        self._broadcast = create_broadcast_publisher(broadcastaddr)
+
+        restartfile = get_config('server')['restartfile']        
+        if restartfile:
+            # Set up a autorestart
+            check_time = get_config('server').get('restartfile_check_time', 5000)
+            self._autorestart = restart_when_modified(self._broadcast, restartfile, 
+                                                      check_time=check_time)
+            self._autorestart.start()
 
     def log_request(self, handler):
         """ Write HTTP requet to the logs
@@ -85,6 +102,8 @@ class Application(tornado.web.Application):
         self._http_server.stop()
         self._http_server = None
         self._zmq_client.terminate()
+        self._autorestart.stop()
+        self._broadcast.close()
 
 
 def terminate_handler( signum, frame ):
@@ -126,16 +145,47 @@ def create_broker_process( ipcaddr ):
     return p
 
 
+def create_worker_pool( workers ):
+    """ Run workers pool in its own process
+
+        This ensure that sub-processes all always forked from
+        the same parent context
+ 
+        This will prevent forking zmq context.
+        If we do not do this, forked workers cannot
+        reconnect when forked from running ZMQ context.
+    """
+    from multiprocessing import Process
+    p = Process(target=run_worker_pool,args=(workers,))
+    p.start()
+    return p
+
+
 def run_worker_pool(workers):
     """ Run a qgis worker pool
     """
     from .qgspool import Pool
 
-    LOGGER.info("Starting worker pool")
-    router = get_config('zmq')['bindaddr'] 
-    pool = Pool(router, workers)
-    return pool
+    # Try to exit gracefully
+    def term_signal(signum,frames):
+        print("Caught signal: %s" % signum, file=sys.stderr)
+        raise SystemExit()
 
+    signal.signal(signal.SIGTERM,term_signal)
+
+    LOGGER.info("Starting worker pool")
+    router        = get_config('zmq')['bindaddr'] 
+    broadcastaddr = get_config('zmq')['broadcastaddr']
+    pool = Pool(router, workers, broadcastaddr=broadcastaddr)
+    try:
+        while True:
+            time.sleep(20)
+    except (KeyboardInterrupt,SystemExit):
+        LOGGER.warning("Pool Interrupted")
+    finally:
+        pool.terminate()
+
+    
 
 def run_server( port, address="", jobs=1,  user=None, workers=0):
     """ Run the server
@@ -154,7 +204,8 @@ def run_server( port, address="", jobs=1,  user=None, workers=0):
     ipcaddr = 'ipc://'+ipc_path+'0'
     # Use ipc sockets for managed workers
     if workers > 0:
-        set_config('zmq','bindaddr', 'ipc://'+ipc_path+'pool0')
+        set_config('zmq','bindaddr'     , 'ipc://'+ipc_path+'pool0')
+        set_config('zmq','broadcastaddr', 'ipc://'+ipc_path+'broadcast0')
 
     application = None
 
@@ -186,7 +237,7 @@ def run_server( port, address="", jobs=1,  user=None, workers=0):
                 assert False, "Not Reached"
         else:
             broker_pr   = create_broker_process(ipcaddr)
-            worker_pool = run_worker_pool(workers) if workers>0 else None
+            worker_pool = create_worker_pool(workers) if workers>0 else None
             sockets = bind_sockets(port, address=address)
 
         # Install asyncio event loop after forking
@@ -225,6 +276,7 @@ def run_server( port, address="", jobs=1,  user=None, workers=0):
         if worker_pool:
             print("Stopping workers")
             worker_pool.terminate()
+            worker_pool.join()
         if broker_pr:
             print("Stopping broker")
             broker_pr.terminate()

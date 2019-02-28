@@ -82,6 +82,7 @@ def run_broker( inaddr, outaddr, maxqueue=100, timeout=3000):
             if backend in sockets:
                 try:
                     worker_id, client_id, *rest = backend.recv_multipart()
+
                     if client_id == WORKER_READY:
                         # Worker is available on new connection
                         # Mark worker as available
@@ -148,10 +149,9 @@ def run_broker( inaddr, outaddr, maxqueue=100, timeout=3000):
         frontend.close()
         context.term()
 
-
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description='Test worker')
+    parser = argparse.ArgumentParser(description='Test broker')
     parser.add_argument('--iface', metavar="host", default="tcp://127.0.0.1", help="Interface to bind to")
     parser.add_argument('--in'   , dest='inaddr' , metavar='address', default='{iface}:8880', help="frontend address")
     parser.add_argument('--out'  , dest='outaddr', metavar='address', default='{iface}:8881', help="backend address")

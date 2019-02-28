@@ -31,8 +31,9 @@ LOGGER = logging.getLogger('QGSRV')
 
 class Pool:
 
-    def __init__(self, router, num_workers):
+    def __init__(self, router, num_workers, broadcastaddr=None):
         self._router = router
+        self._broadcastaddr = broadcastaddr
         self._num_workers = num_workers
         self._pool = []
         self._repopulate_pool()
@@ -78,7 +79,8 @@ class Pool:
         for use after reaping workers which have exited.
         """
         for _ in range(self._num_workers - len(self._pool)):
-            w = Process(target=QgsRequestHandler.run, args=(self._router,))
+            w = Process(target=QgsRequestHandler.run, args=(self._router,),
+                                   kwargs={ 'broadcastaddr': self._broadcastaddr } )
             self._pool.append(w)
             w.name = w.name.replace('Process', 'QgisWorker')
             w.daemon = True

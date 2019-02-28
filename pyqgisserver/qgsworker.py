@@ -171,14 +171,15 @@ class QgsRequestHandler(RequestHandler):
             setattr(cls, 'qgis_server' , qgsserver )
 
     @staticmethod
-    def run( router, identity=""):
+    def run( router, identity="", broadcastaddr=None):
         try:
             QgsRequestHandler.init_server()
         except:
             LOGGER.critical("Qggis initialization error:\n%s", traceback.format_exc())
             sys.exit(99)
 
-        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')))
+        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')),
+                   broadcastaddr=broadcastaddr)
 
     def handle_message(self):
         """ Override this method to handle_messages
@@ -213,12 +214,13 @@ def main():
     from .logger import setup_log_handler
 
     parser = argparse.ArgumentParser(description='Qgis Server Worker')
-    parser.add_argument('--host'    , metavar="host"   , default='tcp://localhost', help="router host")   
-    parser.add_argument('--router'  , metavar='address', default='tcp://{host}:18080', help="router address")
-    parser.add_argument('--identity', default="", help="Set worker identity")
-    parser.add_argument('--rootdir' , default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
-    parser.add_argument('--version', action='store_true', default=False, help="Return version number and exit")
-    parser.add_argument('--logging' , choices=['debug', 'info', 'warning', 'error'], 
+    parser.add_argument('--host'     , metavar="host"   , default='tcp://localhost'   , help="router host")   
+    parser.add_argument('--router'   , metavar='address', default='tcp://{host}:18080', help="router address")
+    parser.add_argument('--broadcast', metavar='address', default='tcp://{host}:18090', help="broadcast address")
+    parser.add_argument('--identity' , default="", help="Set worker identity")
+    parser.add_argument('--rootdir'  , default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
+    parser.add_argument('--version'  , action='store_true', default=False, help="Return version number and exit")
+    parser.add_argument('--logging'  , choices=['debug', 'info', 'warning', 'error'], 
             default=get_config('logging')['level'].lower(), help="set log level")
 
     args = parser.parse_args()
@@ -246,7 +248,10 @@ def main():
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 
-    QgsRequestHandler.run(args.router.format(host=args.host), identity=args.identity)
+    broadcastaddr = args.broadcast.format(host=args.host)
+
+    QgsRequestHandler.run(args.router.format(host=args.host), identity=args.identity,
+                          broadcastaddr=broadcastaddr)
 
     print("Qgis worker terminated", file=sys.stderr)
 

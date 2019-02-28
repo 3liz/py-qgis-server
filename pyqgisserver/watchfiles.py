@@ -24,6 +24,7 @@ def _update_callback( updatefunc, watched_files, modify_times ):
     """
     modified_files = [path for path in watched_files if _check_file(modify_times, path) is not None]
     if len(modified_files) > 0:
+        LOGGER.debug("running update hook for %s", modified_files)
         updatefunc( modified_files )
 
 
@@ -37,7 +38,6 @@ def _check_file(modify_times, path):
         return
     if modify_times[path] != modified:
         modify_times[path] = modified
-        LOGGER.debug("%s modified; running update hook", path)
         return path
 
 

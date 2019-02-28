@@ -49,6 +49,7 @@ endif
 
 docker-test:
 	mkdir -p $(HOME)/.local
+	echo -n "Restart qgis" > .qgis-restart
 	docker run --rm --name qgis-py-server-test-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
@@ -57,6 +58,7 @@ docker-test:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
+		-e QGSRV_SERVER_RESTARTFILE=/src/.qgis-restart \
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
 		$(QGIS_IMAGE) ./run_tests.sh
@@ -64,6 +66,7 @@ docker-test:
 
 docker-run:
 	mkdir -p $(HOME)/.local
+	echo -n "Restart qgis" > .qgis-restart
 	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis-py-server-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
@@ -72,6 +75,7 @@ docker-run:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
+		-e QGSRV_SERVER_RESTARTFILE=/src/.qgis-restart \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
 		$(QGIS_IMAGE) ./run_server.sh
 
@@ -114,17 +118,18 @@ docker-run-worker:
 # Run proxy in a alpine container with precompiled wheels.
 docker-run-proxy:
 	mkdir -p $(HOME)/.local
+	echo -n "Restart qgis" > .qgis-restart
 	docker run -it --rm -p 127.0.0.1:8080:8080 --net mynet --name qgis-py-proxy-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(shell pwd):/src \
-		-v $(HOME)/.alpine/wheels:/wheels \
-		-v $(HOME)/.alpine:/.local \
-		-v $(HOME)/.alpine/.cache:/.pipcache \
-		-v $(shell realpath ../py-amqp-client):/amqp_src \
+		-v $(shell pwd)/.local:/.local \
+		-v $(shell pwd)/.cache/pip:/.pipcache \
+		-e PIP_CACHE_DIR=/.pipcache \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		python-toolbox:3.6-alpine ./run_proxy.sh 
+		-e QGSRV_SERVER_RESTARTFILE=/src/.qgis-restart \
+		$(QGIS_IMAGE) ./run_proxy.sh 
 
 
 

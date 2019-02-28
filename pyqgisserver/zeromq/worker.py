@@ -23,6 +23,7 @@ import zmq
 import pickle
 import signal
 import uuid
+import time
 
 from ..version import __description__, __version__
 from ..logger import setup_log_handler
@@ -91,7 +92,7 @@ class RequestHandler:
         self.send(b"", False)
 
 
-def run_worker(address, handler_factory, identity=None):
+def run_worker(address, handler_factory, identity=None, broadcastaddr=None):
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()
@@ -106,7 +107,14 @@ def run_worker(address, handler_factory, identity=None):
     sock.identity = identity or uuid.uuid1().bytes
     LOGGER.info("Identity set to %s", sock.identity)
     sock.connect(address)
-    
+   
+    if broadcastaddr:
+        LOGGER.info("Enabling broadcast notification")
+        ctx = zmq.Context.instance()
+        sub = ctx.socket(zmq.SUB)
+        sub.setsockopt(zmq.SUBSCRIBE, b'RESTART')
+        sub.connect(broadcastaddr)
+
     try:
         LOGGER.info("Starting ZMQ worker loop")
         while True:
@@ -125,13 +133,27 @@ def run_worker(address, handler_factory, identity=None):
                 if not handler.header_written:
                     handler.status_code = 500
                     handler.send(bytes("Worker internal error".encode('ascii')))
+
+            # Handle broadcast restart
+            try:
+                if broadcastaddr and sub.recv(flags=zmq.NOBLOCK)==b'RESTART':
+                   # There is no really way to restart
+                   # so exit and let the framework restart a new worker
+                   LOGGER.info("Exiting on RESTART notification")
+                   break
+            except zmq.error.Again:
+                pass
+     
     except (KeyboardInterrupt, SystemExit):
             print("Interrupted", file=sys.stderr)
-   # Terminate context
+
+    if broadcastaddr:
+       sub.close()
+    # Terminate context
     print("Terminating context", file=sys.stderr)
     sock.close()
     ctx.term()
-    
+   
 
 if __name__ == '__main__':
     import argparse
