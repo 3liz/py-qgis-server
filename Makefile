@@ -58,9 +58,10 @@ docker-test:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
-		-e QGSRV_SERVER_RESTARTFILE=/src/.qgis-restart \
+		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
+		-e QGIS_PLUGINPATH=/src/tests/plugins \
 		$(QGIS_IMAGE) ./run_tests.sh
 
 
@@ -75,8 +76,9 @@ docker-run:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
-		-e QGSRV_SERVER_RESTARTFILE=/src/.qgis-restart \
+		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
+		-e QGIS_PLUGINPATH=/src/tests/plugins \
 		$(QGIS_IMAGE) ./run_server.sh
 
 
@@ -128,7 +130,7 @@ docker-run-proxy:
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		-e QGSRV_SERVER_RESTARTFILE=/src/.qgis-restart \
+		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		$(QGIS_IMAGE) ./run_proxy.sh 
 
 

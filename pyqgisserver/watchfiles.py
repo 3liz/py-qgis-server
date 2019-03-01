@@ -3,6 +3,7 @@
 import os
 import functools
 import logging
+import traceback
 
 from tornado import ioloop
 
@@ -31,7 +32,12 @@ def _update_callback( updatefunc, watched_files, modify_times ):
 def _check_file(modify_times, path):
     try:
         modified = os.stat(path).st_mtime
+    except FileNotFoundError:
+        # Do not care if file do not exists
+        return
     except Exception:
+        traceback.print_exc()
+        LOGGER.error("Error while checking file %s")
         return
     if path not in modify_times:
         modify_times[path] = modified

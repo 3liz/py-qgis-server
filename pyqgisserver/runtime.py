@@ -27,8 +27,7 @@ from .utils import process
 
 from .monitor import Monitor
 from .profiles import ProfileMngr
-from .broadcast import (create_broadcast_publisher, 
-                        restart_when_modified)
+from .broadcast import Broadcast
 
 LOGGER=logging.getLogger('QGSRV')
 
@@ -78,20 +77,8 @@ class Application(tornado.web.Application):
         server.add_sockets(sockets)
         self._http_server = server
 
-        self.init_broadcast_publisher()
-
-    def init_broadcast_publisher(self):
-
-        broadcastaddr   = get_config('zmq')['broadcastaddr']
-        self._broadcast = create_broadcast_publisher(broadcastaddr)
-
-        restartfile = get_config('server')['restartfile']        
-        if restartfile:
-            # Set up a autorestart
-            check_time = get_config('server').get('restartfile_check_time', 5000)
-            self._autorestart = restart_when_modified(self._broadcast, restartfile, 
-                                                      check_time=check_time)
-            self._autorestart.start()
+        self._broadcast = Broadcast()
+        self._broadcast.init()
 
     def log_request(self, handler):
         """ Write HTTP requet to the logs
@@ -102,7 +89,6 @@ class Application(tornado.web.Application):
         self._http_server.stop()
         self._http_server = None
         self._zmq_client.terminate()
-        self._autorestart.stop()
         self._broadcast.close()
 
 
