@@ -17,6 +17,8 @@ import time
 import tornado.web
 import tornado.platform.asyncio
 
+from multiprocessing import Process
+
 from .logger import log_request
 from .config import get_config, set_config, load_configuration
 
@@ -31,7 +33,7 @@ from .broadcast import Broadcast
 
 LOGGER=logging.getLogger('QGSRV')
 
-def configure_handlers( client ):
+def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
     """
     """
     cfg = get_config('server')
@@ -80,31 +82,30 @@ class Application(tornado.web.Application):
         self._broadcast = Broadcast()
         self._broadcast.init()
 
-    def log_request(self, handler):
+    def log_request(self, handler: tornado.web.RequestHandler ) -> None:
         """ Write HTTP requet to the logs
         """
         log_request(handler)        
 
-    def terminate(self):
+    def terminate(self) -> None:
         self._http_server.stop()
         self._http_server = None
         self._zmq_client.terminate()
         self._broadcast.close()
 
-
-def terminate_handler( signum, frame ):
+def terminate_handler( signum: int, frame ) -> None:
     if signum == signal.SIGTERM:
         if process.task_id() is None:
             sys.stderr.write("Terminating child processes.\n")
             process.terminate_childs()
 
 
-def set_signal_handlers():
+def set_signal_handlers() -> None:
     signal.signal(signal.SIGTERM, terminate_handler)
     signal.signal(signal.SIGINT , terminate_handler)
 
 
-def setuid(username):
+def setuid( username: str) -> None:
     """ setuid to username uid """
     from pwd import getpwnam, getpwuid
     pw = getpwnam(username)
@@ -113,11 +114,9 @@ def setuid(username):
     LOGGER.info("Setuid to user {} ({}:{})".format(getpwuid(os.getuid()).pw_name, os.getuid(), os.getgid()))
 
 
-def create_broker_process( ipcaddr ):
+def create_broker_process( ipcaddr: str ) -> Process:
     """ Create a brker process
     """
-    from multiprocessing import Process
-
     cfg = get_config('zmq')
 
     LOGGER.info("Starting broker process")
@@ -131,7 +130,7 @@ def create_broker_process( ipcaddr ):
     return p
 
 
-def create_worker_pool( workers ):
+def create_worker_pool( workers: int ) -> Process:
     """ Run workers pool in its own process
 
         This ensure that sub-processes all always forked from
@@ -141,13 +140,12 @@ def create_worker_pool( workers ):
         If we do not do this, forked workers cannot
         reconnect when forked from running ZMQ context.
     """
-    from multiprocessing import Process
     p = Process(target=run_worker_pool,args=(workers,))
     p.start()
     return p
 
 
-def run_worker_pool(workers):
+def run_worker_pool(workers: int) -> None:
     """ Run a qgis worker pool
     """
     from .qgspool import Pool
@@ -173,7 +171,7 @@ def run_worker_pool(workers):
 
     
 
-def run_server( port, address="", jobs=1,  user=None, workers=0):
+def run_server( port: int, address: str="", jobs: int=1,  user: str=None, workers: int=0) -> None:
     """ Run the server
 
         :param port: port number

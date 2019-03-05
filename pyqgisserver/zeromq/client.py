@@ -20,15 +20,16 @@ import logging
 import uuid
 import traceback
 
+from typing import Mapping, Any
+
 from collections import namedtuple
 
-from .messages import RequestMessage
+from .messages import RequestMessage, ReplyMessage
 
 from ..version import __description__, __version__
 from ..logger import setup_log_handler
 
 LOGGER=logging.getLogger('QGSRV')
-
 
 class RequestTimeoutError(Exception):
     pass
@@ -41,7 +42,7 @@ class RequestProxyError(Exception):
 
 
 class AsyncResponseHandler:
-    def __init__(self, correlation_id, loop):
+    def __init__(self, correlation_id: bytes, loop: asyncio.AbstractEventLoop) -> None:
         self.correlation_id = correlation_id
         self.headers = None
         # Create a future for sending the result
@@ -51,11 +52,16 @@ class AsyncResponseHandler:
         self._has_more = False
         self.data = None
     
-    def _set_exception(self, exc):
+    def _set_exception(self, exc: Exception) -> None:
         self._has_more = False
         self._future.set_exception(exc)
 
-    def _set_result(self, data):
+    def _set_result(self, data: bytes) -> None:
+        """ Set raw results from request
+
+            This method send the result to the stored
+            future.
+        """
         if self.headers is None:
             status, hdrs, body = pickle.loads(data)
             self.headers = hdrs
@@ -72,13 +78,14 @@ class AsyncResponseHandler:
             self._chunks.put_nowait(data)
             self._has_more = (data != b"")
 
-    def _done(self):
+    def _done(self) -> bool:
         """ Check if there is more data to come
         """
         return not self._has_more and self._future.done()
 
-    async def _get(self, timeout):
-        """ wait for result
+    async def _get(self, timeout: int) -> Any:
+        """ wait for result and return the parsed 
+            result
         """
         try:
             return await asyncio.wait_for(self._future, timeout)
@@ -86,7 +93,7 @@ class AsyncResponseHandler:
             self._has_more = False
             raise RequestTimeoutError()
 
-    async def _next_chunk(self, timeout):
+    async def _next_chunk(self, timeout: int) -> bytes:
         """ Get next chunk
         """
         try:
@@ -101,20 +108,19 @@ class AsyncResponseHandler:
 class AsyncClient:
     """ Async DEALER ZMQ client
     """
-    def __init__(self, address, identity=None, context=None, loop=None):
-        self._context = context or zmq.asyncio.Context.instance()
-        if not context:
-            self._own_context = True
+    def __init__(self, address: str , identity: bytes=None) -> None:
+        
+        context = zmq.asyncio.Context.instance()
 
         self.identity = identity or uuid.uuid1().bytes
 
-        sock = self._context.socket(zmq.DEALER)
+        sock = context.socket(zmq.DEALER)
         sock.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
         sock.setsockopt(zmq.IMMEDIATE, 1)   # Do not queue if there is no connection
         sock.identity = self.identity
         sock.connect(address)
 
-        self._loop = loop or asyncio.get_event_loop() 
+        self._loop = asyncio.get_event_loop() 
 
         self._running = False
         self._handlers = {}
@@ -122,7 +128,7 @@ class AsyncClient:
         self._polling  = False
         LOGGER.info("Starting client %s", self.identity)
 
-    async def _poll(self):
+    async def _poll(self) -> None:
         """ Handle incoming messages
         """
         self._polling = True
@@ -147,7 +153,8 @@ class AsyncClient:
                 LOGGER.error("%s exception %s\n%s", self.identity, err, traceback.format_exc())
         self._polling = False
 
-    async def fetch( self, query, method='GET', headers={}, data=None, timeout=5):
+    async def fetch( self, query: str, method: str='GET', headers: Mapping[str,str]={}, 
+                     data: Any=None, timeout: int=5) -> Any:
         """ Send a request message to the worker
         """
         # Send request
@@ -173,7 +180,7 @@ class AsyncClient:
             self._handlers.pop(correlation_id,None)
             raise
 
-    async def fetch_more( self, response, timeout=5 ):
+    async def fetch_more( self, response, timeout=5 ) -> bytes:
         try:
             data = await response._next_chunk(timeout)
             if data == b"": 
@@ -197,13 +204,11 @@ class AsyncClient:
     #        self._handlers.pop(response.correlation_id,None)
     #        raise
 
-    def terminate(self):
+    def terminate(self) -> None:
         LOGGER.info("Terminating client %s", self.identity)
         self._running = False
         self._futures = {}
         self._socket.close()
-        if self._own_context:
-            self._context.term()
     
 
 if __name__ == '__main__':

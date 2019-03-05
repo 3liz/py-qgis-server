@@ -25,6 +25,9 @@ import signal
 import uuid
 import time
 
+from typing import Callable, TypeVar
+
+
 from ..version import __description__, __version__
 from ..logger import setup_log_handler
 
@@ -32,16 +35,18 @@ LOGGER=logging.getLogger('QGSRV')
 
 from .messages import (WORKER_READY, ReplyMessage)
 
+# Define an abstract type for HTTPRequest
+HTTPRequest = TypeVar('HTTPRequest')
 
 class RequestHandler:
 
-    def __init__(self, socket, client_id, correlation_id, request):
+    def __init__(self, socket: zmq.Socket, client_id: bytes, correlation_id: bytes, request: HTTPRequest) -> None:
         """ Handle requests and 
         
             Handle reply message contruction and pass message correlation_id to 
             reply.
 
-            :param request: the input message
+            :param request: A tornado handler request
             :param socket: the zmq socket
         """
         self.headers = {}
@@ -53,7 +58,7 @@ class RequestHandler:
         self._socket    = socket
         self._client_id = client_id
 
-    def _write( self, data ):
+    def _write( self, data: bytes ) -> None:
         """ Send data back to client
         """
         self._socket.send_multipart([
@@ -61,7 +66,7 @@ class RequestHandler:
             self._correlation_id,
             data])
 
-    def send( self, data, send_more=False ):
+    def send( self, data: bytes, send_more: bool=False ) -> None:
         """ Send data
         """
         if not self.header_written:
@@ -92,7 +97,8 @@ class RequestHandler:
         self.send(b"", False)
 
 
-def run_worker(address, handler_factory, identity=None, broadcastaddr=None):
+def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes, HTTPRequest], RequestHandler], 
+               identity: bytes=None, broadcastaddr: str=None):
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()

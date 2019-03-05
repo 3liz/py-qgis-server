@@ -29,6 +29,8 @@ import yaml
 import traceback
 import functools
 
+from typing import Mapping, TypeVar, Any
+
 from ipaddress import ip_address, ip_network
 from glob import glob 
 
@@ -36,7 +38,13 @@ from .watchfiles import watchfiles
 
 LOGGER = logging.getLogger('QGSRV')
 
+# Define an abstract type for HTTPRequest
+HTTPRequest = TypeVar('HTTPRequest')
+
+
 class Loader(yaml.SafeLoader):
+    """ See https://pyyaml.org/wiki/PyYAMLDocumentation
+    """  
 
     def __init__(self, stream):
         self._root = os.path.split(stream.name)[0]
@@ -73,13 +81,13 @@ class ProfileError(Exception):
 
 class _Profile:
     
-    def __init__(self, data):
+    def __init__(self, data: Mapping[str,Any]) -> None:
         self._services    = data.get('services')
         self._parameters  = data.get('parameters',{})
         self._allowed_ips = [ip_network(ip) for ip in data.get('allowed_ips',[])]
         self._allowed_referers = data.get('allowed_referers')
 
-    def test_services(self, request):
+    def test_services(self, request: HTTPRequest) -> None:
         """ Test allowed services
         """
         if not self._services:
@@ -92,13 +100,13 @@ class _Profile:
             if not service in self._services:
                 raise ProfileError("Rejected service %s" % service)
 
-    def test_allowed_referers(self, request):
+    def test_allowed_referers(self, request: HTTPRequest) -> None:
         """ Test allowed referers
         """
         if self._allowed_referers and request.headers.get('Referer') not in self._allowed_referers:
             raise ProfileError("Rejected referer %s" % request.headers.get('Referer') or 'None')
 
-    def test_allowed_ips(self, request, http_proxy):
+    def test_allowed_ips(self, request: HTTPRequest, http_proxy: bool) -> None:
         """ Test allowed ips
 
             If behind a proxy we use the X-Forwarded-For header to check ip
@@ -118,7 +126,7 @@ class _Profile:
             if not ip in ipn:
                 raise ProfileError("Rejected ip %s" % ip)
 
-    def apply(self, request, http_proxy):
+    def apply(self, request: HTTPRequest, http_proxy: bool) -> None:
         """ Apply profiles constraints
         """
         request.arguments.update((k,[v.encode()]) for k,v in  self._parameters.items())
@@ -130,8 +138,10 @@ class _Profile:
 class ProfileMngr:
     
     @classmethod
-    def initialize( cls, profiles, exit_on_error=True ):
-        """ Load profiles data
+    def initialize( cls, profiles: str, exit_on_error: bool=True ) -> 'ProfileMngr':
+        """ Create Profile manager
+
+            param Profiles: path to profile configuration
         """
         try:
             mngr = ProfileMngr()
@@ -145,10 +155,12 @@ class ProfileMngr:
             else:
                 raise
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._autoreload = None
 
-    def load( self, profiles):
+    def load( self, profiles: str) -> None:
+        """ Load profile configuration
+        """
         LOGGER.info("Reading profiles %s",profiles)
         with open(profiles,'r') as f:
             config = yaml.load(f, Loader=Loader)
@@ -173,8 +185,8 @@ class ProfileMngr:
             LOGGER.info("Disabling profiles autoreload")
             self._autoreload.stop()            
 
-    def apply_profile( self, name, request, http_proxy=False):
-        """
+    def apply_profile( self, name: str, request: HTTPRequest, http_proxy: bool=False) -> bool:
+        """ Check profile condition
         """
         try:
             # name may be a path like string

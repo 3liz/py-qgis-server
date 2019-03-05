@@ -12,7 +12,7 @@ import sys
 import logging
 
 
-def darwin_setup():
+def darwin_setup() -> None:
     """ Set up environment variables for OSX
     """
     prefix = os.environ.get('QGIS3_PREFIX','/Applications')
@@ -24,7 +24,7 @@ def darwin_setup():
     sys.path.append('%s/QGIS.app/Contents/Resources/python' % prefix)
 
 
-def setup_qgis_paths():
+def setup_qgis_paths() -> None:
     """ Init qgis paths 
     """
     if os.uname()[0].lower() == 'darwin':
@@ -38,8 +38,8 @@ def setup_qgis_paths():
 qgis_application = None
 
 
-def start_qgis_application(enable_gui=False, enable_processing=False, verbose=False, cleanup=True,
-                           logger=None, logprefix='Qgis:'):
+def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False, verbose: bool=False, 
+                           cleanup: bool=True, logger : logging.Logger=None, logprefix :str='Qgis:') -> 'QgsApplication':
     """ Start qgis application
 
         :param boolean enable_gui: Enable graphical interface, default to False
@@ -110,7 +110,7 @@ def start_qgis_application(enable_gui=False, enable_processing=False, verbose=Fa
     return qgis_application
 
 
-def init_processing():
+def init_processing() -> None:
     from processing.core.Processing import Processing
     from qgis.analysis import QgsNativeAlgorithms
     from qgis.core import QgsApplication
@@ -118,7 +118,7 @@ def init_processing():
     Processing.initialize()
 
 
-def install_logger_hook( logger, logprefix, verbose=False ):
+def install_logger_hook( logger: logging.Logger, logprefix: str, verbose: bool=False ) -> None:
     """ Install message log hook
     """
     from qgis.core import Qgis, QgsApplication, QgsMessageLog
@@ -138,7 +138,7 @@ def install_logger_hook( logger, logprefix, verbose=False ):
     messageLog.messageReceived.connect( writelogmessage )
 
 
-def init_qgis_server(network_timeout=20000, **kwargs):
+def init_qgis_server(network_timeout: int=20000, **kwargs) -> 'QgsServer':
     """ Init Qgis server
     """
     start_qgis_application(**kwargs)

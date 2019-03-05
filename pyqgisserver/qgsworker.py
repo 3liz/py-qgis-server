@@ -9,11 +9,18 @@
 """ Qgis server request adapters
 
     Embedded qgis server in a 0MQ worker 
+
+    see: 
+        - https://qgis.org/pyqgis/master/server/QgsBufferServerResponse.html
+        - https://qgis.org/pyqgis/master/server/QgsBufferServerRequest.html
 """
 import os
 import sys
 import logging
 import traceback
+import tornado.web
+
+from typing import Dict
 
 from qgis.PyQt.QtCore import QBuffer, QIODevice, QByteArray
 from qgis.server import (QgsServerRequest,
@@ -27,7 +34,7 @@ LOGGER = logging.getLogger('QGSRV')
 
 class Request(QgsServerRequest):
 
-    def __init__(self, handler ):
+    def __init__(self, handler: tornado.web.RequestHandler ) -> None:
         """ Create a new QgsServerRequest from tornado handler request
         """
         req = handler.request
@@ -44,7 +51,7 @@ class Request(QgsServerRequest):
             'POST': QgsServerRequest.PostMethod,
             }[req.method], headers=req.headers)
        
-    def data(self): 
+    def data(self) -> QByteArray: 
         """ Return post/put data a QByteArray
         """
         return QByteArray(self._data)
@@ -56,7 +63,7 @@ class Response(QgsServerResponse):
         The data is written at 'flush()' call.
     """
 
-    def __init__(self, handler):
+    def __init__(self, handler: tornado.web.RequestHandler ) -> None:
         super().__init__()
         self._handler = handler
         self._buffer = QBuffer()
@@ -64,22 +71,22 @@ class Response(QgsServerResponse):
         self._numbytes = 0
         self._finish   = False
 
-    def setStatusCode(self, code):
+    def setStatusCode(self, code: int) -> None:
         if not self._handler.header_written:
             self._handler.status_code = code
         else:
             LOGGER.error("Cannot set status code after header written")
 
-    def statusCode(self):
+    def statusCode(self) -> int:
         return self._handler.status_code
 
-    def finish(self):
+    def finish(self) -> None:
         """ Terminate the request
         """
         self._finish = True
         self.flush()
 
-    def flush(self):
+    def flush(self) -> None:
         """ Write the data to the handler buffer 
             and flush the socket
 
@@ -103,32 +110,32 @@ class Response(QgsServerResponse):
             LOGGER.error("Caught Exception:\n%s", traceback.format_exc())
             self._handler.status_code = 500
 
-    def header(self, key):
+    def header(self, key: str) -> str:
         return self._handler.headers.get(key)
 
-    def headers(self):
+    def headers(self) -> Dict[str,str]:
         """ Return headers as dict
         """
         return self._handler.headers
         
-    def io(self):
+    def io(self) -> QIODevice:
         return self._buffer
 
-    def data(self):
+    def data(self) -> QByteArray:
         """ Return buffer data
         """
         return self._buffer.data()
 
-    def setHeader(self, key, value):
+    def setHeader(self, key: str, value: str) -> None:
         if not self._handler.header_written:
             self._handler.headers[key] = value
         else:
             LOGGER.error("Cannot set header after header written")
 
-    def removeHeader(self, key):
+    def removeHeader(self, key: str) -> None:
         self._handler.headers.pop(key,None)
    
-    def sendError(self, code, message=None):
+    def sendError(self, code: int, message: str=None) -> None:
         if not self._handler.header_written:
             LOGGER.error("%s (%s)", message, code)
             self._handler.status_code = code
@@ -137,19 +144,19 @@ class Response(QgsServerResponse):
         else:
             LOGGER.error("Cannot set error after header written")
 
-    def _clearHeaders(self):
+    def _clearHeaders(self) -> None:
         """ Clear headers set so far
         """
         self._handler.headers = {}
  
-    def clear(self):
+    def clear(self) -> None:
         self._clearHeaders()
         self.truncate()
 
-    def headersSent(self):
+    def headersSent(self) -> bool:
         return self._handler.header_written
 
-    def truncate(self):
+    def truncate(self) -> None:
         """ Truncate buffer
         """
         self._buffer.seek(0)
@@ -159,7 +166,7 @@ class Response(QgsServerResponse):
 class QgsRequestHandler(RequestHandler):
 
     @classmethod
-    def init_server(cls):
+    def init_server(cls) -> None:
         if not hasattr(cls, 'qgis_server' ):
             from .utils.qgis import init_qgis_server
 
@@ -171,7 +178,7 @@ class QgsRequestHandler(RequestHandler):
             setattr(cls, 'qgis_server' , qgsserver )
 
     @staticmethod
-    def run( router, identity="", broadcastaddr=None):
+    def run( router: str, identity: str="", broadcastaddr: str=None) -> None:
         try:
             QgsRequestHandler.init_server()
         except:
@@ -181,7 +188,7 @@ class QgsRequestHandler(RequestHandler):
         run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')),
                    broadcastaddr=broadcastaddr)
 
-    def handle_message(self):
+    def handle_message(self) -> None:
         """ Override this method to handle_messages
         """
         project_location = self.request.headers.pop('X-Map-Location')

@@ -5,12 +5,14 @@ import functools
 import logging
 import traceback
 
+from typing import Callable, Mapping, Union, List
 from tornado import ioloop
 
 LOGGER = logging.getLogger('QGSRV')
 
+UpdateFunc = Callable[[List[str]],None]
 
-def watchfiles(watched_files, updatefunc,  check_time=500):
+def watchfiles(watched_files: List[str], updatefunc: UpdateFunc,  check_time: int=500) -> ioloop.PeriodicCallback:
     """Begins watching source files for changes.
     """
     io_loop = ioloop.IOLoop.current()
@@ -20,7 +22,7 @@ def watchfiles(watched_files, updatefunc,  check_time=500):
     return scheduler
 
 
-def _update_callback( updatefunc, watched_files, modify_times ):
+def _update_callback( updatefunc: UpdateFunc, watched_files: List[str], modify_times: Mapping[float,str]) -> None:
     """ Call update funcs when modified files
     """
     modified_files = [path for path in watched_files if _check_file(modify_times, path) is not None]
@@ -29,7 +31,7 @@ def _update_callback( updatefunc, watched_files, modify_times ):
         updatefunc( modified_files )
 
 
-def _check_file(modify_times, path):
+def _check_file(modify_times: Mapping[float,str], path: str) -> Union[str,None]:
     try:
         modified = os.stat(path).st_mtime
     except FileNotFoundError:

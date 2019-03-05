@@ -31,7 +31,7 @@ LOGGER = logging.getLogger('QGSRV')
 
 class Pool:
 
-    def __init__(self, router, num_workers, broadcastaddr=None):
+    def __init__(self, router: str, num_workers: int, broadcastaddr: str=None) -> None:
         self._router = router
         self._broadcastaddr = broadcastaddr
         self._num_workers = num_workers
@@ -54,9 +54,11 @@ class Pool:
             exitpriority=15
         )
 
-    def _join_exited_workers(self):
+    def _join_exited_workers(self) -> bool:
         """Cleanup after any worker processes which have exited due to reaching
-           their specified lifetime.  Returns True if any workers were cleaned up.
+           their specified lifetime.  
+           
+           Returns True if any workers were cleaned up.
         """
         cleaned = False
         for i in reversed(range(len(self._pool))):
@@ -74,7 +76,7 @@ class Pool:
                 del self._pool[i]
         return cleaned
 
-    def _repopulate_pool(self):
+    def _repopulate_pool(self) -> None:
         """Bring the number of pool processes up to the specified number,
         for use after reaping workers which have exited.
         """
@@ -86,14 +88,14 @@ class Pool:
             w.daemon = True
             w.start()
 
-    def _maintain_pool(self):
+    def _maintain_pool(self) -> None:
         """Clean up any exited workers and start replacements for them.
         """
         if self._join_exited_workers():
             self._repopulate_pool()
 
     @classmethod
-    def _terminate_pool(cls, pool, worker_handler):
+    def _terminate_pool(cls, pool: 'Pool', worker_handler: threading.Thread) -> None: 
 
         worker_handler._state = TERMINATE
         # We must wait for the worker handler to exit before terminating
@@ -114,18 +116,18 @@ class Pool:
                     p.join()
 
     @staticmethod
-    def _handle_workers(pool):
+    def _handle_workers(pool: 'Pool') -> None:
         thread = threading.current_thread()
         while thread._state == RUN:
             pool._maintain_pool()
             time.sleep(0.1)
 
-    def __reduce__(self):
+    def __reduce__(self) -> None:
         raise NotImplementedError(
             'cluster objects cannot be passed between processes or pickled'
         )
 
-    def terminate(self):
+    def terminate(self) -> None:
         self._worker_handler._state = TERMINATE
         self._terminate()
 

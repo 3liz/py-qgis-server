@@ -48,7 +48,7 @@ ifndef LOCAL_HOME
 endif
 
 docker-test:
-	mkdir -p $(HOME)/.local
+	mkdir -p $(LOCAL_HOME)/.local $(LOCAL_HOME)/.cache
 	echo -n "Restart qgis" > .qgis-restart
 	docker run --rm --name qgis-py-server-test-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
@@ -66,19 +66,20 @@ docker-test:
 
 
 docker-run:
-	mkdir -p $(HOME)/.local
+	mkdir -p $(LOCAL_HOME)/.local $(LOCAL_HOME)/.cache
 	echo -n "Restart qgis" > .qgis-restart
 	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis-py-server-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
-		-v $(shell pwd):/src \
-		-v $(shell pwd)/.local:/.local \
-		-v $(shell pwd)/.cache/pip:/.pipcache \
+		-v $(LOCAL_HOME):/src \
+		-v $(LOCAL_HOME)/.local:/.local \
+		-v $(LOCAL_HOME)/.cache/pip:/.pipcache \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
 		-e QGIS_PLUGINPATH=/src/tests/plugins \
+		-e PYTHONWARNINGS=d \
 		$(QGIS_IMAGE) ./run_server.sh
 
 

@@ -26,11 +26,13 @@ import os
 import logging
 import signal
 
+from typing import Union
+
 _task_id  = None
 _ppid     = None
 _children = {}
 
-def _start_child(i):
+def _start_child(i: int) -> Union[int,None]:
 
     global _children
 
@@ -45,7 +47,7 @@ def _start_child(i):
         return None
 
 
-def fork_processes(num_processes):
+def fork_processes(num_processes: int) -> Union[int,None]:
     """Starts multiple worker processes.
 
     In each child process, ``fork_processes`` returns its *task id*, a
@@ -71,7 +73,7 @@ def fork_processes(num_processes):
     return None
 
 
-def manage_processes( max_restarts, logger = None ):
+def manage_processes( max_restarts: int, logger: logging.Logger = None ) -> Union[int, None]:
     """ Manage child processes 
 
     Processes that exit
@@ -122,7 +124,7 @@ def manage_processes( max_restarts, logger = None ):
     sys.exit(0)
 
 
-def task_id():
+def task_id() -> int:
     """Returns the current task id, if any.
 
     Returns None if this process was not created by `fork_processes`.
@@ -131,7 +133,7 @@ def task_id():
     return _task_id
 
 
-def terminate_childs():
+def terminate_childs() -> None:
     """ Terminate all childs
     """
     if _ppid is None: 

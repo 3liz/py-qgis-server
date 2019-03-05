@@ -3,8 +3,8 @@
 set -e
 
 pip3 install -U --user setuptools
-pip3 install -U --user -r requirements.pip
-pip3 install -U --user -r requirements.txt
+pip3 install -U --prefer-binary --user -r requirements.pip
+pip3 install -U --prefer-binary --user -r requirements.txt
 
 pip3 install --user -e ./
 

@@ -9,6 +9,9 @@
 import os
 import sys
 import logging
+import argparse
+
+from typing import List
 
 from .version import __description__, __version__
 from .logger import setup_log_handler
@@ -20,16 +23,14 @@ from .runtime import run_server
 LOGGER = logging.getLogger('QGSRV')
 
 
-def print_version():
+def print_version() -> None:
     program = os.path.basename(sys.argv[0])
     print("{name} {version}".format(name=program, version=__version__,file=sys.stderr))
 
 
-def read_configuration(args=None):
+def read_configuration(args: List[str]=None) -> argparse.Namespace:
     """ Parse command line and read configuration file
     """
-    import argparse
-
     if args is None:
         args = sys.argv
 
@@ -86,7 +87,7 @@ def read_configuration(args=None):
     return args
  
 
-def main():
+def main() -> None:
     """ Run the server as cli command
     """
     args = read_configuration()

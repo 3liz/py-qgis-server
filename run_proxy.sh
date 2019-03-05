@@ -5,8 +5,8 @@ set -e
 PIP="pip3 install -U --user"
 
 $PIP setuptools
-$PIP -r requirements.pip
-$PIP -r requirements.txt
+$PIP --prefer-binary -r requirements.pip
+$PIP --prefer-binary -r requirements.txt
 
 pip install --user -e ./
 

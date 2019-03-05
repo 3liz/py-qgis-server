@@ -11,14 +11,17 @@
 
 import os.path
 
+from typing import TypeVar, Tuple
 from collections import namedtuple
 from .lru import lrucache
 
+# Forward declarations
+Storage = TypeVar('Storage')
 
 CacheDetails=namedtuple("CacheDetails",('value','timestamp'))
 
 class FileCache():
-    def __init__(self, size, store):
+    def __init__(self, size: int, store: Storage) -> None:
         """ Initialize file cache
 
             :param size: size of the lru cache
@@ -31,13 +34,13 @@ class FileCache():
 
         self.QgsProject = QgsProject
 
-    def remove(self, key):
+    def remove(self, key: str) -> None:
         del self.cache[key]
 
-    def clear(self):
+    def clear(self) -> None:
         self.cache.clear()
 
-    def validate(self, key):
+    def validate(self, key: str) -> bool:
         # Get actual path for the project
         path, timestamp = self.store.getpath(key)
         details = self.cache.peek(key)
@@ -54,12 +57,12 @@ class FileCache():
         self.on_cache_update( key, path )
         return True
 
-    def on_cache_update(self, key, path ):
+    def on_cache_update(self, key: str, path: str ) -> None:
         """ Called when cache is updated
         """
         pass
 
-    def lookup(self, key):
+    def lookup(self, key: str) -> Tuple['QgsProject', bool]:
         updated = self.validate(key)
         return self.cache[key].value, updated
 

@@ -8,27 +8,27 @@
 """ Simple LRU cache implementation based on Ordered dict
 """
 from collections import OrderedDict
-
+from typing import Any, Sequence, Tuple
 
 class lrucache():
 
-    def __init__(self, size):
+    def __init__(self, size: int) -> None:
         self._table    = OrderedDict()
         self._capacity = size
 
         # Adjust the size
         self.size(size)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._table)
 
-    def clear(self):
+    def clear(self) -> None:
         self._table.clear()
 
-    def __contains__(self, key):
+    def __contains__(self, key: Any) -> bool:
         return key in self._table
 
-    def peek(self, key):
+    def peek(self, key: Any) -> Any:
         """ Looks up a value in the cache without affecting cache order
 
             Return None if the key doesn't exists
@@ -36,14 +36,14 @@ class lrucache():
         # Look up the node
         return self._table.get(key)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Any) -> Any:
         """ Look up the node
         """
         # Update the list ordering
         self._table.move_to_end(key)
         return self._table[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: Any, value: Any) -> None:
         """ Define a dict like setter
         """
         # First, see if any value is stored under 'key' in the cache already.
@@ -57,12 +57,12 @@ class lrucache():
 
         OrderedDict.__setitem__(self._table, key, value)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: Any) -> None:
         """ Remove from _
         """
         del self._table[key]
 
-    def __iter__(self):
+    def __iter__(self) -> Sequence[Any]:
         """ Return an iterator that returns the keys in the cache.
         
             Values are returned in order from the most recently to least recently used. 
@@ -72,7 +72,7 @@ class lrucache():
         """
         return reversed(self._table.keys())
 
-    def items(self):
+    def items(self) -> Sequence[Tuple[Any,Any]]:
         """ Return an iterator that returns the (key, value) pairs in the cache.
 
             Items are returned  in order from the most recently to least recently used. 
@@ -80,7 +80,7 @@ class lrucache():
         """
         return reversed(self._table.items())
 
-    def keys(self):
+    def keys(self) -> Sequence[Any]:
         """ Return an iterator that returns the keys in the cache.
         
             Keys are returned in order from the most recently to least recently used. 
@@ -88,7 +88,7 @@ class lrucache():
         """
         return reversed(self._table.keys())
 
-    def values(self):
+    def values(self) -> Sequence[Any]:
         """ Return an iterator that returns the values in the cache.
             
             Values are returned  in order from the most recently to least recently used. 
@@ -96,7 +96,7 @@ class lrucache():
         """
         return reversed(self._table.values())
 
-    def size(self, size=None):
+    def size(self, size :int=None) -> int:
         """ Set the size of the cache
 
             :param int size: maximum number of elements in the cache

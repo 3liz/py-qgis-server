@@ -30,7 +30,7 @@ from ..logger import setup_log_handler
 LOGGER=logging.getLogger('QGSRV')
 
 
-def run_broker( inaddr, outaddr, maxqueue=100, timeout=3000):
+def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000) -> None:
     """ Create a ROUTER-ROUTER broker
 
         :param inaddr: frontend address to bind to

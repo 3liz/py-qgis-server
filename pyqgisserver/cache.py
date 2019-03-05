@@ -16,6 +16,8 @@ from pathlib import Path
 from datetime import datetime
 from urllib.parse import urlparse
 
+from typing import Tuple
+
 from .utils.filecache import FileCache
 from .utils.decorators import singleton
 
@@ -23,17 +25,18 @@ from .config import get_config
 
 LOGGER = logging.getLogger('QGSRV')
 
+
 @singleton
 class _Cache(FileCache):
 
-    def __init__(self):
+    def __init__(self) -> None:
         config    = get_config('cache')
         cachesize = config.getint('size')
         rootdir   = Path(config['rootdir'])
 
         protocols = {}
 
-        def get_protocol_path(scheme):
+        def get_protocol_path(scheme: str) -> Path:
             """ Resolve protocol path
             """
             LOGGER.debug("Resolving '%s' protocol", scheme)
@@ -53,7 +56,7 @@ class _Cache(FileCache):
             return rootpath
 
         class _Store:
-            def getpath(self, key, exists=False):
+            def getpath(self, key: str, exists: bool=False) -> Tuple[str, datetime]:
                 
                 key = urlparse(key)
                 if not key.scheme or key.scheme == 'file':
@@ -74,7 +77,7 @@ class _Cache(FileCache):
         # Init FileCache
         super().__init__(size=cachesize, store=_Store())  
 
-    def on_cache_update(self, key, path):
+    def on_cache_update(self, key: str, path: str):
         LOGGER.info("Cache '%s' updated with path: %s" % (key,path)) 
 
 

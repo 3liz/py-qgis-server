@@ -6,9 +6,11 @@ import traceback
 import json
 import os
 
+from typing import Union, Mapping
+
 LOGGER = logging.getLogger('QGSRV')
 
-def _decode( b ):
+def _decode( b: Union[str,bytes] ) -> str:
     if not isinstance(b,str):
         return b.decode('utf-8')
     return b
@@ -16,13 +18,13 @@ def _decode( b ):
 
 class Monitor:
 
-    def __init__(self, client):
+    def __init__(self, amqp_client ) -> None:
         """ Init AMQP monitor
         """
-        self._client = client
+        self._client = amqp_client
         self._routing_key = os.environ['AMQP_ROUTING']
 
-    def emit( self, status, arguments, delta ):
+    def emit( self, status:int, arguments: Mapping[str,str], delta: float ) -> None:
         """ Publish monitor data
         """
         params = { k:_decode(v[0]) for k,v in arguments.items() }
@@ -38,9 +40,8 @@ class Monitor:
                 content_type = 'application/json',
                 content_encoding ='utf-8')
 
-
     @classmethod
-    def initialize( cls):
+    def initialize(cls) -> 'Monitor':
         """ Register an instance of Monitor client
         """
         if os.environ.get('AMQP_ROUTING') is None:
