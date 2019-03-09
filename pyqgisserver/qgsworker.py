@@ -30,6 +30,7 @@ from .zeromq.worker import RequestHandler, run_worker
 from .cache import cache_lookup
 
 from .config  import get_config
+from .plugins import load_plugins
 
 LOGGER = logging.getLogger('QGSRV')
 
@@ -177,6 +178,8 @@ class QgsRequestHandler(RequestHandler):
                                           enable_processing=False, 
                                           logger=LOGGER, 
                                           verbose=LOGGER.level<=logging.DEBUG)
+
+            load_plugins(qgsserver.serverInterface()) 
 
             setattr(cls, 'qgis_server' , qgsserver )
 

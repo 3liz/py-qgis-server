@@ -60,8 +60,8 @@ docker-test:
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
+		-e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		-e QGIS_PLUGINPATH=/src/tests/plugins \
 		$(QGIS_IMAGE) ./run_tests.sh
 
 
@@ -78,7 +78,7 @@ docker-run:
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		-e QGIS_PLUGINPATH=/src/tests/plugins \
+		-e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
 		-e PYTHONWARNINGS=d \
 		$(QGIS_IMAGE) ./run_server.sh
 

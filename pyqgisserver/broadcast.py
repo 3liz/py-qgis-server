@@ -19,6 +19,7 @@ class Broadcast:
         self._sock = None
         self._restart = None
         self._watch_files = []
+        self._config = get_config('server')
 
     def close(self):
         if self._restart:
@@ -30,12 +31,12 @@ class Broadcast:
         """ update files to watch
         """
         self._watch_files.clear()
-        restartmon = get_config('server')['restartmon']
+        restartmon = self._config['restartmon']
         if restartmon:
             self._watch_files.append(restartmon)
 
         # Check for plugins
-        pluginpath = os.getenv("QGIS_PLUGINPATH")
+        pluginpath = self._config['pluginpath']
         if pluginpath:
             plugins = glob(os.path.join(pluginpath,'*/.update-manifest'))
             self._watch_files.extend(plugins)

@@ -60,6 +60,7 @@ def load_configuration():
     CONFIG.set('server', 'http_proxy'  , getenv('QGSRV_SERVER_HTTP_PROXY', 'no'))
     CONFIG.set('server', 'proxy_url'   , getenv('QGSRV_SERVER_PROXY_URL' , ''))
     CONFIG.set('server', 'restartmon'  , getenv('QGSRV_SERVER_RESTARTMON' , ''))
+    CONFIG.set('server', 'pluginpath'  , getenv('QGSRV_SERVER_PLUGINPATH' , ''))
 
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))
