@@ -29,6 +29,8 @@ from qgis.server import (QgsServerRequest,
 from .zeromq.worker import RequestHandler, run_worker
 from .cache import cache_lookup
 
+from .config  import get_config
+
 LOGGER = logging.getLogger('QGSRV')
 
 
@@ -175,15 +177,13 @@ class QgsRequestHandler(RequestHandler):
                                           enable_processing=False, 
                                           logger=LOGGER, 
                                           verbose=LOGGER.level<=logging.DEBUG)
+
             setattr(cls, 'qgis_server' , qgsserver )
 
     @staticmethod
     def run( router: str, identity: str="", broadcastaddr: str=None) -> None:
-        try:
-            QgsRequestHandler.init_server()
-        except:
-            LOGGER.critical("Qggis initialization error:\n%s", traceback.format_exc())
-            sys.exit(99)
+        
+        QgsRequestHandler.init_server()
 
         run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')),
                    broadcastaddr=broadcastaddr)

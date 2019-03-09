@@ -22,6 +22,11 @@ from multiprocessing.util import Finalize
 
 from .qgsworker import QgsRequestHandler
 
+# Early failure min delay
+# If any process fail before that starting delay
+# we abort the whole process
+EARLY_FAILURE_DELAY = 5
+
 RUN = 0
 CLOSE = 1
 TERMINATE = 2
@@ -42,6 +47,9 @@ class Pool:
              target=Pool._handle_workers,
              args=(self, )
         )
+        
+        self._start_time = time.time()
+
         self._worker_handler._state = RUN
         self._worker_handler.daemon = True
         self._worker_handler.start()
@@ -65,8 +73,9 @@ class Pool:
             worker = self._pool[i]
             if worker.exitcode is not None:
                 if worker.exitcode != 0:
+                    # Handle early failure by killing current process
                     LOGGER.warning("Qgis Worker exited with code %s", worker.exitcode) 
-                    if worker.exitcode in (99,-6):
+                    if time.time() - self._start_time < EARLY_FAILURE_DELAY:
                         # Critical exit
                         LOGGER.critical("Critical worker failure. Aborting...")
                         os.kill(os.getpid(), signal.SIGABRT)
