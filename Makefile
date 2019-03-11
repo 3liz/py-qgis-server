@@ -40,6 +40,7 @@ SERVER_HOST:=localhost:8080
 test:
 	cd tests && py.test -v --host=$(SERVER_HOST)
 
+PLUGINPATH:=$(shell pwd)/tests/plugins
 
 BECOME_USER:=$(shell id -u)
 
@@ -73,12 +74,13 @@ docker-run:
 		-v $(LOCAL_HOME):/src \
 		-v $(LOCAL_HOME)/.local:/.local \
 		-v $(LOCAL_HOME)/.cache/pip:/.pipcache \
+		-v $(PLUGINPATH):/plugins \
 		-e PIP_CACHE_DIR=/.pipcache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
-		-e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
+		-e QGSRV_SERVER_PLUGINPATH=/plugins \
 		-e PYTHONWARNINGS=d \
 		$(QGIS_IMAGE) ./run_server.sh
 
