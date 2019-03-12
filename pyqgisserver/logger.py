@@ -18,7 +18,8 @@ RREQ = 22
 
 LOGGER=logging.getLogger('QGSRV')
 
-def setup_log_handler(log_level, formatstr='%(asctime)s\t%(levelname)s\t[%(process)d]\t%(message)s'):
+def setup_log_handler(log_level, formatstr='%(asctime)s\t%(levelname)s\t[%(process)d]\t%(message)s',
+                      stream = None ):
     """ Initialize log handler with the given log level
     """
     logging.addLevelName(REQ, "REQ")
@@ -28,7 +29,7 @@ def setup_log_handler(log_level, formatstr='%(asctime)s\t%(levelname)s\t[%(proce
     logger.setLevel(getattr(logging, log_level.upper()))
     # Init the root logger
     if not logger.handlers:
-        channel = logging.StreamHandler()
+        channel = logging.StreamHandler(stream=stream)
         formatter = logging.Formatter(formatstr)
         channel.setFormatter(formatter)
         logger.addHandler(channel)

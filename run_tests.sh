@@ -2,11 +2,12 @@
 
 set -e
 
-pip3 install -U --user setuptools
-pip3 install -U --prefer-binary --user -r requirements.pip
-pip3 install -U --prefer-binary --user -r requirements.txt
+echo "Installing required packages..."
+pip3 install -q -U --user setuptools
+pip3 install -q -U --prefer-binary --user -r requirements.pip
+pip3 install -q -U --prefer-binary --user -r requirements.txt
 
-pip3 install --user -e ./
+pip3 install -q --user -e ./
 
 export QGIS_DISABLE_MESSAGE_HOOKS=1
 export QGIS_NO_OVERRIDE_IMPORT=1
@@ -14,16 +15,9 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 # Add /.local to path
 export PATH=$PATH:/.local/bin
 
-export QGSRV_LOGGING_LEVEL=DEBUG
+# Disable qDebug stuff that bloats test outputs
+export QT_LOGGING_RULES="*.debug=false;*.warning=false"
 
-# Run the server locally
-echo "Running server..."
-qgisserver -b 127.0.0.1 -p 8080 --timeout=3 --rootdir=$(pwd)/tests/data -w1 &>docker-test.log &
-
-# Wait for server to start
-sleep 7
 # Run new tests
-#echo "Launching test"
-cd tests && py.test -v
-kill $(jobs -p)
+cd tests/unittests && py.test -v
 

@@ -203,9 +203,10 @@ class QgsRequestHandler(RequestHandler):
             project, updated = cache_lookup(project_location)
             if updated: 
                # Needed to cleanup cache capabilities cache
+               config_path = project.fileName()
+               LOGGER.debug("Cleaning config cache entry %s", config_path)
                iface = self.qgis_server.serverInterface()
-               LOGGER.debug("Cleaning config cache entry %s", iface.configFilePath())
-               iface.removeConfigCacheEntry(iface.configFilePath())
+               iface.removeConfigCacheEntry(config_path)
         except FileNotFoundError:
             response.sendError(404,"Project '%s' not found" % project_location)
         else:

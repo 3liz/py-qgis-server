@@ -62,7 +62,7 @@ docker-test:
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
 		-e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
-		-e QGSRV_LOGGING_LEVEL=DEBUG \
+		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
 		$(QGIS_IMAGE) ./run_tests.sh
 
 

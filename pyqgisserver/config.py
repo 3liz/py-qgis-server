@@ -35,10 +35,16 @@ def set_config(section, name, value):
     CONFIG.set(section, name , value)
 
 
+def print_config( fp ):
+    """ print configuration to file
+    """
+    CONFIG.write(fp)
+
+
 def load_configuration():
     """ Read configuration file
 
-        Load PyWPS configuration from configuration file.
+        Load server configuration from configuration file.
 
     :param cfgfile: path to the configuration file
     :param cfgdefault: default configuration dict

@@ -48,7 +48,6 @@ def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False
         :param boolean cleanup: Register atexit hook to close qgisapplication on exit().
             Note that prevents qgis to segfault when exiting. Default to True.
     """
-
     os.environ['QGIS_NO_OVERRIDE_IMPORT']    = '1'
     os.environ['QGIS_DISABLE_MESSAGE_HOOKS'] = '1'
 

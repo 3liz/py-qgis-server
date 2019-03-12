@@ -151,12 +151,11 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
                 pass
      
     except (KeyboardInterrupt, SystemExit):
-            print("Interrupted", file=sys.stderr)
+            pass
 
     if broadcastaddr:
        sub.close()
     # Terminate context
-    print("Terminating context", file=sys.stderr)
     sock.close()
     ctx.term()
    

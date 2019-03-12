@@ -64,23 +64,21 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
 class Application(tornado.web.Application):
 
-    def __init__(self, router, sockets):
-        from tornado.httpserver import HTTPServer
-        # Create 0MQ client
+    def __init__(self, router: str, broadcast: bool=True) -> None:
+        """
+        """
         identity = get_config('zmq')['identity']
         identity = "{}-{}".format(identity,os.getpid())
 
-        self._zmq_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
+        self._broker_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
+        
+        if broadcast:
+            self._broadcast = Broadcast()
+            self._broadcast.init()
+        else:
+            self._broadcast = None
 
-        super().__init__(configure_handlers(self._zmq_client))
-                
-        # Init HTTP server
-        server = HTTPServer(self)
-        server.add_sockets(sockets)
-        self._http_server = server
-
-        self._broadcast = Broadcast()
-        self._broadcast.init()
+        super().__init__(configure_handlers(self._broker_client))
 
     def log_request(self, handler: tornado.web.RequestHandler ) -> None:
         """ Write HTTP requet to the logs
@@ -88,10 +86,11 @@ class Application(tornado.web.Application):
         log_request(handler)        
 
     def terminate(self) -> None:
-        self._http_server.stop()
-        self._http_server = None
-        self._zmq_client.terminate()
-        self._broadcast.close()
+        self._broker_client.terminate()
+        if self._broadcast:
+            self._broadcast.close()
+        
+
 
 def terminate_handler( signum: int, frame ) -> None:
     if signum == signal.SIGTERM:
@@ -144,6 +143,7 @@ def create_worker_pool( workers: int ) -> Process:
     p.start()
     return p
 
+
 def run_worker_pool(workers: int) -> None:
     """ Run a qgis worker pool
     """
@@ -151,7 +151,7 @@ def run_worker_pool(workers: int) -> None:
 
     # Try to exit gracefully
     def term_signal(signum,frames):
-        print("Caught signal: %s" % signum, file=sys.stderr)
+        #print("Caught signal: %s" % signum, file=sys.stderr)
         raise SystemExit()
 
     # Handle critical failure by sending ABORT to
@@ -175,7 +175,20 @@ def run_worker_pool(workers: int) -> None:
     finally:
         pool.terminate()
 
-    
+
+def configure_ipc_addresses(workers: int) -> str:
+    """ Create ipc socket path
+    """
+    ipc_path = '/tmp/qgssrv/broker/'
+    os.makedirs(os.path.dirname(ipc_path), exist_ok=True)
+    ipcaddr = 'ipc://'+ipc_path+'0'
+    # Use ipc sockets for managed workers
+    if workers > 0:
+        set_config('zmq','bindaddr'     , 'ipc://'+ipc_path+'pool0')
+        set_config('zmq','broadcastaddr', 'ipc://'+ipc_path+'broadcast0')
+
+    return ipcaddr
+
 
 def run_server( port: int, address: str="", jobs: int=1,  user: str=None, workers: int=0) -> None:
     """ Run the server
@@ -187,17 +200,12 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     """
     import traceback
     from tornado.netutil import bind_sockets
+    from tornado.httpserver import HTTPServer
 
-    # Create ipc socket path 
-    ipc_path = '/tmp/qgssrv/broker/'
-    os.makedirs(os.path.dirname(ipc_path), exist_ok=True)
-    ipcaddr = 'ipc://'+ipc_path+'0'
-    # Use ipc sockets for managed workers
-    if workers > 0:
-        set_config('zmq','bindaddr'     , 'ipc://'+ipc_path+'pool0')
-        set_config('zmq','broadcastaddr', 'ipc://'+ipc_path+'broadcast0')
+    ipcaddr = configure_ipc_addresses(workers)
 
     application = None
+    server = None
 
     if user:
        setuid(user)
@@ -206,8 +214,9 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         for sock in sockets:
             sock.close()
 
-    worker_pool = None
-    broker_pr   = None
+    worker_pool   = None
+    broker_pr     = None
+    broker_client = None
 
     # Run
     try:
@@ -235,8 +244,13 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         tornado.platform.asyncio.AsyncIOMainLoop().install()
 
         LOGGER.info("Running server on port %s:%s", address, port)
-        # Run the server
-        application = Application(ipcaddr, sockets)
+    
+        application = Application(ipcaddr)
+
+        # Init HTTP server
+        server = HTTPServer(application)
+        server.add_sockets(sockets)
+ 
         loop = asyncio.get_event_loop()
         loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
         asyncio.get_event_loop().run_forever()
@@ -254,6 +268,8 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         pass
 
     # Teardown
+    if server is not None:
+        server.stop()
     if application is not None:
         application.terminate()
         application = None
