@@ -63,6 +63,7 @@ docker-test:
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
 		-e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
+		-e PYTEST_ADDOPTS=$(TEST_OPTS) \
 		$(QGIS_IMAGE) ./run_tests.sh
 
 
@@ -82,7 +83,7 @@ docker-run:
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
 		-e QGSRV_SERVER_PLUGINPATH=/plugins \
 		-e PYTHONWARNINGS=d \
-		$(QGIS_IMAGE) ./run_server.sh
+		$(QGIS_IMAGE) ./run_server.sh 
 
 
 # Run rabbitmq as
