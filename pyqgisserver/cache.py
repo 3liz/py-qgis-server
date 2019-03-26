@@ -56,7 +56,7 @@ class _Cache(FileCache):
             return rootpath
 
         class _Store:
-            def getpath(self, key: str, exists: bool=False) -> Tuple[str, datetime]:
+            def getpath(self, key: str) -> Tuple[str, datetime]:
                 
                 key = urlparse(key)
                 if not key.scheme or key.scheme == 'file':

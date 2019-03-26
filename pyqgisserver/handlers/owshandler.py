@@ -77,7 +77,7 @@ class OwsHandler(BaseHandler):
                 # Partial response
                 self.set_status(200)
                 self.write(response.data)
-                chunk = await self._client.fetch_more(response)
+                chunk = await self._client.fetch_more(response, timeout=self._timeout)
                 if chunk:
                     await self.flush()
                 while chunk:

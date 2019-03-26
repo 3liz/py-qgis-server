@@ -17,7 +17,7 @@ ifdef REGISTRY_URL
 	REGISTRY_PREFIX=$(REGISTRY_URL)/
 endif
 
-FLAVOR:=release
+FLAVOR:=ltr
 
 QGIS_IMAGE=$(REGISTRY_PREFIX)qgis-platform:$(FLAVOR)
 
@@ -63,7 +63,7 @@ docker-test:
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
 		-e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
-		-e PYTEST_ADDOPTS=$(TEST_OPTS) \
+		-e PYTEST_ADDOPTS="$(PYTEST_ADDOPTS)" \
 		$(QGIS_IMAGE) ./run_tests.sh
 
 
