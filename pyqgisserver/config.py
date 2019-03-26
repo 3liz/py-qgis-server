@@ -75,9 +75,6 @@ def load_configuration():
     CONFIG.set('cache', 'size'    , getenv('QGSRV_CACHE_SIZE','10' ))
     CONFIG.set('cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
 
-    CONFIG.add_section('qgis')
-    CONFIG.set('qgis', 'network_timeout', getenv('QGSRV_QGIS_NETWORK_TIMEOUT','20000'))
-
     CONFIG.add_section('zmq')
     CONFIG.set('zmq', 'identity'     , getenv('QGSRV_ZMQ_IDENTITY' ,'OWS-SERVER'))
     CONFIG.set('zmq', 'bindaddr'     , getenv('QGSRV_ZMQ_INADDR'   ,'tcp://*:18080'))

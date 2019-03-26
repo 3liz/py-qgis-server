@@ -174,8 +174,7 @@ class QgsRequestHandler(RequestHandler):
             from .utils.qgis import init_qgis_server
 
             LOGGER.debug("Initializing qgis server")
-            qgsserver = init_qgis_server( network_timeout=3000,
-                                          enable_processing=False, 
+            qgsserver = init_qgis_server( enable_processing=False, 
                                           logger=LOGGER, 
                                           verbose=LOGGER.level<=logging.DEBUG)
 
