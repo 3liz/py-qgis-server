@@ -11,26 +11,33 @@ class Tests(HTTPTestCase):
         rv = self.client.get('',path='/')
         assert rv.status_code == 200
 
+    def test_wms_getcapabilitiesatlas(self):
+        """
+        """
+        rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilitiesAtlas")
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
+
     def test_wms_getcaps(self):
         """
         """
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities")
         assert rv.status_code == 200
-        assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
     def test_wfs_getcaps(self):
         """ 
         """
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WFS&request=GetCapabilities")
         assert rv.status_code == 200
-        assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
     def test_wcs_getcaps(self):
         """
         """
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WCS&request=GetCapabilities")
         assert rv.status_code == 200
-        assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
     def test_map_not_found_return_404(self):
         """ Test that non existent map return 404

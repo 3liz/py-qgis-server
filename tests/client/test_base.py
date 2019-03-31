@@ -16,7 +16,7 @@ def test_wms_getcaps( host ):
     """
     rv = requests.get("http://{}/ows/?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities".format( host ))
     assert rv.status_code == 200
-    assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+    assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
 
 def test_wfs_getcaps( host ):
@@ -24,7 +24,7 @@ def test_wfs_getcaps( host ):
     """
     rv = requests.get("http://{}/ows/?MAP=france_parts.qgs&SERVICE=WFS&request=GetCapabilities".format( host ))
     assert rv.status_code == 200
-    assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+    assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
 
 def test_wcs_getcaps( host ):
@@ -32,7 +32,7 @@ def test_wcs_getcaps( host ):
     """
     rv = requests.get("http://{}/ows/?MAP=france_parts.qgs&SERVICE=WCS&request=GetCapabilities".format( host ))
     assert rv.status_code == 200
-    assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+    assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
 def test_map_not_found_return_404( host ):
     """ Test that non existent map return 404

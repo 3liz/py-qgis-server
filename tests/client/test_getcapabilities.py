@@ -16,7 +16,7 @@ def test_wms_getcapabilities_hrefs( host ):
     urlref = urlparse( "http://{}/ows/?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities".format( host ) )
     rv = requests.get( urlref.geturl() )
     assert rv.status_code == 200
-    assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+    assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
     urlref = urlparse("http://{}/ows/".format( host ))
 
@@ -39,7 +39,7 @@ def test_proxy_location( host ):
                       headers={ 'X-Proxy-Location': urlref.geturl() } )
 
     assert rv.status_code == 200
-    assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+    assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
     xml = etree.fromstring(rv.content)
 

@@ -16,7 +16,7 @@ class Tests(HTTPTestCase):
         """
         rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities" )
         assert rv.status_code == 200
-        assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
         elem = rv.xml.findall(".//wms:OnlineResource", ns)
         assert len(elem) > 0
@@ -32,7 +32,7 @@ class Tests(HTTPTestCase):
                              headers={ 'X-Proxy-Location': urlref.geturl() } )
 
         assert rv.status_code == 200
-        assert rv.headers['content-type'] == 'text/xml; charset=utf-8'
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
         elem = rv.xml.findall(".//wms:OnlineResource", ns)
         assert len(elem) > 0
