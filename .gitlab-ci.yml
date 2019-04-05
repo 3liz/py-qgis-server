@@ -1,0 +1,17 @@
+stages:
+- build
+
+build:
+  stage: build
+  script:
+    - make docker-test LOCAL_HOME=$RUNNER_HOME FLAVOR=ltr
+    - make dist deliver
+    - $FACTORY_SCRIPTS/trigger-ci $DOCKER_SERVER_ID $DOCKER_SERVER_TOKEN master
+  environment:
+    name: snap
+  tags:
+    - infrav3
+  artifacts:
+    reports:
+        junit: tests/unittests/__output__/junit.xml
+
