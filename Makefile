@@ -35,7 +35,7 @@ manifest:
 		echo buildid=$(BUILDID)   >> $(MANIFEST) && \
 		echo commitid=$(COMMITID) >> $(MANIFEST)
 
-SERVER_HOST:=localhost:8080
+SERVER_HOST:=localhost:8888
 
 test:
 	cd tests && py.test -v --host=$(SERVER_HOST)
@@ -67,16 +67,20 @@ docker-test:
 		$(QGIS_IMAGE) ./tests/run_tests.sh
 
 
+WORKERS:=1
+
 docker-run:
 	mkdir -p $$(pwd)/.local $(LOCAL_HOME)/.cache
 	echo -n "Restart qgis" > .qgis-restart
-	docker run -it --rm -p 127.0.0.1:8080:8080 --name qgis-py-server-run-$(COMMITID) -w /src \
+	docker run -it --rm -p 127.0.0.1:8888:8080 --name qgis-py-server-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $$(pwd):/src \
 		-v $$(pwd)/.local:/.local \
 		-v $(LOCAL_HOME)/.cache:/.cache \
 		-v $(PLUGINPATH):/plugins \
 		-e PIP_CACHE_DIR=/.cache \
+		-e QGSRV_SERVER_WORKERS=$(WORKERS) \
+		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
@@ -136,10 +140,6 @@ docker-run-proxy:
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		$(QGIS_IMAGE) ./run_proxy.sh 
-
-
-
-WORKERS:=1
 
 run:
 	qgisserver -b 127.0.0.1 -p 8080 --rootdir=$(shell pwd)/tests/data -w $(WORKERS)

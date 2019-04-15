@@ -197,7 +197,7 @@ class ProfileMngr:
             profile.apply(request, http_proxy)
             return True
         except ProfileError as err:
-            LOGGER.error("Invalid profile '%s': %s", name, err)
-        
+            LOGGER.error("Invalid profile '%s': %s", name or "<default>", err)
+                
         return False
 

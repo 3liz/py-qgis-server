@@ -18,7 +18,6 @@ import os
 import sys
 import logging
 import traceback
-import tornado.web
 
 from typing import Dict
 
@@ -37,8 +36,8 @@ LOGGER = logging.getLogger('QGSRV')
 
 class Request(QgsServerRequest):
 
-    def __init__(self, handler: tornado.web.RequestHandler ) -> None:
-        """ Create a new QgsServerRequest from tornado handler request
+    def __init__(self, handler: RequestHandler ) -> None:
+        """ Create a new QgsServerRequest from zmq handler request
         """
         req = handler.request
         
@@ -66,7 +65,7 @@ class Response(QgsServerResponse):
         The data is written at 'flush()' call.
     """
 
-    def __init__(self, handler: tornado.web.RequestHandler ) -> None:
+    def __init__(self, handler: RequestHandler ) -> None:
         super().__init__()
         self._handler = handler
         self._buffer = QBuffer()
@@ -95,23 +94,27 @@ class Response(QgsServerResponse):
 
             Headers will be written at the first call to flush()
         """
-        self._buffer.seek(0)
-        bytesAvail = self._buffer.bytesAvailable()
-        if self._finish:
-            self._handler.headers['Content-Length']=bytesAvail
-        # Take care of the logic: if finish and not handler.header_written then there is no
-        # chunk following
-        send_more = not self._finish or self._handler.header_written
         try:
+            self._buffer.seek(0)
+            bytesAvail = self._buffer.bytesAvailable()
+            LOGGER.debug("%s: Flushing response data: (%d bytes)",self._handler.identity, bytesAvail)
+            if self._finish:
+                self._handler.headers['Content-Length']=bytesAvail
+            # Take care of the logic: if finish and not handler.header_written then there is no
+            # chunk following
+            send_more = not self._finish or self._handler.header_written
             if bytesAvail:
                 self._handler.send( bytes(self._buffer.data()), send_more )
                 self._buffer.buffer().clear()
             # push the sentinel
             if send_more and self._finish:
                 self._handler.send( b'', False )
-        except Exception:
-            LOGGER.error("Caught Exception:\n%s", traceback.format_exc())
-            self._handler.status_code = 500
+        except:
+            LOGGER.error("Caught Exception (worker: %s, msg: %s):\n%s",
+                          self._handler.identity, self._handler.msgid,
+                          traceback.format_exc())
+            del self._handler.headers['Content-Type']
+            self.sendError(500, "Internal server error")
 
     def header(self, key: str) -> str:
         return self._handler.headers.get(key)
@@ -139,13 +142,17 @@ class Response(QgsServerResponse):
         self._handler.headers.pop(key,None)
    
     def sendError(self, code: int, message: str=None) -> None:
-        if not self._handler.header_written:
-            LOGGER.error("%s (%s)", message, code)
-            self._handler.status_code = code
-            self._handler.send(bytes(str(message).encode('ascii')))
-            self._finish = True
-        else:
-            LOGGER.error("Cannot set error after header written")
+        try:
+            if not self._handler.header_written:
+                LOGGER.error("%s (%s)", message, code)
+                self._handler.status_code = code
+                self._handler.send(bytes(str(message).encode('ascii')))
+                self._finish = True
+            else:
+                LOGGER.error("Cannot set error after header written")
+        except:
+            lOGGER.critical("Unrecoverable exception:\n%s", traceback.format_exc())
+
 
     def _clearHeaders(self) -> None:
         """ Clear headers set so far

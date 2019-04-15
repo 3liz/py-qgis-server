@@ -86,7 +86,7 @@ class OwsHandler(BaseHandler):
                     chunk = await self._client.fetch_more(response)
                 delta = time() - reqtime
             elif status == 509:
-                self.send_error(status, reason="Server busy, please retry later") 
+                self.send_error(status, reason="Server busy, please retry later")
             else:
                 self.set_status(status)
                 self.write(response.data)

@@ -46,7 +46,7 @@ class RequestHandler:
             Handle reply message contruction and pass message correlation_id to 
             reply.
 
-            :param request: A tornado handler request
+            :param request: An HTTP request handler
             :param socket: the zmq socket
         """
         self.headers = {}
@@ -70,7 +70,7 @@ class RequestHandler:
         """ Send data
         """
         if not self.header_written:
-            # We letthe client know that there is more 
+            # We let the client know that there is more 
             # data by setting the 206 code (partial response)
             if send_more and self.status_code==200:
                 self.status_code = 206
@@ -82,12 +82,18 @@ class RequestHandler:
             self._write( data )
             if not send_more:
                 self.status_code = 200
-           
+
     @property
-    def identity(self):
+    def msgid(self):
+        """ Return the message correlation id
+        """
+        return self._correlation_id
+
+    @property
+    def identity(self) -> bytes:
         return self._socket.identity
 
-    def handle_message(self):
+    def handle_message(self) -> None:
         """ Override this method to handle_messages
         """
         print("Received", self.request.data, "from", self._client_id)
@@ -98,7 +104,7 @@ class RequestHandler:
 
 
 def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes, HTTPRequest], RequestHandler], 
-               identity: bytes=None, broadcastaddr: str=None):
+               identity: bytes=None, broadcastaddr: str=None) -> None:
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()
