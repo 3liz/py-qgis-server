@@ -11,6 +11,14 @@ build:
     name: snap
   tags:
     - infrav3
+  only:
+    changes:
+      - tests
+      - Makefile
+      - pyqgisserver
+      - setup.py
+    refs:
+      - master
   artifacts:
     reports:
         junit: tests/unittests/__output__/junit.xml
