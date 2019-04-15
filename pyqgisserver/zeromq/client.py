@@ -159,7 +159,8 @@ class AsyncClient:
         """
         # Send request
         request = pickle.dumps(RequestMessage(query,headers=headers,method=method,data=data),-1)
-        correlation_id = id(request).to_bytes(8,byteorder='big')
+        correlation_id = uuid.uuid1().bytes
+        assert correlation_id not in self._handlers
         try:
             await self._socket.send_multipart([correlation_id, request], flags=zmq.DONTWAIT)
         except zmq.ZMQError as err:
