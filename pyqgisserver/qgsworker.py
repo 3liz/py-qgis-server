@@ -211,18 +211,20 @@ class QgsRequestHandler(RequestHandler):
         request  = Request(self)
         response = Response(self)
 
+        iface = self.qgis_server.serverInterface()
         try:
             LOGGER.debug("Handling request: %s", self.msgid)
             project, updated = cache_lookup(project_location)
+            config_path = project.fileName()
             if updated: 
                # Needed to cleanup cache capabilities cache
-               config_path = project.fileName()
                LOGGER.debug("Cleaning config cache entry %s", config_path)
-               iface = self.qgis_server.serverInterface()
                iface.removeConfigCacheEntry(config_path)
         except FileNotFoundError:
             response.sendError(404,"Project '%s' not found" % project_location)
         else:
+            # See https://github.com/qgis/QGIS/pull/9773
+            iface.setConfigFilePath(config_path)
             self.qgis_server.handleRequest(request, response, project=project)
 
 
