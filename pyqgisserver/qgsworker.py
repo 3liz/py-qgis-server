@@ -180,6 +180,10 @@ class QgsRequestHandler(RequestHandler):
         if not hasattr(cls, 'qgis_server' ):
             from .utils.qgis import init_qgis_server
 
+            # Enable qgis server verbosity
+            if LOGGER.isEnabledFor(logging.DEBUG):
+                os.environ['QGIS_SERVER_LOG_LEVEL'] = '0'
+
             LOGGER.debug("Initializing qgis server")
             qgsserver = init_qgis_server( enable_processing=False, 
                                           logger=LOGGER, 
@@ -206,6 +210,7 @@ class QgsRequestHandler(RequestHandler):
         response = Response(self)
 
         try:
+            LOGGER.debug("Handling request: %s", self.msgid)
             project, updated = cache_lookup(project_location)
             if updated: 
                # Needed to cleanup cache capabilities cache
