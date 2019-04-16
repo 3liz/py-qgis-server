@@ -2,11 +2,25 @@
 
 ## Description
 
-This is a asynchronous HTTP server written in python on top of the [tornado](http://www.tornadoweb.org/en/stable/) framework.
+This is a asynchronous HTTP Qgis server written in python on top of the [tornado](http://www.tornadoweb.org/en/stable/) framework and the
+0MQ messaging framework for distributing requests workers.
+
+It is based on the new Qgis 3 server API for efficiently passing requests/responses using 0MQ messaging framework to workers.
 
 The server may be run as a self-contained single service or as a proxy server with an arbitrary number of workers running
 remotely or locally. Independant workers connect automatically to the front-end proxy with no need of special configuration
 on the proxy side. Thus, this is ideal for auto-scaling configuration for use with container orchestrator as Rancher, Swarm or Kubernetes.
+
+The server is aimed at solving some real situations encountered in production environment: zero conf scalability, handle long-running request situation, auto restart...
+
+## Features
+
+- Multiples workers
+- Fair queuing request dispatching
+- Timeout for long running/stalled requests
+- Full support of qgis server plugins
+- Auto-restart trigger for workers
+- Support streamed/chunked responses 
 
 ## Requirements:
 
@@ -41,6 +55,8 @@ For example:
 
 * Use Supervisor http://supervisord.org/. Will gives you full control over logs and server status notifications.
 * Use the `daemon` command.
+* Use systemd
+* ...
 
 
 ### Running the server
@@ -119,6 +135,8 @@ bindaddr=tcp://*:18080  # QGSRV_ZMQ_INADDR
 maxqueue=1000           # QGSRV_ZMQ_MAXQUEUE
 timeout=15000           # QGSRV_ZMQ_TIMEOUT
 ````
+
+Have a look to `config.py` for all configuration variables.
 
 ## Logging
 
