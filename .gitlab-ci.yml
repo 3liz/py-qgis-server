@@ -13,9 +13,9 @@ build:
     - infrav3
   only:
     changes:
-      - tests
+      - tests/**/*
       - Makefile
-      - pyqgisserver
+      - pyqgisserver/**/*
       - setup.py
     refs:
       - master
