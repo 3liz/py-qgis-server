@@ -25,6 +25,7 @@ import signal
 import uuid
 import time
 
+from threading import Timer
 from typing import Callable, TypeVar
 
 
@@ -103,8 +104,19 @@ class RequestHandler:
         self.send(b"", False)
 
 
+def _timeout_kill():
+    """ Kill worker
+
+        This is a kind of drastic way to handle timeout, but
+        may handle situations were qgis hang
+    """
+    LOGGER.critical("Killing stalled process")
+    os.kill(os.getpid(), signal.SIGABRT)
+
+
 def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes, HTTPRequest], RequestHandler], 
-               identity: bytes=None, broadcastaddr: str=None) -> None:
+               identity: bytes=None, broadcastaddr: str=None, 
+               timeout: int=60) -> None:
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()
@@ -130,12 +142,15 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
     try:
         LOGGER.info("Starting ZMQ worker loop")
         while True:
+            timer = Timer(timeout, _timeout_kill)
             try:
                 sock.send(WORKER_READY)
                 client_id, corr_id, request = sock.recv_multipart()
                 LOGGER.debug("RCV %s: %s", client_id, corr_id)
                 request = pickle.loads(request)
                 handler = handler_factory(sock, client_id, corr_id, request)
+                # Start timeout timer
+                timer.start()
                 handler.handle_message()
             except zmq.ZMQError as err:
                 if err.errno != zmq.EAGAIN:
@@ -145,6 +160,8 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
                 if not handler.header_written:
                     handler.status_code = 500
                     handler.send(bytes("Worker internal error".encode('ascii')))
+            finally:
+                timer.cancel()
 
             # Handle broadcast restart
             try:
@@ -155,7 +172,6 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
                    break
             except zmq.error.Again:
                 pass
-     
     except (KeyboardInterrupt, SystemExit):
             pass
 

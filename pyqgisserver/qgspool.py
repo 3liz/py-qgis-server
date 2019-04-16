@@ -36,10 +36,15 @@ LOGGER = logging.getLogger('QGSRV')
 
 class Pool:
 
-    def __init__(self, router: str, num_workers: int, broadcastaddr: str=None) -> None:
+    def __init__(self, router: str, num_workers: int, broadcastaddr: str=None, 
+                 timeout: int=60) -> None:
+
+        self.critical_failure = False
+
         self._router = router
         self._broadcastaddr = broadcastaddr
         self._num_workers = num_workers
+        self._timeout = timeout
         self._pool = []
         self._repopulate_pool()
 
@@ -78,6 +83,7 @@ class Pool:
                     if time.time() - self._start_time < EARLY_FAILURE_DELAY:
                         # Critical exit
                         LOGGER.critical("Critical worker failure. Aborting...")
+                        self.critical_failure = True
                         os.kill(os.getpid(), signal.SIGABRT)
                 # worker exited
                 worker.join()
@@ -91,7 +97,8 @@ class Pool:
         """
         for _ in range(self._num_workers - len(self._pool)):
             w = Process(target=QgsRequestHandler.run, args=(self._router,),
-                                   kwargs={ 'broadcastaddr': self._broadcastaddr } )
+                                   kwargs={ 'broadcastaddr': self._broadcastaddr,
+                                            'timeout': self._timeout } )
             self._pool.append(w)
             w.name = w.name.replace('Process', 'QgisWorker')
             w.daemon = True

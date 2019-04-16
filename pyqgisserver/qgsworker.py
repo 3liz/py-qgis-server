@@ -194,12 +194,14 @@ class QgsRequestHandler(RequestHandler):
             setattr(cls, 'qgis_server' , qgsserver )
 
     @staticmethod
-    def run( router: str, identity: str="", broadcastaddr: str=None) -> None:
+    def run( router: str, identity: str="", broadcastaddr: str=None, 
+             timeout: int=60) -> None:
         
         QgsRequestHandler.init_server()
 
         run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')),
-                   broadcastaddr=broadcastaddr)
+                   broadcastaddr=broadcastaddr,
+                   timeout=timeout)
 
     def handle_message(self) -> None:
         """ Override this method to handle_messages

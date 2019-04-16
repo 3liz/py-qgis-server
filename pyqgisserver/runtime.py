@@ -45,7 +45,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         'monitor'    : monitor,
         'timeout'    : cfg.getint('timeout'),
         'map_rewrite': cfg.get('map_rewrite'),
-        'http_proxy'  : cfg.get('http_proxy') == 'yes', 
+        'http_proxy' : cfg.get('http_proxy') == 'yes', 
     }
 
     # Load profiles
@@ -154,19 +154,21 @@ def run_worker_pool(workers: int) -> None:
         #print("Caught signal: %s" % signum, file=sys.stderr)
         raise SystemExit()
 
-    # Handle critical failure by sending ABORT to
-    # parent process
-    def abrt_signal(signum,frames):
-        print("Server aborting prematurely !", file=sys.stderr)
-        os.kill(os.getppid(), signal.SIGABRT)
-
-    signal.signal(signal.SIGTERM,term_signal)
-    signal.signal(signal.SIGABRT,abrt_signal)
-
     LOGGER.info("Starting worker pool")
     router        = get_config('zmq')['bindaddr'] 
     broadcastaddr = get_config('zmq')['broadcastaddr']
-    pool = Pool(router, workers, broadcastaddr=broadcastaddr)
+    timeout       = get_config('server').getint('timeout')
+    pool = Pool(router, workers, broadcastaddr=broadcastaddr, timeout=timeout)
+
+    # Handle critical failure by sending ABORT to
+    # parent process
+    def abrt_signal(signum,frames):
+        if pool.critical_failure:
+            print("Server aborting prematurely !", file=sys.stderr)
+            os.kill(os.getppid(), signal.SIGABRT)
+
+    signal.signal(signal.SIGTERM,term_signal)
+    signal.signal(signal.SIGABRT,abrt_signal)
     try:
         while True:
             time.sleep(20)
