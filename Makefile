@@ -90,13 +90,38 @@ docker-run:
 		-e QGIS_OPTIONS_PATH=/src/tests/qgis \
 		$(QGIS_IMAGE) ./run_server.sh 
 
+docker-run-https:
+	mkdir -p $$(pwd)/.local $(LOCAL_HOME)/.cache
+	echo -n "Restart qgis" > .qgis-restart
+	docker run -it --rm -p 127.0.0.1:8443:8080 --name qgis-py-server-run-$(COMMITID) -w /src \
+		-u $(BECOME_USER) \
+		-v $$(pwd):/src \
+		-v $$(pwd)/.local:/.local \
+		-v $(LOCAL_HOME)/.cache:/.cache \
+		-v $(PLUGINPATH):/plugins \
+		-e PIP_CACHE_DIR=/.cache \
+		-e QGSRV_SERVER_WORKERS=$(WORKERS) \
+		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
+		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
+		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
+		-e QGSRV_LOGGING_LEVEL=DEBUG \
+		-e QGSRV_SERVER_PLUGINPATH=/plugins \
+		-e QGSRV_SERVER_SSL=true \
+		-e QGSRV_SERVER_SSL_CERT=/src/tests/certs/localhost.crt \
+		-e QGSRV_SERVER_SSL_KEY=/src/tests/certs/localhost.key \
+		-e PYTHONWARNINGS=d \
+		-e QGIS_OPTIONS_PATH=/src/tests/qgis \
+		$(QGIS_IMAGE) ./run_server.sh 
+
+
 
 # Run rabbitmq as
 # docker run -it --rm --name rabbitmq -p 127.0.0.1:5672:5672 -p 127.0.0.1:15672:15672 --net mynet rabbitmq:3.6-management
 
 docker-run-amqp:
 	mkdir -p $$(pwd)/.local $(LOCAL_HOME)/.cache
-	docker run -it --rm -p 127.0.0.1:8080:8080 --net mynet --name qgis3-py-server-run-$(COMMITID) -w /src \
+	docker run -it --rm -p 127.0.0.1:8888:8080 --net mynet --name qgis3-py-server-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $$(pwd):/src \
 		-v $$(pwd)/.local:/.local \

@@ -12,23 +12,9 @@ import sys
 import logging
 
 
-def darwin_setup() -> None:
-    """ Set up environment variables for OSX
-    """
-    prefix = os.environ.get('QGIS3_PREFIX','/Applications')
-    if not os.path.exists('%s/QGIS.app' % prefix):
-        raise FileNotFoundError('%s/QGIS.app' % prefix)
-    os.environ['QGIS3_HOME'] = '%s/QGIS.app/Contents/MacOS' % prefix
-    os.environ['QGIS3_PLUGINPATH'] =  '%s/QGIS.app/Contents/Resources/python/plugins' % prefix
-    # Set up qgis python bindings path
-    sys.path.append('%s/QGIS.app/Contents/Resources/python' % prefix)
-
-
 def setup_qgis_paths() -> None:
     """ Init qgis paths 
     """
-    if os.uname()[0].lower() == 'darwin':
-        darwin_setup()
     qgis_pluginpath = os.environ.get('QGIS3_PLUGINPATH','/usr/share/qgis/python/plugins/')
     sys.path.append(qgis_pluginpath)
    

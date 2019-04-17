@@ -21,6 +21,8 @@ The server is aimed at solving some real situations encountered in production en
 - Full support of qgis server plugins
 - Auto-restart trigger for workers
 - Support streamed/chunked responses 
+- SSL support
+
 
 ## Requirements:
 

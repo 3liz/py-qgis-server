@@ -192,6 +192,16 @@ def configure_ipc_addresses(workers: int) -> str:
     return ipcaddr
 
 
+def create_ssl_options():
+    """ Create an ssl context
+    """
+    import ssl
+    cfg = get_config('server')
+    ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    ssl_ctx.load_cert_chain(cfg['ssl_cert'],cfg['ssl_key'])
+    return ssl_ctx
+
+
 def run_server( port: int, address: str="", jobs: int=1,  user: str=None, workers: int=0) -> None:
     """ Run the server
 
@@ -203,6 +213,8 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     import traceback
     from tornado.netutil import bind_sockets
     from tornado.httpserver import HTTPServer
+
+    kwargs = {}
 
     ipcaddr = configure_ipc_addresses(workers)
 
@@ -219,6 +231,11 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     worker_pool   = None
     broker_pr     = None
     broker_client = None
+
+    # Setup ssl config
+    if get_config('server').getboolean('ssl'):
+        LOGGER.info("SSL enabled")
+        kwargs['ssl_options'] = create_ssl_options()
 
     # Run
     try:
@@ -250,7 +267,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         application = Application(ipcaddr)
 
         # Init HTTP server
-        server = HTTPServer(application)
+        server = HTTPServer(application, **kwargs)
         server.add_sockets(sockets)
  
         loop = asyncio.get_event_loop()
