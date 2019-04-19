@@ -102,6 +102,18 @@ Qgis workers can be run using the command:
 qgisserver-worker --host=localhost --rootdir=path/to/projects
 ```
 
+
+### Requests to OWS services
+
+The OWS requests use the following format:  `/ows/?<ows_query_params>`
+
+Example:
+
+```
+http://myserver:8080/ows/?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetCapabilities
+```
+
+
 ### Configuration
 
 The configuration can be done either as configuration .ini file in or as environment variables.
