@@ -113,6 +113,19 @@ Example:
 http://myserver:8080/ows/?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetCapabilities
 ```
 
+#### Using with lizmap
+
+In order to use the server with lizmap, you must set the following configuration
+in your `lizmapConfig.ini.php`:
+
+```
+[services]
+wmsServerURL="http://my.domain:<port>/ows/"
+...
+
+; Use relative path
+relativeWMSPath=true
+```
 
 ### Configuration
 
