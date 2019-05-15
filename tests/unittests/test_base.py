@@ -15,7 +15,7 @@ class Tests(HTTPTestCase):
         """
         """
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilitiesAtlas")
-        assert rv.status_code == 200
+        assert rv.status_code == 501
         assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
     def test_wms_getcaps(self):
