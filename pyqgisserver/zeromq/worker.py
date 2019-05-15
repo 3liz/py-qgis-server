@@ -25,7 +25,6 @@ import signal
 import uuid
 import time
 
-from threading import Timer
 from typing import Callable, TypeVar
 
 
@@ -35,6 +34,7 @@ from ..logger import setup_log_handler
 LOGGER=logging.getLogger('QGSRV')
 
 from .messages import (WORKER_READY, ReplyMessage)
+from .supervisor import Client as SupervisorClient
 
 # Define an abstract type for HTTPRequest
 HTTPRequest = TypeVar('HTTPRequest')
@@ -104,24 +104,12 @@ class RequestHandler:
         self.send(b"", False)
 
 
-def _timeout_kill():
-    """ Kill worker
-
-        This is a kind of drastic way to handle timeout, but
-        may handle situations were qgis hang
-    """
-    LOGGER.critical("Killing stalled process")
-    os.kill(os.getpid(), signal.SIGABRT)
-
-
 def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes, HTTPRequest], RequestHandler], 
-               identity: bytes=None, broadcastaddr: str=None, 
-               timeout: int=60) -> None:
+               identity: bytes=None, broadcastaddr: str=None) -> None:
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()
 
-    # Send our "ready" message
     LOGGER.info("Connecting to %s", address)
     sock = ctx.socket(zmq.DEALER)
     sock.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
@@ -139,29 +127,31 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
         sub.setsockopt(zmq.SUBSCRIBE, b'RESTART')
         sub.connect(broadcastaddr)
 
+    # Initialize supervisor client
+    supervisor = SupervisorClient()
+
     try:
         LOGGER.info("Starting ZMQ worker loop")
         while True:
-            timer = Timer(timeout, _timeout_kill)
             try:
                 sock.send(WORKER_READY)
                 client_id, corr_id, request = sock.recv_multipart()
                 LOGGER.debug("RCV %s: %s", client_id, corr_id)
                 request = pickle.loads(request)
+
+                supervisor.notify_busy()
                 handler = handler_factory(sock, client_id, corr_id, request)
-                # Start timeout timer
-                timer.start()
                 handler.handle_message()
             except zmq.ZMQError as err:
                 if err.errno != zmq.EAGAIN:
-                    LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
+                    LOGGER.error("Worker Error %d: %s", err.errno, zmq.strerror(err.errno))
             except Exception as exc:
                 LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
                 if not handler.header_written:
                     handler.status_code = 500
                     handler.send(bytes("Worker internal error".encode('ascii')))
             finally:
-                timer.cancel()
+                supervisor.notify_done()
 
             # Handle broadcast restart
             try:

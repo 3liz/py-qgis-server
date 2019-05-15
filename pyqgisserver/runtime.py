@@ -23,7 +23,7 @@ from .logger import log_request
 from .config import get_config, set_config, load_configuration
 
 from .handlers import (RootHandler, OwsHandler)
-from .zeromq import client, broker
+from .zeromq import client, broker, supervisor
 
 from .utils import process
 
@@ -158,7 +158,8 @@ def run_worker_pool(workers: int) -> None:
     router        = get_config('zmq')['bindaddr'] 
     broadcastaddr = get_config('zmq')['broadcastaddr']
     timeout       = get_config('server').getint('timeout')
-    pool = Pool(router, workers, broadcastaddr=broadcastaddr, timeout=timeout)
+
+    pool = Pool(router, workers, broadcastaddr=broadcastaddr)
 
     # Handle critical failure by sending ABORT to
     # parent process
@@ -169,12 +170,20 @@ def run_worker_pool(workers: int) -> None:
 
     signal.signal(signal.SIGTERM,term_signal)
     signal.signal(signal.SIGABRT,abrt_signal)
+
+    LOGGER.debug("Starting supervisor")
+    sprvsr = supervisor.Supervisor(timeout, lambda pid: pool.kill(pid))
     try:
-        while True:
-            time.sleep(20)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(sprvsr.run())
     except (KeyboardInterrupt,SystemExit):
         LOGGER.warning("Pool Interrupted")
     finally:
+        LOGGER.debug("Stopping supervisor")
+        sprvsr.stop()
+        if not loop.is_closed():
+            loop.close()
+        
         pool.terminate()
 
 
@@ -245,7 +254,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             if  process.fork_processes(jobs) is None: # We are in the main process
                 close_sockets(sockets)
                 broker_pr   = create_broker_process(ipcaddr)
-                worker_pool = run_worker_pool(workers) if workers>0 else None
+                worker_pool = create_worker_pool(workers) if workers>0 else None
                 set_signal_handlers()
 
                 # Note that manage_processes(...) never return in main process 
@@ -272,7 +281,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
  
         loop = asyncio.get_event_loop()
         loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
-        asyncio.get_event_loop().run_forever()
+        loop.run_forever()
     except Exception:
         traceback.print_exc()
         if process.task_id() is not None:

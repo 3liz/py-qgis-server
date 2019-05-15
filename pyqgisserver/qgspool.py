@@ -36,15 +36,13 @@ LOGGER = logging.getLogger('QGSRV')
 
 class Pool:
 
-    def __init__(self, router: str, num_workers: int, broadcastaddr: str=None, 
-                 timeout: int=60) -> None:
+    def __init__(self, router: str, num_workers: int, broadcastaddr: str=None) -> None:
 
         self.critical_failure = False
 
         self._router = router
         self._broadcastaddr = broadcastaddr
         self._num_workers = num_workers
-        self._timeout = timeout
         self._pool = []
         self._repopulate_pool()
 
@@ -97,8 +95,7 @@ class Pool:
         """
         for _ in range(self._num_workers - len(self._pool)):
             w = Process(target=QgsRequestHandler.run, args=(self._router,),
-                                   kwargs={ 'broadcastaddr': self._broadcastaddr,
-                                            'timeout': self._timeout } )
+                                   kwargs={ 'broadcastaddr': self._broadcastaddr } )
             self._pool.append(w)
             w.name = w.name.replace('Process', 'QgisWorker')
             w.daemon = True
@@ -147,6 +144,14 @@ class Pool:
         self._worker_handler._state = TERMINATE
         self._terminate()
 
-
-
+    def kill(self, pid: int) -> bool:
+        """ Kill a running process
+        """
+        try:
+            p = next(filter(lambda w: w.pid == pid, self._pool))
+            #p.kill() # python 3.7
+            os.kill(p.pid, signal.SIGKILL)
+        except StopIteration:
+            pass
+        
 

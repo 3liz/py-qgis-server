@@ -49,8 +49,6 @@ pip install py-qgis-server-X.Y.Z.tar.gz
 
 ## Running the server
 
-The server with a command line interface:
-
 The server does not run as a daemon by itself, there is several way to run a command as a daemon.
 
 For example:

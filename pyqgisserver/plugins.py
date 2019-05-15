@@ -60,11 +60,13 @@ def find_plugins(path: str) -> Generator[str,None,None]:
         LOGGER.debug("Looking for plugin in %s", plugin)
         if not os.path.isdir(plugin):
             continue
-        if not os.path.exists(os.path.join(plugin, '__init__.py')):
-            continue
 
         metadatafile = os.path.join(plugin, 'metadata.txt')
         if not os.path.exists(metadatafile):
+            continue
+
+        if not os.path.exists(os.path.join(plugin, '__init__.py')):
+            LOGGER.warning("Found metadata file but no entry point !")
             continue
 
         cp = configparser.ConfigParser()
