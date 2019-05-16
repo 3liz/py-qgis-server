@@ -28,10 +28,9 @@ requirements = 'requirements.txt'
 if os.path.exists(requirements):
     kwargs['install_requires']=parse_requirements(requirements)
 
-build_manifest_path = os.getenv('QGSRV_BUILD_MANIFEST')
-if build_manifest_path:
-    import shutil
-    shutil.copyfile('build.manifest', build_manifest_path)
+data_path = os.getenv('QGSRV_DATA_PATH')
+if data_path:
+    kwargs['data_files'] = [('share/qgis-server', ['build.manifest'])]
 
 setup(
     name='py-qgis-server',

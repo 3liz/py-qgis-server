@@ -28,7 +28,7 @@ def print_version() -> None:
     manifest = { 'commitid':'n/a', 'buildid':'n/a', 'version':__version__ }
 
     # Read build manifest
-    mnpath = os.getenv('QGSRV_BUILD_MANIFEST')
+    mnpath = os.path.join(os.getenv('QGSRV_DATA_PATH','/'),'build.manifest')
     if mnpath and os.path.exists(mnpath):
         with open(mnpath) as fd:
             manifest.update(l.strip().split('=')[:2] for l in fd.readlines())
