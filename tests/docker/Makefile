@@ -68,7 +68,7 @@ run:
 		-e QGSRV_SERVER_PLUGINPATH=/plugins \
 		-e PYTHONWARNINGS=d \
 		-e QGIS_OPTIONS_PATH=/src/tests/qgis \
-		-e QGSRV_BUILD_MANIFEST=/src/build.manifest \
+		-e QGSRV_BUILD_MANIFEST=/.local/qgis-server.manifest \
 		$(QGIS_IMAGE) $(SCRIPTS)/run_server.sh 
 
 run-https:
