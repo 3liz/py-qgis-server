@@ -1,3 +1,4 @@
 include setup.py MANIFEST.in README.md
 include requirements.txt
+include build.manifest
 

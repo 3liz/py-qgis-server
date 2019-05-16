@@ -24,8 +24,22 @@ LOGGER = logging.getLogger('QGSRV')
 
 
 def print_version() -> None:
+
+    manifest = { 'commitid':'n/a', 'buildid':'n/a', 'version':__version__ }
+
+    # Read build manifest
+    mnpath = os.getenv('QGSRV_BUILD_MANIFEST')
+    if mnpath and os.path.exists(mnpath):
+        with open(mnpath) as fd:
+            manifest.update(l.strip().split('=')[:2] for l in fd.readlines())
+    if manifest['version'] != __version__:
+        print("WARNING: manifest version does not match current version", file=sys.stderr)
+
     program = os.path.basename(sys.argv[0])
-    print("{name} {version}".format(name=program, version=__version__,file=sys.stderr))
+    print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**manifest),
+          file=sys.stderr)
+    if mnpath:
+        print("build manifest: %s" % mnpath, file=sys.stderr)
 
 
 def read_configuration(args: List[str]=None) -> argparse.Namespace:

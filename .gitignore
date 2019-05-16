@@ -7,7 +7,7 @@ tmp
 .tox
 docs/_build
 
-factory.manifest
+build.manifest
 
 __pycache__
 
