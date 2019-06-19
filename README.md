@@ -146,6 +146,7 @@ port=8080          # QGSRV_SERVER_HTTP_PORT
 interfaces=0.0.0.0 # QGSRV_SERVER_INTERFACES
 workers=2          # QGSRV_SERVER_WORKERS
 timeout=20         # QGSRV_SERVER_TIMEOUT
+pluginpath=        # QGSRV_SERVER_PLUGINPATH        
 
 [logging]
 level=DEBUG # QGSRV_LOGGING_LEVEL

@@ -32,3 +32,4 @@ docker-test.log
 .local
 .qgis-restart
 
+/tests/data/montpellier
