@@ -183,6 +183,7 @@ class QgsRequestHandler(RequestHandler):
             # Enable qgis server verbosity
             if LOGGER.isEnabledFor(logging.DEBUG):
                 os.environ['QGIS_SERVER_LOG_LEVEL'] = '0'
+                os.environ['QGIS_DEBUG'] = '1'
 
             LOGGER.debug("Initializing qgis server")
             qgsserver = init_qgis_server( enable_processing=False, 
