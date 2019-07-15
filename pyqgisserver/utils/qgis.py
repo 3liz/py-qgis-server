@@ -123,11 +123,46 @@ def install_logger_hook( logger: logging.Logger, logprefix: str, verbose: bool=F
     messageLog.messageReceived.connect( writelogmessage )
 
 
+def set_proxy_configuration( logger: logging.Logger ) -> None:
+    """ Display proxy configuration
+    """
+    from qgis.PyQt.QtNetwork import QNetworkProxy
+    from qgis.core import QgsNetworkAccessManager
+    from qgis.core import QgsSettings
+
+    nam = QgsNetworkAccessManager.instance()
+    nam.setupDefaultProxyAndCache()
+
+    proxy = nam.fallbackProxy()
+    proxy_type = proxy.type()
+    if proxy_type == QNetworkProxy.NoProxy:
+        return
+
+    logger.info("Proxy configuration enabled: %s:%s, type: %s",
+            proxy.hostName(), proxy.port(), 
+            {  QNetworkProxy.DefaultProxy:    'DefaultProxy',
+               QNetworkProxy.Socks5Proxy:     'Socks5Proxy' ,
+               QNetworkProxy.HttpProxy:       'HttpProxy'   ,
+               QNetworkProxy.HttpCachingProxy:'HttpCachingProxy' ,
+               QNetworkProxy.HttpCachingProxy:'FtpCachingProxy' ,
+            }.get(proxy_type,'Undetermined'))
+        
+ 
+
 def init_qgis_server(**kwargs) -> 'QgsServer':
     """ Init Qgis server
     """
     start_qgis_application(**kwargs)
 
+    logger = kwargs.get('logger') or logger.getLogger()
+
     from qgis.server import QgsServer
-    return  QgsServer()
+    server = QgsServer()
+
+    # Update the network configuration
+    # XXX: At the time the settings are read, the neworkmanager is already
+    # initialized, but with the wrong settings
+    set_proxy_configuration(logger)
+
+    return server
 
