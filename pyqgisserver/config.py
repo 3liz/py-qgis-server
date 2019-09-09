@@ -45,10 +45,6 @@ def load_configuration():
     """ Read configuration file
 
         Load server configuration from configuration file.
-
-    :param cfgfile: path to the configuration file
-    :param cfgdefault: default configuration dict
-    :param cfgdict: configuration dict (override file and default)
     """
 
     global CONFIG

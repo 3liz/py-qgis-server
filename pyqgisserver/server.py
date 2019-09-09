@@ -42,60 +42,66 @@ def print_version() -> None:
         print("build manifest: %s" % mnpath, file=sys.stderr)
 
 
-def read_configuration(args: List[str]=None) -> argparse.Namespace:
+def read_configuration(argv: List[str]=None) -> None:
     """ Parse command line and read configuration file
     """
-    if args is None:
-        args = sys.argv
+    if argv is None:
+        argv = sys.argv[1:]
 
     cli_parser = argparse.ArgumentParser(description=__description__)
 
-    config_file = None
-    conf = get_config('server')
-
     cli_parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], 
-            default=get_config('logging')['level'].lower(), help="set log level")
+            default=argparse.SUPPRESS, help="set log level")
     cli_parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
             default=None, help="Configuration file")
     cli_parser.add_argument('--version', action='store_true', 
             default=False, help="Return version number and exit")
-    cli_parser.add_argument('-p','--port'    , type=int, help="http port", dest='port', default=conf.getint('port'))
-    cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=conf['interfaces'], help="Interface to bind to", dest='interface')
-    cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=conf.getint('workers'), help="Num workers", dest='workers')
+    cli_parser.add_argument('-p','--port'    , type=int, help="http port", dest='port', default=argparse.SUPPRESS)
+    cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=argparse.SUPPRESS, help="Interface to bind to", dest='interface')
+    cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=argparse.SUPPRESS, help="Num workers", dest='workers')
     cli_parser.add_argument('-j','--jobs'    , metavar='NUM', type=int, default=1, help="Num server instances", dest='jobs')
     cli_parser.add_argument('-u','--setuid'  , default='', help="uid to switch to", dest='setuid')
-    cli_parser.add_argument('--rootdir'  , default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
+    cli_parser.add_argument('--rootdir'  , default=argparse.SUPPRESS, metavar='PATH', help='Path to qgis projects')
     cli_parser.add_argument('--proxy'    , action='store_true', default=False, help='Run only as proxy')
-    cli_parser.add_argument('--timeout'  , metavar='SECONDS', type=int, default=conf.getint('timeout'), 
-            help='Set client timeout in seconds')
 
-    args = cli_parser.parse_args()
+    args = cli_parser.parse_args(argv)
 
     if args.version:
         print_version()
         sys.exit(1)
 
-    log_level = args.logging
     if args.config:
         with open(args.config, mode='rt') as config_file:
             read_config_file(config_file)
 
-    read_config_dict({
-        'logging':{ 'level'  : args.logging.upper() },
-        'cache'  :{ 'rootdir': args.rootdir },
-        'server' :{
-            'interfaces': args.interface,
-            'port'      : str(args.port),
-            'timeout'   : str(args.timeout),
-        },
-    })
+    config_dict = { 'logging': {}, 'cache': {}, 'server':{}, }
+
+    conf = get_config('server')
+
+    # Override with cli arguments
+    if 'logging' in args: 
+        config_dict['logging']['level'] = args.logging.upper()
+    if 'rootdir' in args:
+        config_dict['cache']['rootdir'] = args.rootdir
+    if 'interface' in args:
+        config_dict['server']['interfaces'] = args.interface
+    else:
+        args.interface = conf['interfaces']
+    if 'port' in args:
+        config_dict['server']['port']  = str(args.port)
+    else:
+        args.port =  conf.getint('port')
+    if 'workers' in args:
+        config_dict['server']['workers'] = str(args.workers)
+    else:
+        args.workers = conf.getint('workers')
+
+    read_config_dict(config_dict)
 
     print_version()
 
-    workers = args.workers
-
     # set log level
-    setup_log_handler(log_level)
+    setup_log_handler(get_config('logging')['level'])
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
 
     return args
