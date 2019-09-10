@@ -16,7 +16,7 @@ from typing import List
 from .version import __description__, __version__
 from .logger import setup_log_handler
 from .config import (get_config, read_config_file, read_config_dict,
-                     validate_config_path)
+                     validate_config_path, load_configuration)
 
 from .runtime import run_server
 
@@ -69,6 +69,8 @@ def read_configuration(argv: List[str]=None) -> None:
     if args.version:
         print_version()
         sys.exit(1)
+
+    load_configuration()
 
     if args.config:
         with open(args.config, mode='rt') as config_file:

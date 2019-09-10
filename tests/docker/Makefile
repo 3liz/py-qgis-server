@@ -57,6 +57,7 @@ run:
 		-u $(BECOME_USER) \
 		-v $(SRCDIR):/src \
 		-v $$(pwd)/.local:/.local \
+		-v $$(pwd)/server.conf:/server.conf \
 		-v $(LOCAL_HOME)/.cache:/.cache \
 		-v $(PLUGINPATH):/plugins \
 		-e PIP_CACHE_DIR=/.cache \
