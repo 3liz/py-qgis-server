@@ -7,5 +7,5 @@ autoreload: yes
 # Allow anything
 default: {}
 
-profiles: !include profiles/*/*.yml
+profiles: !include [ profiles/*/*.yml , profiles/*/*/*.yml ]
 

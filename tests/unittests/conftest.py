@@ -8,7 +8,7 @@ from time import sleep
 
 def pytest_addoption(parser):
     parser.addoption("--server-log-level", choices=['debug', 'info', 'warning', 'error'] , help="log level",
-                     default='info')
+                     default='error')
 
 
 server_log_level = None
@@ -22,10 +22,12 @@ def pytest_sessionstart(session):
     """ Start subprocesses
     """
     logging.basicConfig( stream=sys.stderr )
-    logging.disable(logging.ERROR)
+
+    log_level = getattr(logging, server_log_level.upper())
+    logging.disable(log_level)
 
     logger = logging.getLogger('QGSRV')
-    logger.setLevel(getattr(logging, server_log_level.upper()))
+    logger.setLevel(log_level)
 
     rt = TestRuntime.instance()
     rt.start()

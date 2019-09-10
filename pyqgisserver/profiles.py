@@ -29,6 +29,8 @@ import yaml
 import traceback
 import functools
 
+from yaml.nodes import SequenceNode
+
 from typing import Mapping, TypeVar, Any
 
 from ipaddress import ip_address, ip_network
@@ -53,21 +55,25 @@ class Loader(yaml.SafeLoader):
     def include(self, node):
         """
         """
-        fileglob = self.construct_scalar(node)
-        if not os.path.isabs(fileglob):
-            fileglob = os.path.join(self._root, self.construct_scalar(node))
+        if isinstance(node, SequenceNode):
+            filelist = self.construct_sequence(node)
+        else:
+            filelist = [ self.construct_scalar(node) ]
         value = {}
-        for filename in glob(fileglob):
-            try:
-                with open(filename, 'r') as f:
-                    data = yaml.load(f, Loader)
-                    if not isinstance(data, dict):
-                        raise Exception("Expecting 'dict', not %s" % type(data))
-                    value.update(data)
-                    LOGGER.debug("Loaded profile: %s", filename)
-            except Exception as err:
-                LOGGER.error("Failed to load %s: %s", filename, err)
-                raise
+        for fileglob in filelist:
+            if not os.path.isabs(fileglob):
+                fileglob = os.path.join(self._root, fileglob)
+            for filename in glob(fileglob):
+                try:
+                    with open(filename, 'r') as f:
+                        data = yaml.load(f, Loader)
+                        if not isinstance(data, dict):
+                            raise Exception("Expecting 'dict', not %s" % type(data))
+                        value.update(data)
+                        LOGGER.debug("Loaded profile: %s", filename)
+                except Exception as err:
+                    LOGGER.error("Failed to load %s: %s", filename, err)
+                    raise
 
         return value
 

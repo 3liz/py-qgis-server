@@ -51,5 +51,13 @@ class Tests(HTTPTestCase):
         rv = self.client.get(uri,path='')
         assert rv.status_code == 200
 
+    def test_wfs_profile(self):
+        """ Test profile located in subdir
+        """
+        uri = ('/ows/p/wfsonly/')
+
+        rv = self.client.get(uri,path='')
+        assert rv.status_code == 200
+
 
 

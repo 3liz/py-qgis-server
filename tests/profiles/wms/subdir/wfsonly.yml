@@ -1,0 +1,9 @@
+
+### Define a simple profile
+### Allowing WFS only and overwriting the MAP parameter
+wfsonly:
+  services: 
+    - WFS
+  parameters:
+    MAP: france_parts.qgs
+
