@@ -29,6 +29,14 @@ def get_config(section):
     return CONFIG[section]
 
 
+def get_env_config(section, name, env, default=None):
+    """ Get configuration value from environment
+        if not found in loaded config
+    """
+    cfg = CONFIG[section]
+    return cfg.get(name,getenv(env,default))
+
+
 def set_config(section, name, value):
     """ Set configuration value
     """
@@ -53,19 +61,18 @@ def load_configuration():
     CONFIG = configparser.ConfigParser()    
 
     CONFIG.add_section('server')
-    CONFIG.set('server', 'port'        , getenv('QGSRV_SERVER_HTTP_PORT', '8080'))
-    CONFIG.set('server', 'interfaces'  , getenv('QGSRV_SERVER_INTERFACES', '0.0.0.0'))
-    CONFIG.set('server', 'workers'     , getenv('QGSRV_SERVER_WORKERS', '2'))
-    CONFIG.set('server', 'timeout'     , getenv('QGSRV_SERVER_TIMEOUT', '20'))
-    CONFIG.set('server', 'profiles'    , getenv('QGSRV_SERVER_PROFILES', ''))
-    CONFIG.set('server', 'map_rewrite' , getenv('QGSRV_SERVER_MAP_REWRITE', ''))
-    CONFIG.set('server', 'http_proxy'  , getenv('QGSRV_SERVER_HTTP_PROXY', 'no'))
-    CONFIG.set('server', 'proxy_url'   , getenv('QGSRV_SERVER_PROXY_URL' , ''))
-    CONFIG.set('server', 'restartmon'  , getenv('QGSRV_SERVER_RESTARTMON' , ''))
-    CONFIG.set('server', 'pluginpath'  , getenv('QGSRV_SERVER_PLUGINPATH' , ''))
-    CONFIG.set('server', 'ssl'         , getenv('QGSRV_SERVER_SSL' , 'no'))
-    CONFIG.set('server', 'ssl_cert'    , getenv('QGSRV_SERVER_SSL_CERT', ''))
-    CONFIG.set('server', 'ssl_key'     , getenv('QGSRV_SERVER_SSL_KEY' , ''))
+    CONFIG.set('server', 'port'          , getenv('QGSRV_SERVER_HTTP_PORT', '8080'))
+    CONFIG.set('server', 'interfaces'    , getenv('QGSRV_SERVER_INTERFACES', '0.0.0.0'))
+    CONFIG.set('server', 'workers'       , getenv('QGSRV_SERVER_WORKERS', '2'))
+    CONFIG.set('server', 'timeout'       , getenv('QGSRV_SERVER_TIMEOUT', '20'))
+    CONFIG.set('server', 'enable_filters', getenv('QGSRV_SERVER_ENABLE_FILTERS', 'yes'))
+    CONFIG.set('server', 'http_proxy'    , getenv('QGSRV_SERVER_HTTP_PROXY', 'no'))
+    CONFIG.set('server', 'proxy_url'     , getenv('QGSRV_SERVER_PROXY_URL' , ''))
+    CONFIG.set('server', 'restartmon'    , getenv('QGSRV_SERVER_RESTARTMON' , ''))
+    CONFIG.set('server', 'pluginpath'    , getenv('QGSRV_SERVER_PLUGINPATH' , ''))
+    CONFIG.set('server', 'ssl'           , getenv('QGSRV_SERVER_SSL' , 'no'))
+    CONFIG.set('server', 'ssl_cert'      , getenv('QGSRV_SERVER_SSL_CERT', ''))
+    CONFIG.set('server', 'ssl_key'       , getenv('QGSRV_SERVER_SSL_KEY' , ''))
 
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))

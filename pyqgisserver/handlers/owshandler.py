@@ -1,5 +1,5 @@
 #
-# Copyright 2018 3liz
+# Copyright 2018-2019 3liz
 # Author: David Marteau
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,40 +23,35 @@ class OwsHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
-    def initialize(self, client, timeout, monitor=None, profiles=None, map_rewrite=None, http_proxy=False):
+    def initialize(self, client, timeout, monitor=None, filters=None, http_proxy=False):
         super().initialize()
 
         self._client      = client
         self._timeout     = timeout
         self._monitor     = monitor
-        self._profiles    = profiles
+        self._filters     = filters
         self._proxy       = http_proxy
-        if map_rewrite:
-            self._rewrite_map = lambda profile,path:map_rewrite % dict(profile=profile,path=project_path) 
-        else:
-            self._rewrite_map = None
 
-    async def handle_request(self, method, data=None, profile=None):
+    async def handle_request(self, method, *args, data=None ):
         reqtime = time()
         try:
             # Handle profile
-            if self._profiles and not self._profiles.apply_profile(profile, self.request, http_proxy=self._proxy):
-                raise HTTPError(403,reason="Unauthorized profile")
+            if self._filters:
+                for filt in self._filters:
+                    await filt.apply( self, *args )
 
-            proxy_url = self.proxy_url(self._proxy, profile=profile)
+            proxy_url = self.proxy_url(self._proxy)
 
             delta = None
             project_path = self.get_argument('MAP')
             query        = self.encode_arguments()
 
-            if self._rewrite_map:
-                project_path = self._rewrite_map(project_path, profile)
-
             headers = {
                 'X-Map-Location': project_path 
-            } 
+            }
+
             if proxy_url: headers['X-Proxy-Location']=proxy_url
-            if self.url_encoded:
+            if self.has_body_arguments:
                 # Do not let qgis server handle url encoded prameters
                 method = 'GET'
                 data   = None
@@ -103,15 +98,15 @@ class OwsHandler(BaseHandler):
         if self._monitor:
               self._monitor.emit( status, self.request.arguments,  delta)
 
-    async def get(self, profile=None):
+    async def get(self, *args):
         """ Handle Get method
         """
-        await self.handle_request('GET', profile=profile)
+        await self.handle_request('GET', *args)
           
-    async def post(self, profile=None):
+    async def post(self, *args):
         """ Handle Post method
         """
-        await self.handle_request('POST', data=self.request.body, profile=profile)
+        await self.handle_request('POST', *args, data=self.request.body)
         
 
 

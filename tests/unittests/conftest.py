@@ -7,11 +7,12 @@ from pyqgisserver.tests import TestRuntime
 from time import sleep
 
 def pytest_addoption(parser):
-    parser.addoption("--server-log-level", choices=['debug', 'info', 'warning', 'error'] , help="log level",
+    parser.addoption("--server-log-level", choices=['debug', 'info', 'warning', 'error','critical'] , help="log level",
                      default='error')
 
 
 server_log_level = None
+
 
 def pytest_configure(config):
     global server_log_level

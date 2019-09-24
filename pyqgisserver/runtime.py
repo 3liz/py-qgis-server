@@ -28,7 +28,7 @@ from .zeromq import client, broker, supervisor
 from .utils import process
 
 from .monitor import Monitor
-from .profiles import ProfileMngr
+from .filters import load_filters
 from .broadcast import Broadcast
 
 LOGGER=logging.getLogger('QGSRV')
@@ -44,20 +44,18 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         'client'     : client,
         'monitor'    : monitor,
         'timeout'    : cfg.getint('timeout'),
-        'map_rewrite': cfg.get('map_rewrite'),
-        'http_proxy' : cfg.get('http_proxy') == 'yes', 
+        'http_proxy' : cfg.getboolean('http_proxy'),
     }
 
-    # Load profiles
-    with_profiles = cfg.get('profiles')
-    if with_profiles:
-        ows_kwargs['profiles'] = ProfileMngr.initialize(with_profiles)
+    handlers = [(r"/", RootHandler)]
 
-    handlers =[
-        (r"/"          , RootHandler),
-        (r"/ows/p/(.*)", OwsHandler, ows_kwargs),
-        (r"/ows/"      , OwsHandler, ows_kwargs),
-    ]
+    # Load filters
+    if cfg.getboolean('enable_filters'):
+        filters = load_filters(r"/ows/")
+        for uri,fltrs in filters.items():
+            kw = ows_kwargs.copy()
+            kw.update( filters = fltrs )
+            handlers.append( (uri, OwsHandler, kw) )
 
     return handlers
 

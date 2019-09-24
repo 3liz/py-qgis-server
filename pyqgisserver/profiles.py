@@ -29,6 +29,8 @@ import yaml
 import traceback
 import functools
 
+from tornado.web import HTTPError
+
 from yaml.nodes import SequenceNode
 
 from typing import Mapping, TypeVar, Any
@@ -36,7 +38,8 @@ from typing import Mapping, TypeVar, Any
 from ipaddress import ip_address, ip_network
 from glob import glob 
 
-from .watchfiles import watchfiles
+from pyqgisserver.watchfiles import watchfiles
+from pyqgisserver.config import get_config, get_env_config
 
 LOGGER = logging.getLogger('QGSRV')
 
@@ -206,4 +209,25 @@ class ProfileMngr:
             LOGGER.error("Invalid profile '%s': %s", name or "<default>", err)
                 
         return False
+
+
+def register_filters() -> None:
+    """
+    """
+    from pyqgisserver.filters import blockingfilter
+
+    with_profiles = get_env_config('server','profiles','QGSRV_SERVER_PROFILES')
+    if with_profiles:
+        mngr = ProfileMngr.initialize(with_profiles)
+       
+        http_proxy = get_config('server').getboolean('http_proxy')
+
+        @blockingfilter(pri=-1000, uri=r"/ows/p/(.*)")
+        def profile_filter( handler, profile ):
+            if not mngr.apply_profile(profile, handler.request, http_proxy):
+                raise HTTPError(403,reason="Unauthorized profile")
+
+        return [profile_filter]
+    
+    return []
 
