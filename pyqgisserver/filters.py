@@ -33,6 +33,7 @@
         return [ myfilter1, myfilter2 ]
 """
 
+import os
 import functools
 import logging
 import tornado.web
@@ -48,16 +49,16 @@ class ServerFilter:
     pass
 
 
-def load_filters( default_uri: str ) -> Mapping[str,List[ServerFilter]]:
+def load_filters( base_uri: str ) -> Mapping[str,List[ServerFilter]]:
     """ Load filters and return a Mapping
     """
     from pkg_resources import iter_entry_points
    
-    filters = { default_uri: [] }
+    filters = { base_uri: [] }
     for ep in iter_entry_points("pyqgisserver_filters"):
         LOGGER.info("Loading filters from %s", ep.name)
         for filt in ep.load()():
-            uri = filt.uri or default_uri
+            uri = os.path.join(base_uri, filt.uri)
             fls = filters.get(uri,[])
             fls.append(filt)
             filters[uri] = fls
@@ -73,7 +74,7 @@ class asyncfilter(ServerFilter):
         Assume that the function return a  coroutine
     """
 
-    def __init__(self, uri=None, pri=0):
+    def __init__(self, pri=0, uri=""):
         self.pri = pri
         self.uri = uri
 
@@ -89,7 +90,7 @@ class blockingfilter(ServerFilter):
     """ Decorator for synchronous request filter
     """
 
-    def __init__(self, pri=0, uri=None):
+    def __init__(self, pri=0, uri=""):
         self.pri = pri
         self.uri = uri
 

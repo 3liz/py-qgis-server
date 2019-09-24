@@ -56,6 +56,8 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
             kw = ows_kwargs.copy()
             kw.update( filters = fltrs )
             handlers.append( (uri, OwsHandler, kw) )
+    else:
+        handlers.append( (r"/ows/", OwsHandler, ows_kwargs) )
 
     return handlers
 

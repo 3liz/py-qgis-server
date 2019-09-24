@@ -222,7 +222,7 @@ def register_filters() -> None:
        
         http_proxy = get_config('server').getboolean('http_proxy')
 
-        @blockingfilter(pri=-1000, uri=r"/ows/p/(.*)")
+        @blockingfilter(pri=-1000, uri=r"p/(.*)")
         def profile_filter( handler, profile ):
             if not mngr.apply_profile(profile, handler.request, http_proxy):
                 raise HTTPError(403,reason="Unauthorized profile")
