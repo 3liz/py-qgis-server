@@ -82,8 +82,8 @@ class asyncfilter(ServerFilter):
         self.fn = fn
         return self
 
-    def apply( self, handler: tornado.web.RequestHandler, *args ) -> Coroutine:
-        return self.fn(handler, *args)
+    def apply( self, handler: tornado.web.RequestHandler ) -> Coroutine:
+        return self.fn(handler)
 
 
 class blockingfilter(ServerFilter):
@@ -98,6 +98,6 @@ class blockingfilter(ServerFilter):
         self.fn = fn
         return self
 
-    async def apply( self, handler: tornado.web.RequestHandler, *args ) -> None:
-        self.fn(handler, *args)
+    async def apply( self, handler: tornado.web.RequestHandler ) -> None:
+        self.fn(handler)
 

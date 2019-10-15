@@ -36,9 +36,9 @@ class OwsHandler(BaseHandler):
         # Handle filters
         super().prepare()
         for filt in self._filters:
-            await filt.apply( self, *self.path_args, **self.path_kwargs)
+            await filt.apply( self )
 
-    async def handle_request(self, method, *args, data=None ):
+    async def handle_request(self, method, data=None ):
         reqtime = time()
         try:
             proxy_url = self.proxy_url(self._proxy)
@@ -99,15 +99,15 @@ class OwsHandler(BaseHandler):
         if self._monitor:
               self._monitor.emit( status, self.request.arguments,  delta)
 
-    async def get(self, *args):
+    async def get(self):
         """ Handle Get method
         """
-        await self.handle_request('GET', *args)
+        await self.handle_request('GET')
           
-    async def post(self, *args):
+    async def post(self):
         """ Handle Post method
         """
-        await self.handle_request('POST', *args, data=self.request.body)
+        await self.handle_request('POST', data=self.request.body)
         
 
 
