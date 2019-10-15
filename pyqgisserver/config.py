@@ -18,7 +18,7 @@ CONFIG = None
 
 getenv = os.environ.get
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 def get_config(section):
     """ Return the configuration section

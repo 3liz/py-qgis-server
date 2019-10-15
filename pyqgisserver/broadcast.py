@@ -11,7 +11,7 @@ from .config import get_config
 # Ask restarting
 BCAST_RESTART = b'RESTART'
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 class Broadcast:
 

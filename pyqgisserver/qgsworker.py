@@ -31,7 +31,7 @@ from .cache import cache_lookup
 from .config  import get_config
 from .plugins import load_plugins
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 class Request(QgsServerRequest):

@@ -66,6 +66,7 @@ run:
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
+		-e QGSRV_SERVER_HTTP_PROXY=yes \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \
 		-e QGSRV_SERVER_PLUGINPATH=/plugins \
 		-e PYTHONWARNINGS=d \

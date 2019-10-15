@@ -32,7 +32,7 @@ CLOSE = 1
 TERMINATE = 2
 
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 class Pool:
 

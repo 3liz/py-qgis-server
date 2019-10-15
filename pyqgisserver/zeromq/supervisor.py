@@ -26,7 +26,7 @@ import logging
 
 from typing import Callable
 
-LOGGER=logging.getLogger('QGSRV')
+LOGGER=logging.getLogger('SRVLOG')
 
 
 def _get_supervisor_addr() -> str:

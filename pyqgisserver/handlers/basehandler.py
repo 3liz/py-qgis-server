@@ -20,7 +20,7 @@ from urllib.parse import urlencode
 from ..version import __version__
 from ..config import get_config
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 class BaseHandler(tornado.web.RequestHandler):

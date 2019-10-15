@@ -27,7 +27,7 @@ from .messages import WORKER_READY
 from ..version import __description__, __version__
 from ..logger import setup_log_handler
 
-LOGGER=logging.getLogger('QGSRV')
+LOGGER=logging.getLogger('SRVLOG')
 
 
 def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000) -> None:

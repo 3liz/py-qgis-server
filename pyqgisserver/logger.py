@@ -16,7 +16,7 @@ RREQ_FORMAT = REQ_LOG_TEMPLATE
 REQ = 21
 RREQ = 22
 
-LOGGER=logging.getLogger('QGSRV')
+LOGGER=logging.getLogger('SRVLOG')
 
 def setup_log_handler(log_level, formatstr='%(asctime)s\t%(levelname)s\t[%(process)d]\t%(message)s',
                       stream = None ):

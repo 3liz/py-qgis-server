@@ -31,7 +31,7 @@ from typing import Callable, TypeVar
 from ..version import __description__, __version__
 from ..logger import setup_log_handler
 
-LOGGER=logging.getLogger('QGSRV')
+LOGGER=logging.getLogger('SRVLOG')
 
 from .messages import (WORKER_READY, ReplyMessage)
 from .supervisor import Client as SupervisorClient

@@ -20,7 +20,7 @@ from .config import (get_config, read_config_file, read_config_dict,
 
 from .runtime import run_server
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 def print_version() -> None:

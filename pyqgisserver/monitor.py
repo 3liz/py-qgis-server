@@ -8,7 +8,7 @@ import os
 
 from typing import Union, Mapping
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 def _decode( b: Union[str,bytes] ) -> str:
     if not isinstance(b,str):

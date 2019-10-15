@@ -8,7 +8,7 @@ import traceback
 from typing import Callable, Mapping, Union, List
 from tornado import ioloop
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 UpdateFunc = Callable[[List[str]],None]
 

@@ -38,10 +38,9 @@ from typing import Mapping, TypeVar, Any
 from ipaddress import ip_address, ip_network
 from glob import glob 
 
-from pyqgisserver.watchfiles import watchfiles
-from pyqgisserver.config import get_config, get_env_config
+from .watchfiles import watchfiles
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 # Define an abstract type for HTTPRequest
 HTTPRequest = TypeVar('HTTPRequest')
@@ -215,6 +214,7 @@ def register_filters() -> None:
     """
     """
     from pyqgisserver.filters import blockingfilter
+    from pyqgisserver.config import get_config, get_env_config
 
     with_profiles = get_env_config('server','profiles','QGSRV_SERVER_PROFILES')
     if with_profiles:

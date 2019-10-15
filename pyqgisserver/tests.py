@@ -27,7 +27,7 @@ from .runtime import (Application,
                       create_broker_process,
                       configure_ipc_addresses)
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 NAMESPACES = {
     'xlink': "http://www.w3.org/1999/xlink",

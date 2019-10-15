@@ -23,7 +23,7 @@ from .utils.decorators import singleton
 
 from .config import get_config
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 @singleton

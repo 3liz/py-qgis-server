@@ -20,7 +20,7 @@ from typing import Generator
 
 from .config  import get_config
 
-LOGGER = logging.getLogger('QGSRV') 
+LOGGER = logging.getLogger('SRVLOG') 
 
 server_plugins = {}
 

@@ -43,7 +43,7 @@ from typing import Coroutine, Mapping, List, Callable, Awaitable
 from tornado.web import HTTPError
 
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 class ServerFilter:
     pass

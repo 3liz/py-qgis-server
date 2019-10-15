@@ -16,7 +16,7 @@ from ..zeromq.client import RequestTimeoutError, RequestGatewayError
 
 from .basehandler import BaseHandler, HTTPError
 
-LOGGER = logging.getLogger('QGSRV')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 class OwsHandler(BaseHandler):
@@ -32,14 +32,15 @@ class OwsHandler(BaseHandler):
         self._filters     = filters
         self._proxy       = http_proxy
 
+    async def prepare(self):
+        # Handle filters
+        super().prepare()
+        for filt in self._filters:
+            await filt.apply( self, *self.path_args, **self.path_kwargs)
+
     async def handle_request(self, method, *args, data=None ):
         reqtime = time()
         try:
-            # Handle profile
-            if self._filters:
-                for filt in self._filters:
-                    await filt.apply( self, *args )
-
             proxy_url = self.proxy_url(self._proxy)
 
             delta = None

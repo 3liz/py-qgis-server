@@ -29,7 +29,7 @@ from .messages import RequestMessage, ReplyMessage
 from ..version import __description__, __version__
 from ..logger import setup_log_handler
 
-LOGGER=logging.getLogger('QGSRV')
+LOGGER=logging.getLogger('SRVLOG')
 
 class RequestTimeoutError(Exception):
     pass

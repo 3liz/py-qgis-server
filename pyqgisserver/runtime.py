@@ -31,7 +31,7 @@ from .monitor import Monitor
 from .filters import load_filters
 from .broadcast import Broadcast
 
-LOGGER=logging.getLogger('QGSRV')
+LOGGER=logging.getLogger('SRVLOG')
 
 def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
     """
