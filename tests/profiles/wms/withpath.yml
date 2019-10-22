@@ -1,8 +1,0 @@
-
-### Define a simple profile with path
-wms/testpath:
-  services: 
-    - WMS
-  parameters:
-    MAP: france_parts.qgs
-

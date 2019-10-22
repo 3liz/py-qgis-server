@@ -21,5 +21,5 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 export QT_LOGGING_RULES="*.debug=false;*.warning=false"
 
 # Run new tests
-cd tests/unittests && py.test -v $@
+cd tests/unittests && pytest -v $@
 

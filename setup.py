@@ -47,9 +47,6 @@ setup(
             'qgisserver = pyqgisserver.server:main',
             'qgisserver-worker = pyqgisserver.qgsworker:main',
         ],
-        'pyqgisserver_filters': [
-            'profile_filter = pyqgisserver.profiles:register_filters',
-        ]
     },
     classifiers=[
         'Environment :: Web Environment',

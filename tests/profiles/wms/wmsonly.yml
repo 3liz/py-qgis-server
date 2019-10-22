@@ -1,9 +1,0 @@
-
-### Define a simple profile
-### Allowing WMS only and overwriting the MAP parameter
-wmsonly:
-  services: 
-    - WMS
-  parameters:
-    MAP: france_parts.qgs
-

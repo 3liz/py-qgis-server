@@ -20,13 +20,13 @@ getenv = os.environ.get
 
 LOGGER = logging.getLogger('SRVLOG')
 
-def get_config(section):
+def get_config(section=None):
     """ Return the configuration section
     """
     if CONFIG is None:
         load_configuration()
 
-    return CONFIG[section]
+    return CONFIG[section] if section else CONFIG
 
 
 def get_env_config(section, name, env, default=None):
