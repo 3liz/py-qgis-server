@@ -124,6 +124,7 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
         LOGGER.info("Enabling broadcast notification")
         ctx = zmq.Context.instance()
         sub = ctx.socket(zmq.SUB)
+        sub.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
         sub.setsockopt(zmq.SUBSCRIBE, b'RESTART')
         sub.connect(broadcastaddr)
 
@@ -169,7 +170,8 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
        sub.close()
     # Terminate context
     sock.close()
-    ctx.term()
+    # XXX Investigate why contexte.term() is hanging 
+    # ctx.term()
    
 
 if __name__ == '__main__':
