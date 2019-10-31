@@ -57,4 +57,16 @@ class Tests(HTTPTestCase):
         rv = self.client.get("?MAP=fail:france_parts.qgs&SERVICE=WFS&request=GetCapabilities")
         assert rv.status_code == 404
 
+    def test_open_with_basename(self):
+        """ Test that custom protocol is correctly resolved
+        """
+        rv = self.client.get("?MAP=france_parts&SERVICE=WFS&request=GetCapabilities")
+        assert rv.status_code == 200
+
+    def test_open_qgz(self):
+        """ Test that custom protocol is correctly resolved
+        """
+        rv = self.client.get("?MAP=france_parts_qgz&SERVICE=WFS&request=GetCapabilities")
+        assert rv.status_code == 200
+
 

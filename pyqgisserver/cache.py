@@ -66,13 +66,15 @@ class _Cache(FileCache):
                 
                 key = key.path.strip('/')
                 path = rootpath / key
-                path = path.with_suffix('.qgs')
-                if not path.is_file():
-                    raise FileNotFoundError(str(path))
+                for sfx in ('.qgs','.qgz'):
+                    path = path.with_suffix(sfx)
+                    if path.is_file():
+                        # Get modification time for the file
+                        timestamp = datetime.fromtimestamp(path.stat().st_mtime)
+                        return str(path), timestamp
 
-                # Get modification time for the file
-                timestamp = datetime.fromtimestamp(path.stat().st_mtime)
-                return str(path), timestamp
+                # No file found
+                raise FileNotFoundError(str(path))
 
         # Init FileCache
         super().__init__(size=cachesize, store=_Store())  
