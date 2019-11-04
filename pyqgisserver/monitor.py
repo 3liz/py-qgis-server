@@ -15,6 +15,8 @@ def _decode( b: Union[str,bytes] ) -> str:
         return b.decode('utf-8')
     return b
 
+TAG_PREFIX = 'AMQP_GLOBAL_TAG_' 
+
 
 class Monitor:
 
@@ -23,6 +25,11 @@ class Monitor:
         """
         self._client = amqp_client
         self._routing_key = os.environ['AMQP_ROUTING']
+      
+        # Get global tags
+        tags = ((e.partition(TAG_PREFIX)[2],os.environ[e]) for e in os.environ if e.startswith(TAG_PREFIX))
+        self._global_tags = { t:v for (t,v) in tags if t }
+            
 
     def emit( self, status:int, arguments: Mapping[str,str], delta: float ) -> None:
         """ Publish monitor data
@@ -30,7 +37,8 @@ class Monitor:
         params = { k:_decode(v[0]) for k,v in arguments.items() }
         # Send all params to our logger
         ms = int(delta * 1000.0)
-        params.update(RESPONSE_TIME=ms,
+        params.update(self._global_tags,
+                      RESPONSE_TIME=ms,
                       RESPONSE_STATUS=status,
                       ROUTING_KEY=self._routing_key)
         log_msg = json.dumps(params)
