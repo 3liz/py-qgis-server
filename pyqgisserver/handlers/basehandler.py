@@ -31,7 +31,8 @@ class BaseHandler(tornado.web.RequestHandler):
         self._links    = []
         self.connection_closed = False
         self.logger = LOGGER
-        self._cfg = get_config('server')
+        self._cfg   = get_config('server')
+        self._cross_origin = self._cfg.getboolean('cross_origin')
 
     def prepare(self):
         self.has_body_arguments = len(self.request.body_arguments)>0
@@ -66,9 +67,14 @@ class BaseHandler(tornado.web.RequestHandler):
         if isinstance(chunk, dict):
             chunk = json.dumps(chunk, sort_keys=True)
         self.set_header('Content-Type', 'application/json;charset=utf-8')   
-        # Allow CORS on all origin
-        if self.request.headers.get('Origin'):
-            self.set_header('Access-Control-Allow-Origin', '*')
+        # Allow CORS
+        origin = self.request.headers.get('Origin')
+        if origin:
+            if self._cross_origin:
+                self.set_header('Access-Control-Allow-Origin', '*')
+            else:
+                self.set_header('Access-Control-Allow-Origin', origin)
+                self.set_header('Vary', 'Origin')
         self.write(chunk)
 
     def write_error(self, status_code, **kwargs):
