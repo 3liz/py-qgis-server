@@ -80,6 +80,8 @@ def load_configuration():
     CONFIG.add_section('cache')
     CONFIG.set('cache', 'size'    , getenv('QGSRV_CACHE_SIZE','10' ))
     CONFIG.set('cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
+    # Ensure that loaded project is valid before loading in cache
+    CONFIG.set('cache', 'strict_check' , getenv('QGSRV_CACHE_STRICT_CHECK','yes'))
 
     CONFIG.add_section('zmq')
     CONFIG.set('zmq', 'identity'     , getenv('QGSRV_ZMQ_IDENTITY' ,'OWS-SERVER'))

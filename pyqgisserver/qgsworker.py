@@ -26,7 +26,7 @@ from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
 from .zeromq.worker import RequestHandler, run_worker
-from .cache import cache_lookup
+from .cache import cache_lookup, StrictCheckingError
 
 from .config  import get_config
 from .plugins import load_plugins
@@ -220,6 +220,8 @@ class QgsRequestHandler(RequestHandler):
                # Needed to cleanup cache capabilities cache
                LOGGER.debug("Cleaning config cache entry %s", config_path)
                iface.removeConfigCacheEntry(config_path)
+        except StrictCheckingError:
+            response.sendError(422,"Invalid layers for project '%s' - strict mode on" % project_location)
         except FileNotFoundError:
             response.sendError(404,"Project '%s' not found" % project_location)
         else:

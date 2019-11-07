@@ -23,7 +23,26 @@ from .utils.decorators import singleton
 
 from .config import get_config
 
+from qgis.core import QgsProjectBadLayerHandler, QgsProject
+
 LOGGER = logging.getLogger('SRVLOG')
+
+
+class StrictCheckingError(Exception):
+    pass
+
+
+class BadLayerHandler(QgsProjectBadLayerHandler):
+
+    def __init__(self):
+        super().__init__()
+        self.invalidLayers = False
+
+    def handleBadLayers( self, layers ) -> None: 
+        """ See https://qgis.org/pyqgis/3.0/core/Project/QgsProjectBadLayerHandler.html
+        """
+        self.invalidLayers = True
+        super().handleBadLayers(layers)
 
 
 @singleton
@@ -33,6 +52,8 @@ class _Cache(FileCache):
         config    = get_config('cache')
         cachesize = config.getint('size')
         rootdir   = Path(config['rootdir'])
+
+        self._strict_check = config.getboolean('strict_check')
 
         protocols = {}
 
@@ -81,6 +102,17 @@ class _Cache(FileCache):
 
     def on_cache_update(self, key: str, path: str):
         LOGGER.info("Cache '%s' updated with path: %s" % (key,path)) 
+
+    def read_project(self, path):
+        """ Override
+        """
+        project = self.QgsProject()
+        badlayerh = BadLayerHandler()
+        project.setBadLayerHandler(badlayerh)
+        project.read(path)
+        if self._strict_check and badlayerh.invalidLayers:
+            raise StrictCheckingError
+        return project
 
 
 def cache_lookup( path ):

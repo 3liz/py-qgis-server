@@ -50,12 +50,17 @@ class FileCache():
                 del self.cache[key]
             else:
                 return False
-        # Load project
-        project = self.QgsProject()
-        project.read(path)
+        project = self.read_project(path)
         self.cache[key] = CacheDetails(project, timestamp)
         self.on_cache_update( key, path )
         return True
+
+    def read_project(self, path):
+        """ Load project
+        """
+        project = self.QgsProject()
+        project.read(path)
+        return project
 
     def on_cache_update(self, key: str, path: str ) -> None:
         """ Called when cache is updated
