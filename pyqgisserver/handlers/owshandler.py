@@ -88,13 +88,13 @@ class OwsHandler(BaseHandler):
                 self.write(response.data)
 
         except RequestTimeoutError:
-              status = 503
+              status = 504
               delta = time() - reqtime
               self.send_error(status, reason="Request timeout error")
         except RequestGatewayError:
               status = 502
               delta = time() - reqtime
-              self.send_error(status, reason="Server busy, please retry later")
+              self.send_error(status, reason="Backend request error")
 
         if self._monitor:
               self._monitor.emit( status, self.request.arguments,  delta)
