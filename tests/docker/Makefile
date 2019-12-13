@@ -31,7 +31,7 @@ SCRIPTS=./tests/docker
 test:
 	mkdir -p $$(pwd)/.local $(LOCAL_HOME)/.cache
 	echo -n "Restart qgis" > .qgis-restart
-	docker run --rm --name qgis-py-server-test-$(COMMITID) -w /src \
+	docker run --rm --name qgis-py-server-test-$(FLAVOR)-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(SRCDIR):/src \
 		-v $$(pwd)/.local:/.local \

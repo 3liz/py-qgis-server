@@ -1,25 +1,61 @@
 stages:
+- test
 - build
+- docker
+- deploy
+- release
+
+.only_changes: &changes_def
+  changes:
+   - pyqgisserver/**/*
+   - tests/**/*
+   - "*.sh"
+   - Makefile
+   - "setup.*"
+
+#-----------------
+# Tests
+#-----------------
+
+.tests:
+  stage: test
+  script:
+    - make docker-test LOCAL_HOME=$RUNNER_HOME FLAVOR=$QGIS_FLAVOR
+  only:
+    <<: *changes_def
+  tags:
+    - infrav3
+  artifacts:
+    reports:
+        junit: tests/unittests/__output__/junit.xml
+
+test:ltr:
+  extends: .tests
+  variables:
+    QGIS_FLAVOR: ltr
+
+test:release:
+  extends: .tests
+  variables:
+    QGIS_FLAVOR: release        
+
+#---------------
+# Build
+#---------------
 
 build:
   stage: build
   script:
-    - make docker-test LOCAL_HOME=$RUNNER_HOME FLAVOR=ltr
     - make dist deliver
-    - $FACTORY_SCRIPTS/trigger-ci $DOCKER_SERVER_ID $DOCKER_SERVER_TOKEN master
   environment:
     name: snap
   tags:
     - infrav3
   only:
-    changes:
-      - tests/**/*
-      - Makefile
-      - pyqgisserver/**/*
-      - setup.py
+    <<: *changes_def
     refs:
       - master
-  artifacts:
-    reports:
-        junit: tests/unittests/__output__/junit.xml
+
+# Docker build
+include: '/docker/.gitlab-ci.yml'
 

@@ -1,0 +1,6 @@
+name=qgis-map-server
+version=3.4.13-1.2.0
+version_short=3.4
+release_tag=ltr
+buildid=201911191210
+commitid=b2b21cc

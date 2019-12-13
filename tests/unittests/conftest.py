@@ -7,28 +7,28 @@ from pyqgisserver.tests import TestRuntime
 from time import sleep
 
 def pytest_addoption(parser):
-    parser.addoption("--server-log-level", choices=['debug', 'info', 'warning', 'error','critical'] , help="log level",
-                     default='error')
+    parser.addoption("--server-debug", action="store_true" , help="Set debug mode",
+                     default=False)
 
 
-server_log_level = None
+server_debug = False
 
 
 def pytest_configure(config):
-    global server_log_level
-    server_log_level = config.getoption('server_log_level')
+    global server_debug
+    server_debug = config.getoption('server_debug')
 
 
 def pytest_sessionstart(session):
     """ Start subprocesses
     """
-    logging.basicConfig( stream=sys.stderr )
+    logging.basicConfig( stream=sys.stderr, level=logging.DEBUG )
 
-    log_level = getattr(logging, server_log_level.upper())
-    logging.disable(log_level)
+    if not server_debug:
+        logging.disable(logging.WARNING)
 
-    logger = logging.getLogger('QGSRV')
-    logger.setLevel(log_level)
+    #logger = logging.getLogger('QGSRV')
+    #logger.setLevel(log_level)
 
     rt = TestRuntime.instance()
     rt.start()

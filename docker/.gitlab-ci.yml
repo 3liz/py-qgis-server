@@ -1,0 +1,90 @@
+
+variables:
+    FACTORY_MANIFEST: "docker/factory.manifest"
+
+.docker_changes: &docker_changes_def
+  changes:
+    - docker/Dockerfile.pypi
+    - docker/Makefile
+    - docker/docker-entrypoint.sh
+
+#-------------
+# Build
+#-------------
+
+.docker-build:
+  stage: docker
+  script:
+    - make -C docker build test deliver clean FLAVOR=$QGIS_FLAVOR
+    - $FACTORY_SCRIPTS/push-to-docker-hub.sh --clean
+  environment:
+    name: snap
+  artifacts:
+    paths:
+      - "docker/factory.manifest"
+  only:
+    <<: *docker_changes_def
+    refs:
+      - master
+  tags:
+    - infrav3
+
+build-docker:ltr:
+  extends: .docker-build
+  variables:
+    QGIS_FLAVOR: ltr
+
+build-docker:release:
+  extends: .docker-build
+  variables:
+    QGIS_FLAVOR: release
+
+#-------------
+# deploy
+#-------------
+
+deploy_snap:
+  stage: deploy
+  script:
+    - $HOME/bin/lzmservicectl update -C MUTU map --annotate="Updated image ($CI_COMMIT_SHORT_SHA)"
+  environment:
+    name: snap
+  only:
+    <<: *docker_changes_def
+    refs:
+       - master
+  tags:
+    - infrav3
+
+#-------------
+# Release
+#-------------
+
+.docker-release:
+  stage: release
+  script:
+    - $FACTORY_SCRIPTS/release-image.sh qgis-map-server-$QGIS_FLAVOR
+  environment:
+    name: production
+  when: manual
+  only:
+    refs:
+      - master
+  tags:
+    - infrav3    
+    
+release:ltr:
+  extends: .docker-release
+  dependencies:
+    - build-docker:ltr
+  variables:
+    QGIS_FLAVOR: ltr
+
+release:release:
+  extends: .docker-release
+  dependencies:
+    - build-docker:release
+  variables:
+    QGIS_FLAVOR: release
+
+

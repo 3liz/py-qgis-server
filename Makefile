@@ -30,10 +30,7 @@ manifest:
 		echo commitid=$(COMMITID) >> $(MANIFEST)
 
 test:
-	cd tests && py.test -v --host=$(SERVER_HOST)
-
-run:
-	qgisserver -b 127.0.0.1 -p 8080 --rootdir=$(shell pwd)/tests/data -w $(WORKERS)
+	cd tests && py.test -v
 
 # Build dependencies
 wheel-deps: dirs
