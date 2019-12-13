@@ -2,12 +2,6 @@
 variables:
     FACTORY_MANIFEST: "docker/factory.manifest"
 
-.docker_changes: &docker_changes_def
-  changes:
-    - docker/Dockerfile.pypi
-    - docker/Makefile
-    - docker/docker-entrypoint.sh
-
 #-------------
 # Build
 #-------------
@@ -23,7 +17,6 @@ variables:
     paths:
       - "docker/factory.manifest"
   only:
-    <<: *docker_changes_def
     refs:
       - master
   tags:
@@ -50,7 +43,6 @@ deploy_snap:
   environment:
     name: snap
   only:
-    <<: *docker_changes_def
     refs:
        - master
   tags:
