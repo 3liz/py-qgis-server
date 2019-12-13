@@ -15,7 +15,7 @@ from typing import List
 
 from .version import __description__, __version__
 from .logger import setup_log_handler
-from .config import (get_config, read_config_file, read_config_dict,
+from .config import (get_config, set_config, read_config_file,
                      validate_config_path, load_configuration)
 
 from .runtime import run_server
@@ -42,7 +42,7 @@ def print_version() -> None:
         print("build manifest: %s" % mnpath, file=sys.stderr)
 
 
-def read_configuration(argv: List[str]=None) -> None:
+def read_configuration(argv: List[str]=None) -> argparse.Namespace:
     """ Parse command line and read configuration file
     """
     if argv is None:
@@ -50,25 +50,24 @@ def read_configuration(argv: List[str]=None) -> None:
 
     cli_parser = argparse.ArgumentParser(description=__description__)
 
-    cli_parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], 
-            default=argparse.SUPPRESS, help="set log level")
+    cli_parser.add_argument('-d','--debug', action='store_true', default=False, help="debug mode") 
     cli_parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
             default=None, help="Configuration file")
     cli_parser.add_argument('--version', action='store_true', 
             default=False, help="Return version number and exit")
     cli_parser.add_argument('-p','--port'    , type=int, help="http port", dest='port', default=argparse.SUPPRESS)
-    cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=argparse.SUPPRESS, help="Interface to bind to", dest='interface')
-    cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=argparse.SUPPRESS, help="Num workers", dest='workers')
-    cli_parser.add_argument('-j','--jobs'    , metavar='NUM', type=int, default=1, help="Num server instances", dest='jobs')
+    cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=argparse.SUPPRESS, help="interface to bind to", dest='interfaces')
+    cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=argparse.SUPPRESS, help="num workers", dest='workers')
+    cli_parser.add_argument('-j','--jobs'    , metavar='NUM', type=int, default=1, help="num server instances", dest='jobs')
     cli_parser.add_argument('-u','--setuid'  , default='', help="uid to switch to", dest='setuid')
-    cli_parser.add_argument('--rootdir'  , default=argparse.SUPPRESS, metavar='PATH', help='Path to qgis projects')
-    cli_parser.add_argument('--proxy'    , action='store_true', default=False, help='Run only as proxy')
+    cli_parser.add_argument('--rootdir'  , default=argparse.SUPPRESS, metavar='PATH', help='path to qgis projects')
+    cli_parser.add_argument('--proxy'    , action='store_true', default=False, help='run only as proxy')
 
     args = cli_parser.parse_args(argv)
 
+    print_version()
     if args.version:
-        print_version()
-        sys.exit(1)
+       sys.exit(1)
 
     load_configuration()
 
@@ -76,38 +75,30 @@ def read_configuration(argv: List[str]=None) -> None:
         with open(args.config, mode='rt') as config_file:
             read_config_file(config_file)
 
-    config_dict = { 'logging': {}, 'cache': {}, 'server':{}, }
+    # Override config
+    def set_arg( section:str, name:str ) -> None:
+        if name in args:
+            set_config( section, name, str(getattr(args,name)))
 
-    conf = get_config('server')
+    set_arg( 'cache'  , 'rootdir' )
+    set_arg( 'server' , 'interfaces')
+    set_arg( 'server' , 'port' )
+    set_arg( 'server' , 'workers' )
 
-    # Override with cli arguments
-    if 'logging' in args: 
-        config_dict['logging']['level'] = args.logging.upper()
-    if 'rootdir' in args:
-        config_dict['cache']['rootdir'] = args.rootdir
-    if 'interface' in args:
-        config_dict['server']['interfaces'] = args.interface
-    else:
-        args.interface = conf['interfaces']
-    if 'port' in args:
-        config_dict['server']['port']  = str(args.port)
-    else:
-        args.port =  conf.getint('port')
-    if 'workers' in args:
-        config_dict['server']['workers'] = str(args.workers)
-    else:
-        args.workers = conf.getint('workers')
-
-    read_config_dict(config_dict)
-
-    print_version()
+    if args.debug:
+        # Force debug mode
+        set_config('logging', 'level', 'DEBUG')
 
     # set log level
     setup_log_handler(get_config('logging')['level'])
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
 
+    conf = get_config('server')
+    args.port       = conf.getint('port')
+    args.workers    = conf.getint('workers')
+    args.interfaces = conf.get('interfaces')
     return args
- 
+
 
 def main() -> None:
     """ Run the server as cli command
@@ -121,7 +112,7 @@ def main() -> None:
         # Do not run any qgis workers
         workers = 0
 
-    run_server( port=args.port, address=args.interface, jobs=args.jobs, user=args.setuid, workers=workers )
+    run_server( port=args.port, address=args.interfaces, jobs=args.jobs, user=args.setuid, workers=workers )
 
     
 

@@ -62,7 +62,7 @@ For example:
 ### Running the server
 
 ```
-usage: qgisserver [-h] [--logging {debug,info,warning,error}] [-c [PATH]]
+usage: qgisserver [-h] [-d] [-c [PATH]]
                   [--version] [-p PORT] [-b IP] [-w NUM] [-j NUM] [-u SETUID]
                   [--rootdir PATH] [--proxy] [--timeout SECONDS]
 
@@ -70,8 +70,7 @@ qgis/HTTP/0MQ scalable server
 
 optional arguments:
   -h, --help            show this help message and exit
-  --logging {debug,info,warning,error}
-                        set log level
+  -d, --debug           debug mode
   -c [PATH], --config [PATH]
                         Configuration file
   --version             Return version number and exit
