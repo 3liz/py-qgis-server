@@ -55,6 +55,9 @@ build:
     <<: *changes_def
     refs:
       - master
+  except:
+      - schedules
+      - triggers
 
 # Docker build
 include: '/docker/.gitlab-ci.yml'
