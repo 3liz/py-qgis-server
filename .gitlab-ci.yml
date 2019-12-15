@@ -5,14 +5,6 @@ stages:
 - deploy
 - release
 
-.only_changes: &changes_def
-  changes:
-   - pyqgisserver/**/*
-   - tests/**/*
-   - "*.sh"
-   - Makefile
-   - "setup.*"
-
 #-----------------
 # Tests
 #-----------------
@@ -22,7 +14,13 @@ stages:
   script:
     - make docker-test LOCAL_HOME=$RUNNER_HOME FLAVOR=$QGIS_FLAVOR
   only:
-    <<: *changes_def
+    changes:
+      - pyqgisserver/**/*
+      - tests/**/*
+      - "*.sh"
+      - Makefile
+      - "setup.*"
+      - "requirements.*"
   tags:
     - infrav3
   artifacts:
@@ -52,7 +50,11 @@ build:
   tags:
     - infrav3
   only:
-    <<: *changes_def
+    changes:
+      - pyqgisserver/**/*
+      - "setup.*"
+      - MANIFEST.in
+      - requirements.txt
     refs:
       - master
   except:
