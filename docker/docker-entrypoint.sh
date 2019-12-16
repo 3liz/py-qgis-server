@@ -11,6 +11,11 @@ if [[ "$1" == "version" ]]; then
     exit 0
 fi
 
+if [[ "$QGSRV_USER" =~ ^root:? ]] || [[ "$QGSRV_USER" =~ ^0:? ]]; then
+    echo "QGSRV_USER must no be root !"
+    exit 1 
+fi
+
 if [[ "$1" = "qgisserver-proxy" ]]; then
     shift
     echo "Running Qgis server proxy"
