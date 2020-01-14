@@ -8,6 +8,7 @@ tmp
 docs/_build
 
 build.manifest
+factory.manifest
 
 __pycache__
 

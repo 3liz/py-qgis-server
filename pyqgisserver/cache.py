@@ -24,6 +24,7 @@ from .utils.decorators import singleton
 from .config import get_config
 
 from qgis.core import QgsProjectBadLayerHandler, QgsProject
+from qgis.server import QgsServerProjectUtils
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -32,18 +33,31 @@ class StrictCheckingError(Exception):
     pass
 
 
+
 class BadLayerHandler(QgsProjectBadLayerHandler):
 
     def __init__(self):
         super().__init__()
-        self.invalidLayers = False
+        self.badLayerNames = set()
 
     def handleBadLayers( self, layers ) -> None: 
         """ See https://qgis.org/pyqgis/3.0/core/Project/QgsProjectBadLayerHandler.html
         """
-        self.invalidLayers = True
-        super().handleBadLayers(layers)
+        super().handleBadLayers( layers )
 
+        nameElements = (l.firstChildElement("layername") for l in layers if l)
+        self.badLayerNames = set(elem.text() for elem in nameElements if elem)
+            
+    def validatLayers( self, project: QgsProject ) -> bool:
+        """ Check layers
+            
+            If layers are excluded do not count them as bad layers
+            see https://github.com/qgis/QGIS/pull/33668
+        """
+        if self.badLayerNames:
+            restricteds = set(QgsServerProjectUtils.wmsRestrictedLayers(project))
+            return self.badLayerNames.issubset(restricteds)
+        return True
 
 @singleton
 class _Cache(FileCache):
@@ -100,17 +114,17 @@ class _Cache(FileCache):
         # Init FileCache
         super().__init__(size=cachesize, store=_Store())  
 
-    def on_cache_update(self, key: str, path: str):
+    def on_cache_update(self, key: str, path: str) -> None:
         LOGGER.info("Cache '%s' updated with path: %s" % (key,path)) 
 
-    def read_project(self, path):
+    def read_project(self, path) -> QgsProject:
         """ Override
         """
         project = self.QgsProject()
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
         project.read(path)
-        if self._strict_check and badlayerh.invalidLayers:
+        if self._strict_check and not badlayerh.validatLayers(project):
             raise StrictCheckingError
         return project
 

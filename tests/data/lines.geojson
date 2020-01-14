@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "test_lines",
+"features": [
+{ "type": "Feature", "properties": { "id": 1, "name": "Line 1" }, "geometry": { "type": "LineString", "coordinates": [ [ 3.80, 43.50 ], [ 3.80, 43.60 ] ] } },
+{ "type": "Feature", "properties": { "id": 2, "name": "Line 2" }, "geometry": { "type": "LineString", "coordinates": [ [ 3.80, 43.60 ], [ 3.90, 43.60 ] ] } },
+{ "type": "Feature", "properties": { "id": 3, "name": "Line 3" }, "geometry": { "type": "LineString", "coordinates": [ [ 3.90, 43.60 ], [ 3.90, 43.50 ] ] } },
+{ "type": "Feature", "properties": { "id": 4, "name": "Line 4" }, "geometry": { "type": "LineString", "coordinates": [ [ 3.90, 43.50 ], [ 3.80, 43.50 ] ] } }
+]
+}
