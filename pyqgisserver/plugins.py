@@ -18,7 +18,7 @@ import configparser
 
 from typing import Generator
 
-from .config  import get_config
+from .config  import confservice
 
 LOGGER = logging.getLogger('SRVLOG') 
 
@@ -98,7 +98,7 @@ def load_plugins(serverIface: 'QgsServerInterface') -> None:
     """ Start all plugins
     """
 
-    plugin_path = get_config('server')['pluginpath']
+    plugin_path = confservice.get('server','pluginpath')
     if not plugin_path:
         return
 

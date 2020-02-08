@@ -18,7 +18,7 @@ from tornado.web import HTTPError
 from urllib.parse import urlencode
 
 from ..version import __version__
-from ..config import get_config
+from ..config import confservice
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -31,7 +31,7 @@ class BaseHandler(tornado.web.RequestHandler):
         self._links    = []
         self.connection_closed = False
         self.logger = LOGGER
-        self._cfg   = get_config('server')
+        self._cfg   = confservice['server']
         self._cross_origin = self._cfg.getboolean('cross_origin')
 
     def prepare(self):

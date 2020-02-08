@@ -28,7 +28,7 @@ from qgis.server import (QgsServerRequest,
 from .zeromq.worker import RequestHandler, run_worker
 from .cache import cache_lookup, StrictCheckingError
 
-from .config  import get_config
+from .config  import confservice
 from .plugins import load_plugins
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -238,7 +238,7 @@ def main():
     import argparse
     from .zeromq.worker import run_worker
     from .version import __description__, __version__
-    from .config  import (get_config, read_config_dict, validate_config_path)
+    from .config  import (confservice, read_config_dict, validate_config_path)
     from .logger import setup_log_handler
 
     parser = argparse.ArgumentParser(description='Qgis Server Worker')
@@ -246,10 +246,10 @@ def main():
     parser.add_argument('--router'   , metavar='address', default='tcp://{host}:18080', help="router address")
     parser.add_argument('--broadcast', metavar='address', default='tcp://{host}:18090', help="broadcast address")
     parser.add_argument('--identity' , default="", help="Set worker identity")
-    parser.add_argument('--rootdir'  , default=get_config('cache')['rootdir'], metavar='PATH', help='Path to qgis projects')
+    parser.add_argument('--rootdir'  , default=confservice['cache']['rootdir'], metavar='PATH', help='Path to qgis projects')
     parser.add_argument('--version'  , action='store_true', default=False, help="Return version number and exit")
     parser.add_argument('--logging'  , choices=['debug', 'info', 'warning', 'error'], 
-            default=get_config('logging')['level'].lower(), help="set log level")
+            default=confservice['logging']['level'].lower(), help="set log level")
 
     args = parser.parse_args()
 

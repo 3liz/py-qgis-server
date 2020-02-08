@@ -39,33 +39,13 @@ import logging
 import tornado.web
 
 from typing import Coroutine, Mapping, List, Callable, Awaitable
-
 from tornado.web import HTTPError
-
 
 LOGGER = logging.getLogger('SRVLOG')
 
+
 class ServerFilter:
     pass
-
-
-def load_filters( base_uri: str ) -> Mapping[str,List[ServerFilter]]:
-    """ Load filters and return a Mapping
-    """
-    from pkg_resources import iter_entry_points
-   
-    filters = { base_uri: [] }
-    for ep in iter_entry_points("pyqgisserver_filters"):
-        LOGGER.info("Loading filters from %s", ep.name)
-        for filt in ep.load()():
-            uri = os.path.join(base_uri, filt.uri)
-            fls = filters.get(uri,[])
-            fls.append(filt)
-            filters[uri] = fls
-    # Sort filters
-    for flist in filters.values():
-        flist.sort(key=lambda f: f.pri, reverse=True)
-    return filters
 
 
 class asyncfilter(ServerFilter):

@@ -13,11 +13,10 @@ COMMITID=$(shell git rev-parse --short HEAD)
 FLAVOR:=ltr
 
 ifdef PYPISERVER
-BUILD_ARGS=--build-arg pypi_server=$(PYPISERVER)
+PYPISERVER_SCHEME ?= https
+PIP_OPTIONS="--extra-index-url=$(PYPISERVER_SCHEME)://$(PYPISERVER) --trusted-host=$(PYPISERVER)"
 DOCKERFILE=-f Dockerfile.pypi
-ifdef PYPISCHEME
-BUILD_ARGS+=--build-arg pypi_scheme=$(PYPISCHEME)
-endif
+BUILD_ARGS=--build-arg PIP_OPTIONS=$(PIP_OPTIONS)
 else
 BUILD_VERSION:=master
 BUILD_ARGS=--build-arg git_branch=$(BUILD_VERSION)
@@ -40,7 +39,8 @@ all:
 build: _build manifest
 
 _build:
-	docker build --rm --force-rm --no-cache $(BUILD_ARGS) -t $(BUILDIMAGE) $(DOCKERFILE) .
+	docker build --rm --force-rm --no-cache $(DOCKER_BUILD_ARGS) \
+		$(BUILD_ARGS) -t $(BUILDIMAGE) $(DOCKERFILE) .
 
 manifest: 
 	{ \

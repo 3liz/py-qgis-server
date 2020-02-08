@@ -12,6 +12,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 UpdateFunc = Callable[[List[str]],None]
 
+
 def watchfiles(watched_files: List[str], updatefunc: UpdateFunc,  check_time: int=500) -> ioloop.PeriodicCallback:
     """Begins watching source files for changes.
     """

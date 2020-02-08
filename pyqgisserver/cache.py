@@ -21,7 +21,7 @@ from typing import Tuple
 from .utils.filecache import FileCache
 from .utils.decorators import singleton
 
-from .config import get_config
+from .config import confservice
 
 from qgis.core import QgsProjectBadLayerHandler, QgsProject
 from qgis.server import QgsServerProjectUtils
@@ -63,7 +63,7 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
 class _Cache(FileCache):
 
     def __init__(self) -> None:
-        config    = get_config('cache')
+        config    = confservice['cache']
         cachesize = config.getint('size')
         rootdir   = Path(config['rootdir'])
 

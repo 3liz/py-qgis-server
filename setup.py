@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages, Extension
+from setuptools import setup, find_namespace_packages, Extension
 import os
 
 
@@ -41,7 +41,8 @@ setup(
     maintainer_email='dmarteau@3liz.org',
     description=VER.__description__,
     url='',
-    packages=find_packages(include=['pyqgisserver','pyqgisserver.*']),
+    packages=find_namespace_packages(include=['pyqgisserver','pyqgisserver.*',
+                                              'pyqgisservercontrib.*']),
     entry_points={
         'console_scripts': [
             'qgisserver = pyqgisserver.server:main',

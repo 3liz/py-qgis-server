@@ -15,7 +15,7 @@ from typing import List
 
 from .version import __description__, __version__
 from .logger import setup_log_handler
-from .config import (get_config, set_config, read_config_file,
+from .config import (confservice, read_config_file,
                      validate_config_path, load_configuration)
 
 from .runtime import run_server
@@ -78,7 +78,7 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
     # Override config
     def set_arg( section:str, name:str ) -> None:
         if name in args:
-            set_config( section, name, str(getattr(args,name)))
+            confservice.set( section, name, str(getattr(args,name)))
 
     set_arg( 'cache'  , 'rootdir' )
     set_arg( 'server' , 'interfaces')
@@ -87,13 +87,13 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
 
     if args.debug:
         # Force debug mode
-        set_config('logging', 'level', 'DEBUG')
+        confservice.set('logging', 'level', 'DEBUG')
 
     # set log level
-    setup_log_handler(get_config('logging')['level'])
+    setup_log_handler(confservice.get('logging','level'))
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
 
-    conf = get_config('server')
+    conf = confservice['server']
     args.port       = conf.getint('port')
     args.workers    = conf.getint('workers')
     args.interfaces = conf.get('interfaces')

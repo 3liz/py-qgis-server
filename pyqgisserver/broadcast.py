@@ -5,8 +5,9 @@ import logging
 
 from glob import glob
 
-from .watchfiles import watchfiles
-from .config import get_config
+from .config import confservice
+
+from pyqgisservercontrib.core.watchfiles import watchfiles
 
 # Ask restarting
 BCAST_RESTART = b'RESTART'
@@ -19,7 +20,7 @@ class Broadcast:
         self._sock = None
         self._restart = None
         self._watch_files = []
-        self._config = get_config('server')
+        self._config = confservice['server']
 
     def close(self):
         if self._restart:
@@ -49,7 +50,7 @@ class Broadcast:
             This publisher will broadcast message
             to workers
         """
-        bindaddr = get_config('zmq')['broadcastaddr']
+        bindaddr = confservice['zmq']['broadcastaddr']
 
         ctx = zmq.Context().instance()
         pub = ctx.socket(zmq.PUB)
@@ -70,7 +71,7 @@ class Broadcast:
             # Update files to watch
             self.update_files()
 
-        check_time = get_config('server').get('restartmon_check_time', 3000)
+        check_time = confservice.getint('server','restartmon_check_time', 3000)
         self._restart = watchfiles(self._watch_files, callback, check_time)
         self._restart.start()
 

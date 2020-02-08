@@ -19,8 +19,10 @@ import tornado.platform.asyncio
 
 from multiprocessing import Process
 
+from typing import Mapping, List
+
 from .logger import log_request
-from .config import get_config, set_config, load_configuration
+from .config import confservice
 
 from .handlers import (RootHandler, OwsHandler)
 from .zeromq import client, broker, supervisor
@@ -28,15 +30,38 @@ from .zeromq import client, broker, supervisor
 from .utils import process
 
 from .monitor import Monitor
-from .filters import load_filters
 from .broadcast import Broadcast
 
 LOGGER=logging.getLogger('SRVLOG')
 
+from pyqgisservercontrib.core.filters import ServerFilter
+
+
+def load_access_policies( base_uri: str ) -> Mapping[str,List[ServerFilter]]:
+    """ Create filter list
+    """
+    import pyqgisservercontrib.core.componentmanager as cm
+
+    collection = []
+    cm.register_entrypoints('qgssrv_contrib_access_policy', collection)  
+
+    # Retrieve collection
+    filters = { base_uri: [] }
+    for filt in collection:
+        uri = os.path.join(base_uri, filt.uri)
+        fls = filters.get(uri,[])
+        fls.append(filt)
+        filters[uri] = fls
+    # Sort filters
+    for flist in filters.values():
+        flist.sort(key=lambda f: f.pri, reverse=True)
+    return filters
+
+
 def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
     """
     """
-    cfg = get_config('server')
+    cfg = confservice['server']
 
     monitor = Monitor.initialize()
 
@@ -51,7 +76,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
     # Load filters
     if cfg.getboolean('enable_filters'):
-        filters = load_filters(r"/ows/")
+        filters = load_access_policies(r"/ows/")
         for uri,fltrs in filters.items():
             kw = ows_kwargs.copy()
             kw.update( filters = fltrs )
@@ -67,7 +92,7 @@ class Application(tornado.web.Application):
     def __init__(self, router: str, broadcast: bool=True) -> None:
         """
         """
-        identity = get_config('zmq')['identity']
+        identity = confservice['zmq']['identity']
         identity = "{}-{}".format(identity,os.getpid())
 
         self._broker_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
@@ -116,7 +141,7 @@ def setuid( username: str) -> None:
 def create_broker_process( ipcaddr: str ) -> Process:
     """ Create a brker process
     """
-    cfg = get_config('zmq')
+    cfg = confservice['zmq']
 
     LOGGER.info("Starting broker process")
     p = Process(target=broker.run_broker, kwargs=dict(
@@ -155,9 +180,9 @@ def run_worker_pool(workers: int) -> None:
         raise SystemExit()
 
     LOGGER.info("Starting worker pool")
-    router        = get_config('zmq')['bindaddr'] 
-    broadcastaddr = get_config('zmq')['broadcastaddr']
-    timeout       = get_config('server').getint('timeout')
+    router        = confservice['zmq']['bindaddr'] 
+    broadcastaddr = confservice['zmq']['broadcastaddr']
+    timeout       = confservice['server'].getint('timeout')
 
     pool = Pool(router, workers, broadcastaddr=broadcastaddr)
 
@@ -195,8 +220,8 @@ def configure_ipc_addresses(workers: int) -> str:
     ipcaddr = 'ipc://'+ipc_path+'0'
     # Use ipc sockets for managed workers
     if workers > 0:
-        set_config('zmq','bindaddr'     , 'ipc://'+ipc_path+'pool0')
-        set_config('zmq','broadcastaddr', 'ipc://'+ipc_path+'broadcast0')
+        confservice.set('zmq','bindaddr'     , 'ipc://'+ipc_path+'pool0')
+        confservice.set('zmq','broadcastaddr', 'ipc://'+ipc_path+'broadcast0')
 
     return ipcaddr
 
@@ -205,7 +230,7 @@ def create_ssl_options():
     """ Create an ssl context
     """
     import ssl
-    cfg = get_config('server')
+    cfg = confservice['server']
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     ssl_ctx.load_cert_chain(cfg['ssl_cert'],cfg['ssl_key'])
     return ssl_ctx
@@ -242,7 +267,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     broker_client = None
 
     # Setup ssl config
-    if get_config('server').getboolean('ssl'):
+    if confservice.getboolean('server','ssl'):
         LOGGER.info("SSL enabled")
         kwargs['ssl_options'] = create_ssl_options()
 

@@ -13,34 +13,15 @@ import os
 import sys
 import configparser
 import logging
+import functools
 
-CONFIG = None
+from typing import Any
 
-getenv = os.environ.get
+getenv = os.getenv
 
 LOGGER = logging.getLogger('SRVLOG')
 
-def get_config(section=None):
-    """ Return the configuration section
-    """
-    if CONFIG is None:
-        load_configuration()
-
-    return CONFIG[section] if section else CONFIG
-
-
-def get_env_config(section, name, env, default=None):
-    """ Get configuration value from environment
-        if not found in loaded config
-    """
-    cfg = CONFIG[section]
-    return cfg.get(name,getenv(env,default))
-
-
-def set_config(section, name, value):
-    """ Set configuration value
-    """
-    CONFIG.set(section, name , value)
+CONFIG = configparser.ConfigParser()    
 
 
 def print_config( fp ):
@@ -54,11 +35,9 @@ def load_configuration():
 
         Load server configuration from configuration file.
     """
-
-    global CONFIG
+    CONFIG.clear()
 
     LOGGER.info('loading configuration')
-    CONFIG = configparser.ConfigParser()    
 
     CONFIG.add_section('server')
     CONFIG.set('server', 'port'          , getenv('QGSRV_SERVER_HTTP_PORT', '8080'))
@@ -116,7 +95,7 @@ def config_to_dict():
 def validate_config_path(confname, confid, optional=False):
     """ Validate directory path
     """
-    confvalue = get_config(confname).get(confid,'')
+    confvalue = CONFIG[confname].get(confid,'')
 
     if not confvalue and optional:
         return
@@ -132,5 +111,44 @@ def validate_config_path(confname, confid, optional=False):
 
     CONFIG.set(confname, confid, confvalue)
 
+#
+# Published services
+#
+from pyqgisservercontrib.core import componentmanager
+
+
+@componentmanager.register_factory('@3liz.org/config-service;1')
+class ConfigService:
+    """ Act as a proxy
+    """ 
+
+    def __init__(self):
+        self.allow_env = True
+
+    def __get_impl( self, _get_fun, section:str, option:str, default:Any = None ) -> Any:
+        """
+        """
+        if self.allow_env:
+            varname  = 'QGSRV_%s_%s' % (section.upper(),option.upper())
+            return _get_fun(section, option, fallback=os.getenv(varname, default))
+        else:
+            return _get_fun(section, option, fallback=default)
+
+    get        = functools.partialmethod(__get_impl,CONFIG.get) 
+    getint     = functools.partialmethod(__get_impl,CONFIG.getint) 
+    getboolean = functools.partialmethod(__get_impl,CONFIG.getboolean) 
+    getfloat   = functools.partialmethod(__get_impl,CONFIG.getfloat) 
+
+    def __getitem__(self, section):
+        return CONFIG[section]
+
+    def __contains__(self, section):
+        return section in CONFIG
+
+    def set( self, section:str, option:str, value: Any ) -> None:
+        CONFIG.set( section, option, value )
+
+
+confservice = ConfigService()
 
 

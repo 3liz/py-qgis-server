@@ -6,8 +6,7 @@ FROM  ${REGISTRY_PREFIX}qgis-platform:${QGIS_VERSION}
 MAINTAINER David Marteau <david.marteau@3liz.com>
 LABEL Description="QGIS3 Python Server" Vendor="3liz.org"
 
-ARG pypi_server
-ARG pypi_scheme=https
+ARG PIP_OPTIONS
 
 RUN apt-get update && apt-get install -y --no-install-recommends gosu wget \
     && apt-get clean  && rm -rf /var/lib/apt/lists/* \
@@ -16,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends gosu wget \
 # Setup will use this variable for copying manifest
 ENV QGSRV_DATA_PATH=/usr/local/share/qgis-server
    
-RUN pip3 install --extra-index-url=$pypi_scheme://$pypi_server --trusted-host=$pypi_server \
+RUN pip3 install $PIP_OPTIONS \
         py-qgis-server \
         py-amqp-client \
     && rm -rf /root/.cache /root/.ccache
