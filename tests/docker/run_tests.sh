@@ -8,11 +8,11 @@ export PATH=$PATH:/.local/bin
 echo "-- HOME is $HOME"
 
 echo "-- Installing required packages..."
-pip3 install -q -U --user setuptools
-pip3 install -q -U --prefer-binary --user -r requirements.pip
-pip3 install -q -U --prefer-binary --user -r requirements.txt
+pip3 install -q -U --no-cache --user setuptools
+pip3 install -q -U --no-cache --prefer-binary --user -r requirements.pip
+pip3 install -q -U --no-cache --prefer-binary --user -r requirements.txt
 
-pip3 install -q --user -e ./
+pip3 install -q --no-cache --user -e ./
 
 export QGIS_DISABLE_MESSAGE_HOOKS=1
 export QGIS_NO_OVERRIDE_IMPORT=1

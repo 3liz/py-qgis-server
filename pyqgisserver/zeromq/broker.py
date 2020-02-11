@@ -96,7 +96,7 @@ def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000)
                             LOGGER.debug("SND worker: %s -> client: %s : %s", worker_id, client_id, msgid)
                         except zmq.ZMQError as err:
                             # ZMQ Will raise error if no client_id connected
-                            LOGGER.error("SND worker: %s -> client: %s', errno %s", worker_id, client_id, err.errno)
+                            LOGGER.error("SND worker: %s -> client: %s', %s ,errno %s", worker_id, client_id, err, err.errno)
                 except Exception as err:
                     LOGGER.error("%s", traceback.format_exc())
 
@@ -111,7 +111,7 @@ def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000)
                         try:
                             frontend.send_multipart([client_id, msgid, b"ERR", b"509"])
                         except zmq.ZMQError as err:
-                            LOGGER.error("SND ERR -> client: %s, errno %s", client_id, err.errno)
+                            LOGGER.error("SND ERR -> client: %s, %s, errno %s", client_id, err, err.errno)
                     else:
                         waiting.appendleft((time(), client_id, msgid, data))
                 except Exception as err:
@@ -134,7 +134,7 @@ def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000)
                             LOGGER.debug("SND client: %s -> worker: %s : %s", client_id, worker_id, msgid)
                             break # Handle next request
                         except zmq.ZMQError as err:
-                            LOGGER.info("SND client: %s -> worker: %s, errno %s", client_id, worker_id, err.errno)
+                            LOGGER.info("SND client: %s -> worker: %s, %s, errno %s", client_id, worker_id, err, err.errno)
                             if not workers: 
                                 # No more workers available
                                 # push back the request on the queue
