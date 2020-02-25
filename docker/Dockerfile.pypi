@@ -8,7 +8,7 @@ LABEL Description="QGIS3 Python Server" Vendor="3liz.org"
 
 ARG PIP_OPTIONS
 
-RUN apt-get update && apt-get install -y --no-install-recommends gosu wget \
+RUN apt-get update && apt-get install -y --no-install-recommends gosu \
     && apt-get clean  && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/share/man 
 

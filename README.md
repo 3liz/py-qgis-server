@@ -22,6 +22,8 @@ The server is aimed at solving some real situations encountered in production en
 - Auto-restart trigger for workers
 - Support streamed/chunked responses 
 - SSL support
+- Support for access control extensions
+- Support for qgis project cache extensions
 
 
 ## Requirements:

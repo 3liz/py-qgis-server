@@ -34,6 +34,7 @@ test: local
 		-v $(SRCDIR):/src \
 		-v $$(pwd)/.local:/.local \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		-e QGSRV_FOO_PROTOCOL=file:foobar/ \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_SERVER_HTTP_PROXY=yes \

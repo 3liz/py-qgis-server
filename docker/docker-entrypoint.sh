@@ -25,7 +25,7 @@ fi
 QGSRV_DISPLAY_XVFB=${QGSRV_DISPLAY_XVFB:-ON}
 
 # Qgis need a HOME
-export HOME=/home/qgssrv
+export HOME=/home/qgis
 
 if [ "$(id -u)" = '0' ]; then
    mkdir -p $HOME

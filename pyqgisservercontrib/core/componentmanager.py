@@ -20,11 +20,13 @@ import logging
 from collections import namedtuple
 from typing import Any, Tuple, Callable, List
 
-
-class FactoryNotFoundError(Exception):
+class ComponentManagerError(Exception):
     pass
 
-class NoRegisteredFactoryError(Exception):
+class FactoryNotFoundError(ComponentManagerError):
+    pass
+
+class NoRegisteredFactoryError(ComponentManagerError):
     pass
 
 

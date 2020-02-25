@@ -26,7 +26,7 @@ from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
 from .zeromq.worker import RequestHandler, run_worker
-from .cache import cache_lookup, StrictCheckingError
+from .qgscache.cachemanager import cacheservice, StrictCheckingError
 
 from .config  import confservice
 from .plugins import load_plugins
@@ -214,7 +214,7 @@ class QgsRequestHandler(RequestHandler):
         iface = self.qgis_server.serverInterface()
         try:
             LOGGER.debug("Handling request: %s", self.msgid)
-            project, updated = cache_lookup(project_location)
+            project, updated = cacheservice.lookup(project_location)
             config_path = project.fileName()
             if updated: 
                # Needed to cleanup cache capabilities cache

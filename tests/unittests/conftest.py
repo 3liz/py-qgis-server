@@ -6,12 +6,18 @@ import logging
 from pyqgisserver.tests import TestRuntime
 from time import sleep
 
+from pathlib import Path
+
 def pytest_addoption(parser):
     parser.addoption("--server-debug", action="store_true" , help="Set debug mode",
                      default=False)
 
 
 server_debug = False
+
+@pytest.fixture(scope='session')
+def data(request):
+    return Path(request.config.rootdir.strpath).parent / 'data'
 
 
 def pytest_configure(config):
