@@ -117,6 +117,8 @@ def validate_config_path(confname, confid, optional=False):
 from pyqgisservercontrib.core import componentmanager
 
 
+NO_DEFAULT=object()
+
 @componentmanager.register_factory('@3liz.org/config-service;1')
 class ConfigService:
     """ Act as a proxy
@@ -125,14 +127,17 @@ class ConfigService:
     def __init__(self):
         self.allow_env = True
 
-    def __get_impl( self, _get_fun, section:str, option:str, default:Any = None ) -> Any:
+    def __get_impl( self, _get_fun, section:str, option:str, default:Any = NO_DEFAULT ) -> Any:
         """
         """
         if self.allow_env:
             varname  = 'QGSRV_%s_%s' % (section.upper(),option.upper())
-            return _get_fun(section, option, fallback=os.getenv(varname, default))
+            value = _get_fun(section, option, fallback=os.getenv(varname, default))
         else:
-            return _get_fun(section, option, fallback=default)
+            value = _get_fun(section, option, fallback=default)
+        if value is NO_DEFAULT:
+            raise KeyError('%s:%s' % (section,option))
+        return value
 
     get        = functools.partialmethod(__get_impl,CONFIG.get) 
     getint     = functools.partialmethod(__get_impl,CONFIG.getint) 

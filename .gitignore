@@ -14,6 +14,7 @@ __pycache__
 
 # Test outputs
 .cache
+.pipcache
 .pytest_cache
 __output__
 

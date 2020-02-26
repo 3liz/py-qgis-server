@@ -58,6 +58,7 @@ class QgsCacheManager:
         self._cache = lrucache(size)
         self._strict_check = cnf.getboolean('strict_check')
         self._aliases = {}
+        self._default_scheme = cnf.get('default_handler',fallback='file')
 
         # Set the base url for file protocol
         self._aliases['file'] = 'file:///%s/' % cnf.get('rootdir').strip('/')
@@ -79,7 +80,7 @@ class QgsCacheManager:
         """ Resolve scheme from configuration variables
         """
         url    = urlparse(key)
-        scheme = url.scheme or 'file'
+        scheme = url.scheme or self._default_scheme
         LOGGER.debug("Resolving '%s' protocol", scheme)
         baseurl = self._aliases.get(scheme)
         if not baseurl:
@@ -106,7 +107,7 @@ class QgsCacheManager:
         """
         url = self.resolve_alias(key)
     
-        scheme = url.scheme or 'file'
+        scheme = url.scheme or self._default_scheme
         # Retrieve the protocol-handler
         try:
             store = componentmanager.get_service('@3liz.org/cache/protocol-handler;1?scheme=%s' % scheme)

@@ -23,9 +23,10 @@ PLUGINPATH:=$(SRCDIR)/tests/plugins
 
 SCRIPTS=./tests/docker
 
+
 local:
 	rm -rf $$(pwd)/.local
-	mkdir -p $$(pwd)/.local 
+	mkdir -p $$(pwd)/.local  $$(pwd)/.pipcache
 
 test: local
 	echo -n "Restart qgis" > .qgis-restart
@@ -33,6 +34,8 @@ test: local
 		-u $(BECOME_USER) \
 		-v $(SRCDIR):/src \
 		-v $$(pwd)/.local:/.local \
+		-v $$(pwd)/.pipcache:/.cache \
+		-e PIP_CACHE_DIR=/.cache \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
 		-e QGSRV_FOO_PROTOCOL=file:foobar/ \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
@@ -55,6 +58,8 @@ run: local
 		-v $$(pwd)/.local:/.local \
 		-v $$(pwd)/server.conf:/server.conf \
 		-v $(PLUGINPATH):/plugins \
+		-v $$(pwd)/.pipcache:/.cache \
+		-e PIP_CACHE_DIR=/.cache \
 		-e QGSRV_SERVER_WORKERS=$(WORKERS) \
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
 		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
