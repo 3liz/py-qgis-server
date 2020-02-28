@@ -127,14 +127,14 @@ class ConfigService:
     def __init__(self):
         self.allow_env = True
 
-    def __get_impl( self, _get_fun, section:str, option:str, default:Any = NO_DEFAULT ) -> Any:
+    def __get_impl( self, _get_fun, section:str, option:str, fallback:Any = NO_DEFAULT ) -> Any:
         """
         """
         if self.allow_env:
             varname  = 'QGSRV_%s_%s' % (section.upper(),option.upper())
-            value = _get_fun(section, option, fallback=os.getenv(varname, default))
+            value = _get_fun(section, option, fallback=os.getenv(varname, fallback))
         else:
-            value = _get_fun(section, option, fallback=default)
+            value = _get_fun(section, option, fallback=fallback)
         if value is NO_DEFAULT:
             raise KeyError('%s:%s' % (section,option))
         return value
