@@ -37,6 +37,11 @@ test:release:
   variables:
     QGIS_FLAVOR: release        
 
+test:3.4:
+  extends: .tests
+  variables:
+    QGIS_FLAVOR: "3.4"
+
 #---------------
 # Build
 #---------------
