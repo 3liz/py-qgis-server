@@ -6,9 +6,8 @@ COMMITID=$(shell git rev-parse --short HEAD)
 
 FLAVOR:=ltr
 
-ifdef REGISTRY_URL
-	REGISTRY_PREFIX=$(REGISTRY_URL)/
-endif
+REGISTRY_URL ?= 3liz
+REGISTRY_PREFIX=$(REGISTRY_URL)/
 
 QGIS_IMAGE=$(REGISTRY_PREFIX)qgis-platform:$(FLAVOR)
 
