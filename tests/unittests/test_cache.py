@@ -1,5 +1,7 @@
 import pytest
 
+from qgis.core import Qgis
+
 from pathlib import Path
 from pyqgisserver.qgscache.cachemanager import QgsCacheManager
 from pyqgisserver.config import confservice
@@ -28,6 +30,7 @@ def test_aliases() -> None:
     assert url.path   == str(rootpath / 'france_parts')
 
 
+@pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 31000, reason="Test fail with qgis 3.4")
 def test_file_cache() -> None:
     """ Tetst file protocol handler
     """

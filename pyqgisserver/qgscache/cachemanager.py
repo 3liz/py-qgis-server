@@ -175,6 +175,7 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
             see https://github.com/qgis/QGIS/pull/33668
         """
         if self.badLayerNames:
+            LOGGER.debug("Found bad layers: %s", self.badLayerNames)
             restricteds = set(QgsServerProjectUtils.wmsRestrictedLayers(project))
             return self.badLayerNames.issubset(restricteds)
         return True
