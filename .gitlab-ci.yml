@@ -9,10 +9,12 @@ stages:
 # Tests
 #-----------------
 
-.tests:
+tests:
   stage: test
   script:
-    - make docker-test LOCAL_HOME=$RUNNER_HOME FLAVOR=$QGIS_FLAVOR
+    - make docker-test FLAVOR=ltr
+    - make docker-test FLAVOR=release
+    - make docker-test FLAVOR=3.4
   only:
     changes:
       - pyqgisserver/**/*
@@ -26,21 +28,6 @@ stages:
   artifacts:
     reports:
         junit: tests/unittests/__output__/junit.xml
-
-test:ltr:
-  extends: .tests
-  variables:
-    QGIS_FLAVOR: ltr
-
-test:release:
-  extends: .tests
-  variables:
-    QGIS_FLAVOR: release        
-
-test:3.4:
-  extends: .tests
-  variables:
-    QGIS_FLAVOR: "3.4"
 
 #---------------
 # Build
