@@ -14,7 +14,6 @@ tests:
   script:
     - make docker-test FLAVOR=ltr
     - make docker-test FLAVOR=release
-    - make docker-test FLAVOR=3.4
   only:
     changes:
       - pyqgisserver/**/*
