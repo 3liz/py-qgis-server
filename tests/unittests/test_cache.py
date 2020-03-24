@@ -29,6 +29,12 @@ def test_aliases() -> None:
     assert url.scheme == ''
     assert url.path   == str(rootpath / 'france_parts')
 
+    url = cacheservice.resolve_alias('bar:france_parts')
+    assert url.scheme == 'file'
+    assert url.path   == 'foobar'
+    assert url.query  == 'data=france_parts'
+
+
 
 @pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 31000, reason="Test fail with qgis 3.4")
 def test_file_cache() -> None:

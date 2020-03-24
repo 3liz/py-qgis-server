@@ -21,7 +21,7 @@ getenv = os.getenv
 
 LOGGER = logging.getLogger('SRVLOG')
 
-CONFIG = configparser.ConfigParser()    
+CONFIG = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())    
 
 
 def print_config( fp ):
@@ -57,11 +57,20 @@ def load_configuration():
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))
 
-    CONFIG.add_section('cache')
-    CONFIG.set('cache', 'size'    , getenv('QGSRV_CACHE_SIZE','10' ))
-    CONFIG.set('cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
+    CONFIG.add_section('projects.cache')
+    CONFIG.set('projects.cache', 'size'    , getenv('QGSRV_CACHE_SIZE','10' ))
+    CONFIG.set('projects.cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
     # Ensure that loaded project is valid before loading in cache
-    CONFIG.set('cache', 'strict_check' , getenv('QGSRV_CACHE_STRICT_CHECK','yes'))
+    CONFIG.set('projects.cache', 'strict_check' , getenv('QGSRV_CACHE_STRICT_CHECK','yes'))
+
+    CONFIG.add_section('projects.schemes')
+
+    # XXX Legacy section
+    CONFIG.add_section('cache')
+    CONFIG.set('cache', 'size'    , '${projects.cache:size}')
+    CONFIG.set('cache', 'rootdir' , '${projects.cache:rootdir}')
+    # Ensure that loaded project is valid before loading in cache
+    CONFIG.set('cache', 'strict_check' , '${projects.cache:strict_check}')
 
     CONFIG.add_section('zmq')
     CONFIG.set('zmq', 'identity'     , getenv('QGSRV_ZMQ_IDENTITY' ,'OWS-SERVER'))
@@ -131,7 +140,7 @@ class ConfigService:
         """
         """
         if self.allow_env:
-            varname  = 'QGSRV_%s_%s' % (section.upper(),option.upper())
+            varname  = 'QGSRV_%s_%s' % (section.upper().replace('.','_'),option.upper().replace('.','_'))
             value = _get_fun(section, option, fallback=os.getenv(varname, fallback))
         else:
             value = _get_fun(section, option, fallback=fallback)

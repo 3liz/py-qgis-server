@@ -35,8 +35,9 @@ test: local
 		-v $$(pwd)/.local:/.local \
 		-v $$(pwd)/.pipcache:/.cache \
 		-e PIP_CACHE_DIR=/.cache \
-		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
-		-e QGSRV_FOO_PROTOCOL=file:foobar/ \
+		-e QGSRV_PROJECTS_SCHEMES_TEST=/src/tests/data/ \
+		-e QGSRV_PROJECTS_SCHEMES_FOO=file:foobar/ \
+		-e QGSRV_PROJECTS_SCHEMES_BAR=file:foobar?data={path} \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
@@ -61,7 +62,7 @@ run: local
 		-e PIP_CACHE_DIR=/.cache \
 		-e QGSRV_SERVER_WORKERS=$(WORKERS) \
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
-		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		-e QGSRV_PROJECTS_SCHEMES_TEST=/src/tests/data/ \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
@@ -82,7 +83,7 @@ run-https: local
 		-v $(PLUGINPATH):/plugins \
 		-e QGSRV_SERVER_WORKERS=$(WORKERS) \
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
-		-e QGSRV_TEST_PROTOCOL=/src/tests/data \
+		-e QGSRV_PROJECTS_SCHEMES_TEST=/src/tests/data/ \
 		-e QGSRV_SERVER_PROFILES=/src/tests/profiles.yml \
 		-e QGSRV_SERVER_RESTARTMON=/src/.qgis-restart \
 		-e QGSRV_LOGGING_LEVEL=DEBUG \

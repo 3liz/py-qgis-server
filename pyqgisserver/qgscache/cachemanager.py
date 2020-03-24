@@ -13,8 +13,8 @@ import os
 import logging
 import urllib.parse
 
-from urllib.parse import urlparse, urljoin
-from typing import TypeVar, Tuple
+from urllib.parse import urlparse, urljoin, parse_qs
+from typing import TypeVar, Tuple, Dict
 from collections import namedtuple
 
 from ..utils.lru import lrucache
@@ -40,6 +40,16 @@ class StrictCheckingError(Exception):
 CACHE_MANAGER_CONTRACTID = '@3liz.org/cache-manager;1'
 
 
+def _merge_qs( query1: str, query2: str ) -> str:
+    """ Merge query1 with query2 but coerce values
+        from query1 
+    """
+    params_1 = parse_qs(query1)
+    params_2 = parse_qs(query2)
+    params_2.update(params_1)
+    return '&'.join('%s=%s' % (k,v[0]) for k,v in params_2.items())
+
+
 @componentmanager.register_factory(CACHE_MANAGER_CONTRACTID)
 class QgsCacheManager:
     """ Handle Qgis project cache 
@@ -50,7 +60,7 @@ class QgsCacheManager:
 
             :param size: size of the lru cache
         """
-        cnf = confservice['cache']
+        cnf = confservice['projects.cache']
 
         size = cnf.getint('size')
 
@@ -84,16 +94,24 @@ class QgsCacheManager:
         LOGGER.debug("Resolving '%s' protocol", scheme)
         baseurl = self._aliases.get(scheme)
         if not baseurl:
-            varname  = "QGSRV_%s_PROTOCOL" % scheme.replace('-','_').upper()
-            baseurl = os.getenv(varname)
-            if baseurl:
-                # Normalize baseurl as dir path
-                # Otherwise urljoin() will replace the base name 
-                baseurl = baseurl.rstrip('/') + '/'
+            try:
+                # Check for user-defined scheme
+                baseurl = confservice.get('projects.schemes',scheme.replace('-','_').lower())
+            except KeyError:
+                pass
+            else:
                 LOGGER.info("Scheme '%s' aliased to %s", scheme, baseurl)
                 self._aliases[scheme] = baseurl
         if baseurl:
-            url = urlparse(urljoin(baseurl,url.path+'?'+url.query))
+            if '{path}' in baseurl:
+                url = urlparse(baseurl.format(path=url.path))
+            else:
+                baseurl = urlparse(baseurl)
+                # Build a new query from coercing with base url params 
+                query = _merge_qs(baseurl.query, url.query)
+                # XXX Note that the path of the base url must be terminated by '/'
+                # otherwise urljoin() will replace the base name - may be not what we want
+                url = urlparse(urljoin(baseurl.geturl(),url.path+'?'+query))
 
         return url
 

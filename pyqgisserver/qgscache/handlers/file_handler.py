@@ -25,7 +25,7 @@ ALLOWED_SFX=('.qgs','.qgz')
 __all__= []
 
 @componentmanager.register_factory('@3liz.org/cache/protocol-handler;1?scheme=file')
-class FileProtocalHandler:
+class FileProtocolHandler:
     """ Handle file protocol
     """
 
