@@ -9,4 +9,5 @@
 __all__=[]
 
 from .file_handler import *
+from .postgres_handler import *
 

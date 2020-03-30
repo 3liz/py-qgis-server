@@ -33,6 +33,7 @@ docker-test.log
 
 .local
 .qgis-restart
+.ipython
 
 /tests/data/montpellier
 /tests/unittests/qgis.db

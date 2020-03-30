@@ -27,6 +27,19 @@ local:
 	rm -rf $$(pwd)/.local
 	mkdir -p $$(pwd)/.local  $$(pwd)/.pipcache
 
+
+PGUSER ?= $(USER)
+PGAPPNAME ?= py-qgis-server-tests
+
+ifdef PGPASSFILE
+PGPASSFILE_VOL=-v $(PGPASSFILE):/.pgpass
+PGPASSFILE_ENV=-e PGPASSFILE:/.pgpass
+endif
+
+ifdef PG_RUN
+PG_RUN_VOL=-v $(PG_RUN):/var/run/postgresql
+endif
+
 test: local
 	echo -n "Restart qgis" > .qgis-restart
 	docker run --rm --name qgis-py-server-test-$(FLAVOR)-$(COMMITID) -w /src \
@@ -34,6 +47,14 @@ test: local
 		-v $(SRCDIR):/src \
 		-v $$(pwd)/.local:/.local \
 		-v $$(pwd)/.pipcache:/.cache \
+		-e USER=$(USER) \
+		-e PGUSER=$(PGUSER) \
+		-e PGAPPNAME=$(PGAPPNAME) \
+		-e PGHOST=$(PGHOST) \
+		$(PG_RUN_VOL) \
+		$(PGPASSFILE_VOL) \
+		$(PGPASSFILE_ENV) \
+		-e PGSERVICEFILE=/src/tests/.pg_service.conf \
 		-e PIP_CACHE_DIR=/.cache \
 		-e QGSRV_PROJECTS_SCHEMES_TEST=/src/tests/data/ \
 		-e QGSRV_PROJECTS_SCHEMES_FOO=file:foobar/ \

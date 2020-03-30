@@ -1,4 +1,6 @@
+
 import pytest
+import os
 
 from qgis.core import Qgis
 
@@ -64,4 +66,52 @@ def test_file_not_found() -> None:
         cacheservice.lookup('I_do_not_exists')
 
    
+@pytest.mark.with_postgres
+def test_postgres_cache() -> None:
+    """ Test postgres handler
+    """
+    cacheservice = QgsCacheManager()
+
+    url = 'postgres:///?project=france_parts'
+
+    details = cacheservice.peek(url)
+    assert details is None
+
+    project, updated = cacheservice.lookup(url)
+    assert updated
+    assert project is not None
+
+    details = cacheservice.peek(url)
+    assert details is not None
+    assert details.project is project
+
+
+@pytest.mark.with_postgres
+def test_postgres_with_pgservice() -> None:
+ 
+    url = 'postgres:///?service=local&project=france_parts'
+
+    cacheservice = QgsCacheManager()
+
+    details = cacheservice.peek(url)
+    assert details is None
+
+    project, updated = cacheservice.lookup(url)
+    assert updated
+    assert project is not None
+
+    details = cacheservice.peek(url)
+    assert details is not None
+    assert details.project is project
+
+
+@pytest.mark.with_postgres
+def test_postgres_pgservice_fail() -> None:
+ 
+    url = 'postgres:///?service=not_working&project=france_parts'
+
+    cacheservice = QgsCacheManager()
+
+    with pytest.raises(FileNotFoundError):
+        cacheservice.lookup(url)
 

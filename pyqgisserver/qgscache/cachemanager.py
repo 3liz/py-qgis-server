@@ -161,6 +161,7 @@ class QgsCacheManager:
             May be used by protocol-handlers to instanciate project
             from path.
         """
+        LOGGER.debug("Reading Qgis project %s", path)
         project = self._create_project()
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
