@@ -3,13 +3,6 @@ variables:
     FACTORY_MANIFEST: "docker/factory.manifest"
 
 
-.only_changes: &changes_def
-  changes:
-   - pyqgisserver/**/*
-   - docker/**/*
-   - "setup.*"
-
-
 #-------------
 # Build
 #-------------
@@ -25,8 +18,8 @@ variables:
     paths:
       - "docker/factory.manifest"
   only:
-    <<: *changes_def
     refs:
+      - tags
       - master
   tags:
     - infrav3
@@ -57,8 +50,8 @@ deploy_snap:
   environment:
     name: snap
   only:
-    <<: *changes_def
     refs:
+       - tags
        - master
   tags:
     - infrav3
@@ -76,6 +69,7 @@ deploy_snap:
   when: manual
   only:
     refs:
+      - tags
       - master
   tags:
     - infrav3    
