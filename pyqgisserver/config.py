@@ -57,6 +57,10 @@ def load_configuration():
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))
 
+    #
+    # Projects cache
+    #
+
     CONFIG.add_section('projects.cache')
     CONFIG.set('projects.cache', 'size'    , getenv('QGSRV_CACHE_SIZE','10' ))
     CONFIG.set('projects.cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
@@ -69,7 +73,6 @@ def load_configuration():
     CONFIG.add_section('cache')
     CONFIG.set('cache', 'size'    , '${projects.cache:size}')
     CONFIG.set('cache', 'rootdir' , '${projects.cache:rootdir}')
-    # Ensure that loaded project is valid before loading in cache
     CONFIG.set('cache', 'strict_check' , '${projects.cache:strict_check}')
 
     CONFIG.add_section('zmq')
