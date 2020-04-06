@@ -13,26 +13,24 @@ COMMITID=$(shell git rev-parse --short HEAD)
 FLAVOR:=ltr
 
 ifdef PYPISERVER
-BUILD_ARGS=--build-arg pypi_server=$(PYPISERVER)
+PYPISERVER_SCHEME ?= https
+PIP_OPTIONS="--extra-index-url=$(PYPISERVER_SCHEME)://$(PYPISERVER) --trusted-host=$(PYPISERVER) --pre"
 DOCKERFILE=-f Dockerfile.pypi
-ifdef PYPISCHEME
-BUILD_ARGS+=--build-arg pypi_scheme=$(PYPISCHEME)
-endif
-else
-BUILD_VERSION:=master
-BUILD_ARGS=--build-arg git_branch=$(BUILD_VERSION)
+BUILD_ARGS=--build-arg PIP_OPTIONS=$(PIP_OPTIONS)
 endif
 
 BUILD_ARGS += --build-arg QGIS_VERSION=$(FLAVOR)
 
-ifdef REGISTRY_URL
+REGISTRY_URL ?= 3liz
 REGISTRY_PREFIX=$(REGISTRY_URL)/
 BUILD_ARGS += --build-arg REGISTRY_PREFIX=$(REGISTRY_PREFIX)
-endif
 
-BUILDIMAGE:=$(NAME):$(FLAVOR)-$(COMMITID)
+export BUILDIMAGE:=$(NAME):$(FLAVOR)-$(COMMITID)
 
 MANIFEST=factory.manifest
+
+SERVER_VERSION:=$(shell cd .. && python3 setup.py --version)
+BUILD_ARGS += --build-arg SERVER_VERSION=$(SERVER_VERSION)
 
 all:
 	@echo "Usage: make [build|test|deliver|clean]"
@@ -40,7 +38,8 @@ all:
 build: _build manifest
 
 _build:
-	docker build --rm --force-rm --no-cache $(BUILD_ARGS) -t $(BUILDIMAGE) $(DOCKERFILE) .
+	docker build --rm --force-rm --no-cache $(DOCKER_BUILD_ARGS) \
+		$(BUILD_ARGS)  -t $(BUILDIMAGE) $(DOCKERFILE) .
 
 manifest: 
 	{ \
@@ -55,6 +54,11 @@ manifest:
     echo commitid=$(COMMITID) >> $(MANIFEST); }
 
 deliver: tag push
+
+tag_version:
+	{ set -e; source factory.manifest; \
+	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$$version; \
+	}
 
 tag:
 	{ set -e; source factory.manifest; \

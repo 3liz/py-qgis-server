@@ -34,3 +34,10 @@ docker-test.log
 .qgis-restart
 
 /tests/data/montpellier
+
+.pipcache
+
+qgis.db
+
+.ipython
+

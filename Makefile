@@ -6,8 +6,7 @@ SHELL:=bash
 BUILDID=$(shell date +"%Y%m%d%H%M")
 COMMITID=$(shell git rev-parse --short HEAD)
 
-BUILDDIR=build
-DIST=${BUILDDIR}/dist
+DIST=docker/dist
 
 MANIFEST=build.manifest
 
@@ -47,7 +46,7 @@ dist: dirs manifest
 	$(PYTHON) setup.py sdist --dist-dir=$(DIST)
 
 clean:
-	rm -rf $(BUILDDIR)
+	rm -rf $(DIST)
 
 docker-%:
 	$(MAKE) -C tests/docker $* FLAVOR=$(FLAVOR)
