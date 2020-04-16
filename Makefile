@@ -44,6 +44,7 @@ deliver:
 	twine upload -r storage $(DIST)/*
 
 dist: dirs manifest
+	rm -rf *.egg-info
 	$(PYTHON) setup.py sdist --dist-dir=$(DIST)
 
 clean:

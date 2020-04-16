@@ -22,24 +22,24 @@ from .runtime import run_server
 
 LOGGER = logging.getLogger('SRVLOG')
 
-
 def print_version() -> None:
 
     manifest = { 'commitid':'n/a', 'buildid':'n/a', 'version':__version__ }
 
     # Read build manifest
-    mnpath = os.path.join(os.getenv('QGSRV_DATA_PATH','/'),'build.manifest')
-    if mnpath and os.path.exists(mnpath):
+    for prefix in (sys.prefix, '/usr/local'):
+        mnpath = os.path.join(prefix,'share/3liz/py-qgis-server/build.manifest')
+        if not os.path.exists(mnpath):
+            continue
+        print("found manifest in %s" % mnpath, file=sys.stderr)
         with open(mnpath) as fd:
             manifest.update(l.strip().split('=')[:2] for l in fd.readlines())
-    if manifest['version'] != __version__:
-        print("WARNING: manifest version does not match current version", file=sys.stderr)
+            if manifest['version'] != __version__:
+                print("WARNING: manifest version does not match current version", file=sys.stderr)
 
     program = os.path.basename(sys.argv[0])
     print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**manifest),
           file=sys.stderr)
-    if mnpath:
-        print("build manifest: %s" % mnpath, file=sys.stderr)
 
 
 def read_configuration(argv: List[str]=None) -> argparse.Namespace:

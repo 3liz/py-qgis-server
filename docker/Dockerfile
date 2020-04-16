@@ -8,7 +8,7 @@ LABEL Description="QGIS3 Python Server" Vendor="3liz.org"
 ARG git_branch=master
 ARG git_repository=https://github.com/3liz/py-qgis-server.git
 
-RUN apt-get update && apt-get install -y --no-install-recommends gosu git make \
+RUN apt-get update && apt-get install -y --no-install-recommends gosu make \
     && apt-get clean  && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/share/man
 

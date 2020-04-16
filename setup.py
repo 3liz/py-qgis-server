@@ -1,7 +1,6 @@
 from setuptools import setup, find_namespace_packages, Extension
 import os
 
-
 def parse_requirements( filename ):
     with open( filename ) as fp:
         return list(filter(None, (r.strip('\n ').partition('#')[0] for r in fp.readlines())))
@@ -28,9 +27,7 @@ requirements = 'requirements.txt'
 if os.path.exists(requirements):
     kwargs['install_requires']=parse_requirements(requirements)
 
-data_path = os.getenv('QGSRV_DATA_PATH')
-if data_path:
-    kwargs['data_files'] = [('share/qgis-server', ['build.manifest'])]
+kwargs['data_files'] = [('share/3liz/py-qgis-server', ['build.manifest'])]
 
 setup(
     name='py-qgis-server',

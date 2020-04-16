@@ -2,6 +2,8 @@
 
 set -e
 
+[[ "$DEBUG_ENTRYPOINT" == "yes" ]]  && set -x
+
 QGSRV_USER=${QGSRV_USER:-"9001:9001"}
 
 if [[ "$1" == "version" ]]; then
