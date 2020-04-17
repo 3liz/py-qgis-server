@@ -27,8 +27,6 @@ requirements = 'requirements.txt'
 if os.path.exists(requirements):
     kwargs['install_requires']=parse_requirements(requirements)
 
-kwargs['data_files'] = [('share/3liz/py-qgis-server', ['build.manifest'])]
-
 setup(
     name='py-qgis-server',
     version=version_tag,
@@ -46,6 +44,9 @@ setup(
             'qgisserver-worker = pyqgisserver.qgsworker:main',
         ],
     },
+    # Add manifest to main package
+    include_package_data=True,
+    package_data={" pyqgisserver": ['build.manifest'] },
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',

@@ -9,7 +9,7 @@ COMMITID=$(shell git rev-parse --short HEAD)
 BUILDDIR=build
 DIST=${BUILDDIR}/dist
 
-MANIFEST=build.manifest
+MANIFEST=pyqgisserver/build.manifest
 
 PYTHON:=python3
 
