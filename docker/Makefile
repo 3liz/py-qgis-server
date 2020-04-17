@@ -14,6 +14,9 @@ FLAVOR:=ltr
 
 # Server version
 BUILD_VERSION:=$(shell cd .. && python3 setup.py --version)
+ifeq ($(BUILD_VERSION),)
+$(error failed to retrieve build version)
+endif
 
 ifdef PYPISERVER
 PYPISERVER_SCHEME ?= https
@@ -52,11 +55,11 @@ manifest:
 	{ \
 	set -e; \
 	version=`docker run --rm $(BUILDIMAGE) version`; \
-	version_short=`echo $$version | cut -d. -f1-2`; \
+	version_short=`echo $$version | cut -d- -f1 |cut -d. -f1-2`-`echo $$version | cut -d- -f2 |cut -d. -f1-2`; \
 	echo name=$(NAME) > $(MANIFEST) && \
     echo version=$$version >> $(MANIFEST) && \
     echo version_short=$$version_short >> $(MANIFEST) && \
-    echo release_tag=$(FLAVOR) >> $(MANIFEST) && \
+    echo release_tag=`echo $$version | cut -d- -f1 |cut -d. -f1-2` >> $(MANIFEST) && \
     echo buildid=$(BUILDID)   >> $(MANIFEST) && \
     echo commitid=$(COMMITID) >> $(MANIFEST); }
 
@@ -66,6 +69,7 @@ tag:
 	{ set -e; source $(MANIFEST); \
 	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$$version; \
 	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$$version_short; \
+	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$$release_tag; \
 	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$(FLAVOR); \
 	}
 
@@ -73,6 +77,7 @@ push:
 	{ set -e; source $(MANIFEST); \
 	docker push $(REGISTRY_URL)/$(NAME):$$version; \
 	docker push $(REGISTRY_URL)/$(NAME):$$version_short; \
+	docker push $(REGISTRY_URL)/$(NAME):$$release_tag; \
 	docker push $(REGISTRY_URL)/$(NAME):$(FLAVOR); \
 	}
 
