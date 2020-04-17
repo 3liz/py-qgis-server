@@ -6,8 +6,8 @@ SHELL:=bash
 BUILDID=$(shell date +"%Y%m%d%H%M")
 COMMITID=$(shell git rev-parse --short HEAD)
 
-BUILDDIR=build
-DIST=${BUILDDIR}/dist
+BUILDDIR:=build
+DIST:=${BUILDDIR}/dist
 
 MANIFEST=pyqgisserver/build.manifest
 

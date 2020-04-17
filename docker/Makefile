@@ -12,16 +12,19 @@ COMMITID=$(shell git rev-parse --short HEAD)
 # QGIS platform version
 FLAVOR:=ltr
 
+# Server version
+BUILD_VERSION:=$(shell cd .. && python3 setup.py --version)
+
 ifdef PYPISERVER
 PYPISERVER_SCHEME ?= https
 PIP_OPTIONS="--extra-index-url=$(PYPISERVER_SCHEME)://$(PYPISERVER) --trusted-host=$(PYPISERVER)"
 DOCKERFILE=-f Dockerfile.pypi
 BUILD_ARGS=--build-arg PIP_OPTIONS=$(PIP_OPTIONS)
 else
-BUILD_VERSION:=master
-BUILD_ARGS=--build-arg git_branch=$(BUILD_VERSION)
+BUILD_PACKAGE=build_package
 endif
 
+BUILD_ARGS += --build-arg BUILD_VERSION=$(BUILD_VERSION)
 BUILD_ARGS += --build-arg QGIS_VERSION=$(FLAVOR)
 
 REGISTRY_URL ?= 3liz
@@ -37,9 +40,13 @@ all:
 
 build: _build manifest
 
-_build:
+_build: $(BUILD_PACKAGE)
 	docker build --rm --force-rm --no-cache $(DOCKER_BUILD_ARGS) \
 		$(BUILD_ARGS) -t $(BUILDIMAGE) $(DOCKERFILE) .
+
+build_package:
+	rm -r dist && mkdir -p dist
+	$(MAKE) -C .. dist DIST=$$PWD/dist
 
 manifest: 
 	{ \
@@ -56,14 +63,14 @@ manifest:
 deliver: tag push
 
 tag:
-	{ set -e; source factory.manifest; \
+	{ set -e; source $(MANIFEST); \
 	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$$version; \
 	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$$version_short; \
 	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$(FLAVOR); \
 	}
 
 push:
-	{ set -e; source factory.manifest; \
+	{ set -e; source $(MANIFEST); \
 	docker push $(REGISTRY_URL)/$(NAME):$$version; \
 	docker push $(REGISTRY_URL)/$(NAME):$$version_short; \
 	docker push $(REGISTRY_URL)/$(NAME):$(FLAVOR); \

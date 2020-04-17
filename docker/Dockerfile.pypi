@@ -7,6 +7,7 @@ MAINTAINER David Marteau <david.marteau@3liz.com>
 LABEL Description="QGIS3 Python Server" Vendor="3liz.org"
 
 ARG PIP_OPTIONS
+ARG BUILD_VERSION
 
 RUN apt-get update && apt-get install -y --no-install-recommends gosu \
     && apt-get clean  && rm -rf /var/lib/apt/lists/* \
@@ -16,11 +17,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends gosu \
 ENV QGSRV_DATA_PATH=/usr/local/share/qgis-server
    
 RUN pip3 install $PIP_OPTIONS \
-        py-qgis-server \
+        "py-qgis-server==${BUILD_VERSION}" \
         py-amqp-client \
     && rm -rf /root/.cache /root/.ccache
 
-COPY /docker-entrypoint.sh /
+COPY docker-entrypoint.sh /
 RUN chmod 0755 /docker-entrypoint.sh
 
 EXPOSE 8080
