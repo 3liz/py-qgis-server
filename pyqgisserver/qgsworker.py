@@ -56,7 +56,8 @@ class Request(QgsServerRequest):
     def data(self) -> QByteArray: 
         """ Return post/put data a QByteArray
         """
-        return QByteArray(self._data)
+        # Make sure that data is valid
+        return QByteArray(self._data) if self._data else QByteArray()
 
 
 class Response(QgsServerResponse):

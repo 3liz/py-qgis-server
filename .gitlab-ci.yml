@@ -14,19 +14,12 @@ tests:
   script:
     - make docker-test FLAVOR=ltr
     - make docker-test FLAVOR=release
-  only:
-    changes:
-      - pyqgisserver/**/*
-      - tests/**/*
-      - "*.sh"
-      - Makefile
-      - "setup.*"
-      - "requirements.*"
   tags:
     - infrav3
-  artifacts:
-    reports:
-        junit: tests/unittests/__output__/junit.xml
+  only:
+    refs:
+      - tags
+      - master
 
 #---------------
 # Build

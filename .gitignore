@@ -23,6 +23,8 @@ __output__
 .DS_Store
 .*.un~
 
+*.qgs~
+
 # git
 
 *.orig
