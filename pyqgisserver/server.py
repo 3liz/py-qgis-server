@@ -12,9 +12,8 @@ import logging
 import argparse
 
 from typing import List
-from pkg_resources import resource_stream
 
-from .version import __description__, __version__
+from .version import __description__, __manifest__
 from .logger import setup_log_handler
 from .config import (confservice, read_config_file,
                      validate_config_path, load_configuration)
@@ -26,18 +25,10 @@ LOGGER = logging.getLogger('SRVLOG')
 
 
 def print_version() -> None:
-
-    manifest = { 'commitid':'n/a', 'buildid':'n/a', 'version':__version__ }
-
-    # Read build manifest
-    try:
-      manifest.update(l.decode().strip().split('=')[:2] for l in resource_stream('pyqgisserver', 
-                                                        'build.manifest').readlines())
-    except Exception as e:
-      print("Failed to read manifest !: %s " % e, file=sys.stderr)
-
+    """ Display version infos
+    """
     program = os.path.basename(sys.argv[0])
-    print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**manifest),
+    print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**__manifest__),
           file=sys.stderr)
 
 

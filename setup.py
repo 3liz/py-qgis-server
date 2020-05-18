@@ -1,22 +1,16 @@
-from setuptools import setup, find_namespace_packages, Extension
+from setuptools import setup, find_namespace_packages
 import os
 
 def parse_requirements( filename ):
     with open( filename ) as fp:
         return list(filter(None, (r.strip('\n ').partition('#')[0] for r in fp.readlines())))
 
-
-def load_source(name, path):
-    from importlib.util import spec_from_file_location, module_from_spec
-    spec = spec_from_file_location(name, path)
-    mod  = module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-VER = load_source("version", 'pyqgisserver/version.py')
-
-version_tag = "{}".format(VER.__version__)
-
+VERSION = "1.3.2"
+DESCRIPTION = ('Py-Qgis-Server is an implementation of the OWS standards '
+               'standard from the Open Geospatial Consortium.'
+               'Py-Qgis-Server written in Python and built on top of Qgis server'
+               'implementation')
+KEYWORDS = 'QGIS OWS OGC'
 kwargs = {}
 
 with open('README.md') as f:
@@ -29,13 +23,14 @@ if os.path.exists(requirements):
 
 setup(
     name='py-qgis-server',
-    version=version_tag,
+    version=VERSION,
     author='3Liz',
-    author_email='infos@3liz.org',
+    author_email='david.marteau@3liz.com',
     maintainer='David Marteau',
-    maintainer_email='dmarteau@3liz.org',
-    description=VER.__description__,
-    url='',
+    maintainer_email='dmarteau@3liz.com',
+    description=DESCRIPTION,
+    keywords=KEYWORDS,
+    url='https://github.com/3liz/py-qgis-server',
     packages=find_namespace_packages(include=['pyqgisserver','pyqgisserver.*',
                                               'pyqgisservercontrib.*']),
     entry_points={
@@ -51,6 +46,7 @@ setup(
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.5",
