@@ -87,28 +87,32 @@ clean-all:
 clean:
 	 docker rmi $(BUILDIMAGE)
 
-TEST_HTTP_PORT:=8080
-QGSRV_USER:=$(shell id -u)
+SRCDIR=$(shell realpath ..)
 
-ifndef LOCAL_HOME
-LOCAL_HOME=$(shell pwd)
-endif
+TEST_HTTP_PORT:=8888
+QGSRV_USER:=$(shell id -u):$(shell id -g)
 
 run:
-	docker run -it --rm -p $(TEST_HTTP_PORT):8080 -v $(shell pwd)/tests/data:/projects \
-       -e QGSRV_CACHE_ROOTDIR=/projects \
-       -e QGSRV_USER=$(QGSRV_USER) \
-       -e QGSRV_LOGGING_LEVEL=DEBUG \
-       $(BUILDIMAGE) 
+	docker run -it --rm -p $(TEST_HTTP_PORT):8080 \
+   -v $(SRCDIR):/src  \
+   -v $(SRCDIR)/tests/data:/projects \
+   -e QGSRV_PROJECTS_SCHEMES_TEST=/src/tests/data/ \
+   -e QGSRV_PROJECTS_SCHEMES_FOO=file:foobar/ \
+   -e QGSRV_PROJECTS_SCHEMES_BAR=file:foobar?data={path} \
+   -e QGSRV_SERVER_HTTP_PROXY=yes \
+   -e QGSRV_CACHE_ROOTDIR=/projects \
+   -e QGSRV_USER=$(QGSRV_USER) \
+   -e QGSRV_LOGGING_LEVEL=DEBUG \
+   $(BUILDIMAGE) 
 
 run-proxy:
 	docker run --rm -p $(TEST_HTTP_PORT):8080 --net mynet --name map-proxy-$(COMMITID) \
-       -e QGSRV_USER=$(QGSRV_USER) \
-       -e QGSRV_LOGGING_LEVEL=DEBUG \
-       $(BUILDIMAGE) qgisserver-proxy
+   -e QGSRV_USER=$(QGSRV_USER) \
+   -e QGSRV_LOGGING_LEVEL=DEBUG \
+   $(BUILDIMAGE) qgisserver-proxy
 
 run-worker:
-	docker run --rm --net mynet -v $(shell pwd)/tests/data:/projects \
+	docker run --rm --net mynet -v $(SRCDIR)/tests/data:/projects \
        --name qgis3-worker-$(COMMITID) \
        -e QGSRV_CACHE_ROOTDIR=/projects \
        -e QGSRV_USER=$(QGSRV_USER) \

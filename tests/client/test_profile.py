@@ -1,9 +1,10 @@
 """
     Test server disponibility
 """
+import pytest
 import requests
 
-
+@pytest.mark.with_profiles
 def test_profile_request( host ):
     """ Test response from root path
     """
@@ -16,6 +17,7 @@ def test_profile_request( host ):
     assert rv.status_code == 200
 
 
+@pytest.mark.with_profiles
 def test_profile_return_403( host ):
     """ Test unauthorized WFS return a 403 response
     """
@@ -26,6 +28,7 @@ def test_profile_return_403( host ):
     assert rv.status_code == 403
 
 
+@pytest.mark.with_profiles
 def test_ip_ok( host ):
     """ Test authorized ip return a 200 response
     """
@@ -35,7 +38,7 @@ def test_ip_ok( host ):
     assert rv.status_code == 200
 
 
-
+@pytest.mark.with_profiles
 def test_ip_rejected_return_403( host ):
     """ Test unauthorized WFS return a 403 response
     """
@@ -45,6 +48,7 @@ def test_ip_rejected_return_403( host ):
     assert rv.status_code == 403
 
 
+@pytest.mark.with_profiles
 def test_profile_with_path( host ):
     """ Test response from root path
     """

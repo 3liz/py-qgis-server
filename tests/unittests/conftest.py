@@ -13,6 +13,9 @@ def pytest_addoption(parser):
                      default=False)
     parser.addoption("--with-postgres", action="store_true", help="Run postgres tests",
                      default=False)
+    parser.addoption("--with-profiles", action="store_true", help="Run profiles tests",
+                     default=False)
+
 
 server_debug  = False
 
@@ -26,6 +29,10 @@ def pytest_configure(config):
     config.with_postgres = config.getoption('with_postgres')
     config.addinivalue_line("markers", "with_postgres: mark test as postgres run")
 
+    # Profiles
+    config.with_profiles = config.getoption('with_profiles')
+    config.addinivalue_line("markers", "with_profiles: mark test as profiles test")
+
 
 @pytest.fixture(scope='session')
 def data(request):
@@ -36,14 +43,18 @@ def data(request):
 def data(pg):
     return Path(request.config.rootdir.strpath).parent / 'data'
 
+
 def pytest_collection_modifyitems(config, items):
     if config.with_postgres:
         # postgres enabled: do not skip tests
         return
     skip_postgres = pytest.mark.skip(reason="Postgres tests disabled")
+    skip_profiles = pytest.mark.skip(reason="Profiles tests disabled")
     for item in items:
         if "with_postgres" in item.keywords:
             item.add_marker(skip_postgres)
+        if "with_profiles" in item.keywords:
+            item.add_marker(skip_profiles)
 
 
 def pytest_sessionstart(session):

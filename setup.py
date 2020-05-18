@@ -46,7 +46,7 @@ setup(
     },
     # Add manifest to main package
     include_package_data=True,
-    package_data={" pyqgisserver": ['build.manifest'] },
+    package_data={"pyqgisserver": ['build.manifest'] },
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
