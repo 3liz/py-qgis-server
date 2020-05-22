@@ -23,7 +23,8 @@ The server is aimed at solving some real situations encountered in production en
 - Support streamed/chunked responses 
 - SSL support
 - Support for access control extensions
-- Support for qgis project cache extensions
+- Support for qgis project stored in postgres database
+- Support adding new projects cache handlers as python extension 
 
 
 ## Requirements:
