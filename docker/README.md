@@ -1,12 +1,14 @@
-# Qgis 3 map  server
+# QGIS 3 map  server
 
 Setup a OGC WWS/WFS/WCS service.
 
-Run the python qgis server from https://github.com/3liz/py-qgis-server in a docker container.
+Run the python QGIS server from https://github.com/3liz/py-qgis-server in a docker container.
+
+Versions are published on Docker Hub https://hub.docker.com/r/3liz/qgis-map-server
 
 ## Run example
 
-```
+```bash
 docker run -p 8080:8080 \
        -v /path/to/qgis/projects:/projects \
        -e QGSRV_SERVER_WORKERS=2 \
@@ -41,12 +43,12 @@ By default, the server ren as user and group id 9001. The user id may be customi
 the `QGSRV_USER` environment variable to the - numerical - user ID of your choice 
 
 
-### Qgis project Cache configuration
+### QGIS project Cache configuration
 
 - QGSRV\_CACHE\_ROOTDIR: Absolute path to the qgis projects root directory
 - QGSRV\_CACHE\_SIZE: Qgis projects cache size
 - QGSRV\_LOGGING\_LEVEL: Logging level (DEBUG,INFO)
-- QGSRV\_SERVER\_WORKERS: Number of qgis server instances
+- QGSRV\_SERVER\_WORKERS: Number of QGIS server instances
 
 The cache hold projects, if the project timestamp change on disk then the project will be reloaded.
 
@@ -56,7 +58,7 @@ Xvfb display support can be activate with `QGSRV_DISPLAY_XVFB=ON` which is the d
 
 ### Plugin path
 
-Plugins can be used from a host mounted volume; use the QGSRV\_SERVER\_PLUGINPATH environment
+Plugins can be used from a host mounted volume; use the `QGSRV_SERVER_PLUGINPATH` environment
 variables to set the path inside the container.
 
 ### Pass QGIS environment variables 
@@ -73,12 +75,12 @@ QGIS_SERVER_WMS_MAX_HEIGHT     # Maximum height for a WMS request - default not 
 QGIS_SERVER_WMS_MAX_WIDTH      # Maximum width for a WMS request  - default not set
 ```
 
-## Using with lizmap
+## Using with Lizmap
 
-In order to use the server with lizmap, you must set the following configuration
+In order to use the server with Lizmap, you must set the following configuration
 in your `lizmapConfig.ini.php`:
 
-```
+```ini
 [services]
 wmsServerURL="http://my.domain:<port>/ows/"
 ...
@@ -89,7 +91,5 @@ relativeWMSPath=true
 
 ## Notes
 
-GeoPackages is not multiprocessing friendly and are not working well with read-only volumes: avoid them if you if
-you intend to use your data with read-only volumes.
-
-
+GeoPackages is not multiprocessing friendly and are not working well with read-only volumes.
+Avoid them if you if you intend to use your data with read-only volumes.

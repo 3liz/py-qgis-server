@@ -37,6 +37,10 @@ The server is aimed at solving some real situations encountered in production en
 
 ## Installation
 
+### From docker
+
+Follow the readme in the [docker/](./docker) folder.
+
 ### From source 
 
 Install in development mode

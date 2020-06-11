@@ -37,5 +37,7 @@ docker-test.log
 .qgis-restart
 .ipython
 
+.idea/
+
 /tests/data/montpellier
 /tests/unittests/qgis.db
