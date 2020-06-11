@@ -6,6 +6,12 @@ Run the python QGIS server from https://github.com/3liz/py-qgis-server in a dock
 
 Versions are published on Docker Hub https://hub.docker.com/r/3liz/qgis-map-server
 
+To know the QGIS version used in an image:
+```bash
+docker run -it 3liz/qgis-map-server:3.10 version
+```
+will return the full QGIS version used.
+
 ## Run example
 
 ```bash
