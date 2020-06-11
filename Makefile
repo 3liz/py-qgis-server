@@ -29,9 +29,6 @@ manifest:
 		echo buildid=$(BUILDID)   >> $(MANIFEST) && \
 		echo commitid=$(COMMITID) >> $(MANIFEST)
 
-test:
-	cd tests && py.test -v
-
 # Build dependencies
 wheel-deps: dirs
 	pip wheel -w $(DIST) -r requirements.txt
@@ -50,7 +47,8 @@ dist: dirs manifest
 clean:
 	rm -rf $(BUILDDIR)
 
+test: docker-test
+
 docker-%:
 	$(MAKE) -C tests/docker $* FLAVOR=$(FLAVOR)
-
 

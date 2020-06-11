@@ -58,6 +58,28 @@ def test_file_cache() -> None:
     assert details.project is project
 
 
+@pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 31000, reason="Test fail with qgis 3.4")
+def test_projects_scheme() -> None:
+    """ Tetst file protocol handler
+    """
+    rootpath = Path(confservice.get('cache','rootdir'))
+
+    cacheservice = QgsCacheManager()
+    details = cacheservice.peek('test:france_parts')
+    assert details is None
+
+    project, updated = cacheservice.lookup('test:france_parts')
+    assert updated
+    assert project is not None
+    assert project.fileName() == str(rootpath / 'france_parts.qgs')
+
+    details = cacheservice.peek('test:france_parts')
+    assert details is not None
+    assert details.project is project
+
+
+
+
 def test_file_not_found() -> None:
     """ Test non existant file return error
     """
