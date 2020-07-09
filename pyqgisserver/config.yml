@@ -1,0 +1,180 @@
+# Copyright (c) 2020 3liz
+---
+config_options:
+    #=========
+    # Server    
+    #=========
+    - name: SERVER_HTTP_PORT
+      label: Port
+      description: Port to listen to
+      default: '8080'
+      type: int
+      key: port
+      section: server
+      tags: [ http ]
+
+    - name: SERVER_INTERFACES
+      label: Interfaces
+      description: Interfaces to listen to
+      default: '0.0.0.0'
+      section: server
+      key: interfaces
+      tags: [ http ]
+
+    - name: SERVER_WORKERS
+      label: Number of workers
+      description: The number of workers for processing requests
+      default: '2'
+      type: int
+      section: server
+      key: workers
+      tags: [ workers ]
+
+    - name: SERVER_ENABLE_FILTERS
+      label: Enable filters
+      description: Enable filters as python extension 
+      default: 'yes'
+      type: boolean
+      section: server
+      key: enable_filters
+      tags: [ filters ] 
+
+    - name: SERVER_HTTP_PROXY
+      label: http proxy 
+      description: Indicates that the server is behind a reverse proxy
+      section: server
+      key: http_proxy
+      type: boolean
+      tags: [ http, proxy ]
+
+    - name: SERVER_PROXY_URL
+      label: Proxy URL
+      description: |
+          The url that must be seen by the client when the server is behind a proxy.
+      default: ''
+      section: server
+      key: proxy_url
+      tags: [ http, proxy ]
+
+    - name: SERVER_RESTARTMON
+      label: Restart test file
+      description: |
+          The file to watch for restarting working. When the modified date of the file is changed.
+          a restart command is broadcasted to the workers. Note that workers processes are restarted 
+          without dropping requests.
+      default: ''
+      section: server
+      key: restartmon
+      type: path
+      tags: [ workers ]
+
+    - name: SERVER_PLUGINPATH
+      label: Plugin paths
+      description: The path to qgis server plugins
+      default: ''
+      section: server
+      key: pluginpath
+      tags: [ qgis, plugins ]
+      type: path  
+
+    - name: SERVER_SSL
+      label: Enable SSL
+      description: Enable SSL endpoint
+      default: 'no'
+      type: boolean
+      tags: [ http, ssl ]
+      section: server
+      key: ssl
+
+    - name: SERVER_SSL_CERT
+      label: SSL Certificat
+      description: Path to the SSL certificat file
+      default: ''
+      tags: [ http, ssl, security ]
+      section: server
+      key: ssl_cert  
+      type: path
+
+    - name: SERVER_SSL_KEY
+      label: SSL Certificat 
+      description: Path to the SSL key file
+      default: ''
+      tags: [ http, ssl, security ]
+      section: server
+      key: ssl_key 
+      type: path
+
+    - name: SERVER_CROSS_ORIGIN
+      label: Allows cross origin CORS
+      description: |
+          Allows any origin for CORS. If set to 'no', allow only CORS for the 'Origin'
+          header.
+      default: ''
+      type: boolean 
+      section: server
+      key: cross_origin
+      tags: [ http, security ]
+
+    #==========
+    # Logging  
+    #==========
+    - name: LOGGING_LEVEL
+      label: Logging level
+      description: Set the logging level
+      type: [DEBUG,INFO,WARNING,ERROR,CRITICAL]
+      default: DEBUG  
+      section: logging
+      key: level
+      tags: [ logging ]
+
+    #===============
+    # Project cache
+    #===============
+    
+    - name: CACHE_SIZE
+      label: Cache size
+      description: |
+         The maximal number of Qgis projects held in cache. The cache strategy is LRU.
+      default: '10'
+      type: int
+      section: projects.cache
+      key: size
+      tags: [ qgis, cache ]
+
+    - name: CACHE_ROOTDIR
+      label: Projects directory
+      description: |
+          The directory location for Qgis project files.
+      tags: [ qgis, cache ]
+      type: path
+      section: projects.cache
+      key: rootdir 
+
+    - name: CACHE_STRICT_CHECK
+      label: Enable strict checking
+      description: |
+          Activate strict checking of project layers. When enabled, Qgis projects
+          with invalid layers will be dismissed and an 'Unprocessable Entity' (422) HTTP error
+          will be issued.
+      default: 'yes'
+      type: boolean
+      section: projects.cache
+      key: strict_check
+      tags: [ qgis, cache ]
+
+    - name: CACHE_INSECURE
+      label: Insecure cache mode
+      description: |
+          Enable or disable the insecure cache mode. The insecure cache mode allow scheme handlers
+          to enable or disable some features considered harmful. See the handler's description
+          for the limitations induced in secure mode.
+      type: boolean
+      default: 'no'
+      section: projects.cache
+      key: insecure
+      tags: [ cache, security ] 
+
+
+
+
+

@@ -6,9 +6,17 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-""" 
-Configuration management
+""" Configuration management
+
+Configuration can be done either by using aconfiguration file or with environnement variable.
+
+Except stated otherwise, the rule for environnement variable names is ``QGSRV_<SECTION>_<KEY>`` all in uppercase.
+
+Options 
+
+
 """
+
 import os
 import sys
 import configparser
@@ -66,6 +74,8 @@ def load_configuration():
     CONFIG.set('projects.cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
     # Ensure that loaded project is valid before loading in cache
     CONFIG.set('projects.cache', 'strict_check' , getenv('QGSRV_CACHE_STRICT_CHECK','yes'))
+    CONFIG.set('projects.cache', 'insecure'     , getenv('QGSRV_CACHE_INSECURE','no'))
+
 
     CONFIG.add_section('projects.schemes')
 
@@ -76,12 +86,17 @@ def load_configuration():
     CONFIG.set('cache', 'strict_check' , '${projects.cache:strict_check}')
 
     CONFIG.add_section('zmq')
+    # Identity prefix used in 0MQ worker socket 
     CONFIG.set('zmq', 'identity'     , getenv('QGSRV_ZMQ_IDENTITY' ,'OWS-SERVER'))
+    # Address to bind 0MQ socket - used only with proxy/worker configuration
     CONFIG.set('zmq', 'bindaddr'     , getenv('QGSRV_ZMQ_INADDR'   ,'tcp://*:18080'))
+    # Control the maximum lenghth of the waiting queue
     CONFIG.set('zmq', 'maxqueue'     , getenv('QGSRV_ZMQ_MAXQUEUE' ,'1000'))
-    # Control the lifetime of requests on waiting queue
+    # Control the lifetime of requests on the waiting queue 
     CONFIG.set('zmq', 'timeout'      , getenv('QGSRV_ZMQ_TIMEOUT'  ,'15000'))
+    # Address to bind broadcast address to - used only with proxy/worker configuration
     CONFIG.set('zmq', 'broadcastaddr', getenv('QGSRV_ZMQ_BROADCASTADDR','tcp://*:18090'))
+
 
 def read_config_dict( userdict ):
     """ Read configuration from dictionary
