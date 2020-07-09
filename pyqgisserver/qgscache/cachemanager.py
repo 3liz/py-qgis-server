@@ -200,5 +200,6 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
         return True
 
 
-cacheservice = componentmanager.get_service(CACHE_MANAGER_CONTRACTID)
+def get_cacheservice():
+    return componentmanager.get_service(CACHE_MANAGER_CONTRACTID)
 

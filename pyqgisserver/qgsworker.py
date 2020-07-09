@@ -26,7 +26,7 @@ from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
 from .zeromq.worker import RequestHandler, run_worker
-from .qgscache.cachemanager import cacheservice, StrictCheckingError
+from .qgscache.cachemanager import get_cacheservice, StrictCheckingError
 
 from .config  import confservice
 from .plugins import load_plugins
@@ -215,7 +215,7 @@ class QgsRequestHandler(RequestHandler):
         iface = self.qgis_server.serverInterface()
         try:
             LOGGER.debug("Handling request: %s", self.msgid)
-            project, updated = cacheservice.lookup(project_location)
+            project, updated = get_cacheservice().lookup(project_location)
             config_path = project.fileName()
             if updated: 
                # Needed to cleanup cache capabilities cache
@@ -239,18 +239,19 @@ def main():
     import argparse
     from .zeromq.worker import run_worker
     from .version import __description__, __version__
-    from .config  import (confservice, read_config_dict, validate_config_path)
+    from .config  import (confservice, load_configuration, read_config_file, validate_config_path)
     from .logger import setup_log_handler
 
     parser = argparse.ArgumentParser(description='Qgis Server Worker')
-    parser.add_argument('--host'     , metavar="host"   , default='tcp://localhost'   , help="router host")   
+    parser.add_argument('-d','--debug', action='store_true', default=False, help="debug mode") 
+    parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
+            default=None, help="Configuration file")
+    parser.add_argument('--host'     , metavar="host"   , default='localhost' , help="router host")   
     parser.add_argument('--router'   , metavar='address', default='tcp://{host}:18080', help="router address")
     parser.add_argument('--broadcast', metavar='address', default='tcp://{host}:18090', help="broadcast address")
     parser.add_argument('--identity' , default="", help="Set worker identity")
-    parser.add_argument('--rootdir'  , default=confservice['cache']['rootdir'], metavar='PATH', help='Path to qgis projects')
+    parser.add_argument('--rootdir'  , default=argparse.SUPPRESS, metavar='PATH', help='Path to qgis projects')
     parser.add_argument('--version'  , action='store_true', default=False, help="Return version number and exit")
-    parser.add_argument('--logging'  , choices=['debug', 'info', 'warning', 'error'], 
-            default=confservice['logging']['level'].lower(), help="set log level")
 
     args = parser.parse_args()
 
@@ -262,20 +263,29 @@ def main():
         print_version()
         sys.exit(1)
 
-    # read configuration dict
-    read_config_dict({
-        'logging':{ 'level': args.logging.upper() },
-        'cache'  :{ 'rootdir': args.rootdir },
-    })
+    load_configuration()
+
+    if args.config:
+        with open(args.config, mode='rt') as config_file:
+            read_config_file(config_file)
+
+    # Override config
+    def set_arg( section:str, name:str ) -> None:
+        if name in args:
+            confservice.set( section, name, str(getattr(args,name)))
+
+    set_arg( 'cache'  , 'rootdir' )
+
+    if args.debug:
+        # Force debug mode
+        confservice.set('logging', 'level', 'DEBUG')
 
     print_version()
 
     validate_config_path('cache','rootdir')
 
-    setup_log_handler(args.logging)
+    setup_log_handler(confservice.get('logging','level'))
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
-
-    LOGGER.setLevel(getattr(logging, args.logging.upper()))
 
     broadcastaddr = args.broadcast.format(host=args.host)
 

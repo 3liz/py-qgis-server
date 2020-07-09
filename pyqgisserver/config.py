@@ -98,14 +98,6 @@ def load_configuration():
     CONFIG.set('zmq', 'broadcastaddr', getenv('QGSRV_ZMQ_BROADCASTADDR','tcp://*:18090'))
 
 
-def read_config_dict( userdict ):
-    """ Read configuration from dictionary
-
-        Will override previous settings
-    """
-    CONFIG.read_dict( userdict )
-
-
 def read_config_file( cfgfile ):
     """ Read configuration from file
     """
