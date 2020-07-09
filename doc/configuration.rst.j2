@@ -1,0 +1,46 @@
+.. _configuration_settings:
+
+Configuration Settings
+======================
+
+Configuration can be done either by using a configuration file or with environnement variable.
+
+Except stated otherwise, the rule for environnement variable names is ``QGSRV_<SECTION>_<KEY>`` all in uppercase.
+
+
+Common Configuration Options
+=============================
+
+{% if config_options %}
+
+{% for config in config_options %}
+{% set config_len = config.name|length -%}
+{% set config_option = config.name %}
+.. _{{config_option}}:
+
+{{config_option}}
+{{ '-' * config_len }}
+
+{% if config['description'] and config['description'] != [''] -%}
+{{config['description']}}
+{% endif %}
+{% if config['type'] -%}
+:Type: {{config['type']}}
+{%- else %}
+:Type: string
+{%- endif %}
+:Default: {{config['default']}}
+{%- if config['version_added'] -%}
+:Version Added: {{config['version_added']}}
+{%- endif %}
+:Section: {{config['section']}}
+:Key: {{config['key']}}
+{%- if config['deprecated'] -%}
+:Deprecated in: {{config['deprecated']['version']}}
+:Deprecated detail: {{config['deprecated']['why']}}
+:Deprecated alternatives: {{config['deprecated']['alternatives']}}
+{%- endif %}
+:Env: QGSRV_{{config_option}}
+
+{% endfor %}
+{% endif %}

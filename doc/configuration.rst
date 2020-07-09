@@ -1,0 +1,287 @@
+.. _configuration_settings:
+
+Configuration Settings
+======================
+
+Configuration can be done either by using a configuration file or with environnement variable.
+
+Except stated otherwise, the rule for environnement variable names is ``QGSRV_<SECTION>_<KEY>`` all in uppercase.
+
+
+Common Configuration Options
+=============================
+
+
+
+
+
+.. _SERVER_HTTP_PORT:
+
+SERVER_HTTP_PORT
+----------------
+
+Port to listen to
+
+:Type: int
+:Default: 8080
+:Section: server
+:Key: port
+:Env: QGSRV_SERVER_HTTP_PORT
+
+
+
+.. _SERVER_INTERFACES:
+
+SERVER_INTERFACES
+-----------------
+
+Interfaces to listen to
+
+
+:Type: string
+:Default: 0.0.0.0
+:Section: server
+:Key: interfaces
+:Env: QGSRV_SERVER_INTERFACES
+
+
+
+.. _SERVER_WORKERS:
+
+SERVER_WORKERS
+--------------
+
+The number of workers for processing requests
+
+:Type: int
+:Default: 2
+:Section: server
+:Key: workers
+:Env: QGSRV_SERVER_WORKERS
+
+
+
+.. _SERVER_ENABLE_FILTERS:
+
+SERVER_ENABLE_FILTERS
+---------------------
+
+Enable filters as python extension
+
+:Type: boolean
+:Default: yes
+:Section: server
+:Key: enable_filters
+:Env: QGSRV_SERVER_ENABLE_FILTERS
+
+
+
+.. _SERVER_HTTP_PROXY:
+
+SERVER_HTTP_PROXY
+-----------------
+
+Indicates that the server is behind a reverse proxy
+
+:Type: boolean
+:Default: 
+:Section: server
+:Key: http_proxy
+:Env: QGSRV_SERVER_HTTP_PROXY
+
+
+
+.. _SERVER_PROXY_URL:
+
+SERVER_PROXY_URL
+----------------
+
+The url that must be seen by the client when the server is behind a proxy.
+
+
+
+:Type: string
+:Default: 
+:Section: server
+:Key: proxy_url
+:Env: QGSRV_SERVER_PROXY_URL
+
+
+
+.. _SERVER_RESTARTMON:
+
+SERVER_RESTARTMON
+-----------------
+
+The file to watch for restarting working. When the modified date of the file is changed.
+a restart command is broadcasted to the workers. Note that workers processes are restarted 
+without dropping requests.
+
+
+:Type: path
+:Default: 
+:Section: server
+:Key: restartmon
+:Env: QGSRV_SERVER_RESTARTMON
+
+
+
+.. _SERVER_PLUGINPATH:
+
+SERVER_PLUGINPATH
+-----------------
+
+The path to qgis server plugins
+
+:Type: path
+:Default: 
+:Section: server
+:Key: pluginpath
+:Env: QGSRV_SERVER_PLUGINPATH
+
+
+
+.. _SERVER_SSL:
+
+SERVER_SSL
+----------
+
+Enable SSL endpoint
+
+:Type: boolean
+:Default: no
+:Section: server
+:Key: ssl
+:Env: QGSRV_SERVER_SSL
+
+
+
+.. _SERVER_SSL_CERT:
+
+SERVER_SSL_CERT
+---------------
+
+Path to the SSL certificat file
+
+:Type: path
+:Default: 
+:Section: server
+:Key: ssl_cert
+:Env: QGSRV_SERVER_SSL_CERT
+
+
+
+.. _SERVER_SSL_KEY:
+
+SERVER_SSL_KEY
+--------------
+
+Path to the SSL key file
+
+:Type: path
+:Default: 
+:Section: server
+:Key: ssl_key
+:Env: QGSRV_SERVER_SSL_KEY
+
+
+
+.. _SERVER_CROSS_ORIGIN:
+
+SERVER_CROSS_ORIGIN
+-------------------
+
+Allows any origin for CORS. If set to 'no', allow only CORS for the 'Origin'
+header.
+
+
+:Type: boolean
+:Default: 
+:Section: server
+:Key: cross_origin
+:Env: QGSRV_SERVER_CROSS_ORIGIN
+
+
+
+.. _LOGGING_LEVEL:
+
+LOGGING_LEVEL
+-------------
+
+Set the logging level
+
+:Type: ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+:Default: DEBUG
+:Section: logging
+:Key: level
+:Env: QGSRV_LOGGING_LEVEL
+
+
+
+.. _CACHE_SIZE:
+
+CACHE_SIZE
+----------
+
+The maximal number of Qgis projects held in cache. The cache strategy is LRU.
+
+
+:Type: int
+:Default: 10
+:Section: projects.cache
+:Key: size
+:Env: QGSRV_CACHE_SIZE
+
+
+
+.. _CACHE_ROOTDIR:
+
+CACHE_ROOTDIR
+-------------
+
+The directory location for Qgis project files.
+
+
+:Type: path
+:Default: 
+:Section: projects.cache
+:Key: rootdir
+:Env: QGSRV_CACHE_ROOTDIR
+
+
+
+.. _CACHE_STRICT_CHECK:
+
+CACHE_STRICT_CHECK
+------------------
+
+Activate strict checking of project layers. When enabled, Qgis projects
+with invalid layers will be dismissed and an 'Unprocessable Entity' (422) HTTP error
+will be issued.
+
+
+:Type: boolean
+:Default: yes
+:Section: projects.cache
+:Key: strict_check
+:Env: QGSRV_CACHE_STRICT_CHECK
+
+
+
+.. _CACHE_INSECURE:
+
+CACHE_INSECURE
+--------------
+
+Enable or disable the insecure cache mode. The insecure cache mode allow scheme handlers
+to enable or disable some features considered harmful. See the handler's description
+for the limitations induced in secure mode.
+
+
+:Type: boolean
+:Default: no
+:Section: projects.cache
+:Key: insecure
+:Env: QGSRV_CACHE_INSECURE
+
+
