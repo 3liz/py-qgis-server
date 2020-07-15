@@ -35,6 +35,10 @@ The server is aimed at solving some real situations encountered in production en
 - Some python knowledge about python virtualenv and package installation.
 - libzmq >= 4.0.1 and pyzmq >= 17
 
+## Documentation:
+
+Latest documentation is available on [ReadTheDoc](https://py-qgis-server.readthedocs.io/en/latest/index.html)
+
 ## Installation
 
 ### From docker
@@ -144,31 +148,7 @@ The precedences of the gonfiguration parameters is the following (from lowest to
 
 #### Configuration parameters
 
-Here is a sample config file with the default values and the corresponding env variables
-
-```
-[server]
-port=8080          # QGSRV_SERVER_HTTP_PORT
-interfaces=0.0.0.0 # QGSRV_SERVER_INTERFACES
-workers=2          # QGSRV_SERVER_WORKERS
-timeout=20         # QGSRV_SERVER_TIMEOUT
-pluginpath=        # QGSRV_SERVER_PLUGINPATH        
-
-[logging]
-level=DEBUG # QGSRV_LOGGING_LEVEL
-
-[cache]
-size=10    # QGSRV_CACHE_SIZE
-rootdir=   # QGSRV_CACHE_ROOTDIR
-
-[zmq]
-identity=OWS-SERVER     # QGSRV_ZMQ_IDENTITY
-bindaddr=tcp://*:18080  # QGSRV_ZMQ_INADDR
-maxqueue=1000           # QGSRV_ZMQ_MAXQUEUE
-timeout=15000           # QGSRV_ZMQ_TIMEOUT
-````
-
-Have a look to `config.py` for all configuration variables.
+Please look at [the documentation](https://py-qgis-server.readthedocs.io/en/latest/index.html) for configuration options
 
 ## Logging
 
