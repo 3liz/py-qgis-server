@@ -24,4 +24,6 @@ templates: configuration.rst
 configuration.rst: ../pyqgisserver/config.yml configuration.rst.j2
 	./jtpl.py -c $^
 
+clean:
+	rm -r ${BUILDDIR}
 

@@ -57,3 +57,7 @@ html_theme ='sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+# Fix for read the doc
+# See https://github.com/readthedocs/readthedocs.org/issues/2569
+master_doc = 'index'
+
