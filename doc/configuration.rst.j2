@@ -20,26 +20,30 @@ Common Configuration Options
 
 {{config_option}}
 {{ '-' * config_len }}
-
-{% if config['description'] and config['description'] != [''] -%}
+{% if config['description'] and config['description'] != [''] %}
 {{config['description']}}
+{{space}}
 {% endif %}
-{% if config['type'] -%}
+
+{%- if config['type'] -%}
 :Type: {{config['type']}}
-{%- else %}
+{% else %}
 :Type: string
-{%- endif %}
+{% endif %}
+{%- if config['default'] -%}
 :Default: {{config['default']}}
+{% endif %}
 {%- if config['version_added'] -%}
 :Version Added: {{config['version_added']}}
-{%- endif %}
+{{space}}
+{%- endif -%}
 :Section: {{config['section']}}
 :Key: {{config['key']}}
 {%- if config['deprecated'] -%}
 :Deprecated in: {{config['deprecated']['version']}}
 :Deprecated detail: {{config['deprecated']['why']}}
 :Deprecated alternatives: {{config['deprecated']['alternatives']}}
-{%- endif %}
+{% endif %}
 :Env: QGSRV_{{config_option}}
 
 {% endfor %}

@@ -42,6 +42,7 @@ config_options:
     - name: SERVER_HTTP_PROXY
       label: http proxy 
       description: Indicates that the server is behind a reverse proxy
+      default: 'no'
       section: server
       key: http_proxy
       type: boolean

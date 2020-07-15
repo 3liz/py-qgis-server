@@ -14,6 +14,10 @@ pdf: build
 	sphinx-build -b latex ./  ${BUILDDIR}/latex
 	cd ${BUILDDIR}/latex && pdflatex ${PROJECT_NAME}.tex
 
+md: build
+	 mkdir -p ${BUILDDIR}/md
+	 sphinx-build -b markdown ./  ${BUILDDIR}/md
+
 build: templates
 templates: configuration.rst
 

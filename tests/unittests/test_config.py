@@ -1,7 +1,6 @@
 import os
 from pyqgisserver.server import read_configuration
-from pyqgisserver.config import (confservice, read_config_file, read_config_dict,
-                                 validate_config_path)
+from pyqgisserver.config import (confservice, read_config_file, validate_config_path)
 
 def test_argument_precedence():
     """ Test argument precedences

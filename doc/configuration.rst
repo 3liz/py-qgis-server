@@ -84,7 +84,7 @@ SERVER_HTTP_PROXY
 Indicates that the server is behind a reverse proxy
 
 :Type: boolean
-:Default: 
+:Default: no
 :Section: server
 :Key: http_proxy
 :Env: QGSRV_SERVER_HTTP_PROXY
@@ -101,7 +101,6 @@ The url that must be seen by the client when the server is behind a proxy.
 
 
 :Type: string
-:Default: 
 :Section: server
 :Key: proxy_url
 :Env: QGSRV_SERVER_PROXY_URL
@@ -119,7 +118,6 @@ without dropping requests.
 
 
 :Type: path
-:Default: 
 :Section: server
 :Key: restartmon
 :Env: QGSRV_SERVER_RESTARTMON
@@ -134,7 +132,6 @@ SERVER_PLUGINPATH
 The path to qgis server plugins
 
 :Type: path
-:Default: 
 :Section: server
 :Key: pluginpath
 :Env: QGSRV_SERVER_PLUGINPATH
@@ -164,7 +161,6 @@ SERVER_SSL_CERT
 Path to the SSL certificat file
 
 :Type: path
-:Default: 
 :Section: server
 :Key: ssl_cert
 :Env: QGSRV_SERVER_SSL_CERT
@@ -179,7 +175,6 @@ SERVER_SSL_KEY
 Path to the SSL key file
 
 :Type: path
-:Default: 
 :Section: server
 :Key: ssl_key
 :Env: QGSRV_SERVER_SSL_KEY
@@ -196,7 +191,6 @@ header.
 
 
 :Type: boolean
-:Default: 
 :Section: server
 :Key: cross_origin
 :Env: QGSRV_SERVER_CROSS_ORIGIN
@@ -243,7 +237,6 @@ The directory location for Qgis project files.
 
 
 :Type: path
-:Default: 
 :Section: projects.cache
 :Key: rootdir
 :Env: QGSRV_CACHE_ROOTDIR

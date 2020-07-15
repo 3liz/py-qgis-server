@@ -10,6 +10,7 @@ Welcome to py-qgis-server's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   intro
    configuration 
    schemes
 
