@@ -39,5 +39,10 @@ docker-test.log
 
 .idea/
 
+/tests/data/liz
 /tests/data/montpellier
 /tests/unittests/qgis.db
+
+*.bak
+*.bak~
+

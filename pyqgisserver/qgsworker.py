@@ -22,6 +22,7 @@ import traceback
 from typing import Dict
 
 from qgis.PyQt.QtCore import QBuffer, QIODevice, QByteArray
+from qgis.core import QgsProject
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
@@ -152,7 +153,7 @@ class Response(QgsServerResponse):
             else:
                 LOGGER.error("Cannot set error after header written")
         except:
-            lOGGER.critical("Unrecoverable exception:\n%s", traceback.format_exc())
+            LOGGER.critical("Unrecoverable exception:\n%s", traceback.format_exc())
 
 
     def _clearHeaders(self) -> None:
@@ -218,7 +219,7 @@ class QgsRequestHandler(RequestHandler):
             project, updated = get_cacheservice().lookup(project_location)
             config_path = project.fileName()
             if updated: 
-               # Needed to cleanup cache capabilities cache
+               # Needed to cleanup cached capabilities
                LOGGER.debug("Cleaning config cache entry %s", config_path)
                iface.removeConfigCacheEntry(config_path)
         except StrictCheckingError:

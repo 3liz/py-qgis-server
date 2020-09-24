@@ -5,7 +5,7 @@ def parse_requirements( filename ):
     with open( filename ) as fp:
         return list(filter(None, (r.strip('\n ').partition('#')[0] for r in fp.readlines())))
 
-VERSION = "1.3.2"
+VERSION = "1.3.3"
 DESCRIPTION = ('Py-Qgis-Server is an implementation of the OWS standards '
                'standard from the Open Geospatial Consortium.'
                'Py-Qgis-Server written in Python and built on top of Qgis server'

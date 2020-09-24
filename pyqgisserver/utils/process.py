@@ -25,8 +25,11 @@ import sys
 import os
 import logging
 import signal
+import errno
 
+from tornado.util import errno_from_exception
 from typing import Union
+
 
 _task_id  = None
 _ppid     = None

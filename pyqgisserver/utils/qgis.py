@@ -154,7 +154,7 @@ def init_qgis_server(**kwargs) -> 'QgsServer':
     """
     start_qgis_application(**kwargs)
 
-    logger = kwargs.get('logger') or logger.getLogger()
+    logger = kwargs.get('logger') or logging.getLogger()
 
     from qgis.server import QgsServer
     server = QgsServer()

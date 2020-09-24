@@ -76,9 +76,8 @@ class Monitor:
             try:
                 await client.connect(exchange=exchange,exchange_type='topic')
                 LOGGER.info("AMQP logger initialized.")
-            except Exception as e:
-                traceback.print_exception(*exc_info)
-                LOGGER.error("Failed to initialize AMQP logger")
+            except Exception:
+                LOGGER.error("Failed to initialize AMQP logger: %s",traceback.format_exc())
 
         asyncio.ensure_future( connect() )
 
