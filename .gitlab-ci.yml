@@ -9,17 +9,26 @@ stages:
 # Tests
 #-----------------
 
-tests:
+.run-tests:
   stage: test
   script:
-    - make docker-test FLAVOR=ltr
-    - make docker-test FLAVOR=release
+    - make docker-test FLAVOR=$QGIS_FLAVOR
   tags:
     - infrav3
   only:
     refs:
       - tags
       - master
+
+tests:ltr:
+  extends: .run-tests 
+  variables:
+    QGIS_FLAVOR: ltr
+
+tests:release:
+  extends: .run-tests 
+  variables:
+    QGIS_FLAVOR: release
 
 #---------------
 # Build

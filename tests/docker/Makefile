@@ -40,9 +40,14 @@ ifdef PG_RUN
 PG_RUN_VOL=-v $(PG_RUN):/var/run/postgresql
 endif
 
+TESTS_CPU_LIMITS:=2.0
+TESTS_MEMORY_LIMITS:=2g
+
 test: local
 	echo -n "Restart qgis" > .qgis-restart
 	docker run --rm --name qgis-py-server-test-$(FLAVOR)-$(COMMITID) -w /src \
+		--cpus $(TESTS_CPU_LIMITS) \
+		--memory $(TESTS_MEMORY_LIMITS) \
 		-u $(BECOME_USER) \
 		-v $(SRCDIR):/src \
 		-v $$(pwd)/.local:/.local \
