@@ -16,6 +16,7 @@ import urllib.parse
 from urllib.parse import urlparse, urljoin, parse_qs
 from typing import TypeVar, Tuple, Dict
 from collections import namedtuple
+from pathlib import Path
 
 from ..utils.lru import lrucache
 from ..config import confservice
@@ -34,6 +35,10 @@ CacheDetails = namedtuple("CacheDetails",('project','timestamp'))
 
 
 class StrictCheckingError(Exception):
+    pass
+
+
+class PathNotAllowedError(Exception):
     pass
 
 
@@ -112,6 +117,15 @@ class QgsCacheManager:
                 # XXX Note that the path of the base url must be terminated by '/'
                 # otherwise urljoin() will replace the base name - may be not what we want
                 url = urlparse(urljoin(baseurl.geturl(),url.path+'?'+query))
+                # Make sure that the result url path is relative to base url
+                try:
+                    # Ensure that if an absolute path is given, we may extract
+                    # a relative path to the base url - note that the base url may
+                    # not have a leading '/'
+                    Path(url.path).relative_to(Path('/') / baseurl.path)
+                except ValueError:
+                    LOGGER.error("The path '%s' is outside base path '%s'", url.path, baseurl.path)
+                    raise PathNotAllowedError()                    
 
         return url
 

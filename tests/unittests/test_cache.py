@@ -5,7 +5,7 @@ import os
 from qgis.core import Qgis
 
 from pathlib import Path
-from pyqgisserver.qgscache.cachemanager import QgsCacheManager
+from pyqgisserver.qgscache.cachemanager import QgsCacheManager, PathNotAllowedError
 from pyqgisserver.config import confservice
 
 def test_aliases() -> None:
@@ -36,6 +36,25 @@ def test_aliases() -> None:
     assert url.path   == 'foobar'
     assert url.query  == 'data=france_parts'
 
+
+def test_absolute_path_with_alias() -> None:
+    """
+    """
+
+    cacheservice = QgsCacheManager()
+
+    # Passing an absolute path that is compatible with
+    # the scheme base url is ok
+    url = cacheservice.resolve_alias('foo:/foobar/france_parts')
+    assert url.scheme == 'file'
+    assert url.path   == '/foobar/france_parts'
+
+    # But not a path wich does is no a relative path
+    # to base url
+    with pytest.raises(PathNotAllowedError):
+        url = cacheservice.resolve_alias('foo:/france_parts')
+
+  
 
 
 @pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 31000, reason="Test fail with qgis 3.4")
