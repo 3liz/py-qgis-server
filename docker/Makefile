@@ -120,3 +120,10 @@ run-worker:
        -e ROUTER_HOST=map-proxy-$(COMMITID) \
        $(BUILDIMAGE) qgisserver-worker
 
+
+# Push to docker hub as rc version
+pushrc:
+	cat $(DOCKERPASS) | docker login -u 3liz --password-stdin
+	docker tag $(BUILDIMAGE) 3liz/$(NAME):$(FLAVOR)-rc
+	docker push 3liz/$(NAME):$(FLAVOR)-rc
+

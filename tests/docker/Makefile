@@ -76,6 +76,8 @@ test: local
 
 WORKERS:=1
 
+PROJECTS_ROOTDIR:=$(SRCDIR)/tests/data
+
 run: local
 	echo -n "Restart qgis" > .qgis-restart
 	docker run -it --rm -p $(SERVER_HTTP_PORT):8080 --name qgis-py-server-run-$(COMMITID) -w /src \
@@ -85,6 +87,7 @@ run: local
 		-v $$(pwd)/server.conf:/server.conf \
 		-v $(PLUGINPATH):/plugins \
 		-v $$(pwd)/.pipcache:/.cache \
+		-v $(PROJECTS_ROOTDIR):/src/tests/data \
 		-e PIP_CACHE_DIR=/.cache \
 		-e QGSRV_SERVER_WORKERS=$(WORKERS) \
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \

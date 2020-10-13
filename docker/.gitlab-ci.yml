@@ -10,7 +10,7 @@ variables:
 .docker-build:
   stage: docker
   script:
-    - make -C docker build deliver clean FLAVOR=$QGIS_FLAVOR
+    - make -C docker build deliver pushrc clean FLAVOR=$QGIS_FLAVOR
   environment:
     name: snap
   artifacts:
