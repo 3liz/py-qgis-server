@@ -1,4 +1,4 @@
-include setup.py MANIFEST.in README.md
+include setup.py MANIFEST.in README.md VERSION
 include requirements.txt
 include pyqgisserver/build.manifest
 

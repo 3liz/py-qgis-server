@@ -1,7 +1,13 @@
-SHELL:=bash
-# 
 # qgis server makefile
 #
+
+VERSION:=1.3.3
+
+ifndef CI_COMMIT_TAG
+VERSION_TAG=$(VERSION)rc0
+else
+VERSION_TAG=$(VERSION)
+endif
 
 BUILDID=$(shell date +"%Y%m%d%H%M")
 COMMITID=$(shell git rev-parse --short HEAD)
@@ -23,7 +29,10 @@ export QGIS_NO_OVERRIDE_IMPORT := 1
 dirs:
 	mkdir -p $(DIST)
 
-manifest:
+version:
+	echo $(VERSION_TAG) > VERSION
+
+manifest: version
 	echo name=$(shell $(PYTHON) setup.py --name) > $(MANIFEST) && \
 		echo version=$(shell $(PYTHON) setup.py --version) >> $(MANIFEST) && \
 		echo buildid=$(BUILDID)   >> $(MANIFEST) && \

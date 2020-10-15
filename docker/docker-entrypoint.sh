@@ -9,7 +9,10 @@ QGSRV_USER=${QGSRV_USER:-"9001:9001"}
 if [[ "$1" == "version" ]]; then
     version=`pip3 list | grep py-qgis-server | tr -s [:blank:] | cut -d ' ' -f 2`
     qgis_version=`python3 -c "from qgis.core import Qgis; print(Qgis.QGIS_VERSION.split('-')[0])"`
-    echo "$qgis_version-$version"
+    # Strip the 'rc' from the version
+    # An 'rc' version is not released so as a docker image the rc is not relevant 
+    # here
+    echo "$qgis_version-${version%rc0}"
     exit 0
 fi
 
