@@ -43,11 +43,6 @@ build:
   tags:
     - infrav3
   only:
-    changes:
-      - pyqgisserver/**/*
-      - "setup.*"
-      - MANIFEST.in
-      - requirements.txt
     refs:
       - tags
       - master
