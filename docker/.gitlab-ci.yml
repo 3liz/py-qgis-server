@@ -65,7 +65,6 @@ deploy_snap:
   only:
     refs:
       - tags
-      - master
   tags:
     - infrav3    
     
