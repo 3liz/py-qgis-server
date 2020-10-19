@@ -1,8 +1,4 @@
 
-variables:
-    FACTORY_MANIFEST: "docker/factory.manifest"
-
-
 #-------------
 # Build
 #-------------
@@ -66,14 +62,18 @@ deploy_snap:
     refs:
       - tags
   tags:
-    - infrav3    
-    
+    - infrav3
+  variables:
+    FACTORY_MANIFEST: "docker/factory.manifest"
+
+
 release:ltr:
   extends: .docker-release
   dependencies:
     - build-docker:ltr
   variables:
     QGIS_FLAVOR: ltr
+
 
 release:release:
   extends: .docker-release

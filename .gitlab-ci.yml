@@ -38,6 +38,7 @@ build:
   stage: build
   script:
     - make dist deliver
+    - make -C .lizcloud -f factory.mk package
   environment:
     name: snap
   tags:
@@ -49,6 +50,26 @@ build:
   except:
       - schedules
       - triggers
+  artifacts:
+    paths:
+      - ".lizcloud/factory.manifest"
+
+release:
+  stage: release
+  script:
+    - $FACTORY_SCRIPTS/release-package py-qgis-server
+  environment:
+    name: production
+  dependencies:
+    - build
+  only:
+    refs:
+      - tags
+  tags:
+    - infrav3
+  variables:
+    FACTORY_MANIFEST: ".lizcloud/factory.manifest"
+
 
 # Docker build
 include: '/docker/.gitlab-ci.yml'
