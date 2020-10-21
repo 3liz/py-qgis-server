@@ -10,7 +10,7 @@ BUILDID=$(shell date +"%Y%m%d%H%M")
 COMMITID=$(shell git rev-parse --short HEAD)
 
 # QGIS platform version
-FLAVOR:=ltr
+FLAVOR:=release
 
 # Server version
 BUILD_VERSION:=$(shell cd .. && python3 setup.py --version)
