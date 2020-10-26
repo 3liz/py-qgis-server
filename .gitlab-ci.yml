@@ -9,26 +9,12 @@ stages:
 # Tests
 #-----------------
 
-.run-tests:
+tests:
   stage: test
   script:
-    - make manifest docker-test FLAVOR=$QGIS_FLAVOR
+    - make manifest docker-test FLAVOR=ltr
   tags:
     - infrav3
-  only:
-    refs:
-      - tags
-      - master
-
-tests:ltr:
-  extends: .run-tests 
-  variables:
-    QGIS_FLAVOR: ltr
-
-tests:release:
-  extends: .run-tests 
-  variables:
-    QGIS_FLAVOR: release
 
 #---------------
 # Build
@@ -38,7 +24,6 @@ build:
   stage: build
   script:
     - make dist deliver
-    - make -C .lizcloud -f factory.mk package
   environment:
     name: snap
   tags:
@@ -46,30 +31,10 @@ build:
   only:
     refs:
       - tags
-      - master
+      - 1.3.x
   except:
       - schedules
       - triggers
-  artifacts:
-    paths:
-      - ".lizcloud/factory.manifest"
-
-release:
-  stage: release
-  script:
-    - $FACTORY_SCRIPTS/release-package py-qgis-server
-  environment:
-    name: production
-  dependencies:
-    - build
-  only:
-    refs:
-      - tags
-  tags:
-    - infrav3
-  variables:
-    FACTORY_MANIFEST: ".lizcloud/factory.manifest"
-
 
 # Docker build
 include: '/docker/.gitlab-ci.yml'
