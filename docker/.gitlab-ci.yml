@@ -43,7 +43,7 @@ deploy_snap:
 # Release
 #-------------
 
--release:
+release:
   stage: release
   script:
     - $FACTORY_SCRIPTS/release-image.sh qgis-map-server-$QGIS_FLAVOR
