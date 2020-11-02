@@ -70,7 +70,7 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
         if name in args:
             confservice.set( section, name, str(getattr(args,name)))
 
-    set_arg( 'cache'  , 'rootdir' )
+    set_arg( 'projects.cache'  , 'rootdir' )
     set_arg( 'server' , 'interfaces')
     set_arg( 'server' , 'port' )
     set_arg( 'server' , 'workers' )
@@ -97,7 +97,7 @@ def main() -> None:
 
     workers = args.workers
     if not args.proxy:
-        validate_config_path('cache','rootdir')
+        validate_config_path('projects.cache','rootdir')
     else:
         # Do not run any qgis workers
         workers = 0

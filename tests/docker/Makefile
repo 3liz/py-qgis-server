@@ -69,6 +69,7 @@ test: local
 		-e QGSRV_SERVER_HTTP_PROXY=yes \
 		-e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
+		-e QGSRV_DISABLE_GETPRINT=yes \
 		-e QGIS_OPTIONS_PATH=/src/tests/qgis \
 		-e PYTEST_ADDOPTS="$(PYTEST_ADDOPTS)" \
 		$(QGIS_IMAGE) $(SCRIPTS)/run_tests.sh

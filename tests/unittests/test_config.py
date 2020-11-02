@@ -28,5 +28,5 @@ def test_argument_precedence():
     assert conf.getint('port') == 9090
 
     # rootdir must be '/tmp/' defined in config file
-    assert confservice.get('cache','rootdir') == '/tmp/'
+    assert confservice.get('projects.cache','rootdir') == '/tmp/'
 

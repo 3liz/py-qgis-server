@@ -71,7 +71,9 @@ class QgsCacheManager:
 
         self._create_project = QgsProject
         self._cache = lrucache(size)
-        self._strict_check = cnf.getboolean('strict_check')
+        self._strict_check         = cnf.getboolean('strict_check')
+        self._trust_layer_metadata = cnf.getboolean('trust_layer_metadata')
+        self._disable_getprint     = cnf.getboolean('disable_getprint')
         self._aliases = {}
         self._default_scheme = cnf.get('default_handler',fallback='file')
 
@@ -177,9 +179,16 @@ class QgsCacheManager:
         """
         LOGGER.debug("Reading Qgis project %s", path)
         project = self._create_project()
+
+        readflags = QgsProject.ReadFlags(); 
+        if self._trust_layer_metadata:
+            readflags |= QgsProject.FlagTrustLayerMetadata
+        if self._disable_getprint:
+            readflags |= QgsProject.FlagDontLoadLayouts 
+
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
-        project.read(path)
+        project.read(path,  readflags)
         if self._strict_check and not badlayerh.validatLayers(project):
             raise StrictCheckingError
         return project

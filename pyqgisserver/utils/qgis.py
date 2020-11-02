@@ -128,7 +128,6 @@ def set_proxy_configuration( logger: logging.Logger ) -> None:
     """
     from qgis.PyQt.QtNetwork import QNetworkProxy
     from qgis.core import QgsNetworkAccessManager
-    from qgis.core import QgsSettings
 
     nam = QgsNetworkAccessManager.instance()
     nam.setupDefaultProxyAndCache()

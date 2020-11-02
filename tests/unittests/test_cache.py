@@ -11,7 +11,7 @@ from pyqgisserver.config import confservice
 def test_aliases() -> None:
     """ Test alias resolution for file
     """
-    rootpath = Path(confservice.get('cache','rootdir'))
+    rootpath = Path(confservice.get('projects.cache','rootdir'))
 
     cacheservice = QgsCacheManager()
 
@@ -61,7 +61,7 @@ def test_absolute_path_with_alias() -> None:
 def test_file_cache() -> None:
     """ Tetst file protocol handler
     """
-    rootpath = Path(confservice.get('cache','rootdir'))
+    rootpath = Path(confservice.get('projects.cache','rootdir'))
 
     cacheservice = QgsCacheManager()
     details = cacheservice.peek('france_parts')
@@ -81,7 +81,7 @@ def test_file_cache() -> None:
 def test_projects_scheme() -> None:
     """ Tetst file protocol handler
     """
-    rootpath = Path(confservice.get('cache','rootdir'))
+    rootpath = Path(confservice.get('projects.cache','rootdir'))
 
     cacheservice = QgsCacheManager()
     details = cacheservice.peek('test:france_parts')

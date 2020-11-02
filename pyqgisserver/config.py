@@ -68,22 +68,15 @@ def load_configuration():
     #
     # Projects cache
     #
-
     CONFIG.add_section('projects.cache')
     CONFIG.set('projects.cache', 'size'    , getenv('QGSRV_CACHE_SIZE','10' ))
     CONFIG.set('projects.cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
-    # Ensure that loaded project is valid before loading in cache
     CONFIG.set('projects.cache', 'strict_check' , getenv('QGSRV_CACHE_STRICT_CHECK','yes'))
     CONFIG.set('projects.cache', 'insecure'     , getenv('QGSRV_CACHE_INSECURE','no'))
-
+    CONFIG.set('projects.cache', 'trust_layer_metadata', getenv('QGSRV_TRUST_LAYER_METADATA','no'))
+    CONFIG.set('projects.cache', 'disable_getprint'    , getenv('QGSRV_DISABLE_GETPRINT','no'))
 
     CONFIG.add_section('projects.schemes')
-
-    # XXX Legacy section
-    CONFIG.add_section('cache')
-    CONFIG.set('cache', 'size'    , '${projects.cache:size}')
-    CONFIG.set('cache', 'rootdir' , '${projects.cache:rootdir}')
-    CONFIG.set('cache', 'strict_check' , '${projects.cache:strict_check}')
 
     CONFIG.add_section('zmq')
     # Identity prefix used in 0MQ worker socket 

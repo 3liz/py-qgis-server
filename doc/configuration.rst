@@ -278,3 +278,41 @@ for the limitations induced in secure mode.
 :Env: QGSRV_CACHE_INSECURE
 
 
+
+.. _TRUST_LAYER_METADATA:
+
+TRUST_LAYER_METADATA
+--------------------
+
+Trust layer metadata. Improves layer load time by skipping expensive checks 
+like primary key unicity, geometry type and 
+srid and by using estimated metadata on layer load. Since QGIS 3.16.
+
+
+:Type: boolean
+:Default: no
+:Version Added: 1.4
+:Section: projects.cache
+:Key: trust_layer_metadata
+:Env: QGSRV_TRUST_LAYER_METADATA
+
+
+
+.. _DISABLE_GETPRINT:
+
+DISABLE_GETPRINT
+----------------
+
+Don't load print layouts. Improves project read time if layouts are not required, 
+and allows projects to be safely read in background threads (since print layouts are 
+not thread safe).
+
+
+:Type: boolean
+:Default: no
+:Version Added: 1.4
+:Section: projects.cache
+:Key: disable_getprint
+:Env: QGSRV_DISABLE_GETPRINT
+
+

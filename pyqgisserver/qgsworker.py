@@ -279,7 +279,7 @@ def main():
         if name in args:
             confservice.set( section, name, str(getattr(args,name)))
 
-    set_arg( 'cache'  , 'rootdir' )
+    set_arg( 'projects.cache'  , 'rootdir' )
 
     if args.debug:
         # Force debug mode
@@ -287,7 +287,7 @@ def main():
 
     print_version()
 
-    validate_config_path('cache','rootdir')
+    validate_config_path('projects.cache','rootdir')
 
     setup_log_handler(confservice.get('logging','level'))
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)

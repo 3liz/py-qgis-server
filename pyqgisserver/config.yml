@@ -175,6 +175,36 @@ config_options:
       key: insecure
       tags: [ cache, security ] 
 
+    - name: TRUST_LAYER_METADATA
+      label: Trust layer metadata
+      description: |
+           Trust layer metadata. Improves layer load time by skipping expensive checks 
+           like primary key unicity, geometry type and 
+           srid and by using estimated metadata on layer load. Since QGIS 3.16.
+      type: boolean
+      default: 'no'
+      section: projects.cache
+      key: trust_layer_metadata
+      tags: [ cache ]
+      version_added: "1.4"
+
+    - name: DISABLE_GETPRINT
+      label: Disable print
+      description: |
+           Don't load print layouts. Improves project read time if layouts are not required, 
+           and allows projects to be safely read in background threads (since print layouts are 
+           not thread safe).
+      type: boolean
+      default: 'no'
+      section: projects.cache
+      key: disable_getprint
+      tags: [ cache ]
+      version_added: "1.4"
+
+
+
+
+
 
 
 
