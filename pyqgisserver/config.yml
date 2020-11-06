@@ -201,6 +201,20 @@ config_options:
       tags: [ cache ]
       version_added: "1.4"
 
+    - name: CACHE_PRELOAD_CONFIG
+      label: Preload cache configuration 
+      description: |
+          Path to configuration file for preloading projects. The file must have one project uri 
+          per line. Each uri is similar to the project uri passed in the 'MAP' query parameter
+          of OWS requests.
+      type: path
+      default: ''
+      section: projects.cache
+      key: preload_config
+      tags: [ cache ]
+      version_added: "1.4"
+
+
 
 
 

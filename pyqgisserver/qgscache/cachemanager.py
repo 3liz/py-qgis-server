@@ -194,8 +194,6 @@ class QgsCacheManager:
         return project
 
 
-
-
 class BadLayerHandler(QgsProjectBadLayerHandler):
 
     def __init__(self):
@@ -223,6 +221,54 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
         return True
 
 
-def get_cacheservice():
+def get_cacheservice() -> QgsCacheManager:
     return componentmanager.get_service(CACHE_MANAGER_CONTRACTID)
+
+
+def preload_projects_file( path: Path, cacheservice: QgsCacheManager ) ->  int:
+    """ Preload projects from configuration file
+    """
+    conf_file = Path(path)
+    if not conf_file.exists():
+        LOGGER.error("%s file do not exists, ignoring preload config", path)
+        return 0
+
+    # No point to preload more files than the cache size
+    maxfiles = confservice['projects.cache'].getint('size')
+    loaded_so_far = 0
+    
+    # Read the projects, strip comments 
+    with conf_file.open() as fp:
+        for p in filter(None,(l.strip('\n ').partition('#')[0] for l in fp.readlines())):
+            p = p.strip(' ')
+            try:
+                project, updated = cacheservice.lookup(p)
+            except StrictCheckingError:
+                LOGGER.error("Preload: '%s' as invalid layers - strict mode on" , p)
+            except PathNotAllowedError:
+                LOGGER.error("Preload: '%s' path not allowed", p)
+            except FileNotFoundError:
+                LOGGER.error("Preload: '%s' not found", p)
+            else:
+                LOGGER.info("Preload: '%s' loaded", p)
+                loaded_so_far += 1
+            if loaded_so_far >= maxfiles:
+                LOGGER.warning("Preload: cache size reached")
+                break
+    return loaded_so_far
+
+
+def preload_projects() -> None:
+    """ Preload projects in cache
+    """
+    confpath = confservice['projects.cache'].get('preload_config', fallback=None)
+    if not confpath:
+        return
+
+    # france_parts.qgs
+    # project_simple.qgs
+    # file:raster_layer.qgs
+
+    preload_projects_file( confpath, get_cacheservice() )
+
 

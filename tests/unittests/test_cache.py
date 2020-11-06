@@ -5,7 +5,9 @@ import os
 from qgis.core import Qgis
 
 from pathlib import Path
-from pyqgisserver.qgscache.cachemanager import QgsCacheManager, PathNotAllowedError
+from pyqgisserver.qgscache.cachemanager import (QgsCacheManager, 
+                                                PathNotAllowedError,
+                                                preload_projects_file)
 from pyqgisserver.config import confservice
 
 def test_aliases() -> None:
@@ -155,4 +157,28 @@ def test_postgres_pgservice_fail() -> None:
 
     with pytest.raises(FileNotFoundError):
         cacheservice.lookup(url)
+
+
+def test_preload_projects(data) -> None:
+    """ Test preloading projects files
+    """
+    cacheservice = QgsCacheManager()
+    path = data / 'preloads.list'
+
+    loaded = preload_projects_file(path, cacheservice)
+    assert loaded == 2
+
+    # file:france_parts.qgs
+    # project_simple.qgs
+    # raster_layer.qgs (invalid layer)
+
+    details = cacheservice.peek('file:france_parts.qgs')
+    assert details is not None
+
+    details = cacheservice.peek('project_simple.qgs')
+    assert details is not None
+
+    details = cacheservice.peek('raster_layer.qgs')
+    assert details is None
+
 

@@ -27,7 +27,8 @@ from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
 from .zeromq.worker import RequestHandler, run_worker
-from .qgscache.cachemanager import (get_cacheservice, 
+from .qgscache.cachemanager import (get_cacheservice,
+                                    preload_projects,
                                     StrictCheckingError,
                                     PathNotAllowedError)
 
@@ -195,6 +196,7 @@ class QgsRequestHandler(RequestHandler):
                                           verbose=LOGGER.level<=logging.DEBUG)
 
             load_plugins(qgsserver.serverInterface()) 
+            preload_projects()
 
             setattr(cls, 'qgis_server' , qgsserver )
 

@@ -316,3 +316,21 @@ not thread safe).
 :Env: QGSRV_DISABLE_GETPRINT
 
 
+
+.. _CACHE_PRELOAD_CONFIG:
+
+CACHE_PRELOAD_CONFIG
+--------------------
+
+Path to configuration file for preloading projects. The file must have one project uri 
+per line. Each uri is similar to the project uri passed in the 'MAP' query parameter
+of OWS requests.
+
+
+:Type: path
+:Version Added: 1.4
+:Section: projects.cache
+:Key: preload_config
+:Env: QGSRV_CACHE_PRELOAD_CONFIG
+
+

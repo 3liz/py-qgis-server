@@ -39,11 +39,6 @@ def data(request):
     return Path(request.config.rootdir.strpath).parent / 'data'
 
 
-@pytest.fixture(scope='session')
-def data(pg):
-    return Path(request.config.rootdir.strpath).parent / 'data'
-
-
 def pytest_collection_modifyitems(config, items):
     if config.with_postgres:
         # postgres enabled: do not skip tests

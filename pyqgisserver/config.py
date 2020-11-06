@@ -75,6 +75,7 @@ def load_configuration():
     CONFIG.set('projects.cache', 'insecure'     , getenv('QGSRV_CACHE_INSECURE','no'))
     CONFIG.set('projects.cache', 'trust_layer_metadata', getenv('QGSRV_TRUST_LAYER_METADATA','no'))
     CONFIG.set('projects.cache', 'disable_getprint'    , getenv('QGSRV_DISABLE_GETPRINT','no'))
+    CONFIG.set('projects.cache', 'preload_config'      , getenv('QGSRV_CACHE_PRELOAD_CONFIG',''))
 
     CONFIG.add_section('projects.schemes')
 
