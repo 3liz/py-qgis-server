@@ -1,4 +1,4 @@
 
-from .roothandler import RootHandler
-from .owshandler  import OwsHandler
+from .roothandler import RootHandler # noqa F401
+from .owshandler  import OwsHandler  # noqa F401
 

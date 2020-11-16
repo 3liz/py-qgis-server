@@ -21,7 +21,7 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 export QT_LOGGING_RULES="*.debug=false;*.warning=false"
 
 # Minimal pylint supports
-pylint -E -d E0401,E1101,E0611  pyqgisserver
+flake8 --ignore=E123,E2,E3,E5,W2,W3  pyqgisserver
 
 # Run new tests
 cd tests/unittests && pytest -v $@

@@ -9,15 +9,12 @@
 """ Qgis worker pool
 """
 import os
-import sys
 import logging
 import threading
 import time
 import signal
 
-from functools import partial
-
-from multiprocessing import Process, cpu_count
+from multiprocessing import Process
 from multiprocessing.util import Finalize
 
 from .qgsworker import QgsRequestHandler
@@ -46,10 +43,8 @@ class Pool:
         self._pool = []
         self._repopulate_pool()
 
-        self._worker_handler = threading.Thread(
-             target=Pool._handle_workers,
-             args=(self, )
-        )
+        self._worker_handler = threading.Thread(target=Pool._handle_workers,
+                                                args=(self, ))
         
         self._start_time = time.time()
 
@@ -95,7 +90,7 @@ class Pool:
         """
         for _ in range(self._num_workers - len(self._pool)):
             w = Process(target=QgsRequestHandler.run, args=(self._router,),
-                                   kwargs={ 'broadcastaddr': self._broadcastaddr } )
+                        kwargs={ 'broadcastaddr': self._broadcastaddr } )
             self._pool.append(w)
             w.name = w.name.replace('Process', 'QgisWorker')
             w.daemon = True

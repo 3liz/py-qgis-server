@@ -107,10 +107,10 @@ def manage_processes( max_restarts: int, logger: logging.Logger = None ) -> Unio
         id = _children.pop(pid)
         if os.WIFSIGNALED(status):
             logger.warning("child %d (pid %d) killed by signal %d, restarting",
-                            id, pid, os.WTERMSIG(status))
+                           id, pid, os.WTERMSIG(status))
         elif os.WEXITSTATUS(status) != 0:
             logger.warning("child %d (pid %d) exited with status %d, restarting",
-                            id, pid, os.WEXITSTATUS(status))
+                           id, pid, os.WEXITSTATUS(status))
         else:
             logger.debug("child %d (pid %d) exited normally", id, pid)
             continue

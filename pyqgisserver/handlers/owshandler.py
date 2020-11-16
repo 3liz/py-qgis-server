@@ -14,7 +14,7 @@ from time import time
 from ..logger import log_rrequest
 from ..zeromq.client import RequestTimeoutError, RequestGatewayError
 
-from .basehandler import BaseHandler, HTTPError
+from .basehandler import BaseHandler
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -51,7 +51,9 @@ class OwsHandler(BaseHandler):
                 'X-Map-Location': project_path 
             }
 
-            if proxy_url: headers['X-Proxy-Location']=proxy_url
+            if proxy_url: 
+                headers['X-Proxy-Location']=proxy_url
+
             if self.has_body_arguments:
                 # Do not let qgis server handle url encoded prameters
                 method = 'GET'
@@ -88,16 +90,16 @@ class OwsHandler(BaseHandler):
                 self.write(response.data)
 
         except RequestTimeoutError:
-              status = 504
-              delta = time() - reqtime
-              self.send_error(status, reason="Request timeout error")
+            status = 504
+            delta = time() - reqtime
+            self.send_error(status, reason="Request timeout error")
         except RequestGatewayError:
-              status = 502
-              delta = time() - reqtime
-              self.send_error(status, reason="Backend request error")
+            status = 502
+            delta = time() - reqtime
+            self.send_error(status, reason="Backend request error")
 
         if self._monitor:
-              self._monitor.emit( status, self.request.arguments,  delta)
+            self._monitor.emit( status, self.request.arguments,  delta)
 
     async def get(self):
         """ Handle Get method

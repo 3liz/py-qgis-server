@@ -18,12 +18,12 @@ Options
 """
 
 import os
-import sys
 import configparser
 import logging
 import functools
 
 from typing import Any
+from pyqgisservercontrib.core import componentmanager
 
 getenv = os.getenv
 
@@ -127,7 +127,6 @@ def validate_config_path(confname, confid, optional=False):
 #
 # Published services
 #
-from pyqgisservercontrib.core import componentmanager
 
 NO_DEFAULT=object()
 

@@ -68,7 +68,7 @@ class Broadcast:
                 pub.send(BCAST_RESTART, zmq.NOBLOCK)
             except zmq.ZMQError as err:
                 if err.errno != zmq.EAGAIN:
-                  LOGGER.error("Broadcast Error %s\n%s", err, traceback.format_exc())
+                    LOGGER.error("Broadcast Error %s\n%s", err, traceback.format_exc())
             # Update files to watch
             self.update_files()
 

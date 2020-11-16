@@ -75,15 +75,13 @@ class PostgresProtocolHandler:
                 LOGGER.error("Postgres handler: Missing parameter %s: %s", url.geturl(), str(exc)) 
                 raise FileNotFoundError(url.geturl())
 
-            connexion_params = dict(
-               host=url.hostname,
-               port=url.port,
-               user=url.username,
-               password=url.password,
-               database=database,
-               # Treats remaining params as supported psql client options
-               **params 
-            )
+            connexion_params = dict(host=url.hostname,
+                                    port=url.port,
+                                    user=url.username,
+                                    password=url.password,
+                                    database=database,
+                                    # Treats remaining params as supported psql client options
+                                    **params)
             urlstr = url.geturl()
         else:
             # Secure mode: allow only secure parameter
@@ -96,12 +94,10 @@ class PostgresProtocolHandler:
                 LOGGER.error("Postgres handler: Missing parameter %s: %s", url.geturl(), str(exc)) 
                 raise FileNotFoundError(url.geturl())
 
-            connexion_params = dict(
-               user=url.username,
-               database=database,
-               # Treats remaining params as supported psql client options
-               **params 
-            )
+            connexion_params = dict(user=url.username,
+                                    database=database,
+                                    # Treats remaining params as supported psql client options
+                                    **params)
             netloc = '%s@' % url.username if url.username else ''
             # Create secure url
             urlstr = "postgres://%s/?%s" % (netloc,'&'.join('%s=%s' % (k,v) for k,v in params.items()))

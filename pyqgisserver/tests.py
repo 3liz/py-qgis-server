@@ -6,22 +6,15 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import sys
 import asyncio
 import tornado.platform.asyncio
 from tornado.testing import AsyncHTTPTestCase
-from contextlib import contextmanager
-import shutil
-import tempfile
 import lxml.etree
 import logging
-import traceback
 
-from contextlib import contextmanager
 from typing import Any, Mapping
 
 from .config import load_configuration
-from .logger import setup_log_handler
 from .runtime import (Application, 
                       create_worker_pool,
                       create_broker_process,
@@ -131,7 +124,7 @@ class OWSTestClient:
 
     def post(self, data: Any, headers: Mapping[str,str]=None, path: str='/ows/') -> HTTPTestResponse:
         return HTTPTestResponse(self._testcase.fetch(path, method='POST', body=data, raise_error=False,
-                               headers=headers))
+                                headers=headers))
 
     def get(self, query: str, headers: Mapping[str,str]=None, path: str='/ows/') -> HTTPTestResponse:
         return HTTPTestResponse(self._testcase.fetch(path + query, raise_error=False, 
@@ -141,7 +134,7 @@ class OWSTestClient:
         return HTTPTestResponse(self._testcase.fetch(path, method='PUT', body=data, raise_error=False,
                                 headers=headers))
 
-    def post_xml(self, doc: 'xml', headers: Mapping[str,str]=None, path: str='/ows/') -> HTTPTestResponse:
+    def post_xml(self, doc: lxml.etree.Element, headers: Mapping[str,str]=None, path: str='/ows/') -> HTTPTestResponse:
         return self.post(data=lxml.etree.tostring(doc, pretty_print=True), headers=headers, path=path)
 
 

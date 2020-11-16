@@ -15,14 +15,12 @@
         - https://qgis.org/pyqgis/master/server/QgsBufferServerRequest.html
 """
 import os
-import sys
 import logging
 import traceback
 
 from typing import Dict
 
 from qgis.PyQt.QtCore import QBuffer, QIODevice, QByteArray
-from qgis.core import QgsProject
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
@@ -32,7 +30,6 @@ from .qgscache.cachemanager import (get_cacheservice,
                                     StrictCheckingError,
                                     PathNotAllowedError)
 
-from .config  import confservice
 from .plugins import load_plugins
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -114,10 +111,10 @@ class Response(QgsServerResponse):
             # push the sentinel
             if send_more and self._finish:
                 self._handler.send( b'', False )
-        except:
+        except Exception:
             LOGGER.error("Caught Exception (worker: %s, msg: %s):\n%s",
-                          self._handler.identity, self._handler.msgid,
-                          traceback.format_exc())
+                         self._handler.identity, self._handler.msgid,
+                         traceback.format_exc())
             del self._handler.headers['Content-Type']
             self.sendError(500, "Internal server error")
 
@@ -155,7 +152,7 @@ class Response(QgsServerResponse):
                 self._finish = True
             else:
                 LOGGER.error("Cannot set error after header written")
-        except:
+        except Exception:
             LOGGER.critical("Unrecoverable exception:\n%s", traceback.format_exc())
 
 
@@ -223,9 +220,9 @@ class QgsRequestHandler(RequestHandler):
             project, updated = get_cacheservice().lookup(project_location)
             config_path = project.fileName()
             if updated: 
-               # Needed to cleanup cached capabilities
-               LOGGER.debug("Cleaning config cache entry %s", config_path)
-               iface.removeConfigCacheEntry(config_path)
+                # Needed to cleanup cached capabilities
+                LOGGER.debug("Cleaning config cache entry %s", config_path)
+                iface.removeConfigCacheEntry(config_path)
         except StrictCheckingError:
             response.sendError(422,"Invalid layers for project '%s' - strict mode on" % project_location)
         except PathNotAllowedError:
@@ -244,15 +241,14 @@ def main():
     import os
     import sys
     import argparse
-    from .zeromq.worker import run_worker
-    from .version import __description__, __version__
+    from .version import __version__
     from .config  import (confservice, load_configuration, read_config_file, validate_config_path)
     from .logger import setup_log_handler
 
     parser = argparse.ArgumentParser(description='Qgis Server Worker')
     parser.add_argument('-d','--debug', action='store_true', default=False, help="debug mode") 
     parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
-            default=None, help="Configuration file")
+                        default=None, help="Configuration file")
     parser.add_argument('--host'     , metavar="host"   , default='localhost' , help="router host")   
     parser.add_argument('--router'   , metavar='address', default='tcp://{host}:18080', help="router address")
     parser.add_argument('--broadcast', metavar='address', default='tcp://{host}:18090', help="broadcast address")

@@ -12,7 +12,6 @@
 import os
 import sys
 import logging
-import traceback
 import glob
 import configparser
 
@@ -24,7 +23,9 @@ LOGGER = logging.getLogger('SRVLOG')
 
 server_plugins = {}
 
-class PluginError(Exception): pass
+
+class PluginError(Exception): 
+    pass
 
 
 def checkQgisVersion(minver: str, maxver: str) -> bool:
@@ -54,8 +55,6 @@ def checkQgisVersion(minver: str, maxver: str) -> bool:
 def find_plugins(path: str) -> Generator[str,None,None]:
     """ return list of plugins in given path
     """
-    from qgis.core import Qgis
-
     for plugin in glob.glob(path + "/*"):
         LOGGER.debug("Looking for plugin in %s", plugin)
         if not os.path.isdir(plugin):
@@ -94,7 +93,7 @@ def find_plugins(path: str) -> Generator[str,None,None]:
 
 
 
-def load_plugins(serverIface: 'QgsServerInterface') -> None:
+def load_plugins(serverIface: 'QgsServerInterface') -> None: # noqa F821
     """ Start all plugins
     """
 
@@ -114,7 +113,7 @@ def load_plugins(serverIface: 'QgsServerInterface') -> None:
             # Initialize the plugin
             server_plugins[plugin] = package.serverClassFactory(serverIface)
             LOGGER.info("Loaded plugin %s",plugin)
-        except:
+        except Exception:
             LOGGER.error("Error loading plugin %s",plugin)
             raise 
     

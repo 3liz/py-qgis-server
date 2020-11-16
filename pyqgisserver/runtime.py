@@ -11,8 +11,6 @@ import sys
 import asyncio
 import logging
 import signal
-import traceback
-import time
 
 import tornado.web
 import tornado.platform.asyncio
@@ -32,9 +30,9 @@ from .utils import process
 from .monitor import Monitor
 from .broadcast import Broadcast
 
-LOGGER=logging.getLogger('SRVLOG')
-
 from pyqgisservercontrib.core.filters import ServerFilter
+
+LOGGER=logging.getLogger('SRVLOG')
 
 
 def load_access_policies( base_uri: str ) -> Mapping[str,List[ServerFilter]]:
@@ -145,11 +143,10 @@ def create_broker_process( ipcaddr: str ) -> Process:
 
     LOGGER.info("Starting broker process")
     p = Process(target=broker.run_broker, kwargs=dict(
-            inaddr   = ipcaddr,
-            outaddr  = cfg['bindaddr'],
-            maxqueue = cfg.getint('maxqueue'),
-            timeout  = cfg.getint('timeout')
-    ))
+                inaddr   = ipcaddr,
+                outaddr  = cfg['bindaddr'],
+                maxqueue = cfg.getint('maxqueue'),
+                timeout  = cfg.getint('timeout')))
     p.start()
     return p
 
@@ -256,7 +253,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     server = None
 
     if user:
-       setuid(user)
+        setuid(user)
 
     def close_sockets(sockets):
         for sock in sockets:
@@ -264,7 +261,6 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
 
     worker_pool   = None
     broker_pr     = None
-    broker_client = None
 
     # Setup ssl config
     if confservice.getboolean('server','ssl'):
@@ -284,7 +280,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
 
                 # Note that manage_processes(...) never return in main process 
                 # and call exit(0) which will be caught by SystemExit exception
-                task_id = process.manage_processes(max_restarts=5, logger=LOGGER)
+                process.manage_processes(max_restarts=5, logger=LOGGER)
 
                 assert False, "Not Reached"
         else:
@@ -317,7 +313,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             # Make sure that child processes are terminated
             print("Terminating child processes", file=sys.stderr)
             process.terminate_childs()
-    except (KeyboardInterrupt, SystemExit) as e:
+    except (KeyboardInterrupt, SystemExit):
         pass
 
     # Teardown

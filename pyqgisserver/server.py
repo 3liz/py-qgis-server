@@ -42,9 +42,9 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
 
     cli_parser.add_argument('-d','--debug', action='store_true', default=False, help="debug mode") 
     cli_parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
-            default=None, help="Configuration file")
+                            default=None, help="Configuration file")
     cli_parser.add_argument('--version', action='store_true', 
-            default=False, help="Return version number and exit")
+                            default=False, help="Return version number and exit")
     cli_parser.add_argument('-p','--port'    , type=int, help="http port", dest='port', default=argparse.SUPPRESS)
     cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=argparse.SUPPRESS, help="interface to bind to", dest='interfaces')
     cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=argparse.SUPPRESS, help="num workers", dest='workers')
@@ -57,7 +57,7 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
 
     print_version()
     if args.version:
-       sys.exit(1)
+        sys.exit(1)
 
     load_configuration()
 

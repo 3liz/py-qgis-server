@@ -13,8 +13,6 @@ import sys
 import asyncio
 import zmq
 import zmq.asyncio
-import weakref
-import time
 import pickle
 import logging
 import uuid
@@ -22,11 +20,8 @@ import traceback
 
 from typing import Mapping, Any
 
-from collections import namedtuple
+from .messages import RequestMessage
 
-from .messages import RequestMessage, ReplyMessage
-
-from ..version import __description__, __version__
 from ..logger import setup_log_handler
 
 LOGGER=logging.getLogger('SRVLOG')
@@ -177,7 +172,7 @@ class AsyncClient:
         # Wait for response
         try:
             return await handler._get(timeout)
-        except:
+        except Exception:
             self._handlers.pop(correlation_id,None)
             raise
 
@@ -188,7 +183,7 @@ class AsyncClient:
                 return None
             else:
                 return data
-        except:
+        except Exception:
             self._handlers.pop(response.correlation_id,None)
             raise
 

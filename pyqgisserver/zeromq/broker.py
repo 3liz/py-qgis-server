@@ -13,7 +13,6 @@
 """
 
 import sys
-import asyncio
 import zmq
 import logging
 import traceback
@@ -24,7 +23,6 @@ from collections import deque
 
 from .messages import WORKER_READY
 
-from ..version import __description__, __version__
 from ..logger import setup_log_handler
 
 LOGGER=logging.getLogger('SRVLOG')
@@ -86,7 +84,7 @@ def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000)
                     if client_id == WORKER_READY:
                         # Worker is available on new connection
                         # Mark worker as available
-                        if not worker_id in workers:
+                        if worker_id not in workers:
                             LOGGER.debug("READY %s", worker_id)
                             workers.add(worker_id)
                     else:
@@ -97,7 +95,7 @@ def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000)
                         except zmq.ZMQError as err:
                             # ZMQ Will raise error if no client_id connected
                             LOGGER.error("SND worker: %s -> client: %s', %s ,errno %s", worker_id, client_id, err, err.errno)
-                except Exception as err:
+                except Exception:
                     LOGGER.error("%s", traceback.format_exc())
 
             # Handle incoming client requests
@@ -114,7 +112,7 @@ def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000)
                             LOGGER.error("SND ERR -> client: %s, %s, errno %s", client_id, err, err.errno)
                     else:
                         waiting.appendleft((time(), client_id, msgid, data))
-                except Exception as err:
+                except Exception:
                     LOGGER.error("%s", traceback.format_exc())
 
             # Handle waiting requests

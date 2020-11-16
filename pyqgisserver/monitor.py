@@ -43,10 +43,10 @@ class Monitor:
                       ROUTING_KEY=self._routing_key)
         log_msg = json.dumps(params)
         self._client.publish( log_msg ,
-                routing_key  = self._routing_key,
-                expiration   = 3000,
-                content_type = 'application/json',
-                content_encoding ='utf-8')
+                              routing_key  = self._routing_key,
+                              expiration   = 3000,
+                              content_type = 'application/json',
+                              content_encoding ='utf-8')
 
     @classmethod
     def initialize(cls) -> 'Monitor':

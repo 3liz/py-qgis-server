@@ -8,12 +8,10 @@
 
 """ Base Request handler 
 """
-import os
 import tornado.web
 import logging
 import json
-import traceback
-from tornado.web import HTTPError
+from tornado.web import HTTPError # noqa F401
 
 from urllib.parse import urlencode
 
@@ -102,8 +100,8 @@ class BaseHandler(tornado.web.RequestHandler):
         req = self.request
         if http_proxy:
             proxy_url = self._cfg.get('proxy_url') or \
-                        req.headers.get('X-Proxy-Location') or \
-                        "{0.protocol}://{0.host}{0.path}".format(req) 
+                req.headers.get('X-Proxy-Location') or \
+                "{0.protocol}://{0.host}{0.path}".format(req) 
             proxy_url = proxy_url.format(**kwargs)
         else:
             proxy_url = "{0.protocol}://{0.host}{0.path}".format(req)

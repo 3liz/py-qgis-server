@@ -25,7 +25,7 @@ qgis_application = None
 
 
 def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False, verbose: bool=False, 
-                           cleanup: bool=True, logger : logging.Logger=None, logprefix :str='Qgis:') -> 'QgsApplication':
+                           cleanup: bool=True, logger : logging.Logger=None, logprefix :str='Qgis:') -> 'QgsApplication':  # noqa: F821
     """ Start qgis application
 
         :param boolean enable_gui: Enable graphical interface, default to False
@@ -106,7 +106,7 @@ def init_processing() -> None:
 def install_logger_hook( logger: logging.Logger, logprefix: str, verbose: bool=False ) -> None:
     """ Install message log hook
     """
-    from qgis.core import Qgis, QgsApplication, QgsMessageLog
+    from qgis.core import Qgis, QgsApplication
     # Add a hook to qgis  message log 
     def writelogmessage(message, tag, level):
         arg = '{} {}: {}'.format( logprefix, tag, message )
@@ -138,17 +138,16 @@ def set_proxy_configuration( logger: logging.Logger ) -> None:
         return
 
     logger.info("Proxy configuration enabled: %s:%s, type: %s",
-            proxy.hostName(), proxy.port(), 
-            {  QNetworkProxy.DefaultProxy:    'DefaultProxy',
-               QNetworkProxy.Socks5Proxy:     'Socks5Proxy' ,
-               QNetworkProxy.HttpProxy:       'HttpProxy'   ,
-               QNetworkProxy.HttpCachingProxy:'HttpCachingProxy' ,
-               QNetworkProxy.HttpCachingProxy:'FtpCachingProxy' ,
-            }.get(proxy_type,'Undetermined'))
-        
+                proxy.hostName(), proxy.port(), 
+                { QNetworkProxy.DefaultProxy:    'DefaultProxy',
+                  QNetworkProxy.Socks5Proxy:     'Socks5Proxy' ,
+                  QNetworkProxy.HttpProxy:       'HttpProxy'   ,
+                  QNetworkProxy.HttpCachingProxy:'HttpCachingProxy' ,
+                  QNetworkProxy.HttpCachingProxy:'FtpCachingProxy' ,
+                }.get(proxy_type,'Undetermined')) # noqa E124
  
 
-def init_qgis_server(**kwargs) -> 'QgsServer':
+def init_qgis_server(**kwargs) -> 'QgsServer': # noqa: F821
     """ Init Qgis server
     """
     start_qgis_application(**kwargs)

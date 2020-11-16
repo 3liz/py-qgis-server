@@ -16,25 +16,20 @@
     3. Return qgis server responses
 """
 import sys
-import os
 import logging
 import traceback
 import zmq
 import pickle
-import signal
 import uuid
-import time
 
 from typing import Callable, TypeVar
 
-
-from ..version import __description__, __version__
 from ..logger import setup_log_handler
-
-LOGGER=logging.getLogger('SRVLOG')
 
 from .messages import (WORKER_READY, ReplyMessage)
 from .supervisor import Client as SupervisorClient
+
+LOGGER=logging.getLogger('SRVLOG')
 
 # Define an abstract type for HTTPRequest
 HTTPRequest = TypeVar('HTTPRequest')
@@ -157,17 +152,17 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
             # Handle broadcast restart
             try:
                 if broadcastaddr and sub.recv(flags=zmq.NOBLOCK)==b'RESTART':
-                   # There is no really way to restart
-                   # so exit and let the framework restart a new worker
-                   LOGGER.info("Exiting on RESTART notification")
-                   break
+                    # There is no really way to restart
+                    # so exit and let the framework restart a new worker
+                    LOGGER.info("Exiting on RESTART notification")
+                    break
             except zmq.error.Again:
                 pass
     except (KeyboardInterrupt, SystemExit):
-            pass
+        pass
 
     if broadcastaddr:
-       sub.close()
+        sub.close()
     # Terminate context
     sock.close()
     # XXX Investigate why contexte.term() is hanging 

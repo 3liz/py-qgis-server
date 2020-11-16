@@ -9,12 +9,11 @@
 """ Cache manager for Qgis Projects
 """
 
-import os
 import logging
 import urllib.parse
 
 from urllib.parse import urlparse, urljoin, parse_qs
-from typing import TypeVar, Tuple, Dict
+from typing import Tuple
 from collections import namedtuple
 from pathlib import Path
 
@@ -26,8 +25,8 @@ from qgis.server import QgsServerProjectUtils
 
 from pyqgisservercontrib.core import componentmanager
 
-# Import default handlers
-from .handlers import *
+# Import default handlers for auto-registration
+from .handlers import * # noqa: F403,F401
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -180,7 +179,7 @@ class QgsCacheManager:
         LOGGER.debug("Reading Qgis project %s", path)
         project = self._create_project()
 
-        readflags = QgsProject.ReadFlags(); 
+        readflags = QgsProject.ReadFlags()
         if self._trust_layer_metadata:
             readflags |= QgsProject.FlagTrustLayerMetadata
         if self._disable_getprint:
@@ -205,7 +204,7 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
         """
         super().handleBadLayers( layers )
 
-        nameElements = (l.firstChildElement("layername") for l in layers if l)
+        nameElements = (lyr.firstChildElement("layername") for lyr in layers if lyr)
         self.badLayerNames = set(elem.text() for elem in nameElements if elem)
 
     def validatLayers( self, project: QgsProject ) -> bool:
@@ -239,7 +238,7 @@ def preload_projects_file( path: Path, cacheservice: QgsCacheManager ) ->  int:
     
     # Read the projects, strip comments 
     with conf_file.open() as fp:
-        for p in filter(None,(l.strip('\n ').partition('#')[0] for l in fp.readlines())):
+        for p in filter(None,(line.strip('\n ').partition('#')[0] for line in fp.readlines())):
             p = p.strip(' ')
             try:
                 project, updated = cacheservice.lookup(p)

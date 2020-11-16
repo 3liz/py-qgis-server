@@ -18,7 +18,6 @@
 
 import os
 import asyncio
-import signal
 import zmq.asyncio
 import zmq
 import traceback

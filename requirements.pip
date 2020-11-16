@@ -1,4 +1,4 @@
 requests
 pytest >= 5.3
-pylint
+flake8
 
