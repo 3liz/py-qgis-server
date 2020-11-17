@@ -18,7 +18,7 @@
 import logging
 
 from collections import namedtuple
-from typing import Any, Tuple, Callable, List
+from typing import Any, Callable
 
 class ComponentManagerError(Exception):
     pass
@@ -70,11 +70,11 @@ class ComponentManager:
         LOGGER.debug("Registering service: %s", contractID)
         self._contractIDs[contractID] = FactoryEntry( nullFactory , service )
 
-    def create_instance( contractID: str ) -> Any:
+    def create_instance( self, contractID: str ) -> Any:
         """ Create an instance of the object referenced by its
             contract id.
         """
-        fe = self._contractIDs.get( contractID );
+        fe = self._contractIDs.get( contractID )
         if fe:
             return fe.create_instance()
         else:
@@ -83,7 +83,7 @@ class ComponentManager:
     def get_service( self, contractID: str ) -> Any:
         """ Return instance object as singleton
         """
-        fe = self._contractIDs.get( contractID );
+        fe = self._contractIDs.get( contractID )
         if fe is None:
             raise FactoryNotFoundError(contractID)
         if fe.service is None:
@@ -104,7 +104,7 @@ def get_service( contractID: str ) -> Any:
 def create_instance( contractID: str ) -> Any:
     """ Alias to component_manager.create_instance
     """
-    return gComponentManager.create_instance( contract )
+    return gComponentManager.create_instance( contractID )
 
 
 def register_entrypoints( category: str, *args, **kwargs ) -> None:

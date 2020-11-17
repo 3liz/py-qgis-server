@@ -33,13 +33,10 @@
         return [ myfilter1, myfilter2 ]
 """
 
-import os
-import functools
 import logging
 import tornado.web
 
-from typing import Coroutine, Mapping, List, Callable, Awaitable
-from tornado.web import HTTPError
+from typing import Coroutine, Callable, Awaitable
 
 LOGGER = logging.getLogger('SRVLOG')
 

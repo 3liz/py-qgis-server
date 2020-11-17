@@ -16,7 +16,6 @@ UpdateFunc = Callable[[List[str]],None]
 def watchfiles(watched_files: List[str], updatefunc: UpdateFunc,  check_time: int=500) -> ioloop.PeriodicCallback:
     """Begins watching source files for changes.
     """
-    io_loop = ioloop.IOLoop.current()
     modify_times = {}
     callback = functools.partial(_update_callback, updatefunc, watched_files, modify_times)
     scheduler = ioloop.PeriodicCallback(callback, check_time)
