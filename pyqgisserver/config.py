@@ -31,6 +31,11 @@ LOGGER = logging.getLogger('SRVLOG')
 
 CONFIG = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())    
 
+def getenv2( env1, env2, default):
+    """ Get value from alternate env variable
+    """
+    return getenv(env1,getenv(env2,default))
+
 
 def print_config( fp ):
     """ print configuration to file
@@ -73,9 +78,12 @@ def load_configuration():
     CONFIG.set('projects.cache', 'rootdir' , getenv('QGSRV_CACHE_ROOTDIR',''))
     CONFIG.set('projects.cache', 'strict_check' , getenv('QGSRV_CACHE_STRICT_CHECK','yes'))
     CONFIG.set('projects.cache', 'insecure'     , getenv('QGSRV_CACHE_INSECURE','no'))
-    CONFIG.set('projects.cache', 'trust_layer_metadata', getenv('QGSRV_TRUST_LAYER_METADATA','no'))
-    CONFIG.set('projects.cache', 'disable_getprint'    , getenv('QGSRV_DISABLE_GETPRINT','no'))
     CONFIG.set('projects.cache', 'preload_config'      , getenv('QGSRV_CACHE_PRELOAD_CONFIG',''))
+    # Use same variable name as Qgis server options
+    CONFIG.set('projects.cache', 'trust_layer_metadata', 
+               getenv2('QGSRV_TRUST_LAYER_METADATA','QGIS_SERVER_TRUST_LAYER_METADATA','no'))
+    CONFIG.set('projects.cache', 'disable_getprint'    , 
+               getenv2('QGSRV_DISABLE_GETPRINT','QGIS_SERVER_DISABLE_GETPRINT','no'))
 
     CONFIG.add_section('projects.schemes')
 

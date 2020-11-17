@@ -186,6 +186,7 @@ config_options:
       section: projects.cache
       key: trust_layer_metadata
       tags: [ cache ]
+      alt_env: QGIS_SERVER_TRUST_LAYER_METADATA
       version_added: "1.4"
 
     - name: DISABLE_GETPRINT
@@ -199,6 +200,7 @@ config_options:
       section: projects.cache
       key: disable_getprint
       tags: [ cache ]
+      alt_env: QGIS_SERVER_DISABLE_GETPRINT
       version_added: "1.4"
 
     - name: CACHE_PRELOAD_CONFIG

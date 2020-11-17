@@ -45,6 +45,9 @@ Common Configuration Options
 :Deprecated alternatives: {{config['deprecated']['alternatives']}}
 {% endif %}
 :Env: QGSRV_{{config_option}}
+{% if config['alt_env'] -%}
+:Alternate name: {{ config['alt_env'] }}
+{% endif %}
 
 {% endfor %}
 {% endif %}

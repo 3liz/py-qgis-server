@@ -101,6 +101,7 @@ run: local
 		-e PYTHONWARNINGS=d \
 		-e QGIS_OPTIONS_PATH=/src/tests/qgis \
 		-e QGSRV_DATA_PATH=/.local/share/qgis-server \
+		-e QGIS_SERVER_TRUST_LAYER_METADATA=yes \
 		$(QGIS_IMAGE) $(SCRIPTS)/run_server.sh 
 
 

@@ -31,6 +31,7 @@ from .qgscache.cachemanager import (get_cacheservice,
                                     PathNotAllowedError)
 
 from .plugins import load_plugins
+from .config import confservice
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -186,6 +187,12 @@ class QgsRequestHandler(RequestHandler):
             if LOGGER.isEnabledFor(logging.DEBUG):
                 os.environ['QGIS_SERVER_LOG_LEVEL'] = '0'
                 os.environ['QGIS_DEBUG'] = '1'
+
+            cache_config = confservice['projects.cache']
+            if cache_config.getboolean('trust_layer_metadata'):
+                os.environ['QGIS_SERVER_TRUST_LAYER_METADATA'] = 'yes'
+            if cache_config.getboolean('disable_getprint'):
+                os.environ['QGIS_SERVER_DISABLE_GETPRINT'] = 'yes'
 
             LOGGER.debug("Initializing qgis server")
             qgsserver = init_qgis_server( enable_processing=False, 

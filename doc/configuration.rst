@@ -30,6 +30,7 @@ Port to listen to
 
 
 
+
 .. _SERVER_INTERFACES:
 
 SERVER_INTERFACES
@@ -43,6 +44,7 @@ Interfaces to listen to
 :Section: server
 :Key: interfaces
 :Env: QGSRV_SERVER_INTERFACES
+
 
 
 
@@ -61,6 +63,7 @@ The number of workers for processing requests
 
 
 
+
 .. _SERVER_ENABLE_FILTERS:
 
 SERVER_ENABLE_FILTERS
@@ -73,6 +76,7 @@ Enable filters as python extension
 :Section: server
 :Key: enable_filters
 :Env: QGSRV_SERVER_ENABLE_FILTERS
+
 
 
 
@@ -91,6 +95,7 @@ Indicates that the server is behind a reverse proxy
 
 
 
+
 .. _SERVER_PROXY_URL:
 
 SERVER_PROXY_URL
@@ -104,6 +109,7 @@ The url that must be seen by the client when the server is behind a proxy.
 :Section: server
 :Key: proxy_url
 :Env: QGSRV_SERVER_PROXY_URL
+
 
 
 
@@ -124,6 +130,7 @@ without dropping requests.
 
 
 
+
 .. _SERVER_PLUGINPATH:
 
 SERVER_PLUGINPATH
@@ -135,6 +142,7 @@ The path to qgis server plugins
 :Section: server
 :Key: pluginpath
 :Env: QGSRV_SERVER_PLUGINPATH
+
 
 
 
@@ -153,6 +161,7 @@ Enable SSL endpoint
 
 
 
+
 .. _SERVER_SSL_CERT:
 
 SERVER_SSL_CERT
@@ -167,6 +176,7 @@ Path to the SSL certificat file
 
 
 
+
 .. _SERVER_SSL_KEY:
 
 SERVER_SSL_KEY
@@ -178,6 +188,7 @@ Path to the SSL key file
 :Section: server
 :Key: ssl_key
 :Env: QGSRV_SERVER_SSL_KEY
+
 
 
 
@@ -197,6 +208,7 @@ header.
 
 
 
+
 .. _LOGGING_LEVEL:
 
 LOGGING_LEVEL
@@ -209,6 +221,7 @@ Set the logging level
 :Section: logging
 :Key: level
 :Env: QGSRV_LOGGING_LEVEL
+
 
 
 
@@ -228,6 +241,7 @@ The maximal number of Qgis projects held in cache. The cache strategy is LRU.
 
 
 
+
 .. _CACHE_ROOTDIR:
 
 CACHE_ROOTDIR
@@ -240,6 +254,7 @@ The directory location for Qgis project files.
 :Section: projects.cache
 :Key: rootdir
 :Env: QGSRV_CACHE_ROOTDIR
+
 
 
 
@@ -261,6 +276,7 @@ will be issued.
 
 
 
+
 .. _CACHE_INSECURE:
 
 CACHE_INSECURE
@@ -276,6 +292,7 @@ for the limitations induced in secure mode.
 :Section: projects.cache
 :Key: insecure
 :Env: QGSRV_CACHE_INSECURE
+
 
 
 
@@ -295,6 +312,8 @@ srid and by using estimated metadata on layer load. Since QGIS 3.16.
 :Section: projects.cache
 :Key: trust_layer_metadata
 :Env: QGSRV_TRUST_LAYER_METADATA
+:Alternate name: QGIS_SERVER_TRUST_LAYER_METADATA
+
 
 
 
@@ -314,6 +333,8 @@ not thread safe).
 :Section: projects.cache
 :Key: disable_getprint
 :Env: QGSRV_DISABLE_GETPRINT
+:Alternate name: QGIS_SERVER_DISABLE_GETPRINT
+
 
 
 
@@ -332,5 +353,6 @@ of OWS requests.
 :Section: projects.cache
 :Key: preload_config
 :Env: QGSRV_CACHE_PRELOAD_CONFIG
+
 
 
