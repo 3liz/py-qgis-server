@@ -1,7 +1,7 @@
 # qgis server makefile
 #
 
-VERSION:=1.4.0
+VERSION:=1.4.1
 
 ifndef CI_COMMIT_TAG
 VERSION_TAG=$(VERSION)rc0
@@ -56,7 +56,11 @@ dist: dirs manifest
 clean:
 	rm -rf $(BUILDDIR)
 
-test: docker-test
+test: lint docker-test
+
+lint:
+	@flake8 --ignore=E123,E2,E3,E5,W2,W3  pyqgisserver pyqgisservercontrib
+
 
 docker-%:
 	$(MAKE) -C tests/docker $* FLAVOR=$(FLAVOR)
