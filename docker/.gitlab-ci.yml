@@ -36,7 +36,7 @@ deploy_snap:
     refs:
        - master
   tags:
-    - infrav3
+    - infrav3-plain
 
 #-------------
 # Release
