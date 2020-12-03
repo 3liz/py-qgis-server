@@ -20,7 +20,7 @@ build-docker:
       - tags
       - master
   tags:
-    - infrav3
+    - infrav3-dind
 
 #-------------
 # deploy
@@ -54,7 +54,7 @@ release:
     refs:
       - tags
   tags:
-    - infrav3
+    - infrav3-dind
   variables:
     FACTORY_MANIFEST: "docker/factory.manifest"
 

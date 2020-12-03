@@ -14,7 +14,7 @@ tests:
   script:
     - make manifest docker-test FLAVOR=release
   tags:
-    - infrav3
+    - infrav3-dind
 
 #---------------
 # Build
