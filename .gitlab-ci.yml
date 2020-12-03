@@ -14,7 +14,7 @@ tests:
   script:
     - make manifest docker-test FLAVOR=ltr
   tags:
-    - infrav3
+    - infrav3-dind
 
 #---------------
 # Build
@@ -27,7 +27,7 @@ build:
   environment:
     name: snap
   tags:
-    - infrav3
+    - infrav3-plain
   only:
     refs:
       - tags
