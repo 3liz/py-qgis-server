@@ -5,7 +5,7 @@
 Description
 ===========
 
-Py-qgis-server is a asynchronous HTTP Qgis server written in python on top of the [tornado](http://www.tornadoweb.org/en/stable/) framework and the 0MQ messaging framework for distributing requests workers.
+Py-qgis-server is a asynchronous HTTP Qgis server written in python on top of the `tornado <http://www.tornadoweb.org/en/stable/>`_ framework and the 0MQ messaging framework for distributing requests workers.
 
 It is based on the new Qgis 3 server API for efficiently passing requests/responses using 0MQ messaging framework to workers.
 
@@ -117,7 +117,7 @@ The options are the same as
 Running with Docker
 -------------------
 
-Docker image is available on [docker-hub](https://hub.docker.com/r/3liz/qgis-map-server). 
+Docker image is available on `docker-hub <https://hub.docker.com/r/3liz/qgis-map-server>`_. 
 
 All options are passed with environment variables. See the :ref:`Configuration settings <configuration_settings>` 
 for a description of the options.
