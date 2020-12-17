@@ -12,7 +12,7 @@ from tornado.testing import AsyncHTTPTestCase
 import lxml.etree
 import logging
 
-from typing import Any, Mapping
+from typing import Any, Dict, Optional
 
 from .config import load_configuration
 from .runtime import (Application, 
@@ -122,20 +122,23 @@ class OWSTestClient:
     def __init__(self, testcase: HTTPTestCase) -> None:
         self._testcase = testcase
 
-    def post(self, data: Any, headers: Mapping[str,str]=None, path: str='/ows/') -> HTTPTestResponse:
+    def post(self, data: Any, headers: Optional[Dict]=None, path: str='/ows/') -> HTTPTestResponse:
         return HTTPTestResponse(self._testcase.fetch(path, method='POST', body=data, raise_error=False,
                                 headers=headers))
 
-    def get(self, query: str, headers: Mapping[str,str]=None, path: str='/ows/') -> HTTPTestResponse:
+    def get(self, query: str, headers: Optional[Dict]=None, path: str='/ows/') -> HTTPTestResponse:
         return HTTPTestResponse(self._testcase.fetch(path + query, raise_error=False, 
                                 headers=headers))
 
-    def put(self, data: Any, headers: Mapping[str,str]=None, path:  str='/ows/') -> HTTPTestResponse:
+    def put(self, data: Any, headers: Optional[Dict]=None, path:  str='/ows/') -> HTTPTestResponse:
         return HTTPTestResponse(self._testcase.fetch(path, method='PUT', body=data, raise_error=False,
                                 headers=headers))
 
-    def post_xml(self, doc: lxml.etree.Element, headers: Mapping[str,str]=None, path: str='/ows/') -> HTTPTestResponse:
-        return self.post(data=lxml.etree.tostring(doc, pretty_print=True), headers=headers, path=path)
+    def post_xml(self, doc: lxml.etree.Element, headers: Optional[Dict]=None, path: str='/ows/') -> HTTPTestResponse:
+        return self.post(data=lxml.etree.tostring(doc, pretty_print=True), 
+                         headers=headers, path=path)
 
-
+    def options( self, headers: Optional[Dict]=None, path: str='/ows/') -> HTTPTestResponse:
+        return HTTPTestResponse(self._testcase.fetch(path, method='OPTIONS', 
+                                headers=headers, raise_error=False))
 

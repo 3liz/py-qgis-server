@@ -12,9 +12,12 @@ import logging
 from time import time
 
 from ..logger import log_rrequest
-from ..zeromq.client import RequestTimeoutError, RequestGatewayError
+from ..zeromq.client import RequestTimeoutError, RequestGatewayError, AsyncClient
+from ..monitor import Monitor
 
 from .basehandler import BaseHandler
+
+from typing import Optional, Awaitable
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -23,7 +26,10 @@ class OwsHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
-    def initialize(self, client, timeout, monitor=None, filters=None, http_proxy=False):
+    def initialize(self, client: AsyncClient, timeout: int, 
+                   monitor: Optional[Monitor]=None, 
+                   filters=None, http_proxy: bool=False) -> None:
+
         super().initialize()
 
         self._client      = client
@@ -32,13 +38,13 @@ class OwsHandler(BaseHandler):
         self._filters     = filters
         self._proxy       = http_proxy
 
-    async def prepare(self):
+    async def prepare(self) -> Awaitable[None]:
         # Handle filters
         super().prepare()
         for filt in self._filters:
             await filt.apply( self )
 
-    async def handle_request(self, method, data=None ):
+    async def handle_request(self, method, data=None ) -> Awaitable[None]:
         reqtime = time()
         try:
             proxy_url = self.proxy_url(self._proxy)
@@ -98,16 +104,18 @@ class OwsHandler(BaseHandler):
         if self._monitor:
             self._monitor.emit( status, self.request.arguments,  delta)
 
-    async def get(self):
+    async def get(self) -> Awaitable[None]:
         """ Handle Get method
         """
         await self.handle_request('GET')
           
-    async def post(self):
+    async def post(self) -> Awaitable[None]:
         """ Handle Post method
         """
         await self.handle_request('POST', data=self.request.body)
         
-
-
+    def options(self) -> None:
+        """ Implement OPTION for validating CORS
+        """
+        self.set_option_headers('GET, POST, OPTIONS')
 

@@ -41,7 +41,18 @@ class Tests(HTTPTestCase):
         assert href.scheme   == urlref.scheme
         assert href.hostname == urlref.hostname
         assert href.path     == urlref.path
-        
+
+    def test_cors_options(self):
+        """ Test CORS options
+        """
+        rv = self.client.options( headers={ 'Origin': 'my.home' } )
+
+        assert rv.status_code == 200
+        assert 'Allow' in rv.headers
+        assert 'Access-Control-Allow-Methods' in rv.headers
+        assert 'Access-Control-Allow-Origin'  in rv.headers
+
+
     def test_lower_case_query_params(self):
         """ Test that we support lower case query param
         """

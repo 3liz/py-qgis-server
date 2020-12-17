@@ -15,6 +15,8 @@ from tornado.web import HTTPError # noqa F401
 
 from urllib.parse import urlencode
 
+from typing import Any, Union, Optional
+
 from ..version import __version__
 from ..config import confservice
 
@@ -24,7 +26,7 @@ LOGGER = logging.getLogger('SRVLOG')
 class BaseHandler(tornado.web.RequestHandler):
     """ Base class for HTTP request hanlers
     """
-    def initialize(self):
+    def initialize(self) -> None:
         super().initialize()
         self._links    = []
         self.connection_closed = False
@@ -32,30 +34,56 @@ class BaseHandler(tornado.web.RequestHandler):
         self._cfg   = confservice['server']
         self._cross_origin = self._cfg.getboolean('cross_origin')
 
-    def prepare(self):
+    def prepare(self) -> None:
         self.has_body_arguments = len(self.request.body_arguments)>0
         # Replace query arguments to upper case:
         self.request.arguments = { k.upper():v for (k,v) in self.request.arguments.items() }
 
-    def encode_arguments(self):
+    def encode_arguments(self) -> str:
         return '?'+urlencode({k:v[0] for k,v in self.request.arguments.items()})
 
-    def compute_etag(self):
+    def compute_etag(self) -> None:
         # Disable etag computation
         pass
 
-    def set_default_headers(self):
+    def set_default_headers(self) -> None:
         """ Override defaults HTTP headers 
         """
         self.set_header("Server",__version__)
 
-    def on_connection_close(self):
+    def on_connection_close(self) -> None:
         """ Override, log and set 'connection_closed' to True
         """
         self.connection_closed = True
         self.logger.warning("Connection closed by client: {}".format(self.request.uri))
 
-    def write_json(self, chunk):
+    def set_option_headers(self, allow_header: Optional[str]=None) -> None:
+        """  Set correct headers for 'OPTION' method
+        """
+        if not allow_header:
+            allow_header = ', '.join( me for me in self.SUPPORTED_METHODS if hasattr(self, me.lower()) )
+        
+        self.set_header("Allow", allow_header)
+        if self.set_access_control_headers():
+            # Required in CORS context
+            # see https://developer.mozilla.org/fr/docs/Web/HTTP/M%C3%A9thode/OPTIONS
+            self.set_header('Access-Control-Allow-Methods', allow_header)
+
+    def set_access_control_headers(self) -> bool:
+        """  Handle Access control and cross origin headers (CORS)
+        """
+        origin = self.request.headers.get('Origin')
+        if origin:
+            if self._cross_origin:
+                self.set_header('Access-Control-Allow-Origin', '*')
+            else:
+                self.set_header('Access-Control-Allow-Origin', origin)
+                self.set_header('Vary', 'Origin')
+            return True
+        else:
+            return False
+
+    def write_json(self, chunk: Union[str,dict]) -> None:
         """ Write body as json
 
             The method will also set CORS implicitely for any origin
@@ -64,18 +92,11 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         if isinstance(chunk, dict):
             chunk = json.dumps(chunk, sort_keys=True)
-        self.set_header('Content-Type', 'application/json;charset=utf-8')   
-        # Allow CORS
-        origin = self.request.headers.get('Origin')
-        if origin:
-            if self._cross_origin:
-                self.set_header('Access-Control-Allow-Origin', '*')
-            else:
-                self.set_header('Access-Control-Allow-Origin', origin)
-                self.set_header('Vary', 'Origin')
+        self.set_header('Content-Type', 'application/json;charset=utf-8')
+        self.set_access_control_headers()
         self.write(chunk)
 
-    def write_error(self, status_code, **kwargs):
+    def write_error(self, status_code: int, **kwargs: Any) -> None:
         """ Override, format error as json
         """
         message = self._reason
@@ -83,7 +104,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if "exc_info" in kwargs:
             exception = kwargs['exc_info'][1]
             # Error was caused by a exception
-            message = f"{exception}"
+            message = "{}".format(exception)
                
         self.logger.error("%s", message)
         response = dict(status="error" if status_code != 200 else "ok",
@@ -93,17 +114,17 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write_json(response)
         self.finish()
 
-    def proxy_url(self, http_proxy=False, **kwargs):
+    def proxy_url(self, http_proxy: bool=False, **kwargs: Any) -> str:
         """ Return the proxy_url
         """
         # Replace the status url with the proxy_url if any
         req = self.request
         if http_proxy:
-            proxy_url = self._cfg.get('proxy_url')  or \
-                req.headers.get('X-Forwarded-Url')  or \
-                f"{req.protocol}://{req.host}{req.path}"
+            proxy_url = self._cfg.get('proxy_url') or \
+                req.headers.get('X-Forwarded-Url') or \
+                "{0.protocol}://{0.host}{0.path}".format(req) 
             proxy_url = proxy_url.format(**kwargs)
         else:
-            proxy_url = f"{req.protocol}://{req.host}{req.path}"
+            proxy_url = "{0.protocol}://{0.host}{0.path}".format(req)
         return proxy_url
 
