@@ -24,12 +24,12 @@ class Tests(HTTPTestCase):
         href = urlparse(elem[0].get(xlink+'href'))
         self.logger.info(href.geturl())
 
-    def test_proxy_location(self):
+    def test_forwarded_url(self):
         """ Test proxy location
         """
         urlref = urlparse('https://my.proxy.loc:9999/anywhere')
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities", 
-                             headers={ 'X-Proxy-Location': urlref.geturl() } )
+                             headers={ 'X-Forwarded-Url': urlref.geturl() } )
 
         assert rv.status_code == 200
         assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'

@@ -267,6 +267,10 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         LOGGER.info("SSL enabled")
         kwargs['ssl_options'] = create_ssl_options()
 
+    if confservice.getboolean('server','http_proxy'):
+        LOGGER.info("Proxy configuration enabled")
+        kwargs['xheaders'] = True
+
     # Run
     try:
         # Fork processes

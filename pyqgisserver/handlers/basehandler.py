@@ -83,7 +83,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if "exc_info" in kwargs:
             exception = kwargs['exc_info'][1]
             # Error was caused by a exception
-            message = "{}".format(exception)
+            message = f"{exception}"
                
         self.logger.error("%s", message)
         response = dict(status="error" if status_code != 200 else "ok",
@@ -99,11 +99,11 @@ class BaseHandler(tornado.web.RequestHandler):
         # Replace the status url with the proxy_url if any
         req = self.request
         if http_proxy:
-            proxy_url = self._cfg.get('proxy_url') or \
-                req.headers.get('X-Proxy-Location') or \
-                "{0.protocol}://{0.host}{0.path}".format(req) 
+            proxy_url = self._cfg.get('proxy_url')  or \
+                req.headers.get('X-Forwarded-Url')  or \
+                f"{req.protocol}://{req.host}{req.path}"
             proxy_url = proxy_url.format(**kwargs)
         else:
-            proxy_url = "{0.protocol}://{0.host}{0.path}".format(req)
+            proxy_url = f"{req.protocol}://{req.host}{req.path}"
         return proxy_url
 

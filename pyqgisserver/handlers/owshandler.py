@@ -52,7 +52,7 @@ class OwsHandler(BaseHandler):
             }
 
             if proxy_url: 
-                headers['X-Proxy-Location']=proxy_url
+                headers['X-Forwarded-Url']=proxy_url
 
             if self.has_body_arguments:
                 # Do not let qgis server handle url encoded prameters
