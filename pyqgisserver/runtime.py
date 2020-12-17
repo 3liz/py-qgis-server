@@ -288,10 +288,6 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             worker_pool = create_worker_pool(workers) if workers>0 else None
             sockets = bind_sockets(port, address=address)
 
-        # Install asyncio event loop after forking
-        # This is why we do not use server.bind/server.start
-        tornado.platform.asyncio.AsyncIOMainLoop().install()
-
         LOGGER.info("Running server on port %s:%s", address, port)
     
         application = Application(ipcaddr)

@@ -75,13 +75,10 @@ class OwsHandler(BaseHandler):
                 # Partial response
                 self.set_status(200)
                 self.write(response.data)
-                chunk = await self._client.fetch_more(response, timeout=self._timeout)
-                if chunk:
-                    await self.flush()
-                while chunk:
+                await self.flush()
+                async for chunk in self._client.fetch_more(response, timeout=self._timeout):
                     self.write(chunk)
-                    self.flush()
-                    chunk = await self._client.fetch_more(response)
+                    await self.flush()
                 delta = time() - reqtime
             elif status == 509:
                 self.send_error(status, reason="Server busy, please retry later")

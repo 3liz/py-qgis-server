@@ -37,12 +37,14 @@ class RequestProxyError(Exception):
 
 
 class AsyncResponseHandler:
-    def __init__(self, correlation_id: bytes, loop: asyncio.AbstractEventLoop) -> None:
+    def __init__(self, correlation_id: bytes) -> None:
+
+        loop = asyncio.get_event_loop()
+
         self.correlation_id = correlation_id
         self.headers = None
         # Create a future for sending the result
         self._future = loop.create_future()
-        self._loop   = loop
         self._chunks = None
         self._has_more = False
         self.data = None
@@ -66,7 +68,7 @@ class AsyncResponseHandler:
             # Create a queue to collect the remaining chunks
             if self.status == 206:
                 self._has_more = True
-                self._chunks = asyncio.Queue(loop=self._loop)
+                self._chunks = asyncio.Queue()
             # Send the result
             self._future.set_result(self)
         elif self._has_more:
@@ -115,8 +117,6 @@ class AsyncClient:
         sock.identity = self.identity
         sock.connect(address)
 
-        self._loop = asyncio.get_event_loop() 
-
         self._running = False
         self._handlers = {}
         self._socket   = sock
@@ -163,7 +163,7 @@ class AsyncClient:
             raise RequestGatewayError()
         
         # Create response handler and register it
-        handler = AsyncResponseHandler(correlation_id, self._loop)
+        handler = AsyncResponseHandler(correlation_id)
         self._handlers[correlation_id] = handler
         # Run poller if needed
         if not self._polling:
@@ -176,29 +176,18 @@ class AsyncClient:
             self._handlers.pop(correlation_id,None)
             raise
 
-    async def fetch_more( self, response, timeout=5 ) -> bytes:
+    async def fetch_more( self, response, timeout=5 ):
+        """ Request next chunk
+        """
         try:
-            data = await response._next_chunk(timeout)
-            if data == b"": 
-                return None
-            else:
-                return data
+            while True:
+                data = await response._next_chunk(timeout) 
+                if data == b"": 
+                    break
+                yield  data
         except Exception:
             self._handlers.pop(response.correlation_id,None)
             raise
-
-    ## Cannot use generator with python 3.5
-    #async def fetch_more( self, response, timeout=5 ):
-    #    """ Request next chunk
-    #    """
-    #    try:
-    #        while True:
-    #            data = await response._next_chunk(timeout) 
-    #            if data == b"": break
-    #            yield  data
-    #    except:
-    #        self._handlers.pop(response.correlation_id,None)
-    #        raise
 
     def terminate(self) -> None:
         LOGGER.info("Terminating client %s", self.identity)
@@ -228,14 +217,13 @@ if __name__ == '__main__':
 
     client = AsyncClient(args.router.format(host=args.host),bytes(args.identity.encode('ascii')))
     sleep(1) # Give some time to connection to establish
+
     async def fetch(index):
         try:
             response = await client.fetch(query="?service=WMS", data=b"Hello world from %d" % index)
             print("%d -> response = %s" % (index,response.data))
-            chunk = await client.fetch_more(response)
-            while chunk:
+            async for chunk in client.fetch_more(response):
                 print("%d -> chunk = %s" % (index,chunk))
-                chunk = await client.fetch_more(response)
         except RequestTimeoutError:
             LOGGER.error("%d -> TIMEOUT", index)
         except RequestGatewayError:
