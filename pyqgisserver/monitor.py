@@ -6,7 +6,9 @@ import traceback
 import json
 import os
 
-from typing import Union, Mapping
+from typing import Union, Dict, Optional
+
+from .config  import confservice
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -18,7 +20,7 @@ def _decode( b: Union[str,bytes] ) -> str:
 TAG_PREFIX = 'AMQP_GLOBAL_TAG_' 
 
 
-def _read_credentials( vhost: str, kwargs: Mapping[str,str] ) -> None:
+def _read_credentials( vhost: str, user: str ) -> Optional:  # ['PlainCredentials']
     """ Read credentials from passfile
     """
     credential_file = os.getenv("AMQPPASSFILE")
@@ -32,38 +34,48 @@ def _read_credentials( vhost: str, kwargs: Mapping[str,str] ) -> None:
         for line in fp.readlines():
             credentials = line.strip()
             if credentials and not credentials.startswith('#'):
-                vhost, user, passwd = credentials.split(':')
-                if vhost in ('*',vhost):
+                cr_vhost, cr_user, passwd = credentials.split(':')
+                if cr_vhost in ('*',vhost) and  cr_user in ('*',user):
                     LOGGER.info("Using credentials for user '%s' on vhost '%s'", user, vhost)
-                    kwargs['credentials'] = PlainCredentials(user,passwd)
-                    break
+                    return PlainCredentials(user,passwd)
+
 
 class Monitor:
 
-    def __init__(self, amqp_client ) -> None:
+    def __init__(self, amqp_client: 'AsyncPublisher', routing_key: str ) -> None: # noqa: F821
         """ Init AMQP monitor
         """
         self._client = amqp_client
-        self._routing_key = os.environ['AMQP_ROUTING']
-      
+
+        self,_dynamic_routing = routing_key.startswith('@')
+        if self._dynamic_routing:
+            self._routing_key = routing_key[1:]
+        else:
+            self._routing_key = routing_key
+
         # Get global tags
         tags = ((e.partition(TAG_PREFIX)[2],os.environ[e]) for e in os.environ if e.startswith(TAG_PREFIX))
         self._global_tags = { t:v for (t,v) in tags if t }
     
 
-    def emit( self, status:int, arguments: Mapping[str,str], delta: float ) -> None:
+    def emit( self, status:int, arguments: Dict, delta: float, meta: Dict ) -> None:
         """ Publish monitor data
         """
+        if self._dynamic_routing:
+            routing_key = self._routing_key.format(META=meta)
+        else:
+            routing_key = self._routing_key
+
         params = { k:_decode(v[0]) for k,v in arguments.items() }
         # Send all params to our logger
         ms = int(delta * 1000.0)
         params.update(self._global_tags,
                       RESPONSE_TIME=ms,
                       RESPONSE_STATUS=status,
-                      ROUTING_KEY=self._routing_key)
+                      ROUTING_KEY=routing_key)
         log_msg = json.dumps(params)
         self._client.publish( log_msg ,
-                              routing_key  = self._routing_key,
+                              routing_key  = routing_key,
                               expiration   = 3000,
                               content_type = 'application/json',
                               content_encoding ='utf-8')
@@ -72,8 +84,11 @@ class Monitor:
     def initialize(cls) -> 'Monitor':
         """ Register an instance of Monitor client
         """
-        if os.environ.get('AMQP_ROUTING') is None:
-            return
+        conf = confservice['monitor:amqp']
+
+        routing_key = conf.get('routing_key')
+        if not routing_key:
+            return 
 
         try:
             from amqpclient.concurrent import AsyncPublisher
@@ -81,15 +96,19 @@ class Monitor:
             LOGGER.warning("Cannot import 'amqpclient', AMQP logging will not be available")
             return None
 
-        hosts = os.environ['AMQP_HOST']
-        vhost = os.environ.get('AMQP_VHOST','/')
-        port  = os.environ.get('AMQP_PORT','5672')
+        hosts = conf['host']
+        user  = conf['user']
+        vhost = conf['vhost']
+        port  = conf['port']
 
         kwargs = {}
 
-        _read_credentials( vhost, kwargs )
+        if user:
+            credentials = _read_credentials( vhost, user )
+            if credentials:
+                kwargs['credentials'] = credentials
 
-        exchange = os.environ.get('AMQP_EXCHANGE','qgis_log')
+        exchange = conf['exchange']
 
         client = AsyncPublisher(host=hosts,port=int(port),virtual_host=vhost,
                                 reconnect_delay=0.001,
@@ -105,7 +124,7 @@ class Monitor:
 
         asyncio.ensure_future( connect() )
 
-        inst = cls(client)
+        inst = cls(client, routing_key)
         setattr(cls,'_instance', inst)
         return inst
 

@@ -102,7 +102,8 @@ class OwsHandler(BaseHandler):
             self.send_error(status, reason="Backend request error")
 
         if self._monitor:
-            self._monitor.emit( status, self.request.arguments,  delta)
+            self._monitor.emit( status, self.request.arguments,  delta, 
+                                meta=self.request.headers)
 
     async def get(self) -> Awaitable[None]:
         """ Handle Get method

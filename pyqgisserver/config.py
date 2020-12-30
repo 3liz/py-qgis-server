@@ -99,6 +99,17 @@ def load_configuration():
     # Address to bind broadcast address to - used only with proxy/worker configuration
     CONFIG.set('zmq', 'broadcastaddr', getenv('QGSRV_ZMQ_BROADCASTADDR','tcp://*:18090'))
 
+    #
+    # Monitoring (AMQP)
+    #
+    CONFIG.add_section('monitor:amqp')
+    CONFIG.set('monitor:amqp','routing_key', getenv('AMQP_ROUTING',''))
+    CONFIG.set('monitor:amqp','host'       , getenv('AMQP_HOST','amqp'))
+    CONFIG.set('monitor:amqp','user'       , getenv('AMQP_USER',''))
+    CONFIG.set('monitor:amqp','vhost'      , getenv('AMQP_VHOST','/'))
+    CONFIG.set('monitor:amqp','port'       , getenv('AMQP_PORT','5672'))
+    CONFIG.set('monitor:amqp','exchange'   , getenv('AMQP_EXCHANGE','qgis_log'))
+
 
 def read_config_file( cfgfile ):
     """ Read configuration from file
