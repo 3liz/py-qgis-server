@@ -1,152 +1,220 @@
 #
-# Copyright 2018 3liz
-# Author David Marteau
+# Copyright 2020 3liz
+# Author: David Marteau
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-""" Qgis worker pool
+#
 """
+The fork serve will ensure that forking processes 
+occurs from [almost] the same state.
+"""
+import sys
 import os
+import zmq
 import logging
-import threading
-import time
 import signal
+import time
+import traceback
+import asyncio
+
+from glob import glob
 
 from multiprocessing import Process
 from multiprocessing.util import Finalize
 
+from typing import Callable, Awaitable
+
+from .zeromq.supervisor import Supervisor
+from .zeromq.pool import Pool
+
+from .config import confservice
+
 from .qgsworker import QgsRequestHandler
 
-# Early failure min delay
-# If any process fail before that starting delay
-# we abort the whole process
-EARLY_FAILURE_DELAY = 5
+from pyqgisservercontrib.core.watchfiles import watchfiles
 
-RUN = 0
-CLOSE = 1
-TERMINATE = 2
+LOGGER=logging.getLogger('SRVLOG')
 
+class _RestartHandler:
 
-LOGGER = logging.getLogger('SRVLOG')
+    def __init__(self) -> None:
+        self._restart = None
+        self._watch_files = []
 
-class Pool:
+    def update_files(self) -> None:
+        """ update files to watch
+        """
+        conf = confservice['server']
 
-    def __init__(self, router: str, num_workers: int, broadcastaddr: str=None) -> None:
+        self._watch_files.clear()
+        restartmon = conf.get('restartmon')
+        if restartmon:
+            self._watch_files.append(restartmon)
 
-        self.critical_failure = False
+        # Check for plugins
+        pluginpath = conf.get('pluginpath')
+        if pluginpath:
+            plugins = glob(os.path.join(pluginpath,'*/.update-manifest'))
+            self._watch_files.extend(plugins)
 
-        self._router = router
-        self._broadcastaddr = broadcastaddr
-        self._num_workers = num_workers
-        self._pool = []
-        self._repopulate_pool()
+        LOGGER.debug("Updated watch files %s", self._watch_files)
 
-        self._worker_handler = threading.Thread(target=Pool._handle_workers,
-                                                args=(self, ))
+    def close(self) -> None:
+        if self._restart:
+            self._restart.stop()
+
+    def start(self, do_restart: Callable[[None],None]) -> None:
+        """ Create a restart handler
+        """
+        self.update_files()
         
-        self._start_time = time.time()
+        def callback( *args ):
+            do_restart()
+            self.update_files()
 
-        self._worker_handler._state = RUN
-        self._worker_handler.daemon = True
-        self._worker_handler.start()
+        check_time = confservice.getint('server','restartmon_check_time', 3000)
+        self._restart = watchfiles(self._watch_files, callback, check_time)
+        self._restart.start()
+
+
+class _Server:
+
+    def __init__(self, broadcastaddr: str, pool: Process,  timeout: int  ) -> None:
+
+        ctx = zmq.Context.instance()
+        pub = ctx.socket(zmq.PUB)
+        pub.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
+        pub.setsockopt(zmq.SNDHWM, 1)      # Max 1 item on send queue
+        pub.bind(broadcastaddr)
+
+        self._timeout = timeout 
+        self._sock = pub
+
+        LOGGER.debug("Started pool server")
+        self._pool = pool
+        self._supervisor = None
+        self._healthcheck = None
+
+        self._restart_handler = _RestartHandler()
+        self._restart_handler.start(self.restart)
 
         # Ensure that pool is terminated is called
         # at process exit
         self._terminate = Finalize(
             self, self._terminate_pool, 
-            args=(self._pool, self._worker_handler),
-            exitpriority=15
+            args=(self._pool,),
+            exitpriority=16
         )
 
-    def _join_exited_workers(self) -> bool:
-        """Cleanup after any worker processes which have exited due to reaching
-           their specified lifetime.  
-           
-           Returns True if any workers were cleaned up.
-        """
-        cleaned = False
-        for i in reversed(range(len(self._pool))):
-            worker = self._pool[i]
-            if worker.exitcode is not None:
-                if worker.exitcode != 0:
-                    # Handle early failure by killing current process
-                    LOGGER.warning("Qgis Worker exited with code %s", worker.exitcode) 
-                    if time.time() - self._start_time < EARLY_FAILURE_DELAY:
-                        # Critical exit
-                        LOGGER.critical("Critical worker failure. Aborting...")
-                        self.critical_failure = True
-                        os.kill(os.getpid(), signal.SIGABRT)
-                # worker exited
-                worker.join()
-                cleaned = True
-                del self._pool[i]
-        return cleaned
+    async def healthcheck(self) -> Awaitable[None]:
+        while True:
+            if self._pool.exitcode is not None and self._pool.exitcode != 0:
+                LOGGER.critical("Pool failure, exiting...")
+                raise SystemExit("Exiting because of unrecoverable error")
+            await asyncio.sleep(5)
+    
+    def start_supervisor(self):
+        """ Start supervisor independently
 
-    def _repopulate_pool(self) -> None:
-        """Bring the number of pool processes up to the specified number,
-        for use after reaping workers which have exited.
+            Note: It is no recommended to run supervisor before asyncio loop
+            has been properly set - for exemple when using a custom loop.
         """
-        for _ in range(self._num_workers - len(self._pool)):
-            w = Process(target=QgsRequestHandler.run, args=(self._router,),
-                        kwargs={ 'broadcastaddr': self._broadcastaddr } )
-            self._pool.append(w)
-            w.name = w.name.replace('Process', 'QgisWorker')
-            w.daemon = True
-            w.start()
+        if self._supervisor is None:
+            LOGGER.info("Initializing supervisor")
+            self._supervisor = Supervisor(self._timeout, lambda pid: os.kill(pid, signal.SIGKILL))
+            self._supervisor.run()
 
-    def _maintain_pool(self) -> None:
-        """Clean up any exited workers and start replacements for them.
-        """
-        if self._join_exited_workers():
-            self._repopulate_pool()
+        if self._healthcheck is None:
+            LOGGER.info("Initializing pool healthcheck")
+            self._healthcheck = asyncio.ensure_future(self.healthcheck())
 
     @classmethod
-    def _terminate_pool(cls, pool: 'Pool', worker_handler: threading.Thread) -> None: 
+    def _terminate_pool(cls, p: Process) -> None:
+        if p and hasattr(p, 'terminate'):
+            if p.exitcode is None:
+                p.terminate()
+            if p.is_alive():
+                p.join()
 
-        worker_handler._state = TERMINATE
-        # We must wait for the worker handler to exit before terminating
-        # workers because we don't want workers to be restarted behind our back.
-        if threading.current_thread() is not worker_handler:
-            worker_handler.join()
-
-        if pool and hasattr(pool[0], 'terminate'):
-            for p in pool:
-                if p.exitcode is None:
-                    p.terminate()
-
-        # Join pool workers
-        if pool and hasattr(pool[0], 'terminate'):
-            for p in pool:
-                if p.is_alive():
-                    # worker has not yet exited
-                    p.join()
-
-    @staticmethod
-    def _handle_workers(pool: 'Pool') -> None:
-        thread = threading.current_thread()
-        while thread._state == RUN:
-            pool._maintain_pool()
-            time.sleep(0.1)
-
-    def __reduce__(self) -> None:
-        raise NotImplementedError(
-            'cluster objects cannot be passed between processes or pickled'
-        )
-
-    def terminate(self) -> None:
-        self._worker_handler._state = TERMINATE
+    def terminate(self):
+        """ Terminate handler
+        """
+        LOGGER.info("Stopping pool server")
+        self._restart_handler.close()
+        if self._healthcheck:
+            self._healthcheck.cancel()
+        self._sock.close()
+        if self._supervisor:
+            self._supervisor.stop()
+        LOGGER.info("Stopping worker pool")
         self._terminate()
 
-    def kill(self, pid: int) -> bool:
-        """ Kill a running process
+    def broadcast(self, command: bytes ) -> None:
+        """ Broadcast notification to workers 
         """
         try:
-            p = next(filter(lambda w: w.pid == pid, self._pool))
-            #p.kill() # python 3.7
-            os.kill(p.pid, signal.SIGKILL)
-        except StopIteration:
-            pass
-        
+            self._sock.send(command, zmq.NOBLOCK)
+        except zmq.ZMQError as err:
+            if err.errno != zmq.EAGAIN:
+                LOGGER.error("Broadcast Error %s\n%s", err, traceback.format_exc())
+
+    def restart(self) -> None:
+        """ Send restart command
+        """
+        self.broadcast(b'RESTART')
+
+
+def create_poolserver(numworkers: int) -> _Server:
+    """ Run workers pool in its own process
+
+        This ensure that sub-processes all always forked from
+        the same parent context
+    """
+    router        = confservice['zmq']['bindaddr']
+    broadcastaddr = confservice['zmq']['broadcastaddr']
+    timeout       = confservice['server'].getint('timeout')
+
+    p = Process(target=run_worker_pool, args=(numworkers, broadcastaddr, router))
+    p.start()
+
+    poolserver = _Server(broadcastaddr, p, timeout)
+    return poolserver
+
+
+def run_worker_pool(numworkers: int, broadcastaddr: str, router: str) -> None:
+    """ Run a qgis worker pool
+
+        Ensure that child processes run in the main thread
+    """
+    # Try to exit gracefully
+    def term_signal(signum,frames):
+        #print("Caught signal: %s" % signum, file=sys.stderr)
+        raise SystemExit()
+
+    LOGGER.info("Starting worker pool")
+    pool = Pool( numworkers, target=QgsRequestHandler.run, args=(router,),
+                 kwargs={ 'broadcastaddr': broadcastaddr, 'maxcycles': None } )
+
+    # Handle critical failure by sending ABORT to
+    # parent process
+    def abrt_signal(signum,frames):
+        if pool.critical_failure:
+            print("Server aborting prematurely !", file=sys.stderr)
+            os.kill(os.getppid(), signal.SIGABRT)
+
+    signal.signal(signal.SIGTERM,term_signal)
+    signal.signal(signal.SIGABRT,abrt_signal)
+
+    try:
+        while True:
+            pool.maintain_pool()
+            time.sleep(0.1)
+    except (KeyboardInterrupt,SystemExit):
+        LOGGER.warning("Pool Interrupted")
+    finally:
+        LOGGER.info("Terminating worker pool")
+        pool.terminate()
+
 

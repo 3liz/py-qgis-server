@@ -16,7 +16,7 @@ from typing import Any, Dict, Optional
 
 from .config import load_configuration
 from .runtime import (Application, 
-                      create_worker_pool,
+                      create_poolserver,
                       create_broker_process,
                       configure_ipc_addresses)
 
@@ -46,14 +46,13 @@ class TestRuntime:
         load_configuration()        
         self.ipcaddr = configure_ipc_addresses(workers)
         self._broker = create_broker_process(self.ipcaddr)
-        self._pool   = create_worker_pool(workers)
+        self._pool   = create_poolserver(workers)
         self.started = True
 
     def stop(self) -> None:
         if not self.started:
             return
         self._pool.terminate()
-        self._pool.join()
         self._broker.terminate()
         self._broker.join()
 
@@ -77,7 +76,7 @@ class HTTPTestCase(AsyncHTTPTestCase):
 
     def get_app(self) -> Application:
         ipcaddr = TestRuntime.instance().ipcaddr
-        self._application = Application(ipcaddr, broadcast=False)
+        self._application = Application(ipcaddr)
         return self._application
     
     def get_new_ioloop(self) -> tornado.platform.asyncio.AsyncIOLoop:

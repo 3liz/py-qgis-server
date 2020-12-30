@@ -31,12 +31,12 @@ def test_wms_getcapabilities_hrefs( host ):
     assert href.path     == urlref.path
 
 
-def test_proxy_location( host ):
+def test_forwarded_url( host ):
     """ Test proxy location
     """
     urlref = urlparse('https://my.proxy.loc:9999/anywhere')
     rv = requests.get("http://{}/ows/?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities".format( host ) , 
-                      headers={ 'X-Proxy-Location': urlref.geturl() } )
+                      headers={ 'X-Forwarded-Url': urlref.geturl() } )
 
     assert rv.status_code == 200
     assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'

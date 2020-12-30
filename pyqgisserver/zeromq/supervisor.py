@@ -23,17 +23,11 @@ import zmq
 import traceback
 import logging
 
-from typing import Callable
+from .utils import _get_ipc
+
+from typing import Callable, Awaitable
 
 LOGGER=logging.getLogger('SRVLOG')
-
-
-def _get_supervisor_addr() -> str:
-    """ Create ipc address for supervisor/client communication
-    """
-    ipc_path = '/tmp/qgssrv/supervisor0'
-    os.makedirs(os.path.dirname(ipc_path), exist_ok=True)
-    return 'ipc://'+ipc_path
 
 
 class Client:
@@ -41,7 +35,7 @@ class Client:
     def __init__(self) -> None:
         """ Supervised client notifier
         """
-        address = _get_supervisor_addr()
+        address = _get_ipc('supervisor')
 
         ctx = zmq.Context.instance()
         self._sock = ctx.socket(zmq.PUSH)
@@ -83,7 +77,7 @@ class Supervisor:
 
             :param timeout: timeout delay in seconds
         """
-        address = _get_supervisor_addr()
+        address = _get_ipc('supervisor')
 
         ctx = zmq.asyncio.Context.instance()
         self._sock = ctx.socket(zmq.PULL)
@@ -94,13 +88,14 @@ class Supervisor:
         self._busy = {}
         self._stopped = True
         self._killfunc = killfunc
+        self._task = None
 
+    def run(self) -> None:
+        self._task = asyncio.ensure_future(self._run_async())
 
-    async def run(self) -> None:
+    async def _run_async(self) -> Awaitable[None]:
         """ Run supervisor
         """
-        LOGGER.debug("Starting supervisor")
-
         loop = asyncio.get_event_loop()
 
         def kill(pid:int) -> None:
@@ -123,13 +118,19 @@ class Supervisor:
             except zmq.ZMQError as err:
                 if err.errno != zmq.EAGAIN:
                     LOGGER.error("%s\n%s", zmq.strerror(err.errno), traceback.format_exc())
+            except asyncio.CancelledError:
+                raise
             except Exception:
                 LOGGER.critical("%s", traceback.format_exc())
+                raise
 
     def stop(self) -> None:
         """ Stop the supervisor
         """
+        LOGGER.info("Stopping supervisor")
         self._stopped = True
+        if self._task and not self._task.cancelled():
+            self._task.cancel()
         for th in self._busy.values():
             th.cancel()
         self._busy.clear()

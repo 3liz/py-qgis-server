@@ -48,6 +48,3 @@ def _check_file(modify_times: Mapping[float,str], path: str) -> Union[str,None]:
         modify_times[path] = modified
         return path
 
-
-
-

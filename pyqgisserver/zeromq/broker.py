@@ -66,7 +66,7 @@ def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000)
 
     # Try to exit gracefully
     def term_signal(signum,frames):
-        #print("Caught signal: %s" % signum, file=sys.stderr)
+        LOGGER.debug("Broker process caught signal: %s" % signum)
         raise SystemExit()
 
     signal.signal(signal.SIGTERM,term_signal)
@@ -138,8 +138,8 @@ def run_broker( inaddr: str, outaddr: str, maxqueue: int=100, timeout: int=3000)
                                 # push back the request on the queue
                                 waiting.append((tm, client_id, msgid, data))
                             
-    except (KeyboardInterrupt,SystemExit):
-        LOGGER.warning("Interrupted")
+    except (KeyboardInterrupt, SystemExit):
+        LOGGER.warning("Broker Terminated")
     except Exception:
         LOGGER.critical("Uncaught Exception:\n%s", traceback.format_exc())
     finally:

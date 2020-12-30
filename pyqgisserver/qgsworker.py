@@ -18,7 +18,7 @@ import os
 import logging
 import traceback
 
-from typing import Dict
+from typing import Dict, Optional, Any
 
 from qgis.PyQt.QtCore import QBuffer, QIODevice, QByteArray
 from qgis.server import (QgsServerRequest,
@@ -143,8 +143,8 @@ class Response(QgsServerResponse):
 
     def removeHeader(self, key: str) -> None:
         self._handler.headers.pop(key,None)
-   
-    def sendError(self, code: int, message: str=None) -> None:
+
+    def sendError(self, code: int, message: Optional[str]=None) -> None:
         try:
             if not self._handler.header_written:
                 LOGGER.error("%s (%s)", message, code)
@@ -205,13 +205,12 @@ class QgsRequestHandler(RequestHandler):
             setattr(cls, 'qgis_server' , qgsserver )
 
     @staticmethod
-    def run( router: str, identity: str="", broadcastaddr: str=None) -> None:
+    def run( router: str, identity: str="", **kwargs: Any) -> None:
         """ Run qgis server worker loop
         """
         QgsRequestHandler.init_server()
 
-        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')),
-                   broadcastaddr=broadcastaddr)
+        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')), **kwargs)
 
     def handle_message(self) -> None:
         """ Override this method to handle_messages

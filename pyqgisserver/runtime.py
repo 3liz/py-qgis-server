@@ -23,12 +23,12 @@ from .logger import log_request
 from .config import confservice
 
 from .handlers import (RootHandler, OwsHandler)
-from .zeromq import client, broker, supervisor
+from .zeromq import client, broker
 
 from .utils import process
+from .qgspool import create_poolserver
 
 from .monitor import Monitor
-from .broadcast import Broadcast
 
 from pyqgisservercontrib.core.filters import ServerFilter
 
@@ -87,7 +87,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
 class Application(tornado.web.Application):
 
-    def __init__(self, router: str, broadcast: bool=True) -> None:
+    def __init__(self, router: str) -> None:
         """
         """
         identity = confservice['zmq']['identity']
@@ -95,12 +95,6 @@ class Application(tornado.web.Application):
 
         self._broker_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
         
-        if broadcast:
-            self._broadcast = Broadcast()
-            self._broadcast.init()
-        else:
-            self._broadcast = None
-
         super().__init__(configure_handlers(self._broker_client))
 
     def log_request(self, handler: tornado.web.RequestHandler ) -> None:
@@ -110,9 +104,6 @@ class Application(tornado.web.Application):
 
     def terminate(self) -> None:
         self._broker_client.terminate()
-        if self._broadcast:
-            self._broadcast.close()
-        
 
 
 def terminate_handler( signum: int, frame ) -> None:
@@ -151,74 +142,18 @@ def create_broker_process( ipcaddr: str ) -> Process:
     return p
 
 
-def create_worker_pool( workers: int ) -> Process:
-    """ Run workers pool in its own process
-
-        This ensure that sub-processes all always forked from
-        the same parent context
- 
-        This will prevent forking zmq context.
-        If we do not do this, forked workers cannot
-        reconnect when forked from running ZMQ context.
-    """
-    p = Process(target=run_worker_pool,args=(workers,))
-    p.start()
-    return p
-
-
-def run_worker_pool(workers: int) -> None:
-    """ Run a qgis worker pool
-    """
-    from .qgspool import Pool
-
-    # Try to exit gracefully
-    def term_signal(signum,frames):
-        #print("Caught signal: %s" % signum, file=sys.stderr)
-        raise SystemExit()
-
-    LOGGER.info("Starting worker pool")
-    router        = confservice['zmq']['bindaddr'] 
-    broadcastaddr = confservice['zmq']['broadcastaddr']
-    timeout       = confservice['server'].getint('timeout')
-
-    pool = Pool(router, workers, broadcastaddr=broadcastaddr)
-
-    # Handle critical failure by sending ABORT to
-    # parent process
-    def abrt_signal(signum,frames):
-        if pool.critical_failure:
-            print("Server aborting prematurely !", file=sys.stderr)
-            os.kill(os.getppid(), signal.SIGABRT)
-
-    signal.signal(signal.SIGTERM,term_signal)
-    signal.signal(signal.SIGABRT,abrt_signal)
-
-    LOGGER.debug("Starting supervisor")
-    sprvsr = supervisor.Supervisor(timeout, lambda pid: pool.kill(pid))
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(sprvsr.run())
-    except (KeyboardInterrupt,SystemExit):
-        LOGGER.warning("Pool Interrupted")
-    finally:
-        LOGGER.debug("Stopping supervisor")
-        sprvsr.stop()
-        if not loop.is_closed():
-            loop.close()
-        
-        pool.terminate()
-
-
 def configure_ipc_addresses(workers: int) -> str:
     """ Create ipc socket path
     """
-    ipc_path = '/tmp/qgssrv/broker/'
+    pid = os.getpid()
+    ipc_path = f"/tmp/qgssrv/broker/{pid}/"
     os.makedirs(os.path.dirname(ipc_path), exist_ok=True)
-    ipcaddr = 'ipc://'+ipc_path+'0'
+    ipcaddr = f"ipc://{ipc_path}0"
     # Use ipc sockets for managed workers
+    confservice.set('zmq','ipcpath', ipc_path)
     if workers > 0:
-        confservice.set('zmq','bindaddr'     , 'ipc://'+ipc_path+'pool0')
-        confservice.set('zmq','broadcastaddr', 'ipc://'+ipc_path+'broadcast0')
+        confservice.set('zmq','bindaddr'     , f"ipc://{ipc_path}pool0")
+        confservice.set('zmq','broadcastaddr', f"ipc://{ipc_path}broadcast0")
 
     return ipcaddr
 
@@ -279,7 +214,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             if  process.fork_processes(jobs) is None: # We are in the main process
                 close_sockets(sockets)
                 broker_pr   = create_broker_process(ipcaddr)
-                worker_pool = create_worker_pool(workers) if workers>0 else None
+                worker_pool = create_poolserver(workers) if workers>0 else None
                 set_signal_handlers()
 
                 # Note that manage_processes(...) never return in main process 
@@ -289,7 +224,7 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
                 assert False, "Not Reached"
         else:
             broker_pr   = create_broker_process(ipcaddr)
-            worker_pool = create_worker_pool(workers) if workers>0 else None
+            worker_pool = create_poolserver(workers) if workers>0 else None
             sockets = bind_sockets(port, address=address)
 
         LOGGER.info("Running server on port %s:%s", address, port)
@@ -299,9 +234,13 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         # Init HTTP server
         server = HTTPServer(application, **kwargs)
         server.add_sockets(sockets)
- 
+
+        # Initialize pool supervisor
+        worker_pool.start_supervisor()
+
         loop = asyncio.get_event_loop()
         loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
+        LOGGER.info("Starting processing requests")
         loop.run_forever()
     except Exception:
         traceback.print_exc()
@@ -313,8 +252,10 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             # Make sure that child processes are terminated
             print("Terminating child processes", file=sys.stderr)
             process.terminate_childs()
-    except (KeyboardInterrupt, SystemExit):
-        pass
+    except KeyboardInterrupt:
+        print("Keyboard Interrupt", file=sys.stderr)
+    except SystemExit as exc:
+        print(exc, file=sys.stderr )
 
     # Teardown
     if server is not None:
@@ -322,21 +263,15 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     if application is not None:
         application.terminate()
         application = None
-        loop = asyncio.get_event_loop()
-        if not loop.is_closed():
-            loop.close()
         print("{}: Server instance stopped".format(os.getpid()), file=sys.stderr)
-
     if process.task_id() is None:
         if worker_pool:
             print("Stopping workers")
             worker_pool.terminate()
-            worker_pool.join()
         if broker_pr:
             print("Stopping broker")
             broker_pr.terminate()
             broker_pr.join()
-        print("Server shutdown", file=sys.stderr)
 
-   
 
+    print("Server shutdown", file=sys.stderr)

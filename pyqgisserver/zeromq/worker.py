@@ -22,7 +22,7 @@ import zmq
 import pickle
 import uuid
 
-from typing import Callable, TypeVar
+from typing import Callable, TypeVar, Optional
 
 from ..logger import setup_log_handler
 
@@ -33,6 +33,7 @@ LOGGER=logging.getLogger('SRVLOG')
 
 # Define an abstract type for HTTPRequest
 HTTPRequest = TypeVar('HTTPRequest')
+HandlerFactory = Callable[[zmq.Socket, bytes, bytes, HTTPRequest], 'RequestHandler']
 
 class RequestHandler:
 
@@ -99,53 +100,74 @@ class RequestHandler:
         self.send(b"", False)
 
 
-def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes, HTTPRequest], RequestHandler], 
-               identity: bytes=None, broadcastaddr: str=None) -> None:
-    """ Enter the message loop
+def dealer_socket( ctx: zmq.Context, address: str, identity: Optional[bytes]=None ) -> zmq.Socket:
+    """ Socket for receiving incoming messages
     """
-    ctx = zmq.Context.instance()
-
-    LOGGER.info("Connecting to %s", address)
+    LOGGER.debug("Connecting to %s", address)
     sock = ctx.socket(zmq.DEALER)
     sock.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
     sock.setsockopt(zmq.SNDHWM, 1)      # Max 1 item on send queue
     sock.setsockopt(zmq.IMMEDIATE, 1)   # Do not queue if no peer, will block on send
     sock.setsockopt(zmq.RCVTIMEO, 1000) # Heartbeat
     sock.identity = identity or uuid.uuid1().bytes
-    LOGGER.info("Identity set to %s", sock.identity)
+    LOGGER.debug("Identity set to %s", sock.identity)
     sock.connect(address)
-   
+    return sock
+
+
+def broadcast_socket( ctx: zmq.Context, broadcastaddr: str ) -> zmq.Socket:
+    """ Socket for receiving broadcast message notifications
+    """
+    LOGGER.debug("Enabling broadcast notification")
+    ctx = zmq.Context.instance()
+    sub = ctx.socket(zmq.SUB)
+    sub.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
+    sub.setsockopt(zmq.SUBSCRIBE, b'RESTART')
+    sub.connect(broadcastaddr)
+    return sub
+
+
+def run_worker(address: str, handler_factory: HandlerFactory, 
+               identity: Optional[bytes]=None, broadcastaddr: Optional[str]=None,
+               maxcycles: Optional[int]=None) -> None:
+    """ Enter the message loop
+    """
+    ctx = zmq.Context.instance()
+
+    sock = dealer_socket( ctx, address, identity )
     if broadcastaddr:
-        LOGGER.info("Enabling broadcast notification")
-        ctx = zmq.Context.instance()
-        sub = ctx.socket(zmq.SUB)
-        sub.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
-        sub.setsockopt(zmq.SUBSCRIBE, b'RESTART')
-        sub.connect(broadcastaddr)
+        sub = broadcast_socket( ctx, broadcastaddr )
 
     # Initialize supervisor client
     supervisor = SupervisorClient()
 
+    def get():
+        client_id, corr_id, request = sock.recv_multipart()
+        LOGGER.debug("RCV %s: %s", client_id, corr_id)
+        return client_id, corr_id, pickle.loads(request)
+
     try:
         LOGGER.info("Starting ZMQ worker loop")
-        while True:
+        completed = 0
+        while maxcycles is None or (maxcycles and completed < maxcycles):
+            sock.send(WORKER_READY)
             try:
-                sock.send(WORKER_READY)
-                client_id, corr_id, request = sock.recv_multipart()
-                LOGGER.debug("RCV %s: %s", client_id, corr_id)
-                request = pickle.loads(request)
-
+                client_id, corr_id, request = get()
                 supervisor.notify_busy()
                 handler = handler_factory(sock, client_id, corr_id, request)
                 handler.handle_message()
+                completed += 1
+            except zmq.error.Again:
+                pass
             except zmq.ZMQError as err:
-                if err.errno != zmq.EAGAIN:
-                    LOGGER.error("Worker Error %d: %s", err.errno, zmq.strerror(err.errno))
+                LOGGER.error("Worker Error %d: %s", err.errno, zmq.strerror(err.errno))
             except Exception as exc:
                 LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
                 if not handler.header_written:
                     handler.status_code = 500
                     handler.send(bytes("Worker internal error".encode('ascii')))
+                    # Got error 500, do not presume worker state
+                    break
             finally:
                 supervisor.notify_done()
 
@@ -163,11 +185,9 @@ def run_worker(address: str, handler_factory: Callable[[zmq.Socket, bytes, bytes
 
     if broadcastaddr:
         sub.close()
-    # Terminate context
     sock.close()
-    # XXX Investigate why contexte.term() is hanging 
-    # ctx.term()
-   
+    LOGGER.info("Terminating Worker")
+
 
 if __name__ == '__main__':
     import argparse
