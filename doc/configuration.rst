@@ -48,6 +48,24 @@ Interfaces to listen to
 
 
 
+.. _SERVER_TIMEOUT:
+
+SERVER_TIMEOUT
+--------------
+
+Set the timeout for Qgis response in seconds. If a Qgis worker takes more than 
+the corresponding value a timeout error (504) is returned to the client. 
+
+
+:Type: int
+:Default: 20
+:Section: server
+:Key: timeout
+:Env: QGSRV_SERVER_TIMEOUT
+
+
+
+
 .. _SERVER_WORKERS:
 
 SERVER_WORKERS

@@ -21,6 +21,17 @@ config_options:
       key: interfaces
       tags: [ http ]
 
+    - name: SERVER_TIMEOUT
+      label: Client Timeout
+      description: |
+          Set the timeout for Qgis response in seconds. If a Qgis worker takes more than 
+          the corresponding value a timeout error (504) is returned to the client. 
+      default: 20
+      type: int
+      section: server
+      key: timeout
+      tags: [ http ] 
+
     - name: SERVER_WORKERS
       label: Number of workers
       description: The number of workers for processing requests
