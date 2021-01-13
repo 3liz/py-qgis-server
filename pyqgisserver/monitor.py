@@ -47,7 +47,7 @@ class Monitor:
         """
         self._client = amqp_client
 
-        self,_dynamic_routing = routing_key.startswith('@')
+        self._dynamic_routing = routing_key.startswith('@')
         if self._dynamic_routing:
             self._routing_key = routing_key[1:]
         else:
