@@ -64,7 +64,7 @@ class Pool:
                 # Return is not zero
                 if worker.exitcode != 0:
                     # Handle early failure by killing current process
-                    LOGGER.warning("Worker exited with code %s", worker.exitcode) 
+                    LOGGER.warning("Worker %s exited with code %s", worker.pid, worker.exitcode) 
                     if time.time() - self._start_time < EARLY_FAILURE_DELAY:
                         # Critical exit
                         LOGGER.critical("Critical worker failure. Aborting...")
