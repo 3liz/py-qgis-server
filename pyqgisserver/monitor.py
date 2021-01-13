@@ -111,7 +111,7 @@ class Monitor:
         exchange = conf['exchange']
 
         client = AsyncPublisher(host=hosts,port=int(port),virtual_host=vhost,
-                                reconnect_delay=0.001,
+                                reconnect_delay=3,
                                 logger=LOGGER, **kwargs)
 
         # Catch exception in connection
