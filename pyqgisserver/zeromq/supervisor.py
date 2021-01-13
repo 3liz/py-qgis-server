@@ -17,6 +17,7 @@
 #
 
 import os
+import signal
 import asyncio
 import zmq.asyncio
 import zmq
@@ -25,7 +26,7 @@ import logging
 
 from .utils import _get_ipc
 
-from typing import Callable, Awaitable
+from typing import Awaitable
 
 LOGGER=logging.getLogger('SRVLOG')
 
@@ -72,7 +73,7 @@ class Client:
 
 class Supervisor:
 
-    def __init__(self, timeout: int,  killfunc: Callable[[int],None])-> None:
+    def __init__(self, timeout: int)-> None:
         """ Run supervisor
 
             :param timeout: timeout delay in seconds
@@ -87,7 +88,6 @@ class Supervisor:
         self._timeout = timeout
         self._busy = {}
         self._stopped = True
-        self._killfunc = killfunc
         self._task = None
 
     def run(self) -> None:
@@ -99,9 +99,13 @@ class Supervisor:
         loop = asyncio.get_event_loop()
 
         def kill(pid:int) -> None:
-            LOGGER.critical("Killing stalled process %s", pid)
             del self._busy[pid]
-            self._killfunc(pid)
+            try:
+                os.kill(pid, signal.SIGKILL)
+                LOGGER.critical("Killed stalled process %s", pid)
+            except ProcessLookupError:
+                # Process was already terminated/crashed
+                pass
 
         self._stopped = False
 

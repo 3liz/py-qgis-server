@@ -123,7 +123,7 @@ class _Server:
         """
         if self._supervisor is None:
             LOGGER.info("Initializing supervisor")
-            self._supervisor = Supervisor(self._timeout, lambda pid: os.kill(pid, signal.SIGKILL))
+            self._supervisor = Supervisor(self._timeout)
             self._supervisor.run()
 
         if self._healthcheck is None:
