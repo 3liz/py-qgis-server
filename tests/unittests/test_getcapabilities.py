@@ -25,7 +25,7 @@ class Tests(HTTPTestCase):
         self.logger.info(href.geturl())
 
     def test_forwarded_url(self):
-        """ Test proxy location
+        """ Test proxy location override WMSUrl
         """
         urlref = urlparse('https://my.proxy.loc:9999/anywhere')
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities", 
@@ -41,6 +41,27 @@ class Tests(HTTPTestCase):
         assert href.scheme   == urlref.scheme
         assert href.hostname == urlref.hostname
         assert href.path     == urlref.path
+
+    def test_wmsurl(self):
+        """ Test proxy location
+        """
+        proxy_url = 'https://my.proxy.loc:9999/anywhere'
+        rv = self.client.get("?MAP=france_parts_wmsurl.qgs&SERVICE=WMS&request=GetCapabilities", 
+                             headers={ 'X-Forwarded-Url': proxy_url } )
+
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
+
+        elem = rv.xml.findall(".//wms:OnlineResource", ns)
+        assert len(elem) > 0
+
+        urlref = urlparse( "http://test.proxy.loc/whatever/" )
+
+        href = urlparse(elem[0].get(xlink+'href'))
+        assert href.scheme   == urlref.scheme
+        assert href.hostname == urlref.hostname
+        assert href.path     == urlref.path
+
 
     def test_cors_options(self):
         """ Test CORS options
