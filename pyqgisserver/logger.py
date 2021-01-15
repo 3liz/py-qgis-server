@@ -82,7 +82,7 @@ def log_request(handler):
     return code, reqtime, length
 
 
-def format_log_rrequest(code, method, query, reqtime, headers, addr=''):
+def format_log_rrequest(path, code, method, query, reqtime, headers, addr=''):
     """ Format current r-request from the given response
 
         :param response: The response returned from the request
@@ -101,7 +101,7 @@ def format_log_rrequest(code, method, query, reqtime, headers, addr=''):
     fmt = RREQ_FORMAT.format(
         ip=addr,
         method=method,
-        url=query,
+        url=f"{path}/{query}",
         code=code,
         time=int(1000.0 * reqtime),
         length=length)

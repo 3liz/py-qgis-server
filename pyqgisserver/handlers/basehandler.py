@@ -114,7 +114,7 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write_json(response)
         self.finish()
 
-    def proxy_url(self, http_proxy: bool=False, **kwargs: Any) -> str:
+    def proxy_url(self, http_proxy: bool, root: str, path:str) -> str:
         """ Return the proxy_url
         """
         # Replace the status url with the proxy_url if any
@@ -122,9 +122,12 @@ class BaseHandler(tornado.web.RequestHandler):
         if http_proxy:
             proxy_url = self._cfg.get('proxy_url') or \
                 req.headers.get('X-Forwarded-Url') or \
-                "{0.protocol}://{0.host}{0.path}".format(req) 
-            proxy_url = proxy_url.format(**kwargs)
+                f"{req.protocol}://{req.host}{root}"
+            if path:
+                proxy_url = proxy_url.rstrip('/')
+                proxy_url = f"{proxy_url}/{path}"
         else:
-            proxy_url = "{0.protocol}://{0.host}{0.path}".format(req)
+            # No proxy to handle: return the full path
+            proxy_url = f"{req.protocol}://{req.host}{req.path}"
         return proxy_url
 

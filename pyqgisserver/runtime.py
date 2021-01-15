@@ -64,6 +64,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     monitor = Monitor.initialize()
 
     ows_kwargs = {
+        'root'       : "/ows/",
         'client'     : client,
         'monitor'    : monitor,
         'timeout'    : cfg.getint('timeout'),
@@ -74,13 +75,13 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
     # Load filters
     if cfg.getboolean('enable_filters'):
-        filters = load_access_policies(r"/ows/")
+        filters = load_access_policies(r"/ows/(.*)")
         for uri,fltrs in filters.items():
             kw = ows_kwargs.copy()
             kw.update( filters = fltrs )
             handlers.append( (uri, OwsHandler, kw) )
     else:
-        handlers.append( (r"/ows/", OwsHandler, ows_kwargs) )
+        handlers.append( (r"/ows/(.*)", OwsHandler, ows_kwargs) )
 
     return handlers
 

@@ -215,31 +215,33 @@ class QgsRequestHandler(RequestHandler):
     def handle_message(self) -> None:
         """ Override this method to handle_messages
         """
-        project_location = self.request.headers.pop('X-Map-Location')
+        project_location = self.request.headers.pop('X-Map-Location',None)
 
         request  = Request(self)
         response = Response(self)
 
-        iface = self.qgis_server.serverInterface()
-        try:
-            LOGGER.debug("Handling request: %s", self.msgid)
-            project, updated = get_cacheservice().lookup(project_location)
-            config_path = project.fileName()
-            if updated: 
-                # Needed to cleanup cached capabilities
-                LOGGER.debug("Cleaning config cache entry %s", config_path)
-                iface.removeConfigCacheEntry(config_path)
-        except StrictCheckingError:
-            response.sendError(422,"Invalid layers for project '%s' - strict mode on" % project_location)
-        except PathNotAllowedError:
-            response.sendError(403,"Project path not allowed")
-        except FileNotFoundError:
-            response.sendError(404,"Project '%s' not found" % project_location)
+        if project_location:
+            iface = self.qgis_server.serverInterface()
+            try:
+                LOGGER.debug("Handling request: %s", self.msgid)
+                project, updated = get_cacheservice().lookup(project_location)
+                config_path = project.fileName()
+                if updated: 
+                    # Needed to cleanup cached capabilities
+                    LOGGER.debug("Cleaning config cache entry %s", config_path)
+                    iface.removeConfigCacheEntry(config_path)
+            except StrictCheckingError:
+                response.sendError(422,"Invalid layers for project '%s' - strict mode on" % project_location)
+            except PathNotAllowedError:
+                response.sendError(403,"Project path not allowed")
+            except FileNotFoundError:
+                response.sendError(404,"Project '%s' not found" % project_location)
+            else:
+                # See https://github.com/qgis/QGIS/pull/9773
+                iface.setConfigFilePath(config_path)
+                self.qgis_server.handleRequest(request, response, project=project)
         else:
-            # See https://github.com/qgis/QGIS/pull/9773
-            iface.setConfigFilePath(config_path)
-            self.qgis_server.handleRequest(request, response, project=project)
-
+            self.qgis_server.handleRequest(request, response)
 
 def main():
     """ Run as command line interface

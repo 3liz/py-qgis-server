@@ -25,7 +25,7 @@ class Tests(HTTPTestCase):
         self.logger.info(href.geturl())
 
     def test_forwarded_url(self):
-        """ Test proxy location override WMSUrl
+        """ Test proxy location
         """
         urlref = urlparse('https://my.proxy.loc:9999/anywhere')
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities", 
@@ -43,7 +43,7 @@ class Tests(HTTPTestCase):
         assert href.path     == urlref.path
 
     def test_wmsurl(self):
-        """ Test proxy location
+        """ Test proxy location is overrided by WMSUrl
         """
         proxy_url = 'https://my.proxy.loc:9999/anywhere'
         rv = self.client.get("?MAP=france_parts_wmsurl.qgs&SERVICE=WMS&request=GetCapabilities", 
@@ -80,4 +80,18 @@ class Tests(HTTPTestCase):
         rv = self.client.get( "?map=france_parts.qgs&SERVICE=WMS&request=GetCapabilities" )
         assert rv.status_code == 200    
 
+    def test_wfs3(self):
+        """ Test wfs3
+        """
+        rv = self.client.get( "/wfs3/?MAP=france_parts.qgs" )
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'].find('application/json') >= 0
+
+        rv = self.client.get( "/wfs3.json?MAP=france_parts.qgs" )
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'].find('application/json') >= 0
+
+        rv = self.client.get( "/wfs3.html?MAP=france_parts.qgs" )
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'].find('text/html') >= 0
 

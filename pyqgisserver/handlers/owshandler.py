@@ -17,7 +17,7 @@ from ..monitor import Monitor
 
 from .basehandler import BaseHandler
 
-from typing import Optional, Awaitable
+from typing import Optional, Awaitable, List
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -26,16 +26,17 @@ class OwsHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
-    def initialize(self, client: AsyncClient, timeout: int, 
+    def initialize(self, root: str, client: AsyncClient, timeout: int, 
                    monitor: Optional[Monitor]=None, 
-                   filters=None, http_proxy: bool=False) -> None:
+                   filters: Optional[List]=None, http_proxy: bool=False) -> None:
 
         super().initialize()
 
+        self._root        = root
         self._client      = client
         self._timeout     = timeout
         self._monitor     = monitor
-        self._filters     = filters
+        self._filters     = filters or []
         self._proxy       = http_proxy
 
     async def prepare(self) -> Awaitable[None]:
@@ -44,19 +45,19 @@ class OwsHandler(BaseHandler):
         for filt in self._filters:
             await filt.apply( self )
 
-    async def handle_request(self, method, data=None ) -> Awaitable[None]:
+    async def handle_request(self, method: str, path: str, data: Optional=None ) -> Awaitable[None]:
         reqtime = time()
         try:
-            proxy_url = self.proxy_url(self._proxy)
+            proxy_url = self.proxy_url(self._proxy, self._root, path)
 
             delta = None
-            project_path = self.get_argument('MAP')
+            project_path = self.get_argument('MAP',default=None)
             query        = self.encode_arguments()
 
-            headers = {
-                'X-Map-Location': project_path 
-            }
+            headers = {}
 
+            if project_path:
+                headers['X-Map-Location']=project_path 
             if proxy_url: 
                 headers['X-Forwarded-Url']=proxy_url
 
@@ -65,13 +66,14 @@ class OwsHandler(BaseHandler):
                 method = 'GET'
                 data   = None
 
-            response = await self._client.fetch(query=query, method=method, headers=headers, data=data,
+            response = await self._client.fetch(query=query, method=method, 
+                                                headers=headers, data=data,
                                                 timeout=self._timeout)
             status = response.status
             hdrs   = response.headers
             delta  = time() - reqtime
 
-            log_rrequest(status, method, query, delta, hdrs)
+            log_rrequest(path, status, method, query, delta, hdrs)
            
             # Send response
             for k,v in hdrs.items():
@@ -105,18 +107,20 @@ class OwsHandler(BaseHandler):
             self._monitor.emit( status, self.request.arguments,  delta, 
                                 meta=self.request.headers)
 
-    async def get(self) -> Awaitable[None]:
+    async def get(self, path: str="") -> Awaitable[None]:
         """ Handle Get method
         """
-        await self.handle_request('GET')
+        await self.handle_request('GET', path)
           
-    async def post(self) -> Awaitable[None]:
+    async def post(self, path: str="") -> Awaitable[None]:
         """ Handle Post method
         """
-        await self.handle_request('POST', data=self.request.body)
+        await self.handle_request('POST', path, data=self.request.body)
         
-    def options(self) -> None:
+    def options(self, path: Optional[str]=None) -> None:
         """ Implement OPTION for validating CORS
         """
         self.set_option_headers('GET, POST, OPTIONS')
+
+
 
