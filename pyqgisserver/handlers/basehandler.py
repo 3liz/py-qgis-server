@@ -125,7 +125,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 f"{req.protocol}://{req.host}{root}"
             if path:
                 proxy_url = proxy_url.rstrip('/')
-                proxy_url = f"{proxy_url}/{path}"
+                proxy_url = f"{proxy_url}{path}"
         else:
             # No proxy to handle: return the full path
             proxy_url = f"{req.protocol}://{req.host}{req.path}"

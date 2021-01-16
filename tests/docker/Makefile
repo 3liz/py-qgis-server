@@ -71,6 +71,7 @@ test: local
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \
 		-e QGSRV_DISABLE_GETPRINT=yes \
 		-e QGIS_OPTIONS_PATH=/src/tests/qgis \
+		-e QGSRV_SERVER_STATUS_PAGE=yes \
 		-e PYTEST_ADDOPTS="$(PYTEST_ADDOPTS)" \
 		$(QGIS_IMAGE) $(SCRIPTS)/run_tests.sh
 
@@ -101,6 +102,7 @@ run: local
 		-e PYTHONWARNINGS=d \
 		-e QGIS_OPTIONS_PATH=/src/tests/qgis \
 		-e QGSRV_DATA_PATH=/.local/share/qgis-server \
+		-e QGSRV_SERVER_STATUS_PAGE=yes \
 		-e QGIS_SERVER_TRUST_LAYER_METADATA=yes \
 		$(QGIS_IMAGE) $(SCRIPTS)/run_server.sh 
 

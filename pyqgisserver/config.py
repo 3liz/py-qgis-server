@@ -66,6 +66,7 @@ def load_configuration():
     CONFIG.set('server', 'ssl_cert'      , getenv('QGSRV_SERVER_SSL_CERT', ''))
     CONFIG.set('server', 'ssl_key'       , getenv('QGSRV_SERVER_SSL_KEY' , ''))
     CONFIG.set('server', 'cross_origin'  , getenv('QGSRV_SERVER_CROSS_ORIGIN' , 'yes'))
+    CONFIG.set('server', 'status_page'   , getenv('QGSRV_SERVER_STATUS_PAGE'  , 'no'))
 
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))

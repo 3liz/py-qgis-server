@@ -107,17 +107,17 @@ class OwsHandler(BaseHandler):
             self._monitor.emit( status, self.request.arguments,  delta, 
                                 meta=self.request.headers)
 
-    async def get(self, path: str="") -> Awaitable[None]:
+    async def get(self, endpoint: str="") -> Awaitable[None]:
         """ Handle Get method
         """
-        await self.handle_request('GET', path)
+        await self.handle_request('GET', endpoint)
           
-    async def post(self, path: str="") -> Awaitable[None]:
+    async def post(self, endpoint: str="") -> Awaitable[None]:
         """ Handle Post method
         """
-        await self.handle_request('POST', path, data=self.request.body)
+        await self.handle_request('POST', endpoint, data=self.request.body)
         
-    def options(self, path: Optional[str]=None) -> None:
+    def options(self, endpoint: Optional[str]=None) -> None:
         """ Implement OPTION for validating CORS
         """
         self.set_option_headers('GET, POST, OPTIONS')

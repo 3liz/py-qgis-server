@@ -5,10 +5,10 @@ from pyqgisserver.tests import HTTPTestCase
 
 class Tests(HTTPTestCase):
 
-    def test_root_request(self):
+    def test_status_request(self):
         """ Test response from root path
         """
-        rv = self.client.get('',path='/')
+        rv = self.client.get('',path='/status/')
         assert rv.status_code == 200
 
     def test_wms_getcapabilitiesatlas(self):

@@ -11,6 +11,7 @@ import tornado.platform.asyncio
 from tornado.testing import AsyncHTTPTestCase
 import lxml.etree
 import logging
+import json
 
 from typing import Any, Dict, Optional
 
@@ -114,6 +115,8 @@ class HTTPTestResponse:
     def xpath_text(self, path: str) -> str:
         return ' '.join(e.text for e in self.xpath(path))
 
+    def json(self) -> Any:
+        return json.loads(self.content)
 
 
 class OWSTestClient:

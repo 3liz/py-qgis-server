@@ -16,7 +16,7 @@ from ..config import config_to_dict
 LOGGER=logging.getLogger('SRVLOG')
 
 
-class RootHandler(BaseHandler):
+class StatusHandler(BaseHandler):
     def get(self):
         try:
             from qgis.core import Qgis
