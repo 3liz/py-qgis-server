@@ -26,6 +26,7 @@ The server is aimed at solving some real situations encountered in production en
 - Support for Qgis project stored in postgres database
 - Support adding new projects cache handlers as python extension 
 - Preloading of Qgis projects.
+- WFS3 support
 
 ## Requirements:
 
@@ -118,8 +119,20 @@ The OWS requests use the following format:  `/ows/?<ows_query_params>`
 Example:
 
 ```
-http://myserver:8080/ows/?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetCapabilities
+http://myserver:8080/ows/?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetCapabilities&MAP=<qgis_project_spec>
 ```
+
+### Requests to OWS/WFS3 services
+
+The OWS requests use the following format:  `/ows/wfs3/<wfs3_api_endpoint>?MAP=<qgis_project_spec>`
+
+Example:
+
+```
+http://myserver:8080/ows/wfs3/collections.html?MAP=<qgis_project_spec>
+```
+
+
 
 #### Using with lizmap
 
