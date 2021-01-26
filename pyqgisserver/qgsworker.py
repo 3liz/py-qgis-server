@@ -149,7 +149,7 @@ class Response(QgsServerResponse):
             if not self._handler.header_written:
                 LOGGER.error("%s (%s)", message, code)
                 self._handler.status_code = code
-                self._handler.send(bytes(str(message).encode('ascii')))
+                self._handler.send(str(message).encode())
                 self._finish = True
             else:
                 LOGGER.error("Cannot set error after header written")
