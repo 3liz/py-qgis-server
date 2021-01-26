@@ -46,3 +46,5 @@ docker-test.log
 *.bak
 *.bak~
 
+VERSION
+
