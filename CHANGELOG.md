@@ -1,6 +1,12 @@
 py-qgis-server CHANGELOG
 ========================
 
+1.5.1
+-----
+
+* Support api endpoint for filters
+* Fix message encoding in worker request handler
+
 1.5.0
 -----
 
