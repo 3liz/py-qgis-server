@@ -12,7 +12,7 @@ stages:
 tests:
   stage: test
   script:
-    - make manifest docker-test FLAVOR=release
+    - make manifest docker-test FLAVOR=ltr
   tags:
     - infrav3-dind
 
@@ -31,7 +31,7 @@ build:
   only:
     refs:
       - tags
-      - master
+      - 1.5.x
   except:
       - schedules
       - triggers

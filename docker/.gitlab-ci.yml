@@ -1,5 +1,5 @@
 variables:
-    QGIS_FLAVOR: release
+    QGIS_FLAVOR: ltr
 
 #-------------
 # Build
@@ -18,7 +18,7 @@ build-docker:
   only:
     refs:
       - tags
-      - master
+      - 1.5.x
   tags:
     - infrav3-dind
 
@@ -34,7 +34,7 @@ deploy_snap:
     name: snap
   only:
     refs:
-       - master
+       - 1.5.x
   tags:
     - infrav3-plain
 

@@ -1,7 +1,7 @@
 # qgis server makefile
 #
 
-VERSION:=1.5.2
+VERSION:=1.5.1
 
 ifndef CI_COMMIT_TAG
 VERSION_TAG=$(VERSION)rc0
@@ -19,7 +19,7 @@ MANIFEST=pyqgisserver/build.manifest
 
 PYTHON:=python3
 
-FLAVOR:=release
+FLAVOR:=ltr
 
 # This is necessary with pytest as long it is not fixed
 # see also https://github.com/qgis/QGIS/pull/5337
