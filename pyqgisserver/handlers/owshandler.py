@@ -33,6 +33,7 @@ class OwsHandler(BaseHandler):
         super().initialize()
 
         self._root        = root
+        self._rootpath    = root
         self._client      = client
         self._timeout     = timeout
         self._monitor     = monitor
@@ -42,13 +43,16 @@ class OwsHandler(BaseHandler):
     async def prepare(self) -> Awaitable[None]:
         # Handle filters
         super().prepare()
+        self._rootpath = self._root
         for filt in self._filters:
-            await filt.apply( self )
+            path = await filt.apply( self )
+            if path:
+                self._rootpath = f"{self._root}{path}"
 
     async def handle_request(self, method: str, path: str, data: Optional=None ) -> Awaitable[None]:
         reqtime = time()
         try:
-            proxy_url = self.proxy_url(self._proxy, self._root, path)
+            proxy_url = self.proxy_url(self._proxy, self._rootpath, path)
 
             delta = None
             project_path = self.get_argument('MAP',default=None)

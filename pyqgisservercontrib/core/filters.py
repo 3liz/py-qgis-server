@@ -36,7 +36,7 @@
 import logging
 import tornado.web
 
-from typing import Coroutine, Callable, Awaitable
+from typing import Coroutine, Callable, Awaitable, Optional
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -75,6 +75,6 @@ class blockingfilter(ServerFilter):
         self.fn = fn
         return self
 
-    async def apply( self, handler: tornado.web.RequestHandler ) -> None:
-        self.fn(handler)
+    async def apply( self, handler: tornado.web.RequestHandler ) -> Optional[str]:
+        return self.fn(handler)
 
