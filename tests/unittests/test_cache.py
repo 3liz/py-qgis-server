@@ -2,7 +2,7 @@
 import pytest
 import os
 
-from qgis.core import Qgis
+from qgis.core import Qgis,QgsProject
 
 from pathlib import Path
 from pyqgisserver.qgscache.cachemanager import (QgsCacheManager, 
@@ -122,7 +122,12 @@ def test_postgres_cache() -> None:
 
     project, updated = cacheservice.lookup(url)
     assert updated
-    assert project is not None
+    assert isinstance(project,QgsProject)
+
+    # Check that project is updated
+    project, updated = cacheservice.lookup(url)
+    assert not updated
+    assert isinstance(project,QgsProject)
 
     details = cacheservice.peek(url)
     assert details is not None
@@ -141,7 +146,7 @@ def test_postgres_with_pgservice() -> None:
 
     project, updated = cacheservice.lookup(url)
     assert updated
-    assert project is not None
+    assert isinstance(project,QgsProject)
 
     details = cacheservice.peek(url)
     assert details is not None

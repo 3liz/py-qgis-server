@@ -68,7 +68,7 @@ class PostgresProtocolHandler:
             LOGGER.warning("Setting postgres connexion parameters in insecure mode %s", url.geturl())
             params = { k:v[0] for k,v in parse_qs(url.query).items() }
             try:
-                project  = params.pop('project')
+                prjname  = params.pop('project')
                 schema   = params.pop('schema','public')
                 database = params.pop('dbname',None)
             except KeyError as exc:
@@ -87,7 +87,7 @@ class PostgresProtocolHandler:
             # Secure mode: allow only secure parameter
             params = { k:v[0] for k,v in parse_qs(url.query).items() if k in ALLOWED_SECURE_PARAMS }
             try:
-                project  = params.pop('project')
+                prjname  = params.pop('project')
                 schema   = params.pop('schema','public')
                 database = params.pop('dbname',None)
             except KeyError as exc:
@@ -107,7 +107,7 @@ class PostgresProtocolHandler:
             LOGGER.debug("**** Postgresql connection params %s", connexion_params)
             conn   = psycopg2.connect(**connexion_params)
             cursor = conn.cursor()
-            cursor.execute("select metadata from %s.qgis_projects where name='%s'" % (schema,project))
+            cursor.execute("select metadata from %s.qgis_projects where name='%s'" % (schema,prjname))
             if cursor.rowcount <= 0:
                 raise FileNotFoundError(url.geturl())
             metadata = cursor.fetchone()[0]
