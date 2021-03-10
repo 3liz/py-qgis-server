@@ -83,6 +83,9 @@ class OwsHandler(BaseHandler):
             for k,v in hdrs.items():
                 self.set_header(k,v)
 
+            # Send CORS Header
+            self.set_access_control_headers()
+
             if status == 206:
                 # Partial response
                 self.set_status(200)
