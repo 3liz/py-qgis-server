@@ -73,6 +73,15 @@ class Tests(HTTPTestCase):
         assert 'Access-Control-Allow-Methods' in rv.headers
         assert 'Access-Control-Allow-Origin'  in rv.headers
 
+    def test_ows_request_with_cors(self):
+        """ Test getcapabilities hrefs
+        """
+        rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities",
+                headers={ 'Origin': 'my.home' })
+
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
+        assert 'Access-Control-Allow-Origin'  in rv.headers
 
     def test_lower_case_query_params(self):
         """ Test that we support lower case query param
