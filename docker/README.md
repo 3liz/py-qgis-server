@@ -97,5 +97,7 @@ relativeWMSPath=true
 
 ## Notes
 
-GeoPackages is not multiprocessing friendly and are not working well with read-only volumes.
+* GeoPackages is not multiprocessing friendly and are not working well with read-only volumes.
 Avoid them if you if you intend to use your data with read-only volumes.
+* Qgis requires Qt5  minimum, there is [known issues](https://askubuntu.com/questions/1034313/ubuntu-18-4-libqt5core-so-5-cannot-open-shared-object-file-no-such-file-or-dir) with too old kernel. As a matter of fact, you should use a kernel 4.19 or superior.
+
