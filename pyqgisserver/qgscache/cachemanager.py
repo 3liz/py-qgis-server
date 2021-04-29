@@ -73,6 +73,7 @@ class QgsCacheManager:
         self._strict_check         = cnf.getboolean('strict_check')
         self._trust_layer_metadata = cnf.getboolean('trust_layer_metadata')
         self._disable_getprint     = cnf.getboolean('disable_getprint')
+        self._disable_owsurls      = cnf.getboolean('disable_owsurls', fallback=False)
         self._aliases = {}
         self._default_scheme = cnf.get('default_handler',fallback='file')
 
@@ -170,6 +171,17 @@ class QgsCacheManager:
         updated = self.update_entry(key)
         return self._cache[key].project, updated
 
+    def prepare_project(self, project: QgsProject ) -> None:
+        """ Set project configuration
+        """
+        if self._disable_owsurls:
+            # Disable ows urls defined in project
+            # May be needed because it overrides 
+            # any proxy settings
+            project.writeEntry("WMSUrl","/", "")
+            project.writeEntry("WFSUrl","/", "")
+            project.writeEntry("WCSUrl","/", "")
+
     def read_project(self, path: str) -> QgsProject:
         """ Read project from path
 
@@ -184,12 +196,14 @@ class QgsCacheManager:
             readflags |= QgsProject.FlagTrustLayerMetadata
         if self._disable_getprint:
             readflags |= QgsProject.FlagDontLoadLayouts 
-
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
         project.read(path,  readflags)
         if self._strict_check and not badlayerh.validatLayers(project):
             raise StrictCheckingError
+
+        self.prepare_project(project)
+
         return project
 
 
