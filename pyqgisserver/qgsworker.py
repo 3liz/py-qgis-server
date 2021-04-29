@@ -45,7 +45,9 @@ class Request(QgsServerRequest):
         
         # Recreate URL
         location = req.headers.get('X-Forwarded-Url',"")
-        location += '?'+req.query.lstrip('?')
+        query    = req.query.lstrip('?')
+        if query:
+            location += f"?{query}"
 
         self._data = req.data
 

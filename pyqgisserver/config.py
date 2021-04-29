@@ -85,7 +85,8 @@ def load_configuration():
                getenv2('QGSRV_TRUST_LAYER_METADATA','QGIS_SERVER_TRUST_LAYER_METADATA','no'))
     CONFIG.set('projects.cache', 'disable_getprint'    , 
                getenv2('QGSRV_DISABLE_GETPRINT','QGIS_SERVER_DISABLE_GETPRINT','no'))
-
+    CONFIG.set('projects.cache', 'disable_owsurls', getenv('QGSRV_CACHE_DISABLE_OWSURLS','no'))
+    
     CONFIG.add_section('projects.schemes')
 
     CONFIG.add_section('zmq')

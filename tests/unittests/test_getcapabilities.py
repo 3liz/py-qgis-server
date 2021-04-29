@@ -45,6 +45,8 @@ class Tests(HTTPTestCase):
     def test_wmsurl(self):
         """ Test proxy location is overrided by WMSUrl
         """
+        from pyqgisserver.config import confservice
+
         proxy_url = 'https://my.proxy.loc:9999/anywhere'
         rv = self.client.get("?MAP=france_parts_wmsurl.qgs&SERVICE=WMS&request=GetCapabilities", 
                              headers={ 'X-Forwarded-Url': proxy_url } )
@@ -55,13 +57,15 @@ class Tests(HTTPTestCase):
         elem = rv.xml.findall(".//wms:OnlineResource", ns)
         assert len(elem) > 0
 
-        urlref = urlparse( "http://test.proxy.loc/whatever/" )
+        if confservice.getboolean('projects.cache', 'disable_owsurls'):
+            urlref = urlparse( proxy_url )
+        else:
+            urlref = urlparse( "http://test.proxy.loc/whatever/" )
 
         href = urlparse(elem[0].get(xlink+'href'))
         assert href.scheme   == urlref.scheme
         assert href.hostname == urlref.hostname
         assert href.path     == urlref.path
-
 
     def test_cors_options(self):
         """ Test CORS options
