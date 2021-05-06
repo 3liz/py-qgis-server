@@ -375,10 +375,10 @@ of OWS requests.
 
 
 
-.. _QGSRV_CACHE_DISABLE_OWSURLS:
+.. _CACHE_DISABLE_OWSURLS:
 
-QGSRV_CACHE_DISABLE_OWSURLS
----------------------------
+CACHE_DISABLE_OWSURLS
+---------------------
 
 Disable ows urls defined in projects. This may be necessary because Qgis projects
 urls override proxy urls.
@@ -389,7 +389,7 @@ urls override proxy urls.
 :Version Added: 1.5.4
 :Section: projects.cache
 :Key: disable_owsurls
-:Env: QGSRV_QGSRV_CACHE_DISABLE_OWSURLS
+:Env: QGSRV_CACHE_DISABLE_OWSURLS
 
 
 
