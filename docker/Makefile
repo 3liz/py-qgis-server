@@ -65,6 +65,31 @@ manifest:
 
 deliver: tag push
 
+ifndef CI_COMMIT_TAG
+
+GIT_BRANCH=$(shell git branch --show-current)
+ifeq ($(GIT_BRANCH),)
+GIT_BRANCH=$(CI_COMMIT_BRANCH)
+endif
+
+ifeq ($(GIT_BRANCH),master)
+TAG_DEV=dev
+else
+TAG_DEV=$(GIT_BRANCH)-dev
+endif
+
+tag:
+	{ set -e; source $(MANIFEST); \
+	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$${release_tag}-$(TAG_DEV); \
+	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$(FLAVOR)-$(TAG_DEV); \
+	}
+
+push:
+	{ set -e; source $(MANIFEST); \
+	docker push $(REGISTRY_URL)/$(NAME):$${release_tag}-$(TAG_DEV); \
+	docker push $(REGISTRY_URL)/$(NAME):$(FLAVOR)-$(TAG_DEV); \
+	}
+else
 tag:
 	{ set -e; source $(MANIFEST); \
 	docker tag $(BUILDIMAGE) $(REGISTRY_PREFIX)$(NAME):$$version; \
@@ -75,11 +100,12 @@ tag:
 
 push:
 	{ set -e; source $(MANIFEST); \
-	docker push $(REGISTRY_URL)/$(NAME):$$version; \
+	docker push $(REGISTRY_URL)/$(NAME):$$version); \
 	docker push $(REGISTRY_URL)/$(NAME):$$version_short; \
 	docker push $(REGISTRY_URL)/$(NAME):$$release_tag; \
 	docker push $(REGISTRY_URL)/$(NAME):$(FLAVOR); \
 	}
+endif
 
 clean-all:
 	docker rmi -f $(shell docker images $(BUILDIMAGE) -q)
@@ -120,14 +146,4 @@ run-worker:
        -e ROUTER_HOST=map-proxy-$(COMMITID) \
        $(BUILDIMAGE) qgisserver-worker
 
-
-# Push to docker hub as rc version
-pushrc:
-ifdef CI_COMMIT_TAG
-	@echo "This is a TAG commit"
-else
-	cat $(DOCKERPASS) | docker login -u 3liz --password-stdin
-	docker tag $(BUILDIMAGE) 3liz/$(NAME):$(FLAVOR)-rc
-	docker push 3liz/$(NAME):$(FLAVOR)-rc
-endif
 
