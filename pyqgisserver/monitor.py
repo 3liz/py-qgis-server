@@ -85,7 +85,6 @@ class Monitor:
         """ Register an instance of Monitor client
         """
         conf = confservice['monitor:amqp']
-
         routing_key = conf.get('routing_key')
         if not routing_key:
             return 
@@ -101,6 +100,8 @@ class Monitor:
         vhost = conf['vhost']
         port  = conf['port']
 
+        reconnect_delay = conf['reconnect_delay']
+
         kwargs = {}
 
         if user:
@@ -111,7 +112,7 @@ class Monitor:
         exchange = conf['exchange']
 
         client = AsyncPublisher(host=hosts,port=int(port),virtual_host=vhost,
-                                reconnect_delay=3,
+                                reconnect_delay=reconnect_delay,
                                 logger=LOGGER, **kwargs)
 
         # Catch exception in connection

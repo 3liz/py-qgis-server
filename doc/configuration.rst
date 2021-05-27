@@ -136,7 +136,7 @@ The url that must be seen by the client when the server is behind a proxy.
 SERVER_RESTARTMON
 -----------------
 
-The file to watch for restarting working. When the modified date of the file is changed.
+The file to watch for restarting workers. When the modified date of the file is changed.
 a restart command is broadcasted to the workers. Note that workers processes are restarted 
 without dropping requests.
 

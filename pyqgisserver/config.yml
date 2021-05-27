@@ -71,7 +71,7 @@ config_options:
     - name: SERVER_RESTARTMON
       label: Restart test file
       description: |
-          The file to watch for restarting working. When the modified date of the file is changed.
+          The file to watch for restarting workers. When the modified date of the file is changed.
           a restart command is broadcasted to the workers. Note that workers processes are restarted 
           without dropping requests.
       default: ''

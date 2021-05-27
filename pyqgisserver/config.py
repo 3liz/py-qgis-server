@@ -111,6 +111,9 @@ def load_configuration():
     CONFIG.set('monitor:amqp','vhost'      , getenv('AMQP_VHOST','/'))
     CONFIG.set('monitor:amqp','port'       , getenv('AMQP_PORT','5672'))
     CONFIG.set('monitor:amqp','exchange'   , getenv('AMQP_EXCHANGE','qgis_log'))
+    # Beware that a too small reconnect delay 
+    # may prevent other asynchronous tasks to run
+    CONFIG.set('monitor:amqp','reconnect_delay', getenv('AMQP_RECONNECT_DELAY','5'))
 
 
 def read_config_file( cfgfile ):
