@@ -22,13 +22,14 @@ from typing import Mapping, List
 from .logger import log_request
 from .config import confservice
 
-from .handlers import (StatusHandler, OwsHandler)
+from .handlers import (StatusHandler, OwsHandler, PingHandler, NotFoundHandler)
 from .zeromq import client, broker
 
 from .utils import process
 from .qgspool import create_poolserver
 
 from .monitor import Monitor
+from .stats import Stats
 
 from pyqgisservercontrib.core.filters import ServerFilter
 
@@ -86,7 +87,9 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         r"/wfs3/static/.*",
     ] 
 
-    handlers = []
+    handlers = [
+        (r"/ping", PingHandler),
+    ]
 
     def add_handler( path, handler, kwargs ):
         LOGGER.debug("*** Adding handler for: %s", path)        
@@ -113,7 +116,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
     add_handler( rf"{root}(?P<endpoint>/wfs3/conformance{end})", OwsHandler, ows_kwargs )
     add_handler( rf"{root}(?P<endpoint>/wfs3/api{end})", OwsHandler, ows_kwargs )
-    
+
     return handlers
 
 
@@ -126,8 +129,10 @@ class Application(tornado.web.Application):
         identity = "{}-{}".format(identity,os.getpid())
 
         self._broker_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
-        
-        super().__init__(configure_handlers(self._broker_client))
+        self.stats = Stats()
+
+        super().__init__(configure_handlers(self._broker_client),
+                         default_handler_class=NotFoundHandler)
 
     def log_request(self, handler: tornado.web.RequestHandler ) -> None:
         """ Write HTTP requet to the logs
@@ -222,10 +227,6 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     if user:
         setuid(user)
 
-    def close_sockets(sockets):
-        for sock in sockets:
-            sock.close()
-
     worker_pool   = None
     broker_pr     = None
 
@@ -241,7 +242,18 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     # Run
     try:
         # Fork processes
+        # This is a *DEPRECATED* feature
         if jobs > 1:
+
+            def close_sockets(sockets):
+                for sock in sockets:
+                    sock.close()
+
+            print(("DEPRECATION WARNING: "
+                   "the 'jobs' option is deprecated "
+                   "and will be removed in near future"),
+                  file=sys.stderr, flush=True)
+
             sockets = bind_sockets(port, address=address)
             if  process.fork_processes(jobs) is None: # We are in the main process
                 close_sockets(sockets)
@@ -260,12 +272,19 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             sockets = bind_sockets(port, address=address)
 
         LOGGER.info("Running server on port %s:%s", address, port)
-    
+
         application = Application(ipcaddr)
 
         # Init HTTP server
         server = HTTPServer(application, **kwargs)
         server.add_sockets(sockets)
+
+        management = None
+        # Activate management
+        if confservice['management'].getboolean('enabled'):
+            from .management.server import start_management_server
+            management = start_management_server(worker_pool,ipcaddr)
+            management.stats = application.stats
 
         # Initialize pool supervisor
         worker_pool.start_supervisor()
@@ -292,6 +311,9 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     # Teardown
     if server is not None:
         server.stop()
+    if management is not None:
+        management.terminate()
+        management = None
     if application is not None:
         application.terminate()
         application = None

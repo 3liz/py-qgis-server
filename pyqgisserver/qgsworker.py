@@ -201,7 +201,13 @@ class QgsRequestHandler(RequestHandler):
                                           logger=LOGGER, 
                                           verbose=LOGGER.level<=logging.DEBUG)
 
-            load_plugins(qgsserver.serverInterface()) 
+            serverIface = qgsserver.serverInterface()
+            load_plugins(serverIface)
+
+            if confservice['management'].getboolean('enabled'):
+                from .management.apis import register_management_apis
+                register_management_apis(serverIface)
+
             preload_projects()
 
             setattr(cls, 'qgis_server' , qgsserver )

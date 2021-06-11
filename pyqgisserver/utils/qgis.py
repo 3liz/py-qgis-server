@@ -117,7 +117,7 @@ def install_logger_hook( logger: logging.Logger, logprefix: str, verbose: bool=F
         elif verbose:
             # Qgis is somehow very noisy
             # log only if verbose is set
-            logger.info(arg)
+            logger.debug(arg)
 
     messageLog = QgsApplication.messageLog()
     messageLog.messageReceived.connect( writelogmessage )

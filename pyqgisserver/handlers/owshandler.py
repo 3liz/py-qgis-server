@@ -39,6 +39,7 @@ class OwsHandler(BaseHandler):
         self._monitor     = monitor
         self._filters     = filters or []
         self._proxy       = http_proxy
+        self._stats       = self.application.stats
 
     async def prepare(self) -> Awaitable[None]:
         # Handle filters
@@ -69,6 +70,8 @@ class OwsHandler(BaseHandler):
                 # Do not let qgis server handle url encoded prameters
                 method = 'GET'
                 data   = None
+
+            self._stats.num_requests +=1
 
             response = await self._client.fetch(query=query, method=method, 
                                                 headers=headers, data=data,
@@ -109,6 +112,9 @@ class OwsHandler(BaseHandler):
             status = 502
             delta = time() - reqtime
             self.send_error(status, reason="Backend request error")
+
+        if status >= 500:
+            self._stats.num_errors +=1
 
         if self._monitor:
             self._monitor.emit( status, self.request.arguments,  delta, 

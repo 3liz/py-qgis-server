@@ -115,6 +115,17 @@ def load_configuration():
     # may prevent other asynchronous tasks to run
     CONFIG.set('monitor:amqp','reconnect_delay', getenv('AMQP_RECONNECT_DELAY','5'))
 
+    #
+    # Management 
+    #
+    CONFIG.add_section('management')
+    CONFIG.set('management','enabled'    , getenv('QGSRV_MANAGEMENT_ENABLED','no'))
+    CONFIG.set('management','interfaces' , getenv('QGSRV_MANAGEMENT_INTERFACES', '127.0.0.1'))
+    CONFIG.set('management','ssl'        , getenv('QGSRV_MANAGEMENT_SSL','no'))
+    CONFIG.set('management','ss_key'     , getenv('QGSRV_MANAGEMENT_SSL_KEY' ,''))
+    CONFIG.set('management','ssl_cert'   , getenv('QGSRV_MANAGEMENT_SSL_CERT',''))
+    CONFIG.set('management','port'       , getenv('QGSRV_MANAGEMENT_PORT','19876'))
+  
 
 def read_config_file( cfgfile ):
     """ Read configuration from file

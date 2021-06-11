@@ -13,6 +13,7 @@ QGIS_IMAGE:=$(REGISTRY_PREFIX)qgis-platform:$(FLAVOR)
 
 SERVER_HTTP_PORT:=127.0.0.1:8888
 SERVER_HTTPS_PORT:=127.0.0.1:8443
+MANAGEMENT_PORT:=127.0.0.1:19876
 
 BECOME_USER:=$(shell id -u)
 
@@ -82,7 +83,10 @@ PROJECTS_ROOTDIR:=$(SRCDIR)/tests/data
 
 run: local
 	echo -n "Restart qgis" > .qgis-restart
-	docker run -it --rm -p $(SERVER_HTTP_PORT):8080 --name qgis-py-server-run-$(COMMITID) -w /src \
+	docker run -it --rm \
+		-p $(SERVER_HTTP_PORT):8080 \
+		-p $(MANAGEMENT_PORT):19876 \
+		--name qgis-py-server-run-$(COMMITID) -w /src \
 		-u $(BECOME_USER) \
 		-v $(SRCDIR):/src \
 		-v $$(pwd)/.local:/.local \
@@ -104,6 +108,8 @@ run: local
 		-e QGSRV_DATA_PATH=/.local/share/qgis-server \
 		-e QGSRV_SERVER_STATUS_PAGE=yes \
 		-e QGIS_SERVER_TRUST_LAYER_METADATA=yes \
+		-e QGSRV_MANAGEMENT_ENABLED=yes \
+		-e QGSRV_MANAGEMENT_INTERFACES=0.0.0.0 \
 		$(QGIS_IMAGE) $(SCRIPTS)/run_server.sh 
 
 
