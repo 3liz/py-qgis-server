@@ -30,6 +30,7 @@ local:
 
 
 PGUSER ?= $(USER)
+PGDATABASE ?= $(USER)
 PGAPPNAME ?= py-qgis-server-tests
 
 ifdef PGPASSFILE
@@ -55,6 +56,7 @@ test: local
 		-v $$(pwd)/.pipcache:/.cache \
 		-e USER=$(USER) \
 		-e PGUSER=$(PGUSER) \
+		-e PGDATABASE=$(PGDATABASE) \
 		-e PGAPPNAME=$(PGAPPNAME) \
 		-e PGHOST=$(PGHOST) \
 		$(PG_RUN_VOL) \
@@ -94,6 +96,14 @@ run: local
 		-v $(PLUGINPATH):/plugins \
 		-v $$(pwd)/.pipcache:/.cache \
 		-v $(PROJECTS_ROOTDIR):/src/tests/data \
+		-e USER=$(USER) \
+		-e PGUSER=$(PGUSER) \
+		-e PGDATABASE=$(PGDATABASE) \
+		-e PGAPPNAME=$(PGAPPNAME) \
+		-e PGHOST=$(PGHOST) \
+		$(PG_RUN_VOL) \
+		$(PGPASSFILE_VOL) \
+		$(PGPASSFILE_ENV) \
 		-e PIP_CACHE_DIR=/.cache \
 		-e QGSRV_SERVER_WORKERS=$(WORKERS) \
 		-e QGSRV_CACHE_ROOTDIR=/src/tests/data \

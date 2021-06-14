@@ -30,8 +30,6 @@ from .handlers import * # noqa: F403,F401
 
 LOGGER = logging.getLogger('SRVLOG')
 
-CacheDetails = namedtuple("CacheDetails",('project','timestamp'))
-
 
 class StrictCheckingError(Exception):
     pass
@@ -39,6 +37,15 @@ class StrictCheckingError(Exception):
 
 class PathNotAllowedError(Exception):
     pass
+
+
+class UnreadableResourceError(Exception):
+    """ Indicates that the  ressource exists but is not readable
+    """
+    pass
+
+
+CacheDetails = namedtuple("CacheDetails",('project','timestamp'))
 
 
 CACHE_MANAGER_CONTRACTID = '@3liz.org/cache-manager;1'
@@ -58,6 +65,10 @@ def _merge_qs( query1: str, query2: str ) -> str:
 class QgsCacheManager:
     """ Handle Qgis project cache 
     """
+
+    StrictCheckingError=StrictCheckingError
+    PathNotAllowedError=PathNotAllowedError
+    UnreadableResourceError=UnreadableResourceError
 
     def __init__(self) -> None:
         """ Initialize cache
@@ -199,12 +210,13 @@ class QgsCacheManager:
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
         project.read(path,  readflags)
-        if self._strict_check and not badlayerh.validatLayers(project):
+        if self._strict_check and not badlayerh.validateLayers(project):
             raise StrictCheckingError
 
         self.prepare_project(project)
 
         return project
+
 
 
 class BadLayerHandler(QgsProjectBadLayerHandler):
@@ -221,7 +233,7 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
         nameElements = (lyr.firstChildElement("layername") for lyr in layers if lyr)
         self.badLayerNames = set(elem.text() for elem in nameElements if elem)
 
-    def validatLayers( self, project: QgsProject ) -> bool:
+    def validateLayers( self, project: QgsProject ) -> bool:
         """ Check layers
             
             If layers are excluded do not count them as bad layers

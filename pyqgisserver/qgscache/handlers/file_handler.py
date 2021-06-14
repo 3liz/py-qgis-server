@@ -11,7 +11,7 @@
 import logging
 import urllib.parse
 
-from typing import Tuple
+from typing import Tuple, Optional
 from datetime import datetime
 from pathlib import Path
 
@@ -32,8 +32,8 @@ class FileProtocolHandler:
     def __init__(self):
         pass
 
-    def get_project( self, url: urllib.parse.ParseResult, project: QgsProject=None,
-                     timestamp: datetime=None) -> Tuple[QgsProject, datetime]:
+    def get_project( self, url: urllib.parse.ParseResult, project: Optional[QgsProject]=None,
+                     timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
         """ Create or return a proect
         """
         # Securit check

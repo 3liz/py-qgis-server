@@ -28,6 +28,7 @@ from .zeromq.worker import RequestHandler, run_worker
 from .qgscache.cachemanager import (get_cacheservice,
                                     preload_projects,
                                     StrictCheckingError,
+                                    UnreadableResourceError,
                                     PathNotAllowedError)
 
 from .plugins import load_plugins
@@ -239,11 +240,13 @@ class QgsRequestHandler(RequestHandler):
                     LOGGER.debug("Cleaning config cache entry %s", config_path)
                     iface.removeConfigCacheEntry(config_path)
             except StrictCheckingError:
-                response.sendError(422,"Invalid layers for project '%s' - strict mode on" % project_location)
+                response.sendError(422,f"Invalid layers for project '{project_location}' - strict mode on")
+            except UnreadableResourceError:
+                response.sendError(422,f"Cannot read project resource '{project_location}'")
             except PathNotAllowedError:
                 response.sendError(403,"Project path not allowed")
             except FileNotFoundError:
-                response.sendError(404,"Project '%s' not found" % project_location)
+                response.sendError(404,f"Project '{project_location}' not found")
             else:
                 # See https://github.com/qgis/QGIS/pull/9773
                 iface.setConfigFilePath(config_path)
