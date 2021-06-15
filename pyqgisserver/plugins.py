@@ -9,12 +9,12 @@
 """ Qgis server plugin managment 
 
 """
-import os
 import sys
 import logging
-import glob
 import configparser
+import traceback
 
+from pathlib import Path
 from typing import Generator
 
 from .config  import confservice
@@ -22,10 +22,7 @@ from .config  import confservice
 LOGGER = logging.getLogger('SRVLOG') 
 
 server_plugins = {}
-
-
-class PluginError(Exception): 
-    pass
+failed_plugins = []
 
 
 def checkQgisVersion(minver: str, maxver: str) -> bool:
@@ -55,23 +52,24 @@ def checkQgisVersion(minver: str, maxver: str) -> bool:
 def find_plugins(path: str) -> Generator[str,None,None]:
     """ return list of plugins in given path
     """
-    for plugin in glob.glob(path + "/*"):
+    path = Path(path)
+    for plugin in path.glob("*"):
         LOGGER.debug("Looking for plugin in %s", plugin)
-        if not os.path.isdir(plugin):
+        if not plugin.is_dir():
             continue
 
-        metadatafile = os.path.join(plugin, 'metadata.txt')
-        if not os.path.exists(metadatafile):
+        metadatafile = plugin / 'metadata.txt'
+        if not metadatafile.exists():
             continue
 
-        if not os.path.exists(os.path.join(plugin, '__init__.py')):
+        if not (plugin / '__init__.py').exists():
             LOGGER.warning("Found metadata file but no entry point !")
             continue
 
         cp = configparser.ConfigParser()
 
         try:
-            with open(metadatafile, mode='rt') as f:
+            with metadatafile.open(mode='rt') as f:
                 cp.read_file(f)
 
             if not cp['general'].getboolean('server'):
@@ -89,12 +87,14 @@ def find_plugins(path: str) -> Generator[str,None,None]:
             LOGGER.warning("Unsupported version for %s. Discarding", plugin)
             continue
 
-        yield os.path.basename(plugin)
+        yield plugin.name
 
 
 
-def load_plugins(serverIface: 'QgsServerInterface') -> None: # noqa F821
+def load_plugins(serverIface: 'QgsServerInterface') -> bool: # noqa F821
     """ Start all plugins
+
+        Return False if some plugins can no be loaded
     """
 
     plugin_path = confservice.get('server','pluginpath')
@@ -114,8 +114,33 @@ def load_plugins(serverIface: 'QgsServerInterface') -> None: # noqa F821
             server_plugins[plugin] = package.serverClassFactory(serverIface)
             LOGGER.info("Loaded plugin %s",plugin)
         except Exception:
-            LOGGER.error("Error loading plugin %s",plugin)
-            raise 
+            strace = traceback.format_exc()
+            LOGGER.error("Error loading plugin %s\n%s", plugin, strace)
+            failed_plugins.append((plugin, strace))
     
 
+def plugin_metadata( plugin: str ):
+    """ Return plugin metadata
+    """
+    if plugin not in server_plugins:
+        return
+    # Read metadata
+    path = Path(sys.modules[plugin].__file__)
+    metadatafile = path.parent / 'metadata.txt'
+    if not metadatafile.exists():
+        return
+
+    with metadatafile.open(mode='rt') as f:
+        cp = configparser.ConfigParser()
+        cp.read_file(f)
+        metadata = { s: dict(p.items()) for s,p in cp.items() }
+        metadata.pop('DEFAULT',None)
+        metadata.update(path=str(path))
+        return metadata
+
+
+def plugin_list():
+    """ Iterate over loaded plugins
+    """
+    return (k for k in server_plugins.keys())
 
