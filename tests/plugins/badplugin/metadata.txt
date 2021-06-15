@@ -1,0 +1,12 @@
+[general]
+name=badplugin
+qgisMinimumVersion=3.0
+;qgisMaximumVersion=
+description=Test bad plugin
+version=1.0.0
+author=
+email=
+; if True it's a server plugin
+server=True
+
+

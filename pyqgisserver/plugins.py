@@ -115,7 +115,7 @@ def load_plugins(serverIface: 'QgsServerInterface') -> bool: # noqa F821
             LOGGER.info("Loaded plugin %s",plugin)
         except Exception:
             strace = traceback.format_exc()
-            LOGGER.error("Error loading plugin %s\n%s", plugin, strace)
+            LOGGER.error("Error loading plugin '%s'\n%s", plugin, strace)
             failed_plugins.append((plugin, strace))
     
 
