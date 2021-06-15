@@ -13,14 +13,16 @@ import logging
 import urllib.parse
 
 from urllib.parse import urlparse, urljoin, parse_qs
-from typing import Tuple
+from typing import Tuple, Optional, Sequence
 from collections import namedtuple
 from pathlib import Path
+from datetime import datetime
 
 from ..utils.lru import lrucache
 from ..config import confservice
 
-from qgis.core import QgsProjectBadLayerHandler, QgsProject
+from qgis.PyQt.QtCore import Qt 
+from qgis.core import QgsProjectBadLayerHandler, QgsProject, QgsMapLayer
 from qgis.server import QgsServerProjectUtils
 
 from pyqgisservercontrib.core import componentmanager
@@ -99,6 +101,9 @@ class QgsCacheManager:
         """
         self._cache.clear()
 
+    def items(self) -> Sequence[Tuple[str,CacheDetails]]:
+        return self._cache.items()
+
     def remove_entry(self, key: str) -> None:
         """ Remove cache entry
         """
@@ -142,13 +147,8 @@ class QgsCacheManager:
 
         return url
 
-    def update_entry(self, key: str) -> bool:
-        """ Update the cache
-
-            :param key: The key of the entry to update
-            :param force: Force updating entry
-
-            :return: true if the entry has been updated
+    def get_project(self, key: str, strict: Optional[bool]=None) -> Tuple[QgsProject,datetime,bool]:
+        """ Load project 
         """
         url = self.resolve_alias(key)
     
@@ -163,15 +163,25 @@ class QgsCacheManager:
         # Get details for the project
         details = self._cache.peek(key)
         if details is not None:
-            project, timestamp  = store.get_project( url, **details._asdict())
-            updated = timestamp != details.timestamp
+            project, timestamp  = store.get_project( url, strict=strict, **details._asdict())
+            needupdate = timestamp != details.timestamp
         else:
-            project, timestamp = store.get_project(url)
-            updated = True
+            project, timestamp = store.get_project(url, strict=strict)
+            needupdate = True
+
+        return project, timestamp, needupdate
+        
+    def update_entry(self, key: str) -> bool:
+        """ Update the cache
+
+            :param key: The key of the entry to update
+            :return: true if the entry has been updated
+        """
+        project, timestamp, updated = self.get_project(key)
         self._cache[key] = CacheDetails(project, timestamp)
         return updated
 
-    def peek(self, key: str) -> CacheDetails:
+    def peek(self, key: str) -> Optional[CacheDetails]:
         """ Return entry if it exists
         """
         return self._cache.peek(key)
@@ -193,7 +203,7 @@ class QgsCacheManager:
             project.writeEntry("WFSUrl","/", "")
             project.writeEntry("WCSUrl","/", "")
 
-    def read_project(self, path: str) -> QgsProject:
+    def read_project(self, path: str, strict: Optional[bool]=None) -> QgsProject:
         """ Read project from path
 
             May be used by protocol-handlers to instanciate project
@@ -210,13 +220,13 @@ class QgsCacheManager:
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
         project.read(path,  readflags)
-        if self._strict_check and not badlayerh.validateLayers(project):
+
+        strict = self._strict_check if strict is None else strict
+        if strict and not badlayerh.validateLayers(project):
             raise StrictCheckingError
 
         self.prepare_project(project)
-
         return project
-
 
 
 class BadLayerHandler(QgsProjectBadLayerHandler):
@@ -290,10 +300,30 @@ def preload_projects() -> None:
     if not confpath:
         return
 
-    # france_parts.qgs
-    # project_simple.qgs
-    # file:raster_layer.qgs
-
     preload_projects_file( confpath, get_cacheservice() )
 
+
+def get_project_summary( key: str, project: QgsProject ):
+    """ Return json summary for cached project
+    """
+    def layer_summary( layer_id: str, layer: QgsMapLayer ):
+        return dict(
+            id=layer_id,
+            name=layer.name(),
+            source=layer.publicSource(),
+            crs=layer.crs().userFriendlyIdentifier(),
+            valid=layer.isValid(),
+            spatial=layer.isSpatial(),
+        )
+
+    layers = [layer_summary(idstr,l) for (idstr,l) in project.mapLayers().items()]
+
+    return dict(
+        cache_key=key,
+        filename=project.fileName(),
+        bad_layers_count=sum(ls['valid'] for ls in layers),
+        layers=layers,
+        crs=project.crs().userFriendlyIdentifier(),
+        last_modified=project.lastModified().toString(Qt.ISODate)
+    )
 

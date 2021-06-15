@@ -22,7 +22,7 @@ from .config  import confservice
 LOGGER = logging.getLogger('SRVLOG') 
 
 server_plugins = {}
-failed_plugins = []
+failed_plugins = {}
 
 
 def checkQgisVersion(minver: str, maxver: str) -> bool:
@@ -116,14 +116,18 @@ def load_plugins(serverIface: 'QgsServerInterface') -> bool: # noqa F821
         except Exception:
             strace = traceback.format_exc()
             LOGGER.error("Error loading plugin '%s'\n%s", plugin, strace)
-            failed_plugins.append((plugin, strace))
+            failed_plugins[plugin] = strace
     
 
 def plugin_metadata( plugin: str ):
     """ Return plugin metadata
     """
+    if plugin in failed_plugins:
+        return { 'error_log' : failed_plugins[plugin] }
+
     if plugin not in server_plugins:
         return
+
     # Read metadata
     path = Path(sys.modules[plugin].__file__)
     metadatafile = path.parent / 'metadata.txt'

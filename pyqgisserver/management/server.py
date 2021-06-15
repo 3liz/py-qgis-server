@@ -30,7 +30,15 @@ class _PoolHandler(BaseHandler):
         super().initialize()
         self._poolserver = poolserver
 
-    async def post(self, action) -> Awaitable[None]:
+    def options(self) -> None:
+        """ Implement OPTION for validating CORS
+        """
+        self.set_option_headers()
+
+
+class _RestartHandler(_PoolHandler):
+
+    def post(self, action) -> None:
         """ Handle POST method
         """
         # Broadcast 'restart' to workers
@@ -40,10 +48,20 @@ class _PoolHandler(BaseHandler):
 
         self.write_json({ 'status': 'ok' }) 
 
-    def options(self) -> None:
-        """ Implement OPTION for validating CORS
+
+class _ReportHandler(_PoolHandler):
+
+    async def get(self) -> Awaitable[None]:
+        """ Return worker reports
         """
-        self.set_option_headers('PUT, OPTIONS')
+        # Broadcast 'restart' to workers
+        req = self.request
+        reports = await self._poolserver.get_reports()
+        for w in reports:
+            for entry in w['cache']:
+                entry.update(link=f"{req.protocol}://{req.host}/cache/{entry['key']}")
+
+        self.write_json({'workers': reports, 'num_workers': self._poolserver.num_workers }) 
 
 
 def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
@@ -56,10 +74,11 @@ def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web
 
     handlers = [
         (r"/", StatusHandler),
-        (r"/pool/(restart)", _PoolHandler, {'poolserver': poolserver}),
-        (r"/plugins/.*"    , QgisHandler, dict(root=r"/plugins/",**kwargs)),
-        (r"/projects/.*"   , QgisHandler, dict(root=r"/projects/",**kwargs)),
-        (r"/qgis/.*"       , QgisHandler, dict(root=r"/qgis/"   ,**kwargs)),
+        (r"/pool/(restart)", _RestartHandler, {'poolserver': poolserver}),
+        (r"/pool/"         , _ReportHandler , {'poolserver': poolserver}),
+        (r"/plugins/.*"    , QgisHandler, dict(root=r"/",**kwargs)),
+        (r"/cache/.*"      , QgisHandler, dict(root=r"/"  ,**kwargs)),
+        (r"/qgis/.*"       , QgisHandler, dict(root=r"/"   ,**kwargs)),
     ]
     return handlers
 

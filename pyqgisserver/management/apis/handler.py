@@ -43,11 +43,12 @@ class RequestHandler:
         """
         """
 
-    def public_url(self, path="") -> str:
+    def public_url(self, path="", rootpath: Optional[str]=None) -> str:
         """ Return the public base url
         """
         url = self._request.originalUrl()
-        public_url = f"{url.scheme()}://{url.authority()}{self._context.apiRootPath()}{path}"
+        rootpath = rootpath or self._context.apiRootPath() 
+        public_url = f"{url.scheme()}://{url.authority()}{rootpath}{path}"
         return public_url
 
     def finish(self, chunk: Optional[Union[str, bytes, dict]] = None) -> None:
@@ -91,11 +92,9 @@ class RequestHandler:
             if isinstance(exception, HTTPError) and exception.reason:
                 reason = exception.reason
         self.set_status(status_code, reason=reason)
-        
-        LOGGER.error(f"{reason}")
         self.write(dict(status="error" if status_code != 200 else "ok",
                         httpcode = status_code,
-                        error    = { "message": reason }))
+                        error    = { "message": self._reason }))
         if not self._finished:
             self.finish()
         

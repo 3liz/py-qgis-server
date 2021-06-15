@@ -15,6 +15,7 @@
     2. Connect a REQ zmq socket to endpoint
     3. Return qgis server responses
 """
+import os
 import sys
 import logging
 import traceback
@@ -22,18 +23,21 @@ import zmq
 import pickle
 import uuid
 
-from typing import Callable, TypeVar, Optional
+from typing import TypeVar, Optional, Type
 
 from ..logger import setup_log_handler
+from ..utils import stats
 
 from .messages import (WORKER_READY, ReplyMessage)
 from .supervisor import Client as SupervisorClient
+
+
 
 LOGGER=logging.getLogger('SRVLOG')
 
 # Define an abstract type for HTTPRequest
 HTTPRequest = TypeVar('HTTPRequest')
-HandlerFactory = Callable[[zmq.Socket, bytes, bytes, HTTPRequest], 'RequestHandler']
+
 
 class RequestHandler:
 
@@ -99,6 +103,12 @@ class RequestHandler:
         self.send(b"Chunk 2", True)
         self.send(b"", False)
 
+    @classmethod
+    def get_report(cls):
+        data = stats.stats()
+        data.update(pid=os.getpid())
+        return data
+
 
 def dealer_socket( ctx: zmq.Context, address: str, identity: Optional[bytes]=None ) -> zmq.Socket:
     """ Socket for receiving incoming messages
@@ -123,11 +133,12 @@ def broadcast_socket( ctx: zmq.Context, broadcastaddr: str ) -> zmq.Socket:
     sub = ctx.socket(zmq.SUB)
     sub.setsockopt(zmq.LINGER, 500)    # Needed for socket no to wait on close
     sub.setsockopt(zmq.SUBSCRIBE, b'RESTART')
+    sub.setsockopt(zmq.SUBSCRIBE, b'REPORT')
     sub.connect(broadcastaddr)
     return sub
 
 
-def run_worker(address: str, handler_factory: HandlerFactory, 
+def run_worker(address: str, handler_factory: Type[RequestHandler], 
                identity: Optional[bytes]=None, broadcastaddr: Optional[str]=None,
                maxcycles: Optional[int]=None) -> None:
     """ Enter the message loop
@@ -171,13 +182,18 @@ def run_worker(address: str, handler_factory: HandlerFactory,
             finally:
                 supervisor.notify_done()
 
-            # Handle broadcast restart
+            # Handle broadcast notifications
             try:
-                if broadcastaddr and sub.recv(flags=zmq.NOBLOCK)==b'RESTART':
-                    # There is no really way to restart
-                    # so exit and let the framework restart a new worker
-                    LOGGER.info("Exiting on RESTART notification")
-                    break
+                if broadcastaddr:
+                    msg = sub.recv(flags=zmq.NOBLOCK)
+                    if msg==b'RESTART':
+                        # There is no really way to restart
+                        # so exit and let the framework restart a new worker
+                        LOGGER.info("Exiting on RESTART notification")
+                        break
+                    elif msg==b'REPORT':
+                        # Reporting asked
+                        supervisor.send_report(handler_factory.get_report())
             except zmq.error.Again:
                 pass
     except (KeyboardInterrupt, SystemExit):

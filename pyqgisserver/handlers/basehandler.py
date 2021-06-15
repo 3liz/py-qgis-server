@@ -132,6 +132,7 @@ class BaseHandler(tornado.web.RequestHandler):
         return proxy_url
 
 
+
 class NotFoundHandler(BaseHandler):
     def prepare(self):  # for all methods
         raise HTTPError(

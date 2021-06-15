@@ -24,7 +24,7 @@ from glob import glob
 from multiprocessing import Process
 from multiprocessing.util import Finalize
 
-from typing import Callable, Awaitable, Optional
+from typing import Callable, Awaitable, Optional, Dict, List
 
 from .zeromq.supervisor import Supervisor
 from .zeromq.pool import Pool
@@ -81,7 +81,8 @@ class _RestartHandler:
 
 class _Server:
 
-    def __init__(self, broadcastaddr: str, pool: Process,  timeout: int  ) -> None:
+    def __init__(self, broadcastaddr: str, pool: Process,  timeout: int,
+                 num_workers: int) -> None:
 
         ctx = zmq.Context.instance()
         pub = ctx.socket(zmq.PUB)
@@ -91,6 +92,7 @@ class _Server:
 
         self._timeout = timeout 
         self._sock = pub
+        self._num_workers = num_workers
 
         LOGGER.debug("Started pool server")
         self._pool = pool
@@ -165,6 +167,24 @@ class _Server:
         """
         self.broadcast(b'RESTART')
 
+    @property
+    def num_workers(self) -> int:
+        return self._num_workers
+
+    async def get_reports(self) -> Awaitable[List[Dict]]:
+        """ Collect reports
+        """
+        maxwait=10
+        so_far=0
+        self._supervisor.clear_reports()
+        self.broadcast(b'REPORT')
+        while self._supervisor.num_reports() < self._num_workers:
+            await asyncio.sleep(1)
+            so_far += 1
+            if so_far >= maxwait:
+                break
+        return self._supervisor.reports
+
 
 def create_poolserver(numworkers: int) -> _Server:
     """ Run workers pool in its own process
@@ -186,7 +206,7 @@ def create_poolserver(numworkers: int) -> _Server:
     p = Process(target=run_worker_pool, args=(numworkers, broadcastaddr, router, maxcycles))
     p.start()
 
-    poolserver = _Server(broadcastaddr, p, timeout)
+    poolserver = _Server(broadcastaddr, p, timeout, numworkers)
     return poolserver
 
 

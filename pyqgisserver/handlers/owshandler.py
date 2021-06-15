@@ -80,7 +80,7 @@ class OwsHandler(BaseHandler):
             hdrs   = response.headers
             delta  = time() - reqtime
 
-            log_rrequest(path, status, method, query, delta, hdrs)
+            log_rrequest(proxy_url, status, method, query, delta, hdrs)
            
             # Send response
             for k,v in hdrs.items():

@@ -24,11 +24,15 @@ import zmq
 import traceback
 import logging
 
+
 from .utils import _get_ipc
 
-from typing import Awaitable
+from collections import namedtuple
+from typing import Awaitable, Any
 
 LOGGER=logging.getLogger('SRVLOG')
+
+_Report = namedtuple('_Report',('data'))
 
 
 class Client:
@@ -45,7 +49,7 @@ class Client:
         self._pid = os.getpid()
         self._busy = False
 
-    def _send(self, data: bytes ) -> None: 
+    def _send(self, data: Any ) -> None: 
         try:
             self._sock.send_pyobj((self._pid, data), flags=zmq.DONTWAIT)
         except zmq.ZMQError as err:
@@ -69,6 +73,9 @@ class Client:
     def close(self) -> None:
         self._sock.close()
 
+    def send_report(self, data: Any) -> None:
+        self._send(_Report(data=data))
+    
 
 
 class Supervisor:
@@ -89,6 +96,7 @@ class Supervisor:
         self._busy = {}
         self._stopped = True
         self._task = None
+        self._reports = {}
 
     def run(self) -> None:
         self._task = asyncio.ensure_future(self._run_async())
@@ -111,14 +119,16 @@ class Supervisor:
 
         while not self._stopped:
             try:
-                pid, notif = await self._sock.recv_pyobj()
-                if notif == b'BUSY':
+                pid, msg = await self._sock.recv_pyobj()
+                if msg == b'BUSY':
                     self._busy[pid] = loop.call_later(self._timeout,kill,pid)
-                elif notif == b'DONE':
+                elif msg == b'DONE':
                     try:
                         self._busy.pop(pid).cancel()
                     except KeyError:
                         pass
+                elif isinstance(msg, _Report):
+                    self._reports[pid] = msg.data
             except zmq.ZMQError as err:
                 if err.errno != zmq.EAGAIN:
                     LOGGER.error("%s\n%s", zmq.strerror(err.errno), traceback.format_exc())
@@ -127,6 +137,16 @@ class Supervisor:
             except Exception:
                 LOGGER.critical("%s", traceback.format_exc())
                 raise
+
+    @property
+    def reports(self):
+        return list(self._reports.values())
+
+    def num_reports(self) -> int:
+        return len(self._reports)
+
+    def clear_reports(self):
+        self._reports = {}
 
     def stop(self) -> None:
         """ Stop the supervisor

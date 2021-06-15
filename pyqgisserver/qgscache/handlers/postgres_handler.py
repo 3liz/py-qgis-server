@@ -35,7 +35,7 @@ import psycopg2
 
 from urllib.parse import parse_qs
 
-from typing import Tuple
+from typing import Tuple, Optional
 from datetime import datetime
 
 from qgis.core import QgsProject
@@ -126,8 +126,9 @@ class PostgresProtocolHandler:
         cnf = componentmanager.get_service('@3liz.org/config-service;1')
         self._insecure = cnf.getboolean('projects.cache','insecure', fallback=False)
 
-    def get_project( self, url: urllib.parse.ParseResult, project: QgsProject=None,
-                     timestamp: datetime=None) -> Tuple[QgsProject, datetime]:
+    def get_project( self, url: urllib.parse.ParseResult, strict: Optional[bool]=None,
+                     project: Optional[QgsProject]=None,
+                     timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
         """ Create or return a project
 
             .. versionadded:: 1.3.2

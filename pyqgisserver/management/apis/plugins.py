@@ -15,11 +15,10 @@ import logging
 from tornado.web import HTTPError # noqa F401
 from typing import Optional 
 
-from pyqgisserver.plugins import plugin_list, plugin_metadata
+from pyqgisserver.plugins import plugin_list, plugin_metadata, failed_plugins
 from .handler import RequestHandler, register_handlers
 
 LOGGER = logging.getLogger('SRVLOG')
-
 
 
 class PluginCollection(RequestHandler):
@@ -37,7 +36,9 @@ class PluginCollection(RequestHandler):
             def link(name):
                 return self.public_url(f"/{name}")
             # List all loaded plugins
-            self.write({ 'plugins': [{ 'name': n, 'status': 'loaded', 'link': link(n) } for n in plugin_list()]})
+            plugins = [{ 'name': n, 'status': 'loaded', 'link': link(n) } for n in plugin_list()]
+            plugins.extend([{ 'name' : n, 'status': 'failed', 'link': link(n) } for n in failed_plugins])
+            self.write({'plugins': plugins })
 
         
 def register( serverIface ):
@@ -45,8 +46,16 @@ def register( serverIface ):
     """
     register_handlers(serverIface, "/plugins","PluginsManagment",
                       [
-                          (r'/$', PluginCollection),
-                          (r'/(?P<name>[^\/]+)/?$', PluginCollection),
+                          # XXX There is some inconsistency how path expression 
+                          # are handled:
+                          #
+                          # 1. Using '/' in first place will catch all requests
+                          # 2. We need to specify the full path for handling names (using
+                          #    only does not work '/(?P<name>[^\/]+)/?$')
+                          # 3. Using '/' at last place will act like '/$'
+                          #
+                          (r'/plugins/(?P<name>[^\/]+)/?$', PluginCollection),
+                          (r'/', PluginCollection),
                       ])
                       
 

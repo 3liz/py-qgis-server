@@ -20,7 +20,8 @@ import traceback
 
 from typing import Dict, Optional, Any
 
-from qgis.PyQt.QtCore import QBuffer, QIODevice, QByteArray
+from qgis.PyQt.QtCore import Qt, QBuffer, QIODevice, QByteArray
+from qgis.core import QgsProject
 from qgis.server import (QgsServerRequest,
                          QgsServerResponse)
 
@@ -253,6 +254,25 @@ class QgsRequestHandler(RequestHandler):
                 self.qgis_server.handleRequest(request, response, project=project)
         else:
             self.qgis_server.handleRequest(request, response)
+
+    @classmethod
+    def get_report(cls):
+        report = super(QgsRequestHandler,cls).get_report()
+
+        def _to_json(key: str, project: QgsProject):
+            return dict(
+                key=key,
+                filename=project.fileName(),
+                last_modified=project.lastModified().toString(Qt.ISODate),
+                num_layers=project.count(),
+            )
+
+        report.update(
+            cache=[_to_json(k,d.project) for (k,d) in get_cacheservice().items()]
+        )
+        return report
+
+
 
 def main():
     """ Run as command line interface
