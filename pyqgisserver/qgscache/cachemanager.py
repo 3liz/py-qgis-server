@@ -321,7 +321,7 @@ def get_project_summary( key: str, project: QgsProject ):
     return dict(
         cache_key=key,
         filename=project.fileName(),
-        bad_layers_count=sum(ls['valid'] for ls in layers),
+        bad_layers_count=sum(1 for ls in layers if not ls['valid']),
         layers=layers,
         crs=project.crs().userFriendlyIdentifier(),
         last_modified=project.lastModified().toString(Qt.ISODate)
