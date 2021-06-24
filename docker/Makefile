@@ -147,3 +147,12 @@ run-worker:
        $(BUILDIMAGE) qgisserver-worker
 
 
+# Push to docker hub as rc version
+pushrc:
+ifdef CI_COMMIT_TAG
+	@echo "This is a TAG commit"
+else
+	cat $(DOCKERPASS) | docker login -u 3liz --password-stdin
+	docker tag $(BUILDIMAGE) 3liz/$(NAME):$(FLAVOR)-rc
+	docker push 3liz/$(NAME):$(FLAVOR)-rc
+endif

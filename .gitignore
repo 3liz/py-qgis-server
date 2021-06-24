@@ -47,5 +47,7 @@ docker-test.log
 *.bak
 *.bak~
 
+qgis.db
+
 VERSION
 
