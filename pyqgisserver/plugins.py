@@ -15,7 +15,7 @@ import configparser
 import traceback
 
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Tuple, Dict
 
 from .config  import confservice
 
@@ -119,12 +119,9 @@ def load_plugins(serverIface: 'QgsServerInterface') -> bool: # noqa F821
             failed_plugins[plugin] = strace
     
 
-def plugin_metadata( plugin: str ):
+def plugin_metadata( plugin: str ) -> Dict:
     """ Return plugin metadata
     """
-    if plugin in failed_plugins:
-        return { 'error_log' : failed_plugins[plugin] }
-
     if plugin not in server_plugins:
         return
 

@@ -27,6 +27,9 @@ class PluginCollection(RequestHandler):
         """ Return plugin info
         """
         if name:
+            if name in failed_plugins:
+                self.write({ 'name': name, 'error_log' : failed_plugins[name], 'status': 'failed' })
+                return
             # Return plugin informations
             metadata = plugin_metadata(name)
             if not metadata:
