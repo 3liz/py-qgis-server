@@ -100,7 +100,7 @@ tag:
 
 push:
 	{ set -e; source $(MANIFEST); \
-	docker push $(REGISTRY_URL)/$(NAME):$$version); \
+	docker push $(REGISTRY_URL)/$(NAME):$$version; \
 	docker push $(REGISTRY_URL)/$(NAME):$$version_short; \
 	docker push $(REGISTRY_URL)/$(NAME):$$release_tag; \
 	docker push $(REGISTRY_URL)/$(NAME):$(FLAVOR); \
