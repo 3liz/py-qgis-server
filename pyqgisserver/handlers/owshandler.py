@@ -107,10 +107,15 @@ class OwsHandler(BaseHandler):
         except RequestTimeoutError:
             status = 504
             delta = time() - reqtime
+            # Log the request with status code 499 indicating
+            # that the request has not returned
+            log_rrequest(proxy_url, 499, method, query, delta, {})
             self.send_error(status, reason="Request timeout error")
         except RequestGatewayError:
             status = 502
             delta = time() - reqtime
+            # Log the request 
+            log_rrequest(proxy_url, 499, method, query, delta, {})
             self.send_error(status, reason="Backend request error")
 
         if status >= 500:
