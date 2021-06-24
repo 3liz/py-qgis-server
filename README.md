@@ -13,6 +13,8 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 
 The server is aimed at solving some real situations encountered in production environment: zero conf scalability, handle long-running request situation, auto restart...
 
+Py-Qgis-server is constantly tested against Qgis release and ltr version.
+
 ## Features
 
 - Multiples workers
@@ -27,12 +29,13 @@ The server is aimed at solving some real situations encountered in production en
 - Support adding new projects cache handlers as python extension 
 - Preloading of Qgis projects.
 - WFS3 support
+- Management API (experimental)
 
 ## Requirements:
 
 - OS: Unix/Posix variants (Linux or OSX) (Windows not officialy supported)
-- Python >= 3.5
-- QGIS > 3.0 installed
+- Python >= 3.6
+- QGIS >= 3.10 installed
 - Some python knowledge about python virtualenv and package installation.
 - libzmq >= 4.0.1 and pyzmq >= 17
 
@@ -43,6 +46,9 @@ Latest documentation is available on [ReadTheDoc](https://py-qgis-server.readthe
 ## Installation
 
 ### From docker
+
+Docker is the recommended way to deploy py-qgis-server as it ensure a working environment for
+running py-qgis-server
 
 Follow the readme in the [docker/](./docker) folder.
 
