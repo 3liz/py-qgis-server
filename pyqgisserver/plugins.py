@@ -15,7 +15,7 @@ import configparser
 import traceback
 
 from pathlib import Path
-from typing import Generator, Tuple, Dict
+from typing import Generator, Dict
 
 from .config  import confservice
 

@@ -28,6 +28,7 @@ tests:ltr:
 
 tests:3.10:
   extends: .tests
+  when: manual
   variables:
     QGIS_FLAVOR: "3.10" 
 
