@@ -239,6 +239,69 @@ config_options:
       tags: [ cache, http ]
       version_added: "1.5.4"
 
+    #===============
+    # Managment API
+    #===============
+ 
+    - name: MANAGEMENT_ENABLED
+      label: Enable management API
+      description: |
+        Activate management API service. The management API is REST api for controlling and inspecting
+        the server behavior, plugins and cached projects.
+        Starting from 1.7.0, this is a experimental feature and will be subject to change. The api will
+        be considered as 'stable' from the 1.8.0 version.
+      type: boolean
+      default: "no"
+      section: management
+      key: enabled
+      tags: [ management ]
+      version_added: "1.7.0"
+
+    - name: MANAGEMENT_INTERFACES
+      label: API interfaces
+      description: |
+          Network interfaces to listen to. The management API service will listen on this interface
+      default: "127.0.0.1"
+      section: management
+      key: interfaces
+      tags: [ http, management ]
+      version_added: "1.7.0"
+
+    - name: MANAGEMENT_PORT
+      label: Port
+      description: Port to listen to
+      default: '19876'
+      type: int
+      key: port
+      section: management
+      tags: [ http, management ]
+
+    - name: MANAGEMENT_SSL
+      label: Enable SSL
+      description: Enable SSL endpoint for API management
+      default: 'no'
+      type: boolean
+      tags: [ http, ssl, management ]
+      section: management
+      key: ssl
+
+    - name: MANAGEMENT_SSL_CERT
+      label: SSL Certificat
+      description: Path to the SSL certificat file for the management API
+      default: ''
+      tags: [ http, ssl, security, management ]
+      section: management
+      key: ssl_cert  
+      type: path
+
+    - name: MANAGEMENT_SSL_KEY
+      label: SSL Certificat 
+      description: Path to the SSL key file for the management API
+      default: ''
+      tags: [ http, ssl, security, management ]
+      section: management
+      key: ssl_key 
+      type: path
 
 
 

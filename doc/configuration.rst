@@ -393,3 +393,105 @@ urls override proxy urls.
 
 
 
+
+.. _MANAGEMENT_ENABLED:
+
+MANAGEMENT_ENABLED
+------------------
+
+Activate management API service. The management API is REST api for controlling and inspecting
+the server behavior, plugins and cached projects.
+Starting from 1.7.0, this is a experimental feature and will be subject to change. The api will
+be considered as 'stable' from the 1.8.0 version.
+
+
+:Type: boolean
+:Default: no
+:Version Added: 1.7.0
+:Section: management
+:Key: enabled
+:Env: QGSRV_MANAGEMENT_ENABLED
+
+
+
+
+.. _MANAGEMENT_INTERFACES:
+
+MANAGEMENT_INTERFACES
+---------------------
+
+Network interfaces to listen to. The management API service will listen on this interface
+
+
+
+:Type: string
+:Default: 127.0.0.1
+:Version Added: 1.7.0
+:Section: management
+:Key: interfaces
+:Env: QGSRV_MANAGEMENT_INTERFACES
+
+
+
+
+.. _MANAGEMENT_PORT:
+
+MANAGEMENT_PORT
+---------------
+
+Port to listen to
+
+:Type: int
+:Default: 19876
+:Section: management
+:Key: port
+:Env: QGSRV_MANAGEMENT_PORT
+
+
+
+
+.. _MANAGEMENT_SSL:
+
+MANAGEMENT_SSL
+--------------
+
+Enable SSL endpoint for API management
+
+:Type: boolean
+:Default: no
+:Section: management
+:Key: ssl
+:Env: QGSRV_MANAGEMENT_SSL
+
+
+
+
+.. _MANAGEMENT_SSL_CERT:
+
+MANAGEMENT_SSL_CERT
+-------------------
+
+Path to the SSL certificat file for the management API
+
+:Type: path
+:Section: management
+:Key: ssl_cert
+:Env: QGSRV_MANAGEMENT_SSL_CERT
+
+
+
+
+.. _MANAGEMENT_SSL_KEY:
+
+MANAGEMENT_SSL_KEY
+------------------
+
+Path to the SSL key file for the management API
+
+:Type: path
+:Section: management
+:Key: ssl_key
+:Env: QGSRV_MANAGEMENT_SSL_KEY
+
+
+
