@@ -139,12 +139,7 @@ class PostgresProtocolHandler:
 
         if timestamp is None or timestamp < modified_time:
             cachemngr = componentmanager.get_service('@3liz.org/cache-manager;1')
-            project  = cachemngr.read_project(urlstr)
-            # Consistency check => test that project modified time is the same as the one found
-            # in database, otherwise this will indicate thate the project was no read correctly
-            if modified_time != datetime.fromtimestamp(project.lastModified().toSecsSinceEpoch()):
-                raise cachemngr.UnreadableResourceError()      
-
+            project   = cachemngr.read_project(urlstr)
             timestamp = modified_time
 
         return project, timestamp
