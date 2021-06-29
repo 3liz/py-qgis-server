@@ -1,6 +1,10 @@
 
 # Unreleased
 
+# 1.7.1
+
+* Revert bad consistency check for postgres handler
+
 # 1.7.0
 
 * Add managment API
