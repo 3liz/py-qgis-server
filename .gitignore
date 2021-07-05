@@ -10,6 +10,8 @@ docs/_build
 build.manifest
 factory.manifest
 
+venv/
+.venv/
 __pycache__
 
 # Test outputs
@@ -50,4 +52,3 @@ docker-test.log
 qgis.db
 
 VERSION
-

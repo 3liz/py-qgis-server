@@ -1,14 +1,14 @@
+# Changelog
 
-# Unreleased
+## Unreleased
 
-# 1.7.1
+## 1.7.1 - 2021-06-30
 
 * Revert bad consistency check for postgres handler
 
-# 1.7.0
+## 1.7.0 - 2021-06-24
 
-* Add managment API
+* Add management API
 * Fix `postgres` protocol (broken in 1.6 branch)
-* Add `server:maxcycle` option for controling worker lifetime
+* Add `server:maxcycle` option for controlling worker lifetime
 * Log failed requests (allow auditing timeout errors)
-
