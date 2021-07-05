@@ -32,6 +32,7 @@ setup(
     author_email='david.marteau@3liz.com',
     maintainer='David Marteau',
     maintainer_email='dmarteau@3liz.com',
+    long_description_content_type="text/markdown",
     description=DESCRIPTION,
     keywords=KEYWORDS,
     url='https://github.com/3liz/py-qgis-server',
@@ -60,4 +61,3 @@ setup(
     ],
     **kwargs
 )
-
