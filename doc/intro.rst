@@ -107,7 +107,7 @@ Running proxy and workers separately
 
 If the ``--proxy`` option is set  the server will act as a proxy server to talk to independent qgis workers.
 
-Qgis workers can be run using the command:
+QGIS workers can be run using the command:
 
 **qgisserver-worker** [*options*]
 
