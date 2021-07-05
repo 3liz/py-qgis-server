@@ -10,7 +10,7 @@ Py-qgis-server is a asynchronous HTTP Qgis server written in python on top of th
 It is based on the new Qgis 3 server API for efficiently passing requests/responses using 0MQ messaging framework to workers.
 
 The server may be run as a self-contained single service or as a proxy server with an arbitrary number of workers running
-remotely or locally. Independant workers connect automatically to the front-end proxy with no need of special configuration
+remotely or locally. Independent workers connect automatically to the front-end proxy with no need of special configuration
 on the proxy side. Thus, this is ideal for auto-scaling configuration for use with container orchestrator as Rancher, Swarm or Kubernetes.
 
 The server is aimed at solving some real situations encountered in production environment: zero conf scalability, handle long-running request situation, auto restart...
@@ -33,7 +33,7 @@ Features
 Requirements
 ------------
 
-- OS: Unix/Posix variants (Linux or OSX) (Windows not officialy supported)
+- OS: Unix/Posix variants (Linux or OSX) (Windows not officially supported)
 - Python >= 3.5 
 - QGIS >= 3.10 installed
 - libzmq >= 4.0.1 and pyzmq >= 17
@@ -49,6 +49,10 @@ Installation
 Install from source
 -------------------
 
+* Install from pypi.org::
+
+    pip install py-qgis-server
+
 * Install from sources::
 
     pip install -e .
@@ -57,8 +61,6 @@ Install from source
 
     make dist
     pip install py-qgis-server-X.Y.Z.tar.gz
-
-
 
 .. _server_running:
 
@@ -121,6 +123,3 @@ Docker image is available on `docker-hub <https://hub.docker.com/r/3liz/qgis-map
 
 All options are passed with environment variables. See the :ref:`Configuration settings <configuration_settings>` 
 for a description of the options.
-
-
-

@@ -19,11 +19,11 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = 'py-qgis-server'
-copyright = '2020, David Marteau - 3liz'
+copyright = '2021, David Marteau - 3liz'
 author = 'David Marteau'
 
 # The full version, including alpha/beta/rc tags
-release = '1.4'
+release = '1.7'
 
 
 # -- General configuration ---------------------------------------------------
@@ -61,4 +61,3 @@ html_static_path = ['_static']
 # Fix for read the doc
 # See https://github.com/readthedocs/readthedocs.org/issues/2569
 master_doc = 'index'
-

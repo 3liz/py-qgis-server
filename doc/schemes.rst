@@ -57,14 +57,14 @@ Schemes aliases are defined by adding the scheme definition in the ``projects.sc
 .. note::
 
     The trailing ``/`` is important for the substitution rules. Otherwise
-    the path will intepreted as a base name which is not what you usually want. 
+    the path will interpreted as a base name which is not what you usually want.
 
 
-In the previous exemple, the ``MAP=my_relative_scheme:myproject`` will be substitued with ``file:relative/path/myproject``
+In the previous exemple, the ``MAP=my_relative_scheme:myproject`` will be substituted with ``file:relative/path/myproject``
 and searched relatively to the ``CACHE_ROOTDIR`` option. 
 
-On the other hand, the ``MAP=my_absolute_scheme:myproject`` will be substitued with ``file:/absolute/path/myproject``
-and the file wille be searched at ``/absolute/path/myproject.qgs``
+On the other hand, the ``MAP=my_absolute_scheme:myproject`` will be substituted with ``file:/absolute/path/myproject``
+and the file will be searched at ``/absolute/path/myproject.qgs``
 
 Important notes:
 
@@ -73,7 +73,7 @@ Important notes:
 
 * Query parameters defined in the alias scheme take precedence over the query parameters from the ``MAP`` parameter.
 
-  There is a spcial exception when using the ``{path}`` expression in the target of alias: only the path of the alias URL
+  There is a special exception when using the ``{path}`` expression in the target of alias: only the path of the alias URL
   will be used in the target url.
 
   i.e, with the following definition::
@@ -84,7 +84,3 @@ Important notes:
   Enable you to protect the `postgres` scheme from any parameter injection, only the path of the original url will be used. 
 
 * Target of alias cannot be alias
-
-
-
-
