@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Management API (experimental) &mdash; py-qgis-server 1.7 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Loader schemes" href="schemes.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> py-qgis-server
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#running-the-server">Running the server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html#common-configuration-options">Common Configuration Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemes.html">Loader schemes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemes.html#default-handlers">Default handlers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemes.html#scheme-aliases">Scheme aliases</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Management API (experimental)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plugins-api">Plugins API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cache-api">Cache API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pool-api">Pool API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qgis-api">Qgis API</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">py-qgis-server</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Management API (experimental)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/management.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="management-api-experimental">
+<span id="management-api"></span><h1>Management API (experimental)<a class="headerlink" href="#management-api-experimental" title="Permalink to this headline">¶</a></h1>
+<p>The management API is a REST api for inspecting the server state and controlling some of the server
+behavior.</p>
+<p>Starting from version 1.7.0, this is an <strong>experimental</strong> feature and it will be subject to change.
+The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
+<div class="section" id="plugins-api">
+<span id="id1"></span><h2>Plugins API<a class="headerlink" href="#plugins-api" title="Permalink to this headline">¶</a></h2>
+<p>The <em>plugins</em> api enable inspecting and managing Qgis server plugins.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#get--plugins-(name)" title="GET /plugins/(name)"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/plugins/(name)</span></code></a></p></li>
+</ul>
+<blockquote>
+<div><dl class="http get">
+<dt class="sig sig-object http" id="get--plugins-(name)">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/plugins/</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#get--plugins-(name)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return plugin status from its name <cite>name</cite></p>
+<p>If <cite>name</cite> is not given, return a summary of plugins that the worker has attempted to load</p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a> – no error</p></li>
+<li><p><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> – the plugin does not exists</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>example</strong>:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/plugins/myplugin</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">example.com</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">application/json</span>
+</pre></div>
+</div>
+<p><strong>response</strong>:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Vary</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+
+<span class="p">{</span>
+  <span class="nt">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="nt">&quot;general&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="nt">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;3liz&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Test plugin&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;myplugin&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;qgisminimumversion&quot;</span><span class="p">:</span> <span class="s2">&quot;3.0&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;server&quot;</span><span class="p">:</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+     <span class="p">},</span>
+     <span class="nt">&quot;path&quot;</span>   <span class="p">:</span> <span class="s2">&quot;/plugins/myplugin/__init__.py&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;myplugin&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;loaded&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="cache-api">
+<span id="id2"></span><h2>Cache API<a class="headerlink" href="#cache-api" title="Permalink to this headline">¶</a></h2>
+<p>The <em>cache</em> api allow qgis project introspection</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#get--cache-(project_uri)" title="GET /cache/(project_uri)"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/cache/(project_uri)</span></code></a></p></li>
+</ul>
+<blockquote>
+<div><dl class="http get">
+<dt class="sig sig-object http" id="get--cache-(project_uri)">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/cache/</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">project_uri</span></em><span class="sig-paren">)</span><a class="headerlink" href="#get--cache-(project_uri)" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the project informations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a> – no error</p></li>
+<li><p><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a> – the project does not exists</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>example</strong>:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/cache/myproject</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">example.com</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">application/json</span>
+</pre></div>
+</div>
+<p><strong>response</strong>:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Vary</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+
+<span class="p">{</span>
+  <span class="nt">&quot;bad_layers_count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&quot;cache_key&quot;</span><span class="p">:</span> <span class="s2">&quot;myproject&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;crs&quot;</span><span class="p">:</span> <span class="s2">&quot;EPSG:4326 - WGS 84&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-06-24T08:04:26&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;layers&quot;</span> <span class="p">:</span> <span class="p">[</span>
+     <span class="p">{</span>
+         <span class="nt">&quot;crs&quot;</span><span class="p">:</span> <span class="s2">&quot;EPSG:4326 - WGS 84&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;myproject_8d8d649f_7748_43cc_8bde_b013e17ede29&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;my project layer&quot;</span><span class="p">,</span>
+         <span class="nt">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;/src/tests/data/myproject/myproject.shp&quot;</span>
+     <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="pool-api">
+<span id="id3"></span><h2>Pool API<a class="headerlink" href="#pool-api" title="Permalink to this headline">¶</a></h2>
+<p>The <em>pool</em> api allow inspecting workers and projects cache associated to them.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#get--pool-" title="GET /pool/"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/pool/</span></code></a></p></li>
+<li><p><a class="reference internal" href="#post--pool-restart" title="POST /pool/restart"><code class="xref http http-post docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/pool/restart</span></code></a></p></li>
+</ul>
+<blockquote>
+<div><dl class="http get">
+<dt class="sig sig-object http" id="get--pool-">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/pool/</span></span><a class="headerlink" href="#get--pool-" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of worker state and the cache for each of them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a> – no error</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>example</strong>:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">GET</span> <span class="nn">/cache/pool/</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">example.com</span>
+<span class="na">Accept</span><span class="o">:</span> <span class="l">application/json</span>
+</pre></div>
+</div>
+<p><strong>response</strong>:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Vary</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
+
+<span class="p">{</span>
+  <span class="nt">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="nt">&quot;workers&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;cache&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;filename&quot;</span><span class="p">:</span>
+            <span class="s2">&quot;/tests/data/myporject.qgs&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;myproject&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;last_modified&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-06-24T08:04:26&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="s2">&quot;http://localhost:19876/cache/myproject&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;num_layers&quot;</span><span class="p">:</span> <span class="mi">1</span>
+          <span class="p">}</span>
+        <span class="p">],</span>
+        <span class="nt">&quot;mem_percent&quot;</span><span class="p">:</span> <span class="mf">0.4297396825334563</span><span class="p">,</span>
+        <span class="nt">&quot;mem_usage&quot;</span><span class="p">:</span> <span class="mi">143597568</span><span class="p">,</span>
+        <span class="nt">&quot;pid&quot;</span><span class="p">:</span> <span class="mi">34</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;cache&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="nt">&quot;mem_percent&quot;</span><span class="p">:</span> <span class="mf">0.41044564806749534</span><span class="p">,</span>
+        <span class="nt">&quot;mem_usage&quot;</span><span class="p">:</span> <span class="mi">137150464</span><span class="p">,</span>
+        <span class="nt">&quot;pid&quot;</span><span class="p">:</span> <span class="mi">31</span>
+      <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--pool-restart">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/pool/restart</span></span><a class="headerlink" href="#post--pool-restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restart workers gracefully.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a> – no error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div></blockquote>
+</div>
+<div class="section" id="qgis-api">
+<span id="id4"></span><h2>Qgis API<a class="headerlink" href="#qgis-api" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>/qgis/</cite> api endpoint is a passthrough for accessing directly the Qgis server api and services. Some services may install some management api that will be accessible from this endpoint.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="schemes.html" class="btn btn-neutral float-left" title="Loader schemes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, David Marteau - 3liz.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
