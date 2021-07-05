@@ -60,4 +60,4 @@ jobs:
         consumer_secret: ${{ secrets.TWITTER_CONSUMER_SECRET }}
         access_token_key: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
         access_token_secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-        tweet_body: "New version of Py-QGIS-Server ${{ env.RELEASE_VERSION }} for #QGIS https://github.com/3liz/py-qgis-server/releases"
+        tweet_body: "New version of Py-QGIS-Server ${{ env.CI_COMMIT_TAG }} for #QGIS https://github.com/3liz/py-qgis-server/releases"
