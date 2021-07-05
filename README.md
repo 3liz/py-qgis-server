@@ -1,25 +1,26 @@
-# QGIS embbeded WMS/WFS/WCS asynchronous scalable server.
+# QGIS embedded WMS/WFS/WCS asynchronous scalable server
 
 ## Description
 
-This is a asynchronous HTTP Qgis server written in python on top of the [tornado](http://www.tornadoweb.org/en/stable/) framework and the
+This is an asynchronous HTTP QGIS server written in python on top of the [tornado](http://www.tornadoweb.org/en/stable/) framework and the
 0MQ messaging framework for distributing requests workers.
 
-It is based on the new Qgis 3 server API for efficiently passing requests/responses using 0MQ messaging framework to workers.
+It is based on the QGIS 3 server API for efficiently passing requests/responses using 0MQ messaging framework to workers.
 
-The server may be run as a self-contained single service or as a proxy server with an arbitrary number of workers running
-remotely or locally. Independant workers connect automatically to the front-end proxy with no need of special configuration
+The server may run as a self-contained single service or as a proxy server with an arbitrary number of workers running
+remotely or locally. Independent workers connect automatically to the front-end proxy with no need of special configuration
 on the proxy side. Thus, this is ideal for auto-scaling configuration for use with container orchestrator as Rancher, Swarm or Kubernetes.
 
 The server is aimed at solving some real situations encountered in production environment: zero conf scalability, handle long-running request situation, auto restart...
 
-Py-Qgis-server is constantly tested against Qgis release and ltr version.
+Py-Qgis-server is constantly tested against QGIS release and ltr version.
+See the QGIS [roadmap](https://www.qgis.org/en/site/getinvolved/development/roadmap.html#release-schedule).
 
 ## Features
 
 - Multiples workers
 - Fair queuing request dispatching
-- Timeout for long running/stalled requests
+- Timeout for long-running/stalled requests
 - Full support of qgis server plugins
 - Auto-restart trigger for workers
 - Support streamed/chunked responses 
@@ -33,7 +34,7 @@ Py-Qgis-server is constantly tested against Qgis release and ltr version.
 
 ## Requirements:
 
-- OS: Unix/Posix variants (Linux or OSX) (Windows not officialy supported)
+- OS: Unix/Posix variants (Linux or OSX) (Windows not officially supported)
 - Python >= 3.6
 - QGIS >= 3.10 installed
 - Some python knowledge about python virtualenv and package installation.
@@ -45,6 +46,12 @@ Latest documentation is available on [ReadTheDoc](https://py-qgis-server.readthe
 
 ## Installation
 
+### From Pypi
+
+```bash
+pip install py-qgis-server
+```
+
 ### From docker
 
 Docker is the recommended way to deploy py-qgis-server as it ensure a working environment for
@@ -55,19 +62,13 @@ Follow the readme in the [docker/](./docker) folder.
 ### From source 
 
 Install in development mode
-```
+```bash
 pip install -e .
-```
-
-### Version X.Y.Z From python package archive
-
-```
-pip install py-qgis-server-X.Y.Z.tar.gz
 ```
 
 ## Running the server
 
-The server does not run as a daemon by itself, there is several way to run a command as a daemon.
+The server does not run as a daemon by itself, there are several ways to run a command as a daemon.
 
 For example:
 
@@ -104,12 +105,12 @@ optional arguments:
   --timeout SECONDS     Set client timeout in seconds
 ```
 
-By default the command will run server instances with workers and use unix sockets to communicate. This can 
+By default, the command will run server instances with workers and use unix sockets to communicate. This can 
 be used to run the server as a single command.
 
 #### Running proxy and workers separately
 
-If the `--proxy` option the server will act as a proxy server to talk to independant qgis workers. 
+If the `--proxy` option the server will act as a proxy server to talk to independent qgis workers. 
 
 Qgis workers can be run using the command:
 
@@ -173,8 +174,3 @@ Please look at [the documentation](https://py-qgis-server.readthedocs.io/en/late
 
 By default, the server log on stdout/stderr and you have to configure redirection and log rotation 
 on your infrastructure environment
-
-
-
-
-
