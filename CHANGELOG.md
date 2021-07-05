@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.7.2 - 2021-07-05
+
+* Release on https://pypi.org
+
 ## 1.7.1 - 2021-06-30
 
 * Revert bad consistency check for postgres handler

@@ -1,7 +1,7 @@
 # qgis server makefile
 #
 
-VERSION:=1.7.1
+VERSION:=1.7.2
 
 ifndef CI_COMMIT_TAG
 VERSION_TAG=$(VERSION)rc0
@@ -64,4 +64,3 @@ lint:
 
 docker-%:
 	$(MAKE) -C tests/docker $* FLAVOR=$(FLAVOR)
-
