@@ -1,5 +1,9 @@
 # QGIS embedded WMS/WFS/WCS asynchronous scalable server
 
+[![PyPi version badge](https://badgen.net/pypi/v/py-qgis-server)](https://pypi.org/project/py-qgis-server/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/py-qgis-server)](https://pypi.org/project/py-qgis-server/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/py-qgis-server)](https://pypi.org/project/py-qgis-server/)
+
 ## Description
 
 This is an asynchronous HTTP QGIS server written in python on top of the [tornado](http://www.tornadoweb.org/en/stable/) framework and the
