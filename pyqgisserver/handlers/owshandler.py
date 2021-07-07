@@ -14,6 +14,7 @@ from time import time
 from ..logger import log_rrequest
 from ..zeromq.client import RequestTimeoutError, RequestGatewayError, AsyncClient
 from ..monitor import Monitor
+from ..config import confservice
 
 from .basehandler import BaseHandler
 
@@ -26,34 +27,22 @@ class OwsHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
-    def initialize(self, root: str, client: AsyncClient, timeout: int, 
+    def initialize(self, client: AsyncClient, timeout: int, 
                    monitor: Optional[Monitor]=None, 
-                   filters: Optional[List]=None, http_proxy: bool=False) -> None:
+                   http_proxy: bool=False) -> None:
 
         super().initialize()
 
-        self._root        = root
-        self._rootpath    = root
         self._client      = client
         self._timeout     = timeout
         self._monitor     = monitor
-        self._filters     = filters or []
         self._proxy       = http_proxy
         self._stats       = self.application.stats
 
-    async def prepare(self) -> Awaitable[None]:
-        # Handle filters
-        super().prepare()
-        self._rootpath = self._root
-        for filt in self._filters:
-            path = await filt.apply( self )
-            if path:
-                self._rootpath = f"{self._root}{path}"
-
-    async def handle_request(self, method: str, path: str, data: Optional=None ) -> Awaitable[None]:
+    async def handle_request(self, method: str, endpoint: Optional[str], data: Optional=None ) -> Awaitable[None]:
         reqtime = time()
         try:
-            proxy_url = self.proxy_url(self._proxy, self._rootpath, path)
+            proxy_url = self.proxy_url(self._proxy, endpoint)
 
             delta = None
             project_path = self.get_argument('MAP',default=None)
@@ -125,12 +114,12 @@ class OwsHandler(BaseHandler):
             self._monitor.emit( status, self.request.arguments,  delta, 
                                 meta=self.request.headers)
 
-    async def get(self, endpoint: str="") -> Awaitable[None]:
+    async def get(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         """ Handle Get method
         """
         await self.handle_request('GET', endpoint)
           
-    async def post(self, endpoint: str="") -> Awaitable[None]:
+    async def post(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         """ Handle Post method
         """
         await self.handle_request('POST', endpoint, data=self.request.body)
@@ -140,5 +129,33 @@ class OwsHandler(BaseHandler):
         """
         self.set_option_headers('GET, POST, OPTIONS')
 
+
+class OwsFilterHandler(OwsHandler):
+    """ Handle filter handlers
+    """
+    def initialize(self, filters: Optional[List]=None, **kwargs) -> None:
+        super().initialize(**kwargs)
+        
+        self._filters = filters or []
+
+    async def prepare(self) -> Awaitable[None]:
+        # Handle filters
+        super().prepare()
+        for filt in self._filters:
+            await filt.apply( self )
+
+
+class OwsApiHandler(OwsHandler):
+    """ Handle Qgis api
+    """
+    async def get(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+        """ Fix issue with the landing page api when not 
+            specifying index.html.
+        """
+        # Rewrite the landing page endpoint
+        if endpoint.endswith(f"{confservice.get('api.endpoints','landing_page')}/"):
+            endpoint = f"{endpoint.rstrip('/')}/index.html"
+        await super().get(endpoint)
+ 
 
 

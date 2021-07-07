@@ -34,13 +34,14 @@ See the QGIS [roadmap](https://www.qgis.org/en/site/getinvolved/development/road
 - Support adding new projects cache handlers as python extension 
 - Preloading of Qgis projects.
 - WFS3 support
+- Control exposition of [Qgis API](https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/server.html#custom-apis)
 - Management API (experimental)
 
 ## Requirements:
 
 - OS: Unix/Posix variants (Linux or OSX) (Windows not officially supported)
 - Python >= 3.6
-- QGIS >= 3.10 installed
+- QGIS >= 3.10 installed  - Qgis >= 3.16 recommended
 - Some python knowledge about python virtualenv and package installation.
 - libzmq >= 4.0.1 and pyzmq >= 17
 
@@ -143,6 +144,11 @@ Example:
 http://myserver:8080/ows/wfs3/collections.html?MAP=<qgis_project_spec>
 ```
 
+### Accessing the Qgis landing page and other qgis API
+
+By default the landing page is not enabled, see the [documentation](https://py-qgis-server.readthedocs.io/en/latest/index.html#api-enabled-landing-page) on how to enable the landing page.
+
+Qgis api may be exposed on demand by [configuring the api endpoints](https://py-qgis-server.readthedocs.io/en/latest/qgisapi.html)
 
 
 #### Using with lizmap

@@ -27,7 +27,7 @@ class Tests(HTTPTestCase):
     def test_forwarded_url(self):
         """ Test proxy location
         """
-        urlref = urlparse('https://my.proxy.loc:9999/anywhere')
+        urlref = urlparse('https://my.proxy.loc:9999/anywhere/')
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities", 
                              headers={ 'X-Forwarded-Url': urlref.geturl() } )
 

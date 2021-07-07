@@ -75,6 +75,7 @@ test: local
 		-e QGSRV_DISABLE_GETPRINT=yes \
 		-e QGIS_OPTIONS_PATH=/src/tests/qgis \
 		-e QGSRV_SERVER_STATUS_PAGE=yes \
+		-e QGSRV_API_ENABLED_LANDING_PAGE=yes \
 		-e PYTEST_ADDOPTS="$(PYTEST_ADDOPTS)" \
 		$(QGIS_IMAGE) $(SCRIPTS)/run_tests.sh
 
@@ -120,6 +121,7 @@ run: local
 		-e QGIS_SERVER_TRUST_LAYER_METADATA=yes \
 		-e QGSRV_MANAGEMENT_ENABLED=yes \
 		-e QGSRV_MANAGEMENT_INTERFACES=0.0.0.0 \
+		-e QGSRV_API_ENABLED_LANDING_PAGE=yes \
 		$(QGIS_IMAGE) $(SCRIPTS)/run_server.sh 
 
 

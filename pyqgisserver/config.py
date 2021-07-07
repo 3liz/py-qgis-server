@@ -22,7 +22,8 @@ import configparser
 import logging
 import functools
 
-from typing import Any
+from typing import Any, Iterable, Tuple
+
 from pyqgisservercontrib.core import componentmanager
 
 getenv = os.getenv
@@ -30,6 +31,9 @@ getenv = os.getenv
 LOGGER = logging.getLogger('SRVLOG')
 
 CONFIG = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())    
+# Preserve case
+CONFIG.optionxform = lambda opt: opt
+
 
 def getenv2( env1, env2, default):
     """ Get value from alternate env variable
@@ -67,9 +71,33 @@ def load_configuration():
     CONFIG.set('server', 'ssl_key'       , getenv('QGSRV_SERVER_SSL_KEY' , ''))
     CONFIG.set('server', 'cross_origin'  , getenv('QGSRV_SERVER_CROSS_ORIGIN' , 'yes'))
     CONFIG.set('server', 'status_page'   , getenv('QGSRV_SERVER_STATUS_PAGE'  , 'no'))
+    # Landing page is availaible since Qgis 3.16
+    CONFIG.set('server', 'landing_page'  , getenv('QGSRV_SERVER_LANDING_PAGE','yes'))
+    CONFIG.set('server', 'landing_page_prefix', 
+               getenv2('QGSRV_LANDING_PAGE_PREFIX','QGIS_SERVER_LANDING_PAGE_PREFIX', '/catalog'))
 
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))
+
+    #
+    # Services configuration
+    #
+
+    # Qgis api endpoints
+    CONFIG.add_section('api.endpoints')
+    CONFIG.set('api.endpoints', 'landing_page', getenv('QGSRV_API_ENDPOINTS_LANDING_PAGE','/ows/catalog'))
+
+    # Services enabled
+    CONFIG.add_section('api.enabled')
+    CONFIG.set('api.enabled', 'landing_page', getenv('QGSRV_API_ENABLED_LANDING_PAGE','no'))
+
+    # Landing page config mapping
+    # see: https://github.com/qgis/QGIS/pull/38189#issuecomment-875682735
+    CONFIG.add_section('api:landing_page')
+    CONFIG.set('api:landing_page', 'QGIS_SERVER_LANDING_PAGE_PREFIX', 
+               '${api.endpoints:landing_page}')
+    CONFIG.set('api:landing_page', 'QGIS_SERVER_LANDING_PAGE_PROJECTS_DIRECTORIES', 
+               '${projects.cache:rootdir}')
 
     #
     # Projects cache
@@ -85,10 +113,12 @@ def load_configuration():
                getenv2('QGSRV_TRUST_LAYER_METADATA','QGIS_SERVER_TRUST_LAYER_METADATA','no'))
     CONFIG.set('projects.cache', 'disable_getprint'    , 
                getenv2('QGSRV_DISABLE_GETPRINT','QGIS_SERVER_DISABLE_GETPRINT','no'))
-    CONFIG.set('projects.cache', 'disable_owsurls', getenv('QGSRV_CACHE_DISABLE_OWSURLS','no'))
+    CONFIG.set('projects.cache', 'disable_owsurls'    , getenv('QGSRV_CACHE_DISABLE_OWSURLS','no'))
     
+    # 
     CONFIG.add_section('projects.schemes')
 
+    #
     CONFIG.add_section('zmq')
     # Identity prefix used in 0MQ worker socket 
     CONFIG.set('zmq', 'identity'     , getenv('QGSRV_ZMQ_IDENTITY' ,'OWS-SERVER'))
@@ -158,6 +188,27 @@ def validate_config_path(confname, confid, optional=False):
         raise ValueError(confvalue)
 
     CONFIG.set(confname, confid, confvalue)
+
+
+def configure_qgis_api( name: str ) -> None:
+    """ Configure qgis service environnement variables
+    """
+    config = CONFIG[f"api:{name}"]
+    for k,v in config.items():
+        LOGGER.debug("configuring qgis api '%s': %s = %s", name, k, v) 
+        os.environ[k] = v
+
+
+def qgis_api_endpoints(enabled_only: bool=True) -> Iterable[Tuple[str,str]]:
+    """ Return the list of enabled services
+    """
+    endpoints = CONFIG["api.endpoints"]
+    enabled   = CONFIG["api.enabled"] 
+    items     = ((name,endpoint) for name,endpoint in endpoints.items())
+    if enabled_only:
+        items = filter(lambda item: enabled.getboolean(item[0]),items) 
+    return items
+        
 
 #
 # Published services

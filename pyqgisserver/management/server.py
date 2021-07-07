@@ -76,9 +76,9 @@ def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web
         (r"/", StatusHandler),
         (r"/pool/(restart)", _RestartHandler, {'poolserver': poolserver}),
         (r"/pool/"         , _ReportHandler , {'poolserver': poolserver}),
-        (r"/plugins/.*"    , QgisHandler, dict(root=r"/",**kwargs)),
-        (r"/cache/.*"      , QgisHandler, dict(root=r"/"  ,**kwargs)),
-        (r"/qgis/.*"       , QgisHandler, dict(root=r"/"   ,**kwargs)),
+        (r"/plugins/.*"    , QgisHandler, kwargs),
+        (r"/cache/.*"      , QgisHandler, kwargs),
+        (r"/ows/.*"        , QgisHandler, kwargs),
     ]
     return handlers
 

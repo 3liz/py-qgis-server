@@ -15,7 +15,7 @@ import sys
 import json
 import traceback
 
-from qgis.PyQt.QtCore import QRegularExpression
+from qgis.PyQt.QtCore import QRegularExpression, QUrl
 
 from qgis.server import (
     QgsServerOgcApi,
@@ -205,12 +205,28 @@ class RequestHandlerDelegate(QgsServerOgcApiHandler):
         handler._execute(self.values(context))
 
 
+class _ServerApi(QgsServerOgcApi):
+
+    __instances = []
+
+    # See above
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        self.__instances.append(self)
+
+    def accept(self, url: QUrl) -> bool:
+        """ Override the api to actually match the rootpath
+        """
+        return url.path().startswith( self.rootPath() )
+
+
 
 def register_handlers(serverIface, rootpath: str, name: str, handlers: List[Tuple[str,Type[RequestHandler]]],
                       descripton: Optional[str]=None,
                       version: Optional[str]=None) -> None:
 
-    api = QgsServerOgcApi(serverIface,rootpath, name, descripton, version)
+    api = _ServerApi(serverIface,rootpath, name, descripton, version)
     for (path,handler) in handlers:
         api.registerHandler(RequestHandlerDelegate(path,handler))
 

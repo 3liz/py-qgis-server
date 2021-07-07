@@ -240,6 +240,32 @@ config_options:
       version_added: "1.5.4"
 
     #===============
+    # Qgis API
+    #===============
+
+    - name: API_ENABLED_LANDING_PAGE
+      label: Enable qgis landing page api
+      description: |
+          Enable access to qgis 'landing page' api
+      type: boolean
+      default: 'no'
+      section: api.enabled
+      key: landing_page
+      tags: [ http, qgis, api ]
+      version_added: "1.7.2"
+
+    - name: API_ENDPOINTS_LANDING_PAGE
+      label: Set the 'landing page' uri endpoint
+      description: |
+          Define endpoint access to the 'landing page' service
+      type: str
+      default: '/catalog'
+      section: api.endpoints
+      key: landing_page
+      tags: [ http, qgis, api ]
+      version_added: "1.7.2"
+
+    #===============
     # Managment API
     #===============
  

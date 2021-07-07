@@ -20,9 +20,15 @@ from multiprocessing import Process
 from typing import Mapping, List
 
 from .logger import log_request
-from .config import confservice
+from .config import confservice, qgis_api_endpoints
 
-from .handlers import (StatusHandler, OwsHandler, PingHandler, NotFoundHandler)
+from .handlers import (StatusHandler, 
+                       OwsHandler, 
+                       OwsFilterHandler, 
+                       OwsApiHandler,
+                       PingHandler, 
+                       NotFoundHandler)
+
 from .zeromq import client, broker
 
 from .utils import process
@@ -39,6 +45,8 @@ LOGGER=logging.getLogger('SRVLOG')
 def load_access_policies() -> Mapping[str,List[ServerFilter]]:
     """ Create filter list
     """
+    confservice.set('server','access_policy_version','2')
+
     import pyqgisservercontrib.core.componentmanager as cm
 
     collection = []
@@ -56,10 +64,9 @@ def load_access_policies() -> Mapping[str,List[ServerFilter]]:
         flist.sort(key=lambda f: f.pri, reverse=True)
     return filters
 
-  
 
 def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
-    """
+    """ Configure request handlers
     """
     cfg = confservice['server']
 
@@ -68,22 +75,20 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     root = r"/ows"
 
     ows_kwargs = {
-        'root'       : f"{root}/",
         'client'     : client,
         'monitor'    : monitor,
         'timeout'    : cfg.getint('timeout'),
         'http_proxy' : cfg.getboolean('http_proxy'),
     }
 
-    # XXX Tornado count non-capturing groups as potential argument group:
-    # So we have to name all groups to prevent the error: 
-    # "groups in url regexes must either be all named or all positional"
-
     end = r"(?:\.html|\.json|/?)"
 
     ows_endpoints = [
+        r"/?",
         rf"/wfs3{end}",
         rf"/wfs3/collections(?:/[^/]+(?:/items)?)?{end}",
+        rf"/wfs3/conformance{end}",
+        rf"/wfs3/api{end}",
         r"/wfs3/static/.*",
     ] 
 
@@ -105,17 +110,19 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         for uri,fltrs in filters.items():
             kw = ows_kwargs.copy()
             kw.update( filters = fltrs)
-            add_handler( f"{root}/{uri.lstrip('/')}", OwsHandler, kw )
+            # Add ow endpoint
             path = f"{root}/{uri.strip('/')}" if uri else root
             for endp in ows_endpoints:
-                add_handler( f"{path}(?P<endpoint>{endp})", OwsHandler, kw )
+                add_handler( f"{path}(?P<endpoint>{endp})", OwsFilterHandler, kw )
     else:
-        add_handler( root, OwsHandler, ows_kwargs )
         for endp in ows_endpoints:
             add_handler( rf"{root}(?P<endpoint>{endp})", OwsHandler, ows_kwargs )
 
-    add_handler( rf"{root}(?P<endpoint>/wfs3/conformance{end})", OwsHandler, ows_kwargs )
-    add_handler( rf"{root}(?P<endpoint>/wfs3/api{end})", OwsHandler, ows_kwargs )
+    #
+    # Add qgis api endpoints
+    #
+    for name,endpoint in qgis_api_endpoints():
+        add_handler( rf"(?P<endpoint>/{endpoint.strip('/')}/.*)", OwsApiHandler, ows_kwargs )
 
     return handlers
 
