@@ -2,9 +2,14 @@
     Test server disponibility
 """
 
+import pytest
+
 from pyqgisserver.tests import HTTPTestCase
 from urllib.parse import urlparse
 
+from qgis.core import Qgis
+
+@pytest.mark.skipif(Qgis.QGIS_VERSION_INT < 31800, reason="Requires qgis >= 3.18")
 class Tests(HTTPTestCase):
 
     def test_landing_page(self):
