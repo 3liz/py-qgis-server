@@ -13,6 +13,7 @@ Welcome to py-qgis-server's documentation!
    intro
    configuration 
    schemes
+   qgisapi
    management
 
 Indices and tables

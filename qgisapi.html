@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>HTTP Routing Table &mdash; py-qgis-server 1.7 documentation</title>
+  <title>Expose Qgis Api &mdash; py-qgis-server 1.7 documentation</title>
   
 
   
@@ -41,13 +41,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
- 
-
-    <script>
-      DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true;
-    </script>
-
-
+    <link rel="next" title="Management API (experimental)" href="management.html" />
+    <link rel="prev" title="Loader schemes" href="schemes.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,7 +88,7 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html#running-the-server">Running the server</a></li>
@@ -102,7 +97,11 @@
 <li class="toctree-l1"><a class="reference internal" href="schemes.html">Loader schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes.html#default-handlers">Default handlers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes.html#scheme-aliases">Scheme aliases</a></li>
-<li class="toctree-l1"><a class="reference internal" href="qgisapi.html">Expose Qgis Api</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Expose Qgis Api</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#api-endpoint">Api endpoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#enabling-api-public-access">Enabling api public access</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="management.html">Management API (experimental)</a></li>
 </ul>
 
@@ -152,10 +151,14 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>HTTP Routing Table</li>
+      <li>Expose Qgis Api</li>
     
     
       <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/qgisapi.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -167,52 +170,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-
-   <h1>HTTP Routing Table</h1>
-
-   <div class="modindex-jumpbox">
-   <a href="#cap-/cache"><strong>/cache</strong></a> | 
-   <a href="#cap-/plugins"><strong>/plugins</strong></a> | 
-   <a href="#cap-/pool"><strong>/pool</strong></a>
-   </div>
-
-   <table class="indextable modindextable">
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-/cache"><td></td><td>
-       <strong>/cache</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="management.html#get--cache-(project_uri)"><code class="xref">GET /cache/(project_uri)</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-/plugins"><td></td><td>
-       <strong>/plugins</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="management.html#get--plugins-(name)"><code class="xref">GET /plugins/(name)</code></a></td><td>
-       <em></em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-/pool"><td></td><td>
-       <strong>/pool</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="management.html#get--pool-"><code class="xref">GET /pool/</code></a></td><td>
-       <em></em></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="management.html#post--pool-restart"><code class="xref">POST /pool/restart</code></a></td><td>
-       <em></em></td></tr>
-   </table>
+  <div class="section" id="expose-qgis-api">
+<span id="id1"></span><h1>Expose Qgis Api<a class="headerlink" href="#expose-qgis-api" title="Permalink to this headline">¶</a></h1>
+<p>Qgis server enable defining <a class="reference external" href="https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/server.html#custom-apis">custom api</a>.</p>
+<p>Py-qgis-server allow you to control public access to the qgis services apis while still allowing access
+throught the management api.</p>
+<p>This may be useful if you plan to have some api doing some backoffice management and do not want these api beeing accessed
+publicly.</p>
+<div class="section" id="api-endpoint">
+<span id="api-endpoints"></span><h2>Api endpoint<a class="headerlink" href="#api-endpoint" title="Permalink to this headline">¶</a></h2>
+<p>Apis may be accessed by the management api by configuring the api endpoint:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">api</span><span class="o">.</span><span class="n">endpoints</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">api_name</span><span class="o">&gt;=/</span><span class="n">endpoint</span>
+</pre></div>
+</div>
+<p>The endpoint should match the root path of the api as defined in the <a class="reference external" href="https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/server.html#custom-apis">qgis server api entrypoint</a></p>
+</div>
+<div class="section" id="enabling-api-public-access">
+<span id="enabling-api"></span><h2>Enabling api public access<a class="headerlink" href="#enabling-api-public-access" title="Permalink to this headline">¶</a></h2>
+<p>Apis are publicly enabled with the following configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">api</span><span class="o">.</span><span class="n">enabled</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">api_name</span><span class="o">&gt;=</span><span class="n">yes</span>
+</pre></div>
+</div>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="management.html" class="btn btn-neutral float-right" title="Management API (experimental)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="schemes.html" class="btn btn-neutral float-left" title="Loader schemes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 

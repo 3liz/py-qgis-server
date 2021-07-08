@@ -394,6 +394,42 @@ urls override proxy urls.
 
 
 
+.. _API_ENABLED_LANDING_PAGE:
+
+API_ENABLED_LANDING_PAGE
+------------------------
+
+Enable access to qgis 'landing page' api
+
+
+:Type: boolean
+:Default: no
+:Version Added: 1.7.2
+:Section: api.enabled
+:Key: landing_page
+:Env: QGSRV_API_ENABLED_LANDING_PAGE
+
+
+
+
+.. _API_ENDPOINTS_LANDING_PAGE:
+
+API_ENDPOINTS_LANDING_PAGE
+--------------------------
+
+Define endpoint access to the 'landing page' service
+
+
+:Type: str
+:Default: /catalog
+:Version Added: 1.7.2
+:Section: api.endpoints
+:Key: landing_page
+:Env: QGSRV_API_ENDPOINTS_LANDING_PAGE
+
+
+
+
 .. _MANAGEMENT_ENABLED:
 
 MANAGEMENT_ENABLED
