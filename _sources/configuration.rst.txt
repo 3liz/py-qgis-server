@@ -421,7 +421,7 @@ Define endpoint access to the 'landing page' service
 
 
 :Type: str
-:Default: /catalog
+:Default: /ows/catalog
 :Version Added: 1.7.2
 :Section: api.endpoints
 :Key: landing_page
