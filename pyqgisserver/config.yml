@@ -259,7 +259,7 @@ config_options:
       description: |
           Define endpoint access to the 'landing page' service
       type: str
-      default: '/catalog'
+      default: '/ows/catalog'
       section: api.endpoints
       key: landing_page
       tags: [ http, qgis, api ]
