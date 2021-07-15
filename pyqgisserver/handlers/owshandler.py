@@ -14,7 +14,6 @@ from time import time
 from ..logger import log_rrequest
 from ..zeromq.client import RequestTimeoutError, RequestGatewayError, AsyncClient
 from ..monitor import Monitor
-from ..config import confservice
 
 from .basehandler import BaseHandler
 
@@ -152,9 +151,6 @@ class OwsApiHandler(OwsHandler):
         """ Fix issue with the landing page api when not 
             specifying index.html.
         """
-        # Rewrite the landing page endpoint
-        if endpoint.endswith(f"{confservice.get('api.endpoints','landing_page')}/"):
-            endpoint = f"{endpoint.rstrip('/')}/index.html"
         await super().get(endpoint)
  
 

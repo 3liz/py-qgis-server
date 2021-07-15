@@ -113,6 +113,9 @@ class Response(QgsServerResponse):
             if bytesAvail:
                 self._handler.send( bytes(self._buffer.data()), send_more )
                 self._buffer.buffer().clear()
+            else:
+                # Return empty response
+                self._handler.send( b'', send_more )
             # push the sentinel
             if send_more and self._finish:
                 self._handler.send( b'', False )

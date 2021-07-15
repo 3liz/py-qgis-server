@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+* Handle 0 length response from qgis server
+* Expose Qgis api to public interface:
+
+    - Expose landing page (https://github.com/3liz/py-qgis-server/issues/29)
+
 ## 1.7.2 - 2021-07-05
 
 * Release on https://pypi.org
