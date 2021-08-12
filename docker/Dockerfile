@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 ARG REGISTRY_PREFIX=''
 ARG QGIS_VERSION=latest
 

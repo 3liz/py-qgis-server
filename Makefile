@@ -59,7 +59,7 @@ clean:
 test: lint docker-test
 
 lint:
-	@flake8 --ignore=E123,E2,E3,E5,W2,W3  pyqgisserver pyqgisservercontrib
+	@flake8 pyqgisserver pyqgisservercontrib
 
 
 docker-%:
