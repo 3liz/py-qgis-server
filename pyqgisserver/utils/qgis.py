@@ -164,3 +164,14 @@ def init_qgis_server(**kwargs) -> 'QgsServer': # noqa: F821
 
     return server
 
+
+def print_qgis_version(verbose: bool=False) -> None:
+    """ Output the qgis version
+    """
+    from qgis.core import Qgis
+    print(f"Qgis {Qgis.QGIS_VERSION} '{Qgis.QGIS_RELEASE_NAME}' ({Qgis.QGIS_VERSION_INT})")
+    if verbose:
+        start_qgis_application(verbose=True)
+    
+
+

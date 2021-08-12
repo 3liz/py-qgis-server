@@ -18,18 +18,20 @@ from .logger import setup_log_handler
 from .config import (confservice, read_config_file,
                      validate_config_path, load_configuration)
 
+from .utils.qgis import print_qgis_version
 from .runtime import run_server
 
 LOGGER = logging.getLogger('SRVLOG')
 
 
 
-def print_version() -> None:
+def print_version(verbose=False) -> None:
     """ Display version infos
     """
     program = os.path.basename(sys.argv[0])
     print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**__manifest__),
           file=sys.stderr)
+    print_qgis_version(verbose=verbose)
 
 
 def read_configuration(argv: List[str]=None) -> argparse.Namespace:
@@ -44,7 +46,7 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
     cli_parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
                             default=None, help="Configuration file")
     cli_parser.add_argument('--version', action='store_true', 
-                            default=False, help="Return version number and exit")
+                            default=False, help="Return version infos and exit")
     cli_parser.add_argument('-p','--port'    , type=int, help="http port", dest='port', default=argparse.SUPPRESS)
     cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=argparse.SUPPRESS, help="interface to bind to", dest='interfaces')
     cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=argparse.SUPPRESS, help="num workers", dest='workers')
@@ -55,9 +57,11 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
 
     args = cli_parser.parse_args(argv)
 
-    print_version()
     if args.version:
+        print_version(verbose=args.debug)
         sys.exit(1)
+    else:
+        print_version()
 
     load_configuration()
 
@@ -87,6 +91,7 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
     args.port       = conf.getint('port')
     args.workers    = conf.getint('workers')
     args.interfaces = conf.get('interfaces')
+
     return args
 
 

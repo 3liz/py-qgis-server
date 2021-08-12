@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Print extended version informations 
+* Use setup.cfg for flake8 options
 * Handle 0 length response from qgis server
 * Expose Qgis api to public interface:
 
