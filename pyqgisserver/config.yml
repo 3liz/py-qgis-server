@@ -121,7 +121,7 @@ config_options:
       description: |
           Allows any origin for CORS. If set to 'no', allow only CORS for the 'Origin'
           header.
-      default: ''
+      default: 'no'
       type: boolean 
       section: server
       key: cross_origin
@@ -135,6 +135,15 @@ config_options:
       description: Set the logging level
       type: [DEBUG,INFO,WARNING,ERROR,CRITICAL]
       default: DEBUG  
+      section: logging
+      key: level
+      tags: [ logging ]
+
+    - name: QGIS_INFO
+      label: Log Qgis 'Info'
+      description: Log out qgis 'Info' message logs
+      type: boolean
+      default: 'no'
       section: logging
       key: level
       tags: [ logging ]

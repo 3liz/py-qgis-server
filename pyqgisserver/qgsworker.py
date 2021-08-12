@@ -204,11 +204,13 @@ class QgsRequestHandler(RequestHandler):
             # Configure qgis api
             for name,_ in qgis_api_endpoints(enabled_only=False):
                 configure_qgis_api(name)                         
+            
+            verbose = LOGGER.level<=logging.DEBUG or confservice.getboolean('logging','qgis_info')
 
             LOGGER.debug("Initializing qgis server")
             qgsserver = init_qgis_server( enable_processing=False, 
                                           logger=LOGGER, 
-                                          verbose=LOGGER.level<=logging.DEBUG)
+                                          verbose=verbose)
 
             serverIface = qgsserver.serverInterface()
             load_plugins(serverIface)

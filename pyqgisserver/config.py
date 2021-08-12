@@ -78,6 +78,7 @@ def load_configuration():
 
     CONFIG.add_section('logging')
     CONFIG.set('logging', 'level', getenv('QGSRV_LOGGING_LEVEL', 'DEBUG'))
+    CONFIG.set('logging', 'qgis_info', getenv('QGSRV_LOGGING_QGIS_INFO', 'no'))
 
     #
     # Api configuration
