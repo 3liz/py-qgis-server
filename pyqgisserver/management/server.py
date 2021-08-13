@@ -63,6 +63,36 @@ class _ReportHandler(_PoolHandler):
 
         self.write_json({'workers': reports, 'num_workers': self._poolserver.num_workers }) 
 
+class _RootHandler(BaseHandler):
+
+    def get(self) -> None:
+        """ Return links to default api entries
+        """
+        req = self.request
+        def _link( path: str, title: str ):
+            return {
+                'href' : f"{req.protocol}://{req.host}{path}",
+                'title': title,
+                'type' : "application/json",
+            }
+
+        data = dict(
+            links=[
+                _link("/status" , "Server status and configuration"),
+                _link("/plugins", "Plugins managment"),
+                _link("/cache"  , "Projects cache managment"),
+                _link("/pool"   , "Workers pool status"),
+            ]
+        )
+        self.write(data) 
+
+
+    def options(self) -> None:
+        """ Implement OPTION for validating CORS
+        """
+        self.set_option_headers()
+
+
 
 def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
     """
@@ -73,12 +103,12 @@ def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web
     }
 
     handlers = [
-        (r"/", StatusHandler),
+        (r"/"      , _RootHandler),
+        (r"/status", StatusHandler),
         (r"/pool/(restart)", _RestartHandler, {'poolserver': poolserver}),
-        (r"/pool/"         , _ReportHandler , {'poolserver': poolserver}),
-        (r"/plugins/.*"    , QgisHandler, kwargs),
-        (r"/cache/.*"      , QgisHandler, kwargs),
-        (r"/ows/.*"        , QgisHandler, kwargs),
+        (r"/pool/?"         ,_ReportHandler,  {'poolserver': poolserver}),
+        # Forward to Qgis api handlers
+        (r"/.+"             , QgisHandler, kwargs),
     ]
     return handlers
 

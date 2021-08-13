@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fix Qgis server api call in managment
 * Add specific option for logging qgis info message logs  
 * Print extended version informations 
 * Use setup.cfg for flake8 options
