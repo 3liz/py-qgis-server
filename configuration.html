@@ -87,7 +87,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="intro.html#installation">Installation</a></li>
@@ -108,6 +108,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#server-ssl-key">SERVER_SSL_KEY</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#server-cross-origin">SERVER_CROSS_ORIGIN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-level">LOGGING_LEVEL</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qgis-info">QGIS_INFO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cache-size">CACHE_SIZE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cache-rootdir">CACHE_ROOTDIR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cache-strict-check">CACHE_STRICT_CHECK</a></li>
@@ -453,14 +454,17 @@ header.</p>
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>boolean</p>
 </dd>
-<dt class="field-even">Section</dt>
-<dd class="field-even"><p>server</p>
+<dt class="field-even">Default</dt>
+<dd class="field-even"><p>no</p>
 </dd>
-<dt class="field-odd">Key</dt>
-<dd class="field-odd"><p>cross_origin</p>
+<dt class="field-odd">Section</dt>
+<dd class="field-odd"><p>server</p>
 </dd>
-<dt class="field-even">Env</dt>
-<dd class="field-even"><p>QGSRV_SERVER_CROSS_ORIGIN</p>
+<dt class="field-even">Key</dt>
+<dd class="field-even"><p>cross_origin</p>
+</dd>
+<dt class="field-odd">Env</dt>
+<dd class="field-odd"><p>QGSRV_SERVER_CROSS_ORIGIN</p>
 </dd>
 </dl>
 </div>
@@ -485,8 +489,29 @@ header.</p>
 </dd>
 </dl>
 </div>
+<div class="section" id="qgis-info">
+<span id="id16"></span><h2>QGIS_INFO<a class="headerlink" href="#qgis-info" title="Permalink to this headline">¶</a></h2>
+<p>Log out qgis ‘Info’ message logs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default</dt>
+<dd class="field-even"><p>no</p>
+</dd>
+<dt class="field-odd">Section</dt>
+<dd class="field-odd"><p>logging</p>
+</dd>
+<dt class="field-even">Key</dt>
+<dd class="field-even"><p>level</p>
+</dd>
+<dt class="field-odd">Env</dt>
+<dd class="field-odd"><p>QGSRV_QGIS_INFO</p>
+</dd>
+</dl>
+</div>
 <div class="section" id="cache-size">
-<span id="id16"></span><h2>CACHE_SIZE<a class="headerlink" href="#cache-size" title="Permalink to this headline">¶</a></h2>
+<span id="id17"></span><h2>CACHE_SIZE<a class="headerlink" href="#cache-size" title="Permalink to this headline">¶</a></h2>
 <p>The maximal number of Qgis projects held in cache. The cache strategy is LRU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -507,7 +532,7 @@ header.</p>
 </dl>
 </div>
 <div class="section" id="cache-rootdir">
-<span id="id17"></span><h2>CACHE_ROOTDIR<a class="headerlink" href="#cache-rootdir" title="Permalink to this headline">¶</a></h2>
+<span id="id18"></span><h2>CACHE_ROOTDIR<a class="headerlink" href="#cache-rootdir" title="Permalink to this headline">¶</a></h2>
 <p>The directory location for Qgis project files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -525,7 +550,7 @@ header.</p>
 </dl>
 </div>
 <div class="section" id="cache-strict-check">
-<span id="id18"></span><h2>CACHE_STRICT_CHECK<a class="headerlink" href="#cache-strict-check" title="Permalink to this headline">¶</a></h2>
+<span id="id19"></span><h2>CACHE_STRICT_CHECK<a class="headerlink" href="#cache-strict-check" title="Permalink to this headline">¶</a></h2>
 <p>Activate strict checking of project layers. When enabled, Qgis projects
 with invalid layers will be dismissed and an ‘Unprocessable Entity’ (422) HTTP error
 will be issued.</p>
@@ -548,7 +573,7 @@ will be issued.</p>
 </dl>
 </div>
 <div class="section" id="cache-insecure">
-<span id="id19"></span><h2>CACHE_INSECURE<a class="headerlink" href="#cache-insecure" title="Permalink to this headline">¶</a></h2>
+<span id="id20"></span><h2>CACHE_INSECURE<a class="headerlink" href="#cache-insecure" title="Permalink to this headline">¶</a></h2>
 <p>Enable or disable the insecure cache mode. The insecure cache mode allow scheme handlers
 to enable or disable some features considered harmful. See the handler’s description
 for the limitations induced in secure mode.</p>
@@ -571,7 +596,7 @@ for the limitations induced in secure mode.</p>
 </dl>
 </div>
 <div class="section" id="trust-layer-metadata">
-<span id="id20"></span><h2>TRUST_LAYER_METADATA<a class="headerlink" href="#trust-layer-metadata" title="Permalink to this headline">¶</a></h2>
+<span id="id21"></span><h2>TRUST_LAYER_METADATA<a class="headerlink" href="#trust-layer-metadata" title="Permalink to this headline">¶</a></h2>
 <p>Trust layer metadata. Improves layer load time by skipping expensive checks
 like primary key unicity, geometry type and
 srid and by using estimated metadata on layer load. Since QGIS 3.16.</p>
@@ -600,7 +625,7 @@ srid and by using estimated metadata on layer load. Since QGIS 3.16.</p>
 </dl>
 </div>
 <div class="section" id="disable-getprint">
-<span id="id21"></span><h2>DISABLE_GETPRINT<a class="headerlink" href="#disable-getprint" title="Permalink to this headline">¶</a></h2>
+<span id="id22"></span><h2>DISABLE_GETPRINT<a class="headerlink" href="#disable-getprint" title="Permalink to this headline">¶</a></h2>
 <p>Don’t load print layouts. Improves project read time if layouts are not required,
 and allows projects to be safely read in background threads (since print layouts are
 not thread safe).</p>
@@ -629,7 +654,7 @@ not thread safe).</p>
 </dl>
 </div>
 <div class="section" id="cache-preload-config">
-<span id="id22"></span><h2>CACHE_PRELOAD_CONFIG<a class="headerlink" href="#cache-preload-config" title="Permalink to this headline">¶</a></h2>
+<span id="id23"></span><h2>CACHE_PRELOAD_CONFIG<a class="headerlink" href="#cache-preload-config" title="Permalink to this headline">¶</a></h2>
 <p>Path to configuration file for preloading projects. The file must have one project uri
 per line. Each uri is similar to the project uri passed in the ‘MAP’ query parameter
 of OWS requests.</p>
@@ -652,7 +677,7 @@ of OWS requests.</p>
 </dl>
 </div>
 <div class="section" id="cache-disable-owsurls">
-<span id="id23"></span><h2>CACHE_DISABLE_OWSURLS<a class="headerlink" href="#cache-disable-owsurls" title="Permalink to this headline">¶</a></h2>
+<span id="id24"></span><h2>CACHE_DISABLE_OWSURLS<a class="headerlink" href="#cache-disable-owsurls" title="Permalink to this headline">¶</a></h2>
 <p>Disable ows urls defined in projects. This may be necessary because Qgis projects
 urls override proxy urls.</p>
 <dl class="field-list simple">
@@ -677,7 +702,7 @@ urls override proxy urls.</p>
 </dl>
 </div>
 <div class="section" id="api-enabled-landing-page">
-<span id="id24"></span><h2>API_ENABLED_LANDING_PAGE<a class="headerlink" href="#api-enabled-landing-page" title="Permalink to this headline">¶</a></h2>
+<span id="id25"></span><h2>API_ENABLED_LANDING_PAGE<a class="headerlink" href="#api-enabled-landing-page" title="Permalink to this headline">¶</a></h2>
 <p>Enable access to qgis ‘landing page’ api</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -701,7 +726,7 @@ urls override proxy urls.</p>
 </dl>
 </div>
 <div class="section" id="api-endpoints-landing-page">
-<span id="id25"></span><h2>API_ENDPOINTS_LANDING_PAGE<a class="headerlink" href="#api-endpoints-landing-page" title="Permalink to this headline">¶</a></h2>
+<span id="id26"></span><h2>API_ENDPOINTS_LANDING_PAGE<a class="headerlink" href="#api-endpoints-landing-page" title="Permalink to this headline">¶</a></h2>
 <p>Define endpoint access to the ‘landing page’ service</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -725,7 +750,7 @@ urls override proxy urls.</p>
 </dl>
 </div>
 <div class="section" id="management-enabled">
-<span id="id26"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this headline">¶</a></h2>
+<span id="id27"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this headline">¶</a></h2>
 <p>Activate management API service. The management API is REST api for controlling and inspecting
 the server behavior, plugins and cached projects.
 Starting from 1.7.0, this is a experimental feature and will be subject to change. The api will
@@ -752,7 +777,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </div>
 <div class="section" id="management-interfaces">
-<span id="id27"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this headline">¶</a></h2>
+<span id="id28"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this headline">¶</a></h2>
 <p>Network interfaces to listen to. The management API service will listen on this interface</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -776,7 +801,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </div>
 <div class="section" id="management-port">
-<span id="id28"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this headline">¶</a></h2>
+<span id="id29"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this headline">¶</a></h2>
 <p>Port to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -797,7 +822,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </div>
 <div class="section" id="management-ssl">
-<span id="id29"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this headline">¶</a></h2>
+<span id="id30"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this headline">¶</a></h2>
 <p>Enable SSL endpoint for API management</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -818,7 +843,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </div>
 <div class="section" id="management-ssl-cert">
-<span id="id30"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this headline">¶</a></h2>
+<span id="id31"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this headline">¶</a></h2>
 <p>Path to the SSL certificat file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -836,7 +861,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </div>
 <div class="section" id="management-ssl-key">
-<span id="id31"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this headline">¶</a></h2>
+<span id="id32"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this headline">¶</a></h2>
 <p>Path to the SSL key file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>

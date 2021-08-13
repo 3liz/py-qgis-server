@@ -220,6 +220,7 @@ header.
 
 
 :Type: boolean
+:Default: no
 :Section: server
 :Key: cross_origin
 :Env: QGSRV_SERVER_CROSS_ORIGIN
@@ -239,6 +240,22 @@ Set the logging level
 :Section: logging
 :Key: level
 :Env: QGSRV_LOGGING_LEVEL
+
+
+
+
+.. _QGIS_INFO:
+
+QGIS_INFO
+---------
+
+Log out qgis 'Info' message logs
+
+:Type: boolean
+:Default: no
+:Section: logging
+:Key: level
+:Env: QGSRV_QGIS_INFO
 
 
 
