@@ -250,7 +250,7 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
             see https://github.com/qgis/QGIS/pull/33668
         """
         if self.badLayerNames:
-            LOGGER.debug("Found bad layers: %s", self.badLayerNames)
+            LOGGER.error("Found bad layers: %s", self.badLayerNames)
             restricteds = set(QgsServerProjectUtils.wmsRestrictedLayers(project))
             return self.badLayerNames.issubset(restricteds)
         return True
@@ -326,4 +326,3 @@ def get_project_summary( key: str, project: QgsProject ):
         crs=project.crs().userFriendlyIdentifier(),
         last_modified=project.lastModified().toString(Qt.ISODate)
     )
-
