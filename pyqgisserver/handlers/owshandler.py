@@ -56,8 +56,9 @@ class OwsHandler(BaseHandler):
 
             if self.has_body_arguments:
                 # Do not let qgis server handle url encoded prameters
-                method = 'GET'
-                data   = None
+                data = None
+                if method == 'POST':
+                    method = 'GET'
 
             self._stats.num_requests +=1
 
@@ -153,5 +154,15 @@ class OwsApiHandler(OwsHandler):
         """
         await super().get(endpoint)
  
+    async def delete(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+        await self.handle_request('DELETE', endpoint)
 
+    async def head(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+        await self.handle_request('HEAD', endpoint)
+
+    async def put(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+        await self.handle_request('PUT', endpoint)
+
+    async def patch(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+        await self.handle_request('PATCH', endpoint)
 

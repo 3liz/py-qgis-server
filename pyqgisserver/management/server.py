@@ -15,7 +15,7 @@ import logging
 
 from ..logger import log_request
 from ..config import confservice
-from ..handlers import (BaseHandler, StatusHandler, OwsHandler as QgisHandler, NotFoundHandler)
+from ..handlers import (BaseHandler, StatusHandler, OwsApiHandler as QgisHandler, NotFoundHandler)
 from ..zeromq import client
 
 from typing import Awaitable

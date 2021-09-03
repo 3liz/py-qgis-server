@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Fix supports for PUT/DELETE/PATCH/HEAD HTTP methods for qgis API
+
+## 1.7.3 - 2021-08-13
+
 * Fix Qgis server api call in managment
 * Add specific option for logging qgis info message logs  
 * Print extended version informations 

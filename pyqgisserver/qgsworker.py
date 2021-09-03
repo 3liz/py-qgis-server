@@ -57,6 +57,9 @@ class Request(QgsServerRequest):
             'GET' : QgsServerRequest.GetMethod,
             'PUT' : QgsServerRequest.PutMethod,
             'POST': QgsServerRequest.PostMethod,
+            'HEAD': QgsServerRequest.HeadMethod,
+            'DELETE': QgsServerRequest.DeleteMethod,
+            'PATCH': QgsServerRequest.PatchMethod,
             }[req.method], headers=req.headers)
        
     def data(self) -> QByteArray: 
@@ -105,7 +108,7 @@ class Response(QgsServerResponse):
             self._buffer.seek(0)
             bytesAvail = self._buffer.bytesAvailable()
             LOGGER.debug("%s: Flushing response data: (%d bytes)",self._handler.identity, bytesAvail)
-            if self._finish:
+            if self._finish and bytesAvail:
                 self._handler.headers['Content-Length']=bytesAvail
             # Take care of the logic: if finish and not handler.header_written then there is no
             # chunk following
