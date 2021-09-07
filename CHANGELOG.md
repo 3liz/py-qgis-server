@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.4
+
 * Enforce required python version in setup.py
 * Fix supports for PUT/DELETE/PATCH/HEAD HTTP methods for qgis API
 
