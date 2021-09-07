@@ -169,4 +169,3 @@ if __name__ == '__main__':
                maxqueue=args.maxqueue,
                timeout=args.timeout)
     print("DONE", file=sys.stderr)
-
