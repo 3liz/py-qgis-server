@@ -9,14 +9,13 @@
 
 ## 1.7.3 - 2021-08-13
 
-* Fix Qgis server api call in managment
+* Fix Qgis server api call in management
 * Add specific option for logging qgis info message logs  
-* Print extended version informations 
+* Print extended version information 
 * Use setup.cfg for flake8 options
 * Handle 0 length response from qgis server
 * Expose Qgis api to public interface:
-
-    - Expose landing page (https://github.com/3liz/py-qgis-server/issues/29)
+* Expose landing page (https://github.com/3liz/py-qgis-server/issues/29)
 
 ## 1.7.2 - 2021-07-05
 
