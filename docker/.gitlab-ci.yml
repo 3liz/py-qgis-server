@@ -78,5 +78,3 @@ release:ltr:
     QGIS_FLAVOR: ltr
   dependencies:
     - build-docker:ltr
-
-
