@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+    qgis-server:
+        environment:
+            PGPASSFILE: /.pgpass
+            PGUSER: ${PGUSER} \
+            PGDATABASE: ${PGDATABASE} \
+            PGAPPNAME: ${PGAPPNAME} \
+            PGHOST: ${PGHOST}
+        volumes:
+            - ${PG_RUN}:/var/run/postgresql
+            - ${PGPASSFILE}:/.pgpass

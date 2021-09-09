@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Logging: raise from debug to error if invalid layers are found
+* Use docker-compose for running tests
+
 ## 1.7.4 - 2021-09-07
 
 * Enforce required python version in setup.py

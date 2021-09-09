@@ -56,11 +56,11 @@ dist: dirs manifest
 clean:
 	rm -rf $(BUILDDIR)
 
-test: lint docker-test
+test: lint test-test
 
 lint:
 	@flake8 pyqgisserver pyqgisservercontrib
 
 
-docker-%:
-	$(MAKE) -C tests/docker $* FLAVOR=$(FLAVOR)
+test-%:
+	$(MAKE) -C tests $* FLAVOR=$(FLAVOR)

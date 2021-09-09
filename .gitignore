@@ -45,6 +45,7 @@ docker-test.log
 /tests/data/montpellier
 /tests/unittests/qgis.db
 /tests/data/private
+/tests/qgis
 
 *.bak
 *.bak~
