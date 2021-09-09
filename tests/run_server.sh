@@ -21,7 +21,7 @@ fi
 
 # Run the server locally
 echo "Running server..."
-qgisserver -b 0.0.0.0 -p 8080 -c /server.conf
+exec qgisserver -b 0.0.0.0 -p 8080 -c /server.conf
 
 
 

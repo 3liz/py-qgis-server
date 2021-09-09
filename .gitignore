@@ -53,3 +53,5 @@ docker-test.log
 qgis.db
 
 VERSION
+.env
+
