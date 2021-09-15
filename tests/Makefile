@@ -26,8 +26,10 @@ SRCDIR=$(shell realpath ..)
 PLUGINPATH:=$(SRCDIR)/tests/plugins
 
 local:
-	rm -rf $$(pwd)/.local
 	mkdir -p $$(pwd)/.local  $$(pwd)/.cache
+
+clean:
+	rm -rf $$(pwd)/.local
 
 PGUSER ?= $(USER)
 PGDATABASE ?= $(USER)
