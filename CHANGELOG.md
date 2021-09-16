@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Fix streamed GetFeature requests 
+    - Refactorize streamed response 
+    - Allow empty chunk
 * Logging: raise from debug to error if invalid layers are found
 * Use docker-compose for running tests
 

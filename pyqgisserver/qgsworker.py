@@ -109,18 +109,22 @@ class Response(QgsServerResponse):
             bytesAvail = self._buffer.bytesAvailable()
             LOGGER.debug("%s: Flushing response data: (%d bytes)",self._handler.identity, bytesAvail)
             if self._finish and bytesAvail:
+                # Make sure that we have Content-length set
                 self._handler.headers['Content-Length']=bytesAvail
             # Take care of the logic: if finish and not handler.header_written then there is no
             # chunk following
             send_more = not self._finish or self._handler.header_written
             if bytesAvail:
+                LOGGER.debug("Sending bytes %s (send_more: %s)", bytesAvail, send_more)
                 self._handler.send( bytes(self._buffer.data()), send_more )
                 self._buffer.buffer().clear()
             else:
                 # Return empty response
+                LOGGER.debug("Sending empty response (send_more: %s)", send_more)
                 self._handler.send( b'', send_more )
             # push the sentinel
             if send_more and self._finish:
+                LOGGER.debug("Sending EOF")
                 self._handler.send( b'', False )
         except Exception:
             LOGGER.error("Caught Exception (worker: %s, msg: %s):\n%s",

@@ -80,7 +80,7 @@ class RequestHandler:
             self._write( message ) 
             self.header_written = True
         elif self.status_code == 206:
-            self._write( data )
+            self._write(pickle.dumps((data, send_more),-1))
             if not send_more:
                 self.status_code = 200
 

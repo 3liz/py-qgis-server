@@ -18,7 +18,7 @@ import logging
 import uuid
 import traceback
 
-from typing import Mapping, Any
+from typing import Mapping, Any, Tuple
 
 from .messages import RequestMessage
 
@@ -72,8 +72,9 @@ class AsyncResponseHandler:
             # Send the result
             self._future.set_result(self)
         elif self._has_more:
-            self._chunks.put_nowait(data)
-            self._has_more = (data != b"")
+            body, has_more = pickle.loads(data)
+            self._has_more = has_more
+            self._chunks.put_nowait((body,has_more))
 
     def _done(self) -> bool:
         """ Check if there is more data to come
@@ -90,16 +91,14 @@ class AsyncResponseHandler:
             self._has_more = False
             raise RequestTimeoutError()
 
-    async def _next_chunk(self, timeout: int) -> bytes:
+    async def _next_chunk(self, timeout: int) -> Tuple[bytes,bool]:
         """ Get next chunk
         """
         try:
-            if self._chunks:
-                return await asyncio.wait_for(self._chunks.get(), timeout)
+            return await asyncio.wait_for(self._chunks.get(), timeout)
         except asyncio.TimeoutError:
             self._has_more = False
             raise RequestTimeoutError()
-        return b""
 
 
 class AsyncClient:
@@ -181,8 +180,8 @@ class AsyncClient:
         """
         try:
             while True:
-                data = await response._next_chunk(timeout) 
-                if data == b"": 
+                data, has_more = await response._next_chunk(timeout) 
+                if not has_more:
                     break
                 yield  data
         except Exception:
