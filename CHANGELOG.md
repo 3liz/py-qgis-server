@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 1.7.5
+## 1.7.5 - 2021-09-21
 
 * Fix streamed GetFeature requests 
     - Refactorize streamed response 
