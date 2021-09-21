@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Pass `X-Qgis-*` headers 
+    - Allow custom headers from https://github.com/qgis/QGIS/pull/41333
+
 ## 1.7.5 - 2021-09-21
 
 * Fix streamed GetFeature requests 

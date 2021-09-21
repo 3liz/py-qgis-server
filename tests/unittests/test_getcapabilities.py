@@ -1,9 +1,11 @@
 """
     Test server disponibility
 """
+import pytest
 
 from pyqgisserver.tests import HTTPTestCase
 from urllib.parse import urlparse
+from qgis.core import Qgis
 
 ns = { "wms": "http://www.opengis.net/wms" }
 
@@ -92,4 +94,24 @@ class Tests(HTTPTestCase):
         """
         rv = self.client.get( "?map=france_parts.qgs&SERVICE=WMS&request=GetCapabilities" )
         assert rv.status_code == 200    
+
+    @pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 32000, reason="Requires qgis >= 3.20")
+    def test_qgis_urls(self):
+        """ Test X-Qgis-* urls 
+            see https://github.com/qgis/QGIS/pull/41333
+        """
+        urlref = urlparse('https://my.proxy.loc:9999/anywhere/')
+        rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities", 
+                             headers={ 'X-Qgis-Service-Url': urlref.geturl() } )
+
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
+
+        elem = rv.xml.findall(".//wms:OnlineResource", ns)
+        assert len(elem) > 0
+
+        href = urlparse(elem[0].get(xlink+'href'))
+        assert href.scheme   == urlref.scheme
+        assert href.hostname == urlref.hostname
+        assert href.path     == urlref.path
 

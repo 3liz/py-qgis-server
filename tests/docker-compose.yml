@@ -31,6 +31,7 @@ services:
             QGSRV_SERVER_SSL_KEY: /src/tests/certs/localhost.key
             QGSRV_SERVER_TIMEOUT: ${REQUEST_TIMEOUT}
             QGSRV_CACHE_STRICT_CHECK: ${STRICT_CHECK}
+            PYTEST_ADDOPTS: ${PYTEST_ADDOPTS}
         user: ${BECOME_USER}
         volumes:
             - ${SRCDIR}:/src 

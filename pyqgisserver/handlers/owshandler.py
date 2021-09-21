@@ -54,6 +54,13 @@ class OwsHandler(BaseHandler):
             if proxy_url: 
                 headers['X-Forwarded-Url']=proxy_url
 
+            def copy_headers(pat):
+                headers.update((k,v) for k,v in self.request.headers.items() if k.upper().startswith(pat))
+
+            # Copy custom Qgis/Forwarded headers
+            # see https://github.com/qgis/QGIS/pull/41333
+            copy_headers('X-QGIS-')
+
             if self.has_body_arguments:
                 # Do not let qgis server handle url encoded prameters
                 data = None
