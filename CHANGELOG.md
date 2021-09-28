@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fix wrong type for AMQP Logger variable `connection_delay` 
 * Pass `X-Qgis-*` headers 
     - Allow custom headers from https://github.com/qgis/QGIS/pull/41333
 

@@ -100,7 +100,7 @@ class Monitor:
         vhost = conf['vhost']
         port  = conf['port']
 
-        reconnect_delay = conf['reconnect_delay']
+        reconnect_delay = conf.getint('reconnect_delay')
 
         kwargs = {}
 
