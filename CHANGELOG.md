@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Add condition when preprocessing POST requests
 * Handle `QGIS_PROJECT_FILE` environment variable
     - Return 400 on invalid OWS service request (no Map)
 
