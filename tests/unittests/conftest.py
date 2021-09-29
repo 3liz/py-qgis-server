@@ -9,21 +9,16 @@ from time import sleep
 from pathlib import Path
 
 def pytest_addoption(parser):
-    parser.addoption("--server-debug", action="store_true" , help="Set debug mode",
-                     default=False)
     parser.addoption("--with-postgres", action="store_true", help="Run postgres tests",
                      default=False)
     parser.addoption("--with-profiles", action="store_true", help="Run profiles tests",
                      default=False)
 
 
-server_debug  = False
-
 def pytest_configure(config):
 
     # Debug mode
-    global server_debug, postgres_user
-    server_debug  = config.getoption('server_debug')
+    global postgres_user
 
     # Postgres 
     config.with_postgres = config.getoption('with_postgres')
@@ -55,14 +50,6 @@ def pytest_collection_modifyitems(config, items):
 def pytest_sessionstart(session):
     """ Start subprocesses
     """
-    logging.basicConfig( stream=sys.stderr, level=logging.DEBUG )
-
-    if not server_debug:
-        logging.disable(logging.WARNING)
-
-    #logger = logging.getLogger('QGSRV')
-    #logger.setLevel(log_level)
-
     rt = TestRuntime.instance()
     rt.start()
     print("Waiting for server to initialize...")

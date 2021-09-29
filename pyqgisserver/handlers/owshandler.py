@@ -137,7 +137,7 @@ class OwsHandler(BaseHandler):
         self.set_option_headers('GET, POST, OPTIONS')
 
 
-class OwsFilterHandler(OwsHandler):
+class _FilterHandlerMixIn:
     """ Handle filter handlers
     """
     def initialize(self, filters: Optional[List]=None, **kwargs) -> None:
@@ -150,6 +150,10 @@ class OwsFilterHandler(OwsHandler):
         super().prepare()
         for filt in self._filters:
             await filt.apply( self )
+
+
+class OwsFilterHandler(_FilterHandlerMixIn,OwsHandler):
+    pass
 
 
 class OwsApiHandler(OwsHandler):
@@ -172,4 +176,8 @@ class OwsApiHandler(OwsHandler):
 
     async def patch(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         await self.handle_request('PATCH', endpoint)
+
+
+class OwsApiFilterHandler(_FilterHandlerMixIn, OwsApiHandler):
+    pass
 

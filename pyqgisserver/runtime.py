@@ -26,6 +26,7 @@ from .handlers import (StatusHandler,
                        OwsHandler, 
                        OwsFilterHandler, 
                        OwsApiHandler,
+                       OwsApiFilterHandler,
                        PingHandler, 
                        NotFoundHandler)
 
@@ -83,8 +84,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
     end = r"(?:\.html|\.json|/?)"
 
-    ows_endpoints = [
-        r"/?",
+    ows_api_endpoints = [
         rf"/wfs3{end}",
         rf"/wfs3/collections(?:/[^/]+(?:/items)?)?{end}",
         rf"/wfs3/conformance{end}",
@@ -112,11 +112,14 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
             kw.update( filters = fltrs)
             # Add ow endpoint
             path = f"{root}/{uri.strip('/')}" if uri else root
-            for endp in ows_endpoints:
-                add_handler( f"{path}(?P<endpoint>{endp})", OwsFilterHandler, kw )
+            # Add service endpoint
+            add_handler( f"{path}(?P<endpoint>/?)", OwsFilterHandler, kw )
+            for endp in ows_api_endpoints:
+                add_handler( rf"{path}(?P<endpoint>{endp})", OwsApiFilterHandler, kw )
     else:
-        for endp in ows_endpoints:
-            add_handler( rf"{root}(?P<endpoint>{endp})", OwsHandler, ows_kwargs )
+        add_handler( rf"{root}(?P<endpoint>/?)", OwsHandler, kw )
+        for endp in ows_api_endpoints:
+            add_handler( rf"{root}(?P<endpoint>{endp})", OwsApiHandler, ows_kwargs )
 
     #
     # Add qgis api endpoints

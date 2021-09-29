@@ -69,4 +69,10 @@ class Tests(HTTPTestCase):
         rv = self.client.get("?MAP=france_parts_qgz&SERVICE=WFS&request=GetCapabilities")
         assert rv.status_code == 200
 
+    def test_ows_service_nomap_return_400(self):
+        """ Test that a ows request without Map  return 400
+        """
+        rv = self.client.get("?Service=WMS&request=GetCapabilities")
+        assert rv.status_code == 400
+
 

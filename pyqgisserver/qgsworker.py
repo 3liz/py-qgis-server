@@ -23,7 +23,8 @@ from typing import Dict, Optional, Any
 from qgis.PyQt.QtCore import Qt, QBuffer, QIODevice, QByteArray
 from qgis.core import QgsProject
 from qgis.server import (QgsServerRequest,
-                         QgsServerResponse)
+                         QgsServerResponse,
+                         QgsServerException)
 
 from .zeromq.worker import RequestHandler, run_worker
 from .qgscache.cachemanager import (get_cacheservice,
@@ -238,6 +239,8 @@ class QgsRequestHandler(RequestHandler):
 
         run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')), **kwargs)
 
+    QGIS_NO_MAP_ERROR_MSG = "No project defined. For OWS services: please provide a SERVICE and a MAP parameter" 
+
     def handle_message(self) -> None:
         """ Override this method to handle_messages
         """
@@ -245,6 +248,18 @@ class QgsRequestHandler(RequestHandler):
 
         request  = Request(self)
         response = Response(self)
+
+        if not project_location:
+            # Try to get project from environment
+            project_location = os.getenv("QGIS_PROJECT_FILE")
+
+        if not project_location and request.parameter('SERVICE'):
+            LOGGER.error("No project defined for %s", request.parameter('SERVICE'))
+            # A project is required
+            exception = QgsServerException(self.QGIS_NO_MAP_ERROR_MSG, 400)
+            response.write(exception)
+            response.finish()
+            return
 
         if project_location:
             iface = self.qgis_server.serverInterface()
