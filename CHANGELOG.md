@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Configurable forwarded header list
+    - Configure whitelist of Header's prefix allowed
+      to be forwarded to Qgis api/services
 * Add condition when preprocessing POST requests
 * Handle `QGIS_PROJECT_FILE` environment variable
     - Return 400 on invalid OWS service request (no Map)

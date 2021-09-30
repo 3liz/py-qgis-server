@@ -2,7 +2,6 @@ import sys
 import os
 import pytest
 
-import logging
 from pyqgisserver.tests import TestRuntime
 from time import sleep
 

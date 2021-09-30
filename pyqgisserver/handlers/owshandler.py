@@ -28,15 +28,17 @@ class OwsHandler(BaseHandler):
     """
     def initialize(self, client: AsyncClient, timeout: int, 
                    monitor: Optional[Monitor]=None, 
-                   http_proxy: bool=False) -> None:
+                   http_proxy: bool=False,
+                   allowed_hdrs: List[str]=[] ) -> None:
 
         super().initialize()
 
-        self._client      = client
-        self._timeout     = timeout
-        self._monitor     = monitor
-        self._proxy       = http_proxy
-        self._stats       = self.application.stats
+        self._client       = client
+        self._timeout      = timeout
+        self._monitor      = monitor
+        self._proxy        = http_proxy
+        self._stats        = self.application.stats
+        self._allowed_hdrs = allowed_hdrs
 
     async def handle_request(self, method: str, endpoint: Optional[str], data: Optional=None ) -> Awaitable[None]:
         reqtime = time()
@@ -60,10 +62,10 @@ class OwsHandler(BaseHandler):
 
             # Copy custom Qgis/Forwarded headers
             # see https://github.com/qgis/QGIS/pull/41333
-            copy_headers(('X-QGIS-','X-LIZMAP-'))
+            copy_headers(self._allowed_hdrs)
 
             if self.get_argument('SERVICE', default=None) and  self.has_body_arguments:
-                # Do not let qgis server handle url encoded prameters
+                # Do not let qgis server handle url encoded parameters
                 data = None
                 if method == 'POST':
                     method = 'GET'

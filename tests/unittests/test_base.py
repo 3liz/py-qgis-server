@@ -75,4 +75,21 @@ class Tests(HTTPTestCase):
         rv = self.client.get("?Service=WMS&request=GetCapabilities")
         assert rv.status_code == 400
 
+    def test_allowed_headers(self):
+        """ Test allowed headers as defined in configuration
+
+            Use the 'headers' test plugin
+        """
+        headers = {
+            'X-Qgis-Test': 'This is Qgis header',        
+            'X-Lizmap-Test': 'This is Lizmap header',        
+        }
+
+        rv = self.client.get("?MAP=france_parts&SERVICE=WFS&request=GetCapabilities",
+                             headers = headers)
+        assert rv.status_code == 200
+        assert rv.headers['X-Qgis-Header'] == headers['X-Qgis-Test']
+        assert rv.headers['X-Lizmap-Header'] == headers['X-Lizmap-Test']
+
+        
 

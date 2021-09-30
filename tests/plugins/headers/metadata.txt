@@ -1,0 +1,12 @@
+[general]
+name=headers
+qgisMinimumVersion=3.0
+;qgisMaximumVersion=
+description=Test plugin headers
+version=1.0.0
+author=
+email=
+; if True it's a server plugin
+server=True
+
+

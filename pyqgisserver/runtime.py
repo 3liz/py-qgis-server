@@ -76,10 +76,11 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     root = r"/ows"
 
     ows_kwargs = {
-        'client'     : client,
-        'monitor'    : monitor,
-        'timeout'    : cfg.getint('timeout'),
-        'http_proxy' : cfg.getboolean('http_proxy'),
+        'client'      : client,
+        'monitor'     : monitor,
+        'timeout'     : cfg.getint('timeout'),
+        'http_proxy'  : cfg.getboolean('http_proxy'),
+        'allowed_hdrs': tuple(k.upper() for k in cfg.get('allow_headers').split(','))
     }
 
     end = r"(?:\.html|\.json|/?)"
