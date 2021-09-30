@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.7 - 2021-09-30
+
 * Configurable forwarded header list
     - Configure whitelist of Header's prefix allowed
       to be forwarded to Qgis api/services
