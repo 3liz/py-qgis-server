@@ -120,6 +120,8 @@ SERVER_PROXY_URL
 ----------------
 
 The url that must be seen by the client when the server is behind a proxy.
+Note that this option will be overidden by `QGIS_SERVER_<SERVICE>_URL` or 
+by `X-Qgis-<service>-Url` headers.
 
 
 

@@ -1,73 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Configuration Settings &mdash; py-qgis-server 1.7 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Loader schemes" href="schemes.html" />
     <link rel="prev" title="Description" href="intro.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> py-qgis-server
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Description</a></li>
@@ -134,80 +84,39 @@
 <li class="toctree-l1"><a class="reference internal" href="management.html">Management API (experimental)</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">py-qgis-server</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Configuration Settings</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/configuration.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="configuration-settings">
-<span id="id1"></span><h1>Configuration Settings<a class="headerlink" href="#configuration-settings" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="configuration-settings">
+<span id="id1"></span><h1>Configuration Settings<a class="headerlink" href="#configuration-settings" title="Permalink to this headline"></a></h1>
 <p>Configuration can be done either by using a configuration file or with environnement variable.</p>
 <p>Except stated otherwise, the rule for environnement variable names is <code class="docutils literal notranslate"><span class="pre">QGSRV_&lt;SECTION&gt;_&lt;KEY&gt;</span></code> all in uppercase.</p>
-</div>
-<div class="section" id="common-configuration-options">
-<h1>Common Configuration Options<a class="headerlink" href="#common-configuration-options" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="server-http-port">
-<span id="id2"></span><h2>SERVER_HTTP_PORT<a class="headerlink" href="#server-http-port" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="common-configuration-options">
+<h1>Common Configuration Options<a class="headerlink" href="#common-configuration-options" title="Permalink to this headline"></a></h1>
+<section id="server-http-port">
+<span id="id2"></span><h2>SERVER_HTTP_PORT<a class="headerlink" href="#server-http-port" title="Permalink to this headline"></a></h2>
 <p>Port to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -226,9 +135,9 @@
 <dd class="field-odd"><p>QGSRV_SERVER_HTTP_PORT</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-interfaces">
-<span id="id3"></span><h2>SERVER_INTERFACES<a class="headerlink" href="#server-interfaces" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-interfaces">
+<span id="id3"></span><h2>SERVER_INTERFACES<a class="headerlink" href="#server-interfaces" title="Permalink to this headline"></a></h2>
 <p>Interfaces to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -247,9 +156,9 @@
 <dd class="field-odd"><p>QGSRV_SERVER_INTERFACES</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-timeout">
-<span id="id4"></span><h2>SERVER_TIMEOUT<a class="headerlink" href="#server-timeout" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-timeout">
+<span id="id4"></span><h2>SERVER_TIMEOUT<a class="headerlink" href="#server-timeout" title="Permalink to this headline"></a></h2>
 <p>Set the timeout for Qgis response in seconds. If a Qgis worker takes more than
 the corresponding value a timeout error (504) is returned to the client.</p>
 <dl class="field-list simple">
@@ -269,9 +178,9 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 <dd class="field-odd"><p>QGSRV_SERVER_TIMEOUT</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-workers">
-<span id="id5"></span><h2>SERVER_WORKERS<a class="headerlink" href="#server-workers" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-workers">
+<span id="id5"></span><h2>SERVER_WORKERS<a class="headerlink" href="#server-workers" title="Permalink to this headline"></a></h2>
 <p>The number of workers for processing requests</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -290,9 +199,9 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 <dd class="field-odd"><p>QGSRV_SERVER_WORKERS</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-enable-filters">
-<span id="id6"></span><h2>SERVER_ENABLE_FILTERS<a class="headerlink" href="#server-enable-filters" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-enable-filters">
+<span id="id6"></span><h2>SERVER_ENABLE_FILTERS<a class="headerlink" href="#server-enable-filters" title="Permalink to this headline"></a></h2>
 <p>Enable filters as python extension</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -311,9 +220,9 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 <dd class="field-odd"><p>QGSRV_SERVER_ENABLE_FILTERS</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-http-proxy">
-<span id="id7"></span><h2>SERVER_HTTP_PROXY<a class="headerlink" href="#server-http-proxy" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-http-proxy">
+<span id="id7"></span><h2>SERVER_HTTP_PROXY<a class="headerlink" href="#server-http-proxy" title="Permalink to this headline"></a></h2>
 <p>Indicates that the server is behind a reverse proxy</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -332,10 +241,12 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 <dd class="field-odd"><p>QGSRV_SERVER_HTTP_PROXY</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-proxy-url">
-<span id="id8"></span><h2>SERVER_PROXY_URL<a class="headerlink" href="#server-proxy-url" title="Permalink to this headline">¶</a></h2>
-<p>The url that must be seen by the client when the server is behind a proxy.</p>
+</section>
+<section id="server-proxy-url">
+<span id="id8"></span><h2>SERVER_PROXY_URL<a class="headerlink" href="#server-proxy-url" title="Permalink to this headline"></a></h2>
+<p>The url that must be seen by the client when the server is behind a proxy.
+Note that this option will be overidden by <cite>QGIS_SERVER_&lt;SERVICE&gt;_URL</cite> or
+by <cite>X-Qgis-&lt;service&gt;-Url</cite> headers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>string</p>
@@ -350,9 +261,9 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 <dd class="field-even"><p>QGSRV_SERVER_PROXY_URL</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-restartmon">
-<span id="id9"></span><h2>SERVER_RESTARTMON<a class="headerlink" href="#server-restartmon" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-restartmon">
+<span id="id9"></span><h2>SERVER_RESTARTMON<a class="headerlink" href="#server-restartmon" title="Permalink to this headline"></a></h2>
 <p>The file to watch for restarting workers. When the modified date of the file is changed.
 a restart command is broadcasted to the workers. Note that workers processes are restarted
 without dropping requests.</p>
@@ -370,9 +281,9 @@ without dropping requests.</p>
 <dd class="field-even"><p>QGSRV_SERVER_RESTARTMON</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-pluginpath">
-<span id="id10"></span><h2>SERVER_PLUGINPATH<a class="headerlink" href="#server-pluginpath" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-pluginpath">
+<span id="id10"></span><h2>SERVER_PLUGINPATH<a class="headerlink" href="#server-pluginpath" title="Permalink to this headline"></a></h2>
 <p>The path to qgis server plugins</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -388,9 +299,9 @@ without dropping requests.</p>
 <dd class="field-even"><p>QGSRV_SERVER_PLUGINPATH</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-ssl">
-<span id="id11"></span><h2>SERVER_SSL<a class="headerlink" href="#server-ssl" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-ssl">
+<span id="id11"></span><h2>SERVER_SSL<a class="headerlink" href="#server-ssl" title="Permalink to this headline"></a></h2>
 <p>Enable SSL endpoint</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -409,9 +320,9 @@ without dropping requests.</p>
 <dd class="field-odd"><p>QGSRV_SERVER_SSL</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-ssl-cert">
-<span id="id12"></span><h2>SERVER_SSL_CERT<a class="headerlink" href="#server-ssl-cert" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-ssl-cert">
+<span id="id12"></span><h2>SERVER_SSL_CERT<a class="headerlink" href="#server-ssl-cert" title="Permalink to this headline"></a></h2>
 <p>Path to the SSL certificat file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -427,9 +338,9 @@ without dropping requests.</p>
 <dd class="field-even"><p>QGSRV_SERVER_SSL_CERT</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-ssl-key">
-<span id="id13"></span><h2>SERVER_SSL_KEY<a class="headerlink" href="#server-ssl-key" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-ssl-key">
+<span id="id13"></span><h2>SERVER_SSL_KEY<a class="headerlink" href="#server-ssl-key" title="Permalink to this headline"></a></h2>
 <p>Path to the SSL key file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -445,9 +356,9 @@ without dropping requests.</p>
 <dd class="field-even"><p>QGSRV_SERVER_SSL_KEY</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="server-cross-origin">
-<span id="id14"></span><h2>SERVER_CROSS_ORIGIN<a class="headerlink" href="#server-cross-origin" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="server-cross-origin">
+<span id="id14"></span><h2>SERVER_CROSS_ORIGIN<a class="headerlink" href="#server-cross-origin" title="Permalink to this headline"></a></h2>
 <p>Allows any origin for CORS. If set to ‘no’, allow only CORS for the ‘Origin’
 header.</p>
 <dl class="field-list simple">
@@ -467,9 +378,9 @@ header.</p>
 <dd class="field-odd"><p>QGSRV_SERVER_CROSS_ORIGIN</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="logging-level">
-<span id="id15"></span><h2>LOGGING_LEVEL<a class="headerlink" href="#logging-level" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="logging-level">
+<span id="id15"></span><h2>LOGGING_LEVEL<a class="headerlink" href="#logging-level" title="Permalink to this headline"></a></h2>
 <p>Set the logging level</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -488,9 +399,9 @@ header.</p>
 <dd class="field-odd"><p>QGSRV_LOGGING_LEVEL</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="qgis-info">
-<span id="id16"></span><h2>QGIS_INFO<a class="headerlink" href="#qgis-info" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="qgis-info">
+<span id="id16"></span><h2>QGIS_INFO<a class="headerlink" href="#qgis-info" title="Permalink to this headline"></a></h2>
 <p>Log out qgis ‘Info’ message logs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -509,9 +420,9 @@ header.</p>
 <dd class="field-odd"><p>QGSRV_QGIS_INFO</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="cache-size">
-<span id="id17"></span><h2>CACHE_SIZE<a class="headerlink" href="#cache-size" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="cache-size">
+<span id="id17"></span><h2>CACHE_SIZE<a class="headerlink" href="#cache-size" title="Permalink to this headline"></a></h2>
 <p>The maximal number of Qgis projects held in cache. The cache strategy is LRU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -530,9 +441,9 @@ header.</p>
 <dd class="field-odd"><p>QGSRV_CACHE_SIZE</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="cache-rootdir">
-<span id="id18"></span><h2>CACHE_ROOTDIR<a class="headerlink" href="#cache-rootdir" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="cache-rootdir">
+<span id="id18"></span><h2>CACHE_ROOTDIR<a class="headerlink" href="#cache-rootdir" title="Permalink to this headline"></a></h2>
 <p>The directory location for Qgis project files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -548,9 +459,9 @@ header.</p>
 <dd class="field-even"><p>QGSRV_CACHE_ROOTDIR</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="cache-strict-check">
-<span id="id19"></span><h2>CACHE_STRICT_CHECK<a class="headerlink" href="#cache-strict-check" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="cache-strict-check">
+<span id="id19"></span><h2>CACHE_STRICT_CHECK<a class="headerlink" href="#cache-strict-check" title="Permalink to this headline"></a></h2>
 <p>Activate strict checking of project layers. When enabled, Qgis projects
 with invalid layers will be dismissed and an ‘Unprocessable Entity’ (422) HTTP error
 will be issued.</p>
@@ -571,9 +482,9 @@ will be issued.</p>
 <dd class="field-odd"><p>QGSRV_CACHE_STRICT_CHECK</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="cache-insecure">
-<span id="id20"></span><h2>CACHE_INSECURE<a class="headerlink" href="#cache-insecure" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="cache-insecure">
+<span id="id20"></span><h2>CACHE_INSECURE<a class="headerlink" href="#cache-insecure" title="Permalink to this headline"></a></h2>
 <p>Enable or disable the insecure cache mode. The insecure cache mode allow scheme handlers
 to enable or disable some features considered harmful. See the handler’s description
 for the limitations induced in secure mode.</p>
@@ -594,9 +505,9 @@ for the limitations induced in secure mode.</p>
 <dd class="field-odd"><p>QGSRV_CACHE_INSECURE</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="trust-layer-metadata">
-<span id="id21"></span><h2>TRUST_LAYER_METADATA<a class="headerlink" href="#trust-layer-metadata" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="trust-layer-metadata">
+<span id="id21"></span><h2>TRUST_LAYER_METADATA<a class="headerlink" href="#trust-layer-metadata" title="Permalink to this headline"></a></h2>
 <p>Trust layer metadata. Improves layer load time by skipping expensive checks
 like primary key unicity, geometry type and
 srid and by using estimated metadata on layer load. Since QGIS 3.16.</p>
@@ -623,9 +534,9 @@ srid and by using estimated metadata on layer load. Since QGIS 3.16.</p>
 <dd class="field-odd"><p>QGIS_SERVER_TRUST_LAYER_METADATA</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="disable-getprint">
-<span id="id22"></span><h2>DISABLE_GETPRINT<a class="headerlink" href="#disable-getprint" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="disable-getprint">
+<span id="id22"></span><h2>DISABLE_GETPRINT<a class="headerlink" href="#disable-getprint" title="Permalink to this headline"></a></h2>
 <p>Don’t load print layouts. Improves project read time if layouts are not required,
 and allows projects to be safely read in background threads (since print layouts are
 not thread safe).</p>
@@ -652,9 +563,9 @@ not thread safe).</p>
 <dd class="field-odd"><p>QGIS_SERVER_DISABLE_GETPRINT</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="cache-preload-config">
-<span id="id23"></span><h2>CACHE_PRELOAD_CONFIG<a class="headerlink" href="#cache-preload-config" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="cache-preload-config">
+<span id="id23"></span><h2>CACHE_PRELOAD_CONFIG<a class="headerlink" href="#cache-preload-config" title="Permalink to this headline"></a></h2>
 <p>Path to configuration file for preloading projects. The file must have one project uri
 per line. Each uri is similar to the project uri passed in the ‘MAP’ query parameter
 of OWS requests.</p>
@@ -675,9 +586,9 @@ of OWS requests.</p>
 <dd class="field-odd"><p>QGSRV_CACHE_PRELOAD_CONFIG</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="cache-disable-owsurls">
-<span id="id24"></span><h2>CACHE_DISABLE_OWSURLS<a class="headerlink" href="#cache-disable-owsurls" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="cache-disable-owsurls">
+<span id="id24"></span><h2>CACHE_DISABLE_OWSURLS<a class="headerlink" href="#cache-disable-owsurls" title="Permalink to this headline"></a></h2>
 <p>Disable ows urls defined in projects. This may be necessary because Qgis projects
 urls override proxy urls.</p>
 <dl class="field-list simple">
@@ -700,9 +611,9 @@ urls override proxy urls.</p>
 <dd class="field-even"><p>QGSRV_CACHE_DISABLE_OWSURLS</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="api-enabled-landing-page">
-<span id="id25"></span><h2>API_ENABLED_LANDING_PAGE<a class="headerlink" href="#api-enabled-landing-page" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="api-enabled-landing-page">
+<span id="id25"></span><h2>API_ENABLED_LANDING_PAGE<a class="headerlink" href="#api-enabled-landing-page" title="Permalink to this headline"></a></h2>
 <p>Enable access to qgis ‘landing page’ api</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -724,9 +635,9 @@ urls override proxy urls.</p>
 <dd class="field-even"><p>QGSRV_API_ENABLED_LANDING_PAGE</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="api-endpoints-landing-page">
-<span id="id26"></span><h2>API_ENDPOINTS_LANDING_PAGE<a class="headerlink" href="#api-endpoints-landing-page" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="api-endpoints-landing-page">
+<span id="id26"></span><h2>API_ENDPOINTS_LANDING_PAGE<a class="headerlink" href="#api-endpoints-landing-page" title="Permalink to this headline"></a></h2>
 <p>Define endpoint access to the ‘landing page’ service</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -748,9 +659,9 @@ urls override proxy urls.</p>
 <dd class="field-even"><p>QGSRV_API_ENDPOINTS_LANDING_PAGE</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="management-enabled">
-<span id="id27"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="management-enabled">
+<span id="id27"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this headline"></a></h2>
 <p>Activate management API service. The management API is REST api for controlling and inspecting
 the server behavior, plugins and cached projects.
 Starting from 1.7.0, this is a experimental feature and will be subject to change. The api will
@@ -775,9 +686,9 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 <dd class="field-even"><p>QGSRV_MANAGEMENT_ENABLED</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="management-interfaces">
-<span id="id28"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="management-interfaces">
+<span id="id28"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this headline"></a></h2>
 <p>Network interfaces to listen to. The management API service will listen on this interface</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -799,9 +710,9 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 <dd class="field-even"><p>QGSRV_MANAGEMENT_INTERFACES</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="management-port">
-<span id="id29"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="management-port">
+<span id="id29"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this headline"></a></h2>
 <p>Port to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -820,9 +731,9 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 <dd class="field-odd"><p>QGSRV_MANAGEMENT_PORT</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="management-ssl">
-<span id="id30"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="management-ssl">
+<span id="id30"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this headline"></a></h2>
 <p>Enable SSL endpoint for API management</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -841,9 +752,9 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 <dd class="field-odd"><p>QGSRV_MANAGEMENT_SSL</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="management-ssl-cert">
-<span id="id31"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="management-ssl-cert">
+<span id="id31"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this headline"></a></h2>
 <p>Path to the SSL certificat file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -859,9 +770,9 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 <dd class="field-even"><p>QGSRV_MANAGEMENT_SSL_CERT</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="management-ssl-key">
-<span id="id32"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="management-ssl-key">
+<span id="id32"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this headline"></a></h2>
 <p>Path to the SSL key file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -877,55 +788,38 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 <dd class="field-even"><p>QGSRV_MANAGEMENT_SSL_KEY</p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="schemes.html" class="btn btn-neutral float-right" title="Loader schemes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="intro.html" class="btn btn-neutral float-left" title="Description" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="schemes.html" class="btn btn-neutral float-right" title="Loader schemes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, David Marteau - 3liz.
-
-    </p>
+    <p>&#169; Copyright 2021, David Marteau - 3liz.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

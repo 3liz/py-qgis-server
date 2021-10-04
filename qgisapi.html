@@ -1,73 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Expose Qgis Api &mdash; py-qgis-server 1.7 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Management API (experimental)" href="management.html" />
     <link rel="prev" title="Loader schemes" href="schemes.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> py-qgis-server
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Description</a></li>
@@ -105,143 +55,85 @@
 <li class="toctree-l1"><a class="reference internal" href="management.html">Management API (experimental)</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">py-qgis-server</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Expose Qgis Api</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/qgisapi.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="expose-qgis-api">
-<span id="id1"></span><h1>Expose Qgis Api<a class="headerlink" href="#expose-qgis-api" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="expose-qgis-api">
+<span id="id1"></span><h1>Expose Qgis Api<a class="headerlink" href="#expose-qgis-api" title="Permalink to this headline"></a></h1>
 <p>Qgis server enable defining <a class="reference external" href="https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/server.html#custom-apis">custom api</a>.</p>
 <p>Py-qgis-server allow you to control public access to the qgis services apis while still allowing access
 throught the management api.</p>
 <p>This may be useful if you plan to have some api doing some backoffice management and do not want these api beeing accessed
 publicly.</p>
-<div class="section" id="api-endpoint">
-<span id="api-endpoints"></span><h2>Api endpoint<a class="headerlink" href="#api-endpoint" title="Permalink to this headline">¶</a></h2>
+<section id="api-endpoint">
+<span id="api-endpoints"></span><h2>Api endpoint<a class="headerlink" href="#api-endpoint" title="Permalink to this headline"></a></h2>
 <p>Apis may be accessed by the management api by configuring the api endpoint:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">api</span><span class="o">.</span><span class="n">endpoints</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">api_name</span><span class="o">&gt;=/</span><span class="n">endpoint</span>
 </pre></div>
 </div>
 <p>The endpoint should match the root path of the api as defined in the <a class="reference external" href="https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/server.html#custom-apis">qgis server api entrypoint</a></p>
-</div>
-<div class="section" id="enabling-api-public-access">
-<span id="enabling-api"></span><h2>Enabling api public access<a class="headerlink" href="#enabling-api-public-access" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="enabling-api-public-access">
+<span id="enabling-api"></span><h2>Enabling api public access<a class="headerlink" href="#enabling-api-public-access" title="Permalink to this headline"></a></h2>
 <p>Apis are publicly enabled with the following configuration:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">api</span><span class="o">.</span><span class="n">enabled</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">api_name</span><span class="o">&gt;=</span><span class="n">yes</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="management.html" class="btn btn-neutral float-right" title="Management API (experimental)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="schemes.html" class="btn btn-neutral float-left" title="Loader schemes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="management.html" class="btn btn-neutral float-right" title="Management API (experimental)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, David Marteau - 3liz.
-
-    </p>
+    <p>&#169; Copyright 2021, David Marteau - 3liz.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
