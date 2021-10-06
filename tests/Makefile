@@ -85,7 +85,7 @@ run:
 	$(MAKE) up RUN_COMMAND=./tests/run_server.sh
 
 up: env
-	docker-compose up -V --force-recreate
+	docker-compose up -V --force-recreate --exit-code-from qgis-server
 
 stop:
 	docker-compose down -v --remove-orphans
