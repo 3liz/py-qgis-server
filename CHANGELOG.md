@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## Unreleased 
+
+* Tests: abort on container exit with proper return code
+* Remove claiming support for Qgis 3.10
 
 ## 1.7.7 - 2021-09-30
 

@@ -38,6 +38,14 @@ from .config import confservice, configure_qgis_api, qgis_api_endpoints
 
 LOGGER = logging.getLogger('SRVLOG')
 
+HTTP_METHODS = {
+    'GET' : QgsServerRequest.GetMethod,
+    'PUT' : QgsServerRequest.PutMethod,
+    'POST': QgsServerRequest.PostMethod,
+    'HEAD': QgsServerRequest.HeadMethod,
+    'DELETE': QgsServerRequest.DeleteMethod,
+    'PATCH': QgsServerRequest.PatchMethod,
+}
 
 class Request(QgsServerRequest):
 
@@ -53,16 +61,8 @@ class Request(QgsServerRequest):
             location += f"?{query}"
 
         self._data = req.data
-
-        super().__init__(location, method={
-            'GET' : QgsServerRequest.GetMethod,
-            'PUT' : QgsServerRequest.PutMethod,
-            'POST': QgsServerRequest.PostMethod,
-            'HEAD': QgsServerRequest.HeadMethod,
-            'DELETE': QgsServerRequest.DeleteMethod,
-            'PATCH': QgsServerRequest.PatchMethod,
-            }[req.method], headers=req.headers)
-       
+        super().__init__(location, HTTP_METHODS[req.method], headers=req.headers)
+         
     def data(self) -> QByteArray: 
         """ Return post/put data a QByteArray
         """

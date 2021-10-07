@@ -30,12 +30,6 @@ tests:ltr:
   variables:
     QGIS_FLAVOR: ltr
 
-tests:3.10:
-  extends: .tests
-  when: manual
-  variables:
-    QGIS_FLAVOR: "3.10" 
-
 #---------------
 # Build
 #---------------
