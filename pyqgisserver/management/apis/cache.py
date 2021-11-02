@@ -49,7 +49,7 @@ def register( serverIface ):
     """
     register_handlers(serverIface, "/cache","CacheManagment",
                       [
-                          (r'/cache/(?P<key>[^\/]+)/?$', CacheCollection),
+                          (r'/cache/(?P<key>.+)$', CacheCollection),
                           (r'/', CacheCollection),
                       ])
                       
