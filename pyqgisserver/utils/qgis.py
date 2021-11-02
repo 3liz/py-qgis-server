@@ -64,7 +64,7 @@ def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False
 
     qgis_application = QgsApplication([], enable_gui )
     qgis_application.setPrefixPath(qgis_prefix, True)
-    qgis_application.initQgis()
+    #qgis_application.initQgis()
 
     if cleanup:
         # Closing QgsApplication on exit will
