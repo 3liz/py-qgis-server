@@ -180,6 +180,9 @@ class OwsApiHandler(OwsHandler):
     async def patch(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         await self.handle_request('PATCH', endpoint)
 
+    async def options(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+        await self.handle_request('OPTIONS', endpoint)
+
 
 class OwsApiFilterHandler(_FilterHandlerMixIn, OwsApiHandler):
     pass
