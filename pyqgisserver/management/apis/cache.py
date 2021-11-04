@@ -18,6 +18,8 @@ from pyqgisserver.qgscache.cachemanager import (get_cacheservice, get_project_su
  
 from .handler import RequestHandler, register_handlers
 
+from qgis.core import Qgis
+
 LOGGER = logging.getLogger('SRVLOG')
 
 
@@ -47,9 +49,11 @@ class CacheCollection(RequestHandler):
 def register( serverIface ):
     """ Register plugins api handlers
     """
+    # XXX See https://github.com/qgis/QGIS/issues/45439
+    prefix = '/cache' if Qgis.QGIS_VERSION_INT < 32200 else ''
     register_handlers(serverIface, "/cache","CacheManagment",
                       [
-                          (r'/cache/(?P<key>.+)$', CacheCollection),
+                          (rf'{prefix}/(?P<key>.+)$', CacheCollection),
                           (r'/', CacheCollection),
                       ])
                       

@@ -63,4 +63,4 @@ lint:
 
 
 test-%:
-	$(MAKE) -C tests $* FLAVOR=$(FLAVOR)
+	$(MAKE) -C tests env $* FLAVOR=$(FLAVOR)

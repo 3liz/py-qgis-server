@@ -18,6 +18,8 @@ from typing import Optional
 from pyqgisserver.plugins import plugin_list, plugin_metadata, failed_plugins
 from .handler import RequestHandler, register_handlers
 
+from qgis.core import Qgis
+
 LOGGER = logging.getLogger('SRVLOG')
 
 
@@ -47,18 +49,12 @@ class PluginCollection(RequestHandler):
 def register( serverIface ):
     """ Register plugins api handlers
     """
+    # XXX See https://github.com/qgis/QGIS/issues/45439
+    prefix = '/plugins' if Qgis.QGIS_VERSION_INT < 32200 else ''
     register_handlers(serverIface, "/plugins","PluginsManagment",
                       [
-                          # XXX There is some inconsistency how path expression 
-                          # are handled:
-                          #
-                          # 1. Using '/' in first place will catch all requests
-                          # 2. We need to specify the full path for handling names (using
-                          #    only does not work '/(?P<name>[^\/]+)/?$')
-                          # 3. Using '/' at last place will act like '/$'
-                          #
-                          (r'/plugins/(?P<name>[^\/]+)/?$', PluginCollection),
+                          (rf'{prefix}/(?P<name>[^\/]+)/?$', PluginCollection),
                           (r'/', PluginCollection),
                       ])
-                      
+
 
