@@ -10,7 +10,6 @@
 The fork serve will ensure that forking processes 
 occurs from [almost] the same state.
 """
-import sys
 import os
 import zmq
 import logging
@@ -216,6 +215,7 @@ def run_worker_pool(numworkers: int, broadcastaddr: str, router: str,
 
         Ensure that child processes run in the main thread
     """
+
     # Try to exit gracefully
     def term_signal(signum,frames):
         #print("Caught signal: %s" % signum, file=sys.stderr)
@@ -225,18 +225,12 @@ def run_worker_pool(numworkers: int, broadcastaddr: str, router: str,
     pool = Pool( numworkers, target=QgsRequestHandler.run, args=(router,),
                  kwargs={ 'broadcastaddr': broadcastaddr, 'maxcycles': maxcycles } )
 
-    # Handle critical failure by sending ABORT to
-    # parent process
-    def abrt_signal(signum,frames):
-        if pool.critical_failure:
-            print("Server aborting prematurely !", file=sys.stderr)
-            os.kill(os.getppid(), signal.SIGABRT)
-
     signal.signal(signal.SIGTERM,term_signal)
-    signal.signal(signal.SIGABRT,abrt_signal)
 
     try:
         while True:
+            if pool.critical_failure:
+                raise RuntimeError("Server aborting prematurely !")
             pool.maintain_pool()
             time.sleep(0.1)
     except (KeyboardInterrupt,SystemExit):
