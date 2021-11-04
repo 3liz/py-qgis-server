@@ -1,7 +1,15 @@
 # Changelog
 
-## Unreleased 
+## Unreleased
 
+## 1.7.8 - 2021-11-04
+
+* Fix Managment API for Qgis >= 3.22
+    - See https://github.com/qgis/QGIS/issues/45439
+* Fix critical failure handling
+* Fix 'cache' api handler
+* Do not call 'initQgis' when initialising Qgis server
+* [API]: Forward OPTION request to api handlers
 * Tests: abort on container exit with proper return code
 * Remove claiming support for Qgis 3.10
 
