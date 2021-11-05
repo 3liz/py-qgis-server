@@ -244,7 +244,8 @@ class QgsRequestHandler(RequestHandler):
     def handle_message(self) -> None:
         """ Override this method to handle_messages
         """
-        project_location = self.request.headers.pop('X-Map-Location',None)
+        project_location = self.request.headers.pop('X-Map-Location', None)
+        ogc_scheme       = self.request.headers.pop('X-Ogc-Scheme'  , None)
 
         request  = Request(self)
         response = Response(self)
@@ -253,7 +254,7 @@ class QgsRequestHandler(RequestHandler):
             # Try to get project from environment
             project_location = os.getenv("QGIS_PROJECT_FILE")
 
-        if not project_location and request.parameter('SERVICE'):
+        if not project_location and ogc_scheme != 'OAF' and request.parameter('SERVICE'):
             LOGGER.error("No project defined for %s", request.parameter('SERVICE'))
             # A project is required
             exception = QgsServerException(self.QGIS_NO_MAP_ERROR_MSG, 400)

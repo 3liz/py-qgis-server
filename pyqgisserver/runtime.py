@@ -17,7 +17,7 @@ import tornado.platform.asyncio
 
 from multiprocessing import Process
 
-from typing import Mapping, List
+from typing import Optional, Mapping, List
 
 from .logger import log_request
 from .config import confservice, qgis_api_endpoints
@@ -43,15 +43,21 @@ from pyqgisservercontrib.core.filters import ServerFilter
 LOGGER=logging.getLogger('SRVLOG')
 
 
-def load_access_policies() -> Mapping[str,List[ServerFilter]]:
+def load_access_policies() -> Optional[Mapping[str,List[ServerFilter]]]:
     """ Create filter list
     """
+    if not confservice.getboolean('server','enable_filters'):
+        return None
+
     confservice.set('server','access_policy_version','2')
 
     import pyqgisservercontrib.core.componentmanager as cm
 
     collection = []
     cm.register_entrypoints('qgssrv_contrib_access_policy', collection) 
+
+    if not collection:
+        return None
 
     # Retrieve filters
     filters = { "": [] }
@@ -106,8 +112,8 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         handlers.append( ("/status/?", StatusHandler) )
 
     # Load filters
-    if cfg.getboolean('enable_filters'):
-        filters = load_access_policies()
+    filters = load_access_policies()
+    if filters:
         for uri,fltrs in filters.items():
             kw = ows_kwargs.copy()
             kw.update( filters = fltrs)
@@ -118,7 +124,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
             for endp in ows_api_endpoints:
                 add_handler( rf"{path}(?P<endpoint>{endp})", OwsApiFilterHandler, kw )
     else:
-        add_handler( rf"{root}(?P<endpoint>/?)", OwsHandler, kw )
+        add_handler( rf"{root}(?P<endpoint>/?)", OwsHandler, ows_kwargs)
         for endp in ows_api_endpoints:
             add_handler( rf"{root}(?P<endpoint>{endp})", OwsApiHandler, ows_kwargs )
 

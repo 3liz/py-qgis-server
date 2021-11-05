@@ -40,7 +40,9 @@ class OwsHandler(BaseHandler):
         self._stats        = self.application.stats
         self._allowed_hdrs = allowed_hdrs
 
-    async def handle_request(self, method: str, endpoint: Optional[str], data: Optional=None ) -> Awaitable[None]:
+        self.ogc_scheme   = None
+        
+    async def handle_request(self, method: str, endpoint: Optional[str]=None) -> Awaitable[None]:
         reqtime = time()
         try:
             proxy_url = self.proxy_url(self._proxy, endpoint)
@@ -51,10 +53,15 @@ class OwsHandler(BaseHandler):
 
             headers = {}
 
+            data = self.request.body
+
             if project_path:
                 headers['X-Map-Location']=project_path 
             if proxy_url: 
                 headers['X-Forwarded-Url']=proxy_url
+
+            if self.ogc_scheme:
+                headers['X-Ogc-Scheme'] = self.ogc_scheme
 
             def copy_headers(pats):
                 headers.update((k,v) for k,v in self.request.headers.items() if \
@@ -132,7 +139,7 @@ class OwsHandler(BaseHandler):
     async def post(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         """ Handle Post method
         """
-        await self.handle_request('POST', endpoint, data=self.request.body)
+        await self.handle_request('POST', endpoint)
         
     def options(self, endpoint: Optional[str]=None) -> None:
         """ Implement OPTION for validating CORS
@@ -162,6 +169,10 @@ class OwsFilterHandler(_FilterHandlerMixIn,OwsHandler):
 class OwsApiHandler(OwsHandler):
     """ Handle Qgis api
     """
+    def initialize( self, *args, **kwargs ) -> None:
+        super().initialize(*args, **kwargs )
+        self.ogc_scheme = 'OAF'
+
     async def get(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         """ Fix issue with the landing page api when not 
             specifying index.html.

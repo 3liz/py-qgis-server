@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Fix landing page regression (from 1.7.7)
+
 ## 1.7.8 - 2021-11-04
 
 * Fix Managment API for Qgis >= 3.22
