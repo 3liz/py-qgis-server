@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.9 - 2021-11-05
+
 * Fix landing page regression (from 1.7.7)
 
 ## 1.7.8 - 2021-11-04
