@@ -49,7 +49,7 @@ class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self) -> None:
         """ Override defaults HTTP headers 
         """
-        self.set_header("Server",__version__)
+        self.set_header("Server",f"Py-Qgis-Server {__version__}")
 
     def on_connection_close(self) -> None:
         """ Override, log and set 'connection_closed' to True

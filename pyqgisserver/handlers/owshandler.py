@@ -135,16 +135,27 @@ class OwsHandler(BaseHandler):
         """ Handle Get method
         """
         await self.handle_request('GET', endpoint)
-          
+
     async def post(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         """ Handle Post method
         """
         await self.handle_request('POST', endpoint)
         
     def options(self, endpoint: Optional[str]=None) -> None:
-        """ Implement OPTION for validating CORS
+        """ Implement OPTIONS for validating CORS
         """
         self.set_option_headers('GET, POST, OPTIONS')
+
+    def head(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+        """ Handle HEAD method
+
+            HEAD method is not forwarded because qgis server 
+            return 501.
+            
+            Because of this the actuel HEAD method does not return anything meaningful about 
+            the resources referenced from the url - may this will change it the future.
+        """
+        pass
 
 
 class _FilterHandlerMixIn:

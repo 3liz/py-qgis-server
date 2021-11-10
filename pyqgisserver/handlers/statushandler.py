@@ -20,6 +20,8 @@ LOGGER=logging.getLogger('SRVLOG')
 class PingHandler(BaseHandler):
     def get(self):
         self.write_json({ 'status': 'ok' })
+    def head(self):
+        pass
 
 
 class StatusHandler(BaseHandler):

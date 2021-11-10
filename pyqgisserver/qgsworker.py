@@ -255,6 +255,8 @@ class QgsRequestHandler(RequestHandler):
             project_location = os.getenv("QGIS_PROJECT_FILE")
 
         if not project_location and ogc_scheme != 'OAF' and request.parameter('SERVICE'):
+            # Prevent qgis for returning 500 when MAP is not defined for
+            # OWS services
             LOGGER.error("No project defined for %s", request.parameter('SERVICE'))
             # A project is required
             exception = QgsServerException(self.QGIS_NO_MAP_ERROR_MSG, 400)
