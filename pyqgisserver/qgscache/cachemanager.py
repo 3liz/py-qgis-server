@@ -14,7 +14,7 @@ import urllib.parse
 
 from urllib.parse import urlparse, urljoin, parse_qs
 from typing import Tuple, Optional, Sequence
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from pathlib import Path
 from datetime import datetime
 
@@ -82,7 +82,8 @@ class QgsCacheManager:
         size = cnf.getint('size')
 
         self._create_project = QgsProject
-        self._cache = lrucache(size)
+        self._lru_cache            = lrucache(size)
+        self._static_cache         = OrderedDict()
         self._strict_check         = cnf.getboolean('strict_check')
         self._trust_layer_metadata = cnf.getboolean('trust_layer_metadata')
         self._disable_getprint     = cnf.getboolean('disable_getprint')
@@ -99,15 +100,22 @@ class QgsCacheManager:
     def clear(self) -> None:
         """ Clear the whole cache
         """
-        self._cache.clear()
+        self._lru_cache.clear()
+        self._static_cache.clear()
 
-    def items(self) -> Sequence[Tuple[str,CacheDetails]]:
-        return self._cache.items()
+    def lru_items(self) -> Sequence[Tuple[str,CacheDetails]]:
+        return self._lru_cache.items()
+
+    def static_items(self) -> Sequence[Tuple[str,CacheDetails]]:
+        return self._static_cache.items()
 
     def remove_entry(self, key: str) -> None:
         """ Remove cache entry
         """
-        del self._cache[key]
+        if key in self._static_cache:
+            del self._static_cache[key]
+        else:
+            del self._lru_cache[key]
 
     def resolve_alias(self, key: str ) -> urllib.parse.ParseResult:
         """ Resolve scheme from configuration variables
@@ -161,7 +169,7 @@ class QgsCacheManager:
             raise FileNotFoundError(key)
 
         # Get details for the project
-        details = self._cache.peek(key)
+        details = self._lru_cache.peek(key) or self._static_cache.get(key)
         if details is not None:
             project, timestamp  = store.get_project( url, strict=strict, **details._asdict())
             needupdate = timestamp != details.timestamp
@@ -171,26 +179,32 @@ class QgsCacheManager:
 
         return project, timestamp, needupdate
         
-    def update_entry(self, key: str) -> bool:
+    def update_entry(self, key: str, static_cache: bool=False) -> bool:
         """ Update the cache
 
             :param key: The key of the entry to update
             :return: true if the entry has been updated
         """
         project, timestamp, updated = self.get_project(key)
-        self._cache[key] = CacheDetails(project, timestamp)
+        if static_cache or key in self._static_cache:
+            self._static_cache[key] = CacheDetails(project, timestamp)
+        else:
+            self._lru_cache[key] = CacheDetails(project, timestamp)
         return updated
 
     def peek(self, key: str) -> Optional[CacheDetails]:
         """ Return entry if it exists
         """
-        return self._cache.peek(key)
+        return self._lru_cache.peek(key) or self._static_cache.get(key)
 
     def lookup(self, key: str) -> Tuple[QgsProject, bool]:
         """ Lookup entry from key
         """
         updated = self.update_entry(key)
-        return self._cache[key].project, updated
+        if key in self._static_cache:
+            return self._static_cache[key].project, updated
+        else:
+            return self._lru_cache[key].project, updated
 
     def prepare_project(self, project: QgsProject ) -> None:
         """ Set project configuration
@@ -261,23 +275,21 @@ def get_cacheservice() -> QgsCacheManager:
 
 
 def preload_projects_file( path: Path, cacheservice: QgsCacheManager ) ->  int:
-    """ Preload projects from configuration file
+    """ Preload projects from configuration file in static cache
     """
     conf_file = Path(path)
     if not conf_file.exists():
         LOGGER.error("%s file do not exists, ignoring preload config", path)
         return 0
-
-    # No point to preload more files than the cache size
-    maxfiles = confservice['projects.cache'].getint('size')
-    loaded_so_far = 0
     
+    loaded_so_far = 0
+
     # Read the projects, strip comments 
     with conf_file.open() as fp:
         for p in filter(None,(line.strip('\n ').partition('#')[0] for line in fp.readlines())):
             p = p.strip(' ')
             try:
-                project, updated = cacheservice.lookup(p)
+                cacheservice.update_entry(p, static_cache=True)
             except StrictCheckingError:
                 LOGGER.error("Preload: '%s' as invalid layers - strict mode on" , p)
             except PathNotAllowedError:
@@ -285,11 +297,9 @@ def preload_projects_file( path: Path, cacheservice: QgsCacheManager ) ->  int:
             except FileNotFoundError:
                 LOGGER.error("Preload: '%s' not found", p)
             else:
-                LOGGER.info("Preload: '%s' loaded", p)
                 loaded_so_far += 1
-            if loaded_so_far >= maxfiles:
-                LOGGER.warning("Preload: cache size reached")
-                break
+                LOGGER.info("Preload: '%s' loaded", p)
+
     return loaded_so_far
 
 

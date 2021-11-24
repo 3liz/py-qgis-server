@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Preloaded files are now stored in static cache 
 * Minimal support for HEAD requests.
 
 ## 1.7.9 - 2021-11-05

@@ -383,6 +383,7 @@ CACHE_PRELOAD_CONFIG
 Path to configuration file for preloading projects. The file must have one project uri 
 per line. Each uri is similar to the project uri passed in the 'MAP' query parameter
 of OWS requests.
+Preloaded projects are stored in a static cache, i.e they are not subject to lru eviction. 
 
 
 :Type: path

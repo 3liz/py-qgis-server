@@ -42,7 +42,6 @@ def test_aliases() -> None:
 def test_absolute_path_with_alias() -> None:
     """
     """
-
     cacheservice = QgsCacheManager()
 
     # Passing an absolute path that is compatible with
@@ -97,8 +96,6 @@ def test_projects_scheme() -> None:
     details = cacheservice.peek('test:france_parts')
     assert details is not None
     assert details.project is project
-
-
 
 
 def test_file_not_found() -> None:
@@ -177,6 +174,11 @@ def test_preload_projects(data) -> None:
     # project_simple.qgs
     # raster_layer.qgs (invalid layer)
 
+    # Ensure  that items are in static cache
+    items = list(k for k,_ in cacheservice.static_items())
+    assert "file:france_parts.qgs" in items
+    assert "project_simple.qgs" in items
+
     details = cacheservice.peek('file:france_parts.qgs')
     assert details is not None
 
@@ -185,5 +187,4 @@ def test_preload_projects(data) -> None:
 
     details = cacheservice.peek('raster_layer.qgs')
     assert details is None
-
 

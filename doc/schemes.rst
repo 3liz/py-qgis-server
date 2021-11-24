@@ -8,7 +8,7 @@ Py-qgis-server support custom loaders schemes definitions
 Qgis projects path are passed in the ``MAP`` query parameter of the request. By default this parameter
 is interpreted as an url.
 
-If no scheme is specified, the ``MAP`` parameter is interpreted as a file path relative to the ``CACHE_ROOTDIR`` setting and is 
+If no scheme is specified, the ``MAP`` parameter is interpreted as a file path relative to the :ref:`CACHE_ROOTDIR` setting and is 
 handled with the ``file`` protocol handler.
 
 .. _default handlers:
@@ -24,7 +24,7 @@ File protocol
 -------------
 
 Handle projects file stored on local media. The ``file:`` protocol is aliased by default for using
-the ``CACHE_ROOTDIR`` as base path for when looking for projects.
+the :ref:`CACHE_ROOTDIR` as base path for when looking for projects.
 
 :Secure mode: No special limitation
 

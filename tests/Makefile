@@ -78,13 +78,13 @@ env: local
 		PYTEST_ADDOPTS=$(PYTEST_ADDOPTS)
 		EOF
 
-test: 
-	$(MAKE) up RUN_COMMAND=./tests/run_tests.sh
+test: export RUN_COMMAND=./tests/run_tests.sh
+test: env up 
 
-run:
-	$(MAKE) up RUN_COMMAND=./tests/run_server.sh
+run: export RUN_COMMAND=./tests/run_server.sh
+run: up
 
-up: env
+up:
 	docker-compose up -V --force-recreate --exit-code-from qgis-server
 
 stop:
