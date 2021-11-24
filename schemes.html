@@ -18,7 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Expose Qgis Api" href="qgisapi.html" />
+    <link rel="next" title="Cache" href="cache.html" />
     <link rel="prev" title="Configuration Settings" href="configuration.html" /> 
 </head>
 
@@ -51,6 +51,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#scheme-aliases">Scheme aliases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">Cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="qgisapi.html">Expose Qgis Api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="management.html">Management API (experimental)</a></li>
 </ul>
@@ -84,7 +85,7 @@
 <p>Py-qgis-server support custom loaders schemes definitions</p>
 <p>Qgis projects path are passed in the <code class="docutils literal notranslate"><span class="pre">MAP</span></code> query parameter of the request. By default this parameter
 is interpreted as an url.</p>
-<p>If no scheme is specified, the <code class="docutils literal notranslate"><span class="pre">MAP</span></code> parameter is interpreted as a file path relative to the <code class="docutils literal notranslate"><span class="pre">CACHE_ROOTDIR</span></code> setting and is
+<p>If no scheme is specified, the <code class="docutils literal notranslate"><span class="pre">MAP</span></code> parameter is interpreted as a file path relative to the <a class="reference internal" href="configuration.html#cache-rootdir"><span class="std std-ref">CACHE_ROOTDIR</span></a> setting and is
 handled with the <code class="docutils literal notranslate"><span class="pre">file</span></code> protocol handler.</p>
 </section>
 <section id="default-handlers">
@@ -93,7 +94,7 @@ handled with the <code class="docutils literal notranslate"><span class="pre">fi
 <section id="file-protocol">
 <span id="id3"></span><h2>File protocol<a class="headerlink" href="#file-protocol" title="Permalink to this headline"></a></h2>
 <p>Handle projects file stored on local media. The <code class="docutils literal notranslate"><span class="pre">file:</span></code> protocol is aliased by default for using
-the <code class="docutils literal notranslate"><span class="pre">CACHE_ROOTDIR</span></code> as base path for when looking for projects.</p>
+the <a class="reference internal" href="configuration.html#cache-rootdir"><span class="std std-ref">CACHE_ROOTDIR</span></a> as base path for when looking for projects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Secure mode</dt>
 <dd class="field-odd"><p>No special limitation</p>
@@ -153,7 +154,7 @@ postgres=postgres:///?service=myservice&amp;project={path}
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="configuration.html" class="btn btn-neutral float-left" title="Configuration Settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="qgisapi.html" class="btn btn-neutral float-right" title="Expose Qgis Api" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cache.html" class="btn btn-neutral float-right" title="Cache" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

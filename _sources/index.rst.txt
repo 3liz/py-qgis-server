@@ -11,8 +11,9 @@ Welcome to py-qgis-server's documentation!
    :caption: Contents:
 
    intro
-   configuration 
+   configuration
    schemes
+   cache
    qgisapi
    management
 

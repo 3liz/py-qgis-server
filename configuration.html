@@ -80,6 +80,7 @@
 <li class="toctree-l1"><a class="reference internal" href="schemes.html">Loader schemes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes.html#default-handlers">Default handlers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schemes.html#scheme-aliases">Scheme aliases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">Cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="qgisapi.html">Expose Qgis Api</a></li>
 <li class="toctree-l1"><a class="reference internal" href="management.html">Management API (experimental)</a></li>
 </ul>
@@ -568,7 +569,8 @@ not thread safe).</p>
 <span id="id23"></span><h2>CACHE_PRELOAD_CONFIG<a class="headerlink" href="#cache-preload-config" title="Permalink to this headline"></a></h2>
 <p>Path to configuration file for preloading projects. The file must have one project uri
 per line. Each uri is similar to the project uri passed in the ‘MAP’ query parameter
-of OWS requests.</p>
+of OWS requests.
+Preloaded projects are stored in a static cache, i.e they are not subject to lru eviction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>path</p>
