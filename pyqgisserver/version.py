@@ -6,10 +6,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import sys
+from typing import Dict
 
-def read_manifest() -> None:
+
+def read_manifest() -> Dict:
     from pkg_resources import resource_stream
-    
+
     # Read build manifest
     manifest = { 'commitid':'n/a', 'buildid':'n/a', 'version':'n/a' }
     try:
@@ -18,9 +20,9 @@ def read_manifest() -> None:
     except Exception as e:
         print("WARNING: Failed to read manifest ! %s " % e, file=sys.stderr)
     return manifest
-  
+
+
 __manifest__ = read_manifest()
 
 __version__ = __manifest__['version']
 __description__="Qgis/HTTP/0MQ scalable server"
-
