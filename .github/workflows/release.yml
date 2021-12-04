@@ -27,7 +27,7 @@ jobs:
 
     - name: Setup
       run: |
-        make version
+        make manifest
 
     - name: Install Python requirements
       run: pip install qgis-plugin-ci
