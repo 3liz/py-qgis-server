@@ -32,7 +32,7 @@ See the QGIS [roadmap](https://www.qgis.org/en/site/getinvolved/development/road
 - Support for access control extensions
 - Support for Qgis project stored in postgres database
 - Support adding new projects cache handlers as python extension 
-- Preloading of Qgis projects.
+- Preloading of Qgis projects in static cache
 - WFS3 support
 - Control exposition of [Qgis API](https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/server.html#custom-apis)
 - Management API (experimental)

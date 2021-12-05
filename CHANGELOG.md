@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Add `install-lizmap-plugin` script
 * Preloaded files are now stored in static cache 
 * Minimal support for HEAD requests.
 

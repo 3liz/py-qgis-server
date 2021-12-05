@@ -16,6 +16,7 @@ if [[ "$1" == "version" ]]; then
     exit 0
 fi
 
+
 if [[ "$QGSRV_USER" =~ ^root:? ]] || [[ "$QGSRV_USER" =~ ^0:? ]]; then
     echo "QGSRV_USER must no be root !"
     exit 1 
@@ -64,6 +65,6 @@ if [[ "$1" == "qgisserver-worker" ]]; then
     echo "Running Qgis server worker"
     exec qgisserver-worker --host=$ROUTER_HOST $@
 else
-    exec qgisserver $@
+    exec $@
 fi
 
