@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.7.11 - 2021-12-10
+
+* Fix the release process on https://pypi.org
+
 ## 1.7.10 - 2021-12-06
 
 * Add `install-lizmap-plugin` script
@@ -14,7 +18,7 @@
 
 ## 1.7.8 - 2021-11-04
 
-* Fix Managment API for Qgis >= 3.22
+* Fix Management API for Qgis >= 3.22
     - See https://github.com/qgis/QGIS/issues/45439
 * Fix critical failure handling
 * Fix 'cache' api handler
