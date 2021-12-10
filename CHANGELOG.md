@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.7.12 - 2021-12-10
+
+* Fix the wrong tag in Makefile
+
 ## 1.7.11 - 2021-12-10
 
 * Fix the release process on https://pypi.org

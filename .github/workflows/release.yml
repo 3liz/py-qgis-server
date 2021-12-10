@@ -14,7 +14,7 @@ jobs:
     steps:
 
     - name: Set env
-      # CI_COMMIT_TAG is used in Makefile
+      # CI_COMMIT_TAG is used in Makefile to not have the "RC" flag
       run: echo "CI_COMMIT_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
     - name: Get source code
@@ -24,6 +24,9 @@ jobs:
       uses: actions/setup-python@v2.3.1
       with:
         python-version: '3.10'
+
+    - name: Check tag
+      run: tests/check_tag.sh ${{ env.CI_COMMIT_TAG }}
 
     - name: Setup
       run: |
