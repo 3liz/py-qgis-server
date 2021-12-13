@@ -104,7 +104,7 @@ class Supervisor:
     async def _run_async(self) -> Awaitable[None]:
         """ Run supervisor
         """
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         def kill(pid:int) -> None:
             del self._busy[pid]

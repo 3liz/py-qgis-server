@@ -39,7 +39,7 @@ class RequestProxyError(Exception):
 class AsyncResponseHandler:
     def __init__(self, correlation_id: bytes) -> None:
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         self.correlation_id = correlation_id
         self.headers = None
