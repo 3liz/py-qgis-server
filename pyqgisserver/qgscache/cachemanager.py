@@ -216,6 +216,7 @@ class QgsCacheManager:
             project.writeEntry("WMSUrl","/", "")
             project.writeEntry("WFSUrl","/", "")
             project.writeEntry("WCSUrl","/", "")
+            project.writeEntry("WMTSUrl","/", "")
 
     def read_project(self, path: str, strict: Optional[bool]=None) -> QgsProject:
         """ Read project from path

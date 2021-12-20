@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Disable project's WMTSUrl
+
 ## 1.7.12 - 2021-12-10
 
 * Fix the wrong tag in Makefile
