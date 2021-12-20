@@ -29,7 +29,7 @@ local:
 	mkdir -p $$(pwd)/.local  $$(pwd)/.cache
 
 clean:
-	rm -rf $$(pwd)/.local
+	rm -rf $$(pwd)/.local $$(pwd)/.cache
 
 PGUSER ?= $(USER)
 PGDATABASE ?= $(USER)

@@ -8,7 +8,6 @@ export PATH=$PATH:/.local/bin
 echo "-- HOME is $HOME"
 
 echo "-- Installing required packages..."
-pip3 install -q -U --user setuptools
 pip3 install -q --prefer-binary --user -r requirements.pip
 pip3 install -q --prefer-binary --user -r requirements.txt
 
