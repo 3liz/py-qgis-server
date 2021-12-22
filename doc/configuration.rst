@@ -414,6 +414,27 @@ urls override proxy urls.
 
 
 
+.. _CACHE_FORCE_ETAG:
+
+CACHE_FORCE_ETAG
+----------------
+
+Force etag header even if 'TRUST_LAYER_METADATA' is not set.
+By default etags are set only when 'TRUST_LAYER_METADATA' is set because
+capabilities rely only on qgis project data and not on the underlying layer
+data. 
+
+
+:Type: boolean
+:Default: no
+:Version Added: 1.7.13
+:Section: projects.cache
+:Key: force_etag
+:Env: QGSRV_CACHE_FORCE_ETAG
+
+
+
+
 .. _API_ENABLED_LANDING_PAGE:
 
 API_ENABLED_LANDING_PAGE

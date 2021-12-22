@@ -115,3 +115,20 @@ class Tests(HTTPTestCase):
         assert href.hostname == urlref.hostname
         assert href.path     == urlref.path
 
+    def test_getcapabilities_etag(self):
+        """ Test getcapabilities etag
+        """
+        rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WFS&request=GetCapabilities" )
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
+
+        etag = rv.headers.get('Etag')
+        assert etag is not None
+
+        # Redo request with etag
+        rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WFS&request=GetCapabilities",
+                              headers={ 'If-None-Match': etag })
+        assert rv.status_code == 304
+
+
+

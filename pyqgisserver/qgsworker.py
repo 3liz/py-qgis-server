@@ -17,6 +17,7 @@
 import os
 import logging
 import traceback
+import hashlib
 
 from typing import Dict, Optional, Any
 
@@ -83,6 +84,14 @@ class Response(QgsServerResponse):
         self._buffer.open(QIODevice.ReadWrite)
         self._numbytes = 0
         self._finish   = False
+
+        self._extra_headers = {}
+        
+    def setExtraHeader( self, key: str, value: str ) -> None:
+        # Keep extra headers so we may 
+        # set them again on clear()
+        self._extra_headers[key] = value
+        self.setHeader(key, value)
 
     def setStatusCode(self, code: int) -> None:
         if not self._handler.header_written:
@@ -176,6 +185,7 @@ class Response(QgsServerResponse):
         """ Clear headers set so far
         """
         self._handler.headers = {}
+        self._handler.headers.update(self._extra_headers)
  
     def clear(self) -> None:
         self._clearHeaders()
@@ -204,8 +214,10 @@ class QgsRequestHandler(RequestHandler):
                 os.environ['QGIS_DEBUG'] = '1'
 
             cache_config = confservice['projects.cache']
-            if cache_config.getboolean('trust_layer_metadata'):
+            trust_mode_on = cache_config.getboolean('trust_layer_metadata')
+            if trust_mode_on:
                 os.environ['QGIS_SERVER_TRUST_LAYER_METADATA'] = 'yes'
+
             if cache_config.getboolean('disable_getprint'):
                 os.environ['QGIS_SERVER_DISABLE_GETPRINT'] = 'yes'
 
@@ -231,6 +243,36 @@ class QgsRequestHandler(RequestHandler):
 
             setattr(cls, 'qgis_server' , qgsserver )
 
+    def compute_etag(self, scheme, project: QgsProject, request: QgsServerRequest) -> Optional[str]:
+        """ Compute ETAG for GetCapabilities requests
+        """
+        conf = confservice['projects.cache']
+        compute = conf.getboolean('force_etag') or conf.getboolean('trust_layer_metadata')
+
+        if compute and scheme == 'OWS':
+            owsrequest = request.parameter('REQUEST') or ""
+            if owsrequest.lower() == "getcapabilities":
+                hasher = hashlib.sha1()
+                hasher.update(request.parameter('SERVICE').lower().encode())
+                hasher.update((request.parameter('VERSION') or "").lower().encode())
+                hasher.update(project.fileName().encode())
+                hasher.update(project.lastModified().toString(Qt.ISODate).encode())
+                return '"%s"' % hasher.hexdigest()
+
+    def check_etag_header(self, scheme, project: QgsProject, request: QgsServerRequest,
+                          response: Response) -> bool:
+        """ Compute etag and check header
+        """
+        computed_etag = self.compute_etag(scheme, project, request)
+        if computed_etag is None:
+            return False
+
+        response.setExtraHeader("Etag", computed_etag)
+
+        # Check etag header
+        etag = self.request.headers.get("If-None-Match","")
+        return etag == "*" or etag == computed_etag
+
     @staticmethod
     def run( router: str, identity: str="", **kwargs: Any) -> None:
         """ Run qgis server worker loop
@@ -254,7 +296,7 @@ class QgsRequestHandler(RequestHandler):
             # Try to get project from environment
             project_location = os.getenv("QGIS_PROJECT_FILE")
 
-        if not project_location and ogc_scheme != 'OAF' and request.parameter('SERVICE'):
+        if not project_location and ogc_scheme == 'OWS' and request.parameter('SERVICE'):
             # Prevent qgis for returning 500 when MAP is not defined for
             # OWS services
             LOGGER.error("No project defined for %s", request.parameter('SERVICE'))
@@ -274,6 +316,12 @@ class QgsRequestHandler(RequestHandler):
                     # Needed to cleanup cached capabilities
                     LOGGER.debug("Cleaning config cache entry %s", config_path)
                     iface.removeConfigCacheEntry(config_path)
+                # Check etag
+                if self.check_etag_header(ogc_scheme, project, request, response):
+                    response.setStatusCode(304)
+                    response.finish()
+                    return
+
             except StrictCheckingError:
                 response.sendError(422,f"Invalid layers for project '{project_location}' - strict mode on")
             except UnreadableResourceError:

@@ -97,6 +97,14 @@ class QgsCacheManager:
         # Load protocol handlers
         componentmanager.register_entrypoints('qgssrv_contrib_protocol_handler')
 
+    @property
+    def trust_mode_on(self) -> bool:
+        return self._trust_layer_metadata
+
+    @property
+    def strict_mode_on(self) -> bool:
+        return self._strict_check
+
     def clear(self) -> None:
         """ Clear the whole cache
         """

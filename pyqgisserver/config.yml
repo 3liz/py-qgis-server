@@ -251,6 +251,21 @@ config_options:
       tags: [ cache, http ]
       version_added: "1.5.4"
 
+    - name: CACHE_FORCE_ETAG
+      label: Force etag header for OWS 'GetCapabilities' requests 
+      description: |
+          Force etag header even if 'TRUST_LAYER_METADATA' is not set.
+          By default etags are set only when 'TRUST_LAYER_METADATA' is set because
+          capabilities rely only on qgis project data and not on the underlying layer
+          data. 
+      type: boolean
+      default: 'no'
+      section: projects.cache
+      key: force_etag
+      tags: [ cache, http ]
+      version_added: "1.7.13"
+
+
     #===============
     # Qgis API
     #===============

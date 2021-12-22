@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Compute etag for ows getcapabilities requests
 * Disable project's WMTSUrl
 
 ## 1.7.12 - 2021-12-10

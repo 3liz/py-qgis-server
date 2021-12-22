@@ -17,12 +17,12 @@ from ..monitor import Monitor
 
 from .basehandler import BaseHandler
 
-from typing import Optional, Awaitable, List
+from typing import Optional, Awaitable, List, Dict
 
 LOGGER = logging.getLogger('SRVLOG')
 
 
-class OwsHandler(BaseHandler):
+class AsyncClientHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
@@ -39,37 +39,45 @@ class OwsHandler(BaseHandler):
         self._proxy        = http_proxy
         self._stats        = self.application.stats
         self._allowed_hdrs = allowed_hdrs
+        self._proxy_url    = None
 
         self.ogc_scheme   = None
-        
+
+    def set_backend_headers(self, headers) -> Dict[str,str]:
+        """ Set headers passed to backend
+        """
+        project_path = self.get_argument('MAP',default=None)
+       
+        if project_path:
+            headers['X-Map-Location']=project_path 
+        if self.ogc_scheme:
+            headers['X-Ogc-Scheme'] = self.ogc_scheme
+
+        # Pass etag
+        headers['If-None-Match'] = self.request.headers.get("If-None-Match", "")
+
+        def copy_headers(pats):
+            headers.update((k,v) for k,v in self.request.headers.items() if \
+                           any(map(k.upper().startswith,pats)))
+
+        # Copy custom Qgis/Forwarded headers
+        # see https://github.com/qgis/QGIS/pull/41333
+        copy_headers(self._allowed_hdrs)
+
     async def handle_request(self, method: str, endpoint: Optional[str]=None) -> Awaitable[None]:
         reqtime = time()
         try:
-            proxy_url = self.proxy_url(self._proxy, endpoint)
-
             delta = None
-            project_path = self.get_argument('MAP',default=None)
-            query        = self.encode_arguments()
+            query = self.encode_arguments()
 
             headers = {}
-
-            data = self.request.body
-
-            if project_path:
-                headers['X-Map-Location']=project_path 
+            proxy_url = self.proxy_url(self._proxy, endpoint)
             if proxy_url: 
                 headers['X-Forwarded-Url']=proxy_url
 
-            if self.ogc_scheme:
-                headers['X-Ogc-Scheme'] = self.ogc_scheme
+            self.set_backend_headers(headers)
 
-            def copy_headers(pats):
-                headers.update((k,v) for k,v in self.request.headers.items() if \
-                               any(map(k.upper().startswith,pats)))
-
-            # Copy custom Qgis/Forwarded headers
-            # see https://github.com/qgis/QGIS/pull/41333
-            copy_headers(self._allowed_hdrs)
+            data = self.request.body
 
             if self.get_argument('SERVICE', default=None) and  self.has_body_arguments:
                 # Do not let qgis server handle url encoded parameters
@@ -108,7 +116,10 @@ class OwsHandler(BaseHandler):
                 self.send_error(status, reason="Server busy, please retry later")
             else:
                 self.set_status(status)
-                self.write(response.data)
+                if response.data:
+                    # XXX Tornado do no like 304 
+                    # with (potentially empty) chunk
+                    self.write(response.data)
 
         except RequestTimeoutError:
             status = 504
@@ -158,6 +169,14 @@ class OwsHandler(BaseHandler):
         pass
 
 
+
+class OwsHandler(AsyncClientHandler):
+
+    def initialize( self, *args, **kwargs ) -> None:
+        super().initialize(*args, **kwargs )
+        self.ogc_scheme = 'OWS'
+
+
 class _FilterHandlerMixIn:
     """ Handle filter handlers
     """
@@ -177,7 +196,7 @@ class OwsFilterHandler(_FilterHandlerMixIn,OwsHandler):
     pass
 
 
-class OwsApiHandler(OwsHandler):
+class OwsApiHandler(AsyncClientHandler):
     """ Handle Qgis api
     """
     def initialize( self, *args, **kwargs ) -> None:
