@@ -42,7 +42,7 @@ def _read_credentials( vhost: str, user: str ) -> Optional:  # ['PlainCredential
 
 class Monitor:
 
-    def __init__(self, amqp_client: 'AsyncPublisher', routing_key: str ) -> None: # noqa: F821
+    def __init__(self, amqp_client: 'AsyncPublisher', routing_key: str, default_routing: Optional[str]=None ) -> None: # noqa: F821
         """ Init AMQP monitor
         """
         self._client = amqp_client
@@ -50,6 +50,9 @@ class Monitor:
         self._dynamic_routing = routing_key.startswith('@')
         if self._dynamic_routing:
             self._routing_key = routing_key[1:]
+            self._default_routing = default_routing
+            if not self._default_routing:
+                LOGGER.warning("Monitor:  no default routing defined for dynamic routing !")
         else:
             self._routing_key = routing_key
 
@@ -62,7 +65,14 @@ class Monitor:
         """ Publish monitor data
         """
         if self._dynamic_routing:
-            routing_key = self._routing_key.format(META=meta)
+            try:
+                routing_key = self._routing_key.format(META=meta)
+            except KeyError: 
+                # FALLBACK to default routing key
+                if self._default_routing:
+                    routing_key = self._default_routing
+                else:
+                    LOGGER.warning("No default routing defined as fallback for dynamic routing")
         else:
             routing_key = self._routing_key
 
@@ -125,7 +135,11 @@ class Monitor:
 
         asyncio.ensure_future( connect() )
 
-        inst = cls(client, routing_key)
+        # Get default routing key in case as fallback in case
+        # We fail to get dynamic key
+        default_routing_key = conf.get('default_routing_key', fallback=None)
+
+        inst = cls(client, routing_key, default_routing=default_routing_key)
         setattr(cls,'_instance', inst)
         return inst
 
