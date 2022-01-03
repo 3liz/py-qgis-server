@@ -195,7 +195,11 @@ def validate_config_path(confname, confid, optional=False):
 def configure_qgis_api( name: str ) -> None:
     """ Configure qgis service environnement variables
     """
-    config = CONFIG[f"api:{name}"]
+    section = f"api:{name}"
+    if not CONFIG.has_section(section):
+        return
+
+    config = CONFIG[section]
     for k,v in config.items():
         LOGGER.debug("configuring qgis api '%s': %s = %s", name, k, v) 
         os.environ[k] = v

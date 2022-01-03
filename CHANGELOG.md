@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Do not require `api:<name>` config section when granting api access
 * Compute etag for ows getcapabilities requests
 * Disable project's WMTSUrl
 
