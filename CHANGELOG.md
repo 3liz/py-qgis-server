@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.13 - 2022-01-03
+
 * Do not require `api:<name>` config section when granting api access
 * Compute etag for ows getcapabilities requests
 * Disable project's WMTSUrl
