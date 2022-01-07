@@ -116,6 +116,7 @@ def load_configuration():
                getenv2('QGSRV_DISABLE_GETPRINT','QGIS_SERVER_DISABLE_GETPRINT','no'))
     CONFIG.set('projects.cache', 'disable_owsurls'    , getenv('QGSRV_CACHE_DISABLE_OWSURLS','no')) 
     CONFIG.set('projects.cache', 'force_etag'         , getenv('QGSRV_CACHE_FORCE_ETAG','no')) 
+    CONFIG.set('projects.cache', 'default_handler'    , getenv('QGSRV_CACHE_DEFAULT_HANDLER', 'file'))
 
     # 
     CONFIG.add_section('projects.schemes')

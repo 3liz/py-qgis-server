@@ -89,7 +89,7 @@ class QgsCacheManager:
         self._disable_getprint     = cnf.getboolean('disable_getprint')
         self._disable_owsurls      = cnf.getboolean('disable_owsurls', fallback=False)
         self._aliases = {}
-        self._default_scheme = cnf.get('default_handler',fallback='file')
+        self._default_scheme = cnf.get('default_handler')
 
         # Set the base url for file protocol
         self._aliases['file'] = 'file:///%s/' % cnf.get('rootdir').strip('/')

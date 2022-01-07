@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Define explicit `CACHE_DEFAULT_HANDLER` configuration option 
+* Monitoring: define default routing key as fallback when using dynamic key 
+
 ## 1.7.13 - 2022-01-03
 
 * Do not require `api:<name>` config section when granting api access

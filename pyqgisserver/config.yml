@@ -265,6 +265,16 @@ config_options:
       tags: [ cache, http ]
       version_added: "1.7.13"
 
+    - name: CACHE_DEFAULT_HANDLER
+      label: Default handler for cache manager
+      description: |
+          Set the default handler for MAP parameters
+      type: string
+      default: ''
+      section: projects.cache
+      key: preload_config
+      tags: [ cache ]
+
 
     #===============
     # Qgis API
