@@ -52,7 +52,7 @@ class Monitor:
             self._routing_key = routing_key[1:]
             self._default_routing = default_routing
             if not self._default_routing:
-                LOGGER.warning("Monitor:  no default routing defined for dynamic routing !")
+                LOGGER.warning("No default routing defined as fallback for dynamic routing")
         else:
             self._routing_key = routing_key
 
@@ -71,8 +71,6 @@ class Monitor:
                 # FALLBACK to default routing key
                 if self._default_routing:
                     routing_key = self._default_routing
-                else:
-                    LOGGER.warning("No default routing defined as fallback for dynamic routing")
         else:
             routing_key = self._routing_key
 
