@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.14 - 2022-01-18
+
 * Define explicit `CACHE_DEFAULT_HANDLER` configuration option 
 * Monitoring: define default routing key as fallback when using dynamic key 
 
