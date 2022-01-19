@@ -68,6 +68,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#cache-preload-config">CACHE_PRELOAD_CONFIG</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cache-disable-owsurls">CACHE_DISABLE_OWSURLS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cache-force-etag">CACHE_FORCE_ETAG</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cache-default-handler">CACHE_DEFAULT_HANDLER</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#api-enabled-landing-page">API_ENABLED_LANDING_PAGE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#api-endpoints-landing-page">API_ENDPOINTS_LANDING_PAGE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#management-enabled">MANAGEMENT_ENABLED</a></li>
@@ -642,8 +643,26 @@ data.</p>
 </dd>
 </dl>
 </section>
+<section id="cache-default-handler">
+<span id="id26"></span><h2>CACHE_DEFAULT_HANDLER<a class="headerlink" href="#cache-default-handler" title="Permalink to this headline"></a></h2>
+<p>Set the default handler for MAP parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+<dt class="field-even">Section</dt>
+<dd class="field-even"><p>projects.cache</p>
+</dd>
+<dt class="field-odd">Key</dt>
+<dd class="field-odd"><p>preload_config</p>
+</dd>
+<dt class="field-even">Env</dt>
+<dd class="field-even"><p>QGSRV_CACHE_DEFAULT_HANDLER</p>
+</dd>
+</dl>
+</section>
 <section id="api-enabled-landing-page">
-<span id="id26"></span><h2>API_ENABLED_LANDING_PAGE<a class="headerlink" href="#api-enabled-landing-page" title="Permalink to this headline"></a></h2>
+<span id="id27"></span><h2>API_ENABLED_LANDING_PAGE<a class="headerlink" href="#api-enabled-landing-page" title="Permalink to this headline"></a></h2>
 <p>Enable access to qgis ‘landing page’ api</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -667,7 +686,7 @@ data.</p>
 </dl>
 </section>
 <section id="api-endpoints-landing-page">
-<span id="id27"></span><h2>API_ENDPOINTS_LANDING_PAGE<a class="headerlink" href="#api-endpoints-landing-page" title="Permalink to this headline"></a></h2>
+<span id="id28"></span><h2>API_ENDPOINTS_LANDING_PAGE<a class="headerlink" href="#api-endpoints-landing-page" title="Permalink to this headline"></a></h2>
 <p>Define endpoint access to the ‘landing page’ service</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -691,7 +710,7 @@ data.</p>
 </dl>
 </section>
 <section id="management-enabled">
-<span id="id28"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this headline"></a></h2>
+<span id="id29"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this headline"></a></h2>
 <p>Activate management API service. The management API is REST api for controlling and inspecting
 the server behavior, plugins and cached projects.
 Starting from 1.7.0, this is a experimental feature and will be subject to change. The api will
@@ -718,7 +737,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-interfaces">
-<span id="id29"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this headline"></a></h2>
+<span id="id30"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this headline"></a></h2>
 <p>Network interfaces to listen to. The management API service will listen on this interface</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -742,7 +761,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-port">
-<span id="id30"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this headline"></a></h2>
+<span id="id31"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this headline"></a></h2>
 <p>Port to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -763,7 +782,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl">
-<span id="id31"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this headline"></a></h2>
+<span id="id32"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this headline"></a></h2>
 <p>Enable SSL endpoint for API management</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -784,7 +803,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl-cert">
-<span id="id32"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this headline"></a></h2>
+<span id="id33"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this headline"></a></h2>
 <p>Path to the SSL certificat file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -802,7 +821,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl-key">
-<span id="id33"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this headline"></a></h2>
+<span id="id34"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this headline"></a></h2>
 <p>Path to the SSL key file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>

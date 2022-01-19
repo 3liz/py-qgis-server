@@ -435,6 +435,22 @@ data.
 
 
 
+.. _CACHE_DEFAULT_HANDLER:
+
+CACHE_DEFAULT_HANDLER
+---------------------
+
+Set the default handler for MAP parameters
+
+
+:Type: string
+:Section: projects.cache
+:Key: preload_config
+:Env: QGSRV_CACHE_DEFAULT_HANDLER
+
+
+
+
 .. _API_ENABLED_LANDING_PAGE:
 
 API_ENABLED_LANDING_PAGE
