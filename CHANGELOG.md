@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Fix api managment:
+    - Follow backport for https://github.com/qgis/QGIS/issues/45439
+    - Fix regression from static cache implementation
+
 ## 1.7.14 - 2022-01-18
 
 * Define explicit `CACHE_DEFAULT_HANDLER` configuration option 

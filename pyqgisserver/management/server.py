@@ -54,7 +54,6 @@ class _ReportHandler(_PoolHandler):
     async def get(self) -> Awaitable[None]:
         """ Return worker reports
         """
-        # Broadcast 'restart' to workers
         req = self.request
         reports = await self._poolserver.get_reports()
         for w in reports:

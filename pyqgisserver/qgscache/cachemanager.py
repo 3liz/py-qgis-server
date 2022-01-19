@@ -17,6 +17,8 @@ from typing import Tuple, Optional, Sequence
 from collections import namedtuple, OrderedDict
 from pathlib import Path
 from datetime import datetime
+from enum import Enum
+from itertools import chain
 
 from ..utils.lru import lrucache
 from ..config import confservice
@@ -61,6 +63,12 @@ def _merge_qs( query1: str, query2: str ) -> str:
     params_2 = parse_qs(query2)
     params_2.update(params_1)
     return '&'.join('%s=%s' % (k,v[0]) for k,v in params_2.items())
+
+
+class CacheType(Enum): 
+    LRU = 'lru'
+    STATIC = 'static'
+    ALL = 'all'
 
 
 @componentmanager.register_factory(CACHE_MANAGER_CONTRACTID)
@@ -111,11 +119,13 @@ class QgsCacheManager:
         self._lru_cache.clear()
         self._static_cache.clear()
 
-    def lru_items(self) -> Sequence[Tuple[str,CacheDetails]]:
-        return self._lru_cache.items()
-
-    def static_items(self) -> Sequence[Tuple[str,CacheDetails]]:
-        return self._static_cache.items()
+    def items(self, cachetype: CacheType = CacheType.ALL) -> Sequence[Tuple[str,CacheDetails]]:
+        if cachetype == CacheType.ALL:
+            return chain(self._lru_cache.items(), self._static_cache.items())
+        elif cachetype == CacheType.LRU:
+            return self._lru_cache.items()
+        elif cachetype == CacheType.STATIC:
+            return self._static_cache.items()
 
     def remove_entry(self, key: str) -> None:
         """ Remove cache entry

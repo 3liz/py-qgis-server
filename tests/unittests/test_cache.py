@@ -6,6 +6,7 @@ from qgis.core import Qgis,QgsProject
 
 from pathlib import Path
 from pyqgisserver.qgscache.cachemanager import (QgsCacheManager, 
+                                                CacheType,
                                                 PathNotAllowedError,
                                                 preload_projects_file)
 from pyqgisserver.config import confservice
@@ -175,7 +176,7 @@ def test_preload_projects(data) -> None:
     # raster_layer.qgs (invalid layer)
 
     # Ensure  that items are in static cache
-    items = list(k for k,_ in cacheservice.static_items())
+    items = list(k for k,_ in cacheservice.items(CacheType.STATIC))
     assert "file:france_parts.qgs" in items
     assert "project_simple.qgs" in items
 
