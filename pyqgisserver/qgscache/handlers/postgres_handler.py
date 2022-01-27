@@ -54,7 +54,7 @@ ALLOWED_SECURE_PARAMS=('service','project','dbname','schema')
 # makes it hard to debug.
 #
 # So we check the timestamp ourselve and makes a consistency check to ensure
-# That the project has benn read correctly
+# That the project has been read correctly
 #
 
 def _check_unsafe_url( insecure: bool, url: urllib.parse.ParseResult ) -> Tuple[str,datetime]:

@@ -114,9 +114,10 @@ def load_configuration():
                getenv2('QGSRV_TRUST_LAYER_METADATA','QGIS_SERVER_TRUST_LAYER_METADATA','no'))
     CONFIG.set('projects.cache', 'disable_getprint'    , 
                getenv2('QGSRV_DISABLE_GETPRINT','QGIS_SERVER_DISABLE_GETPRINT','no'))
-    CONFIG.set('projects.cache', 'disable_owsurls'    , getenv('QGSRV_CACHE_DISABLE_OWSURLS','no')) 
-    CONFIG.set('projects.cache', 'force_etag'         , getenv('QGSRV_CACHE_FORCE_ETAG','no')) 
-    CONFIG.set('projects.cache', 'default_handler'    , getenv('QGSRV_CACHE_DEFAULT_HANDLER', 'file'))
+    CONFIG.set('projects.cache', 'disable_owsurls'     , getenv('QGSRV_CACHE_DISABLE_OWSURLS','no')) 
+    CONFIG.set('projects.cache', 'force_etag'          , getenv('QGSRV_CACHE_FORCE_ETAG','no')) 
+    CONFIG.set('projects.cache', 'default_handler'     , getenv('QGSRV_CACHE_DEFAULT_HANDLER', 'file'))
+    CONFIG.set('projects.cache', 'allow_storage_schemes', getenv('QGSRV_CACHE_ALLOW_STORAGE_SCHEMES', '*'))
 
     # 
     CONFIG.add_section('projects.schemes')

@@ -275,6 +275,17 @@ config_options:
       key: preload_config
       tags: [ cache ]
 
+    - name: CACHE_ALLOW_STORAGE_SCHEMES
+      label: Allowed project storage schemes
+      description: |
+          Restrict authorized project storage scheme for projects uri to
+          those listed - The value must be a comma separated list of allowed
+          schemes. The value '*' allow any scheme.
+          Note that aliases are resolved before applying restrictions.
+      type: str
+      default: '\*'
+      key: allow_storage_schemes
+      tags: [ cache, qgis, security ]
 
     #===============
     # Qgis API

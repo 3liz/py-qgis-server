@@ -451,6 +451,26 @@ Set the default handler for MAP parameters
 
 
 
+.. _CACHE_ALLOW_STORAGE_SCHEMES:
+
+CACHE_ALLOW_STORAGE_SCHEMES
+---------------------------
+
+Restrict authorized project storage scheme for projects uri to
+those listed - The value must be a comma separated list of allowed
+schemes. The value '*' allow any scheme.
+Note that aliases are resolved before applying restrictions.
+
+
+:Type: str
+:Default: \*
+:Section: 
+:Key: allow_storage_schemes
+:Env: QGSRV_CACHE_ALLOW_STORAGE_SCHEMES
+
+
+
+
 .. _API_ENABLED_LANDING_PAGE:
 
 API_ENABLED_LANDING_PAGE

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Use QgsProjectStorage for unhandled uri schemes
+    - This allow support for all QgsProjectStorage extensions
+* Add `ALLOW_STORAGE_SCHEMES` configuration for restricting allowed project schemes
+
 * Fix api managment:
     - Follow backport for https://github.com/qgis/QGIS/issues/45439
     - Fix regression from static cache implementation

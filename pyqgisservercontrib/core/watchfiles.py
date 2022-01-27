@@ -5,7 +5,7 @@ import functools
 import logging
 import traceback
 
-from typing import Callable, Mapping, Union, List
+from typing import Callable, Mapping, List, Optional
 from tornado import ioloop
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -22,7 +22,7 @@ def watchfiles(watched_files: List[str], updatefunc: UpdateFunc,  check_time: in
     return scheduler
 
 
-def _update_callback( updatefunc: UpdateFunc, watched_files: List[str], modify_times: Mapping[float,str]) -> None:
+def _update_callback( updatefunc: UpdateFunc, watched_files: List[str], modify_times: Mapping[str,float]) -> None:
     """ Call update funcs when modified files
     """
     modified_files = [path for path in watched_files if _check_file(modify_times, path) is not None]
@@ -31,7 +31,7 @@ def _update_callback( updatefunc: UpdateFunc, watched_files: List[str], modify_t
         updatefunc( modified_files )
 
 
-def _check_file(modify_times: Mapping[float,str], path: str) -> Union[str,None]:
+def _check_file(modify_times: Mapping[str,float], path: str) -> Optional[str]:
     try:
         modified = os.stat(path).st_mtime
     except FileNotFoundError:

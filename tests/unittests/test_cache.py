@@ -106,6 +106,16 @@ def test_file_not_found() -> None:
     with pytest.raises(FileNotFoundError):    
         cacheservice.lookup('I_do_not_exists')
 
+
+def test_invalid_scheme() -> None:
+    """ Test non existant file return error
+    """
+    cacheservice = QgsCacheManager()
+    with pytest.raises(FileNotFoundError):    
+        cacheservice.lookup('badscheme:///foo')
+
+
+
    
 @pytest.mark.with_postgres
 def test_postgres_cache() -> None:
