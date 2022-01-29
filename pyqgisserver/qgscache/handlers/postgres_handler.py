@@ -126,7 +126,7 @@ class PostgresProtocolHandler:
         cnf = componentmanager.get_service('@3liz.org/config-service;1')
         self._insecure = cnf.getboolean('projects.cache','insecure', fallback=False)
 
-    def get_project( self, url: urllib.parse.ParseResult, strict: Optional[bool]=None,
+    def get_project( self, url: Optional[urllib.parse.ParseResult], strict: Optional[bool]=None,
                      project: Optional[QgsProject]=None,
                      timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
         """ Create or return a project
@@ -135,11 +135,17 @@ class PostgresProtocolHandler:
 
             Supports the postgres:///projectname syntax
         """
-        urlstr, modified_time = _check_unsafe_url( self._insecure, url )
+        if url:
+            urlstr, modified_time = _check_unsafe_url( self._insecure, url )
+        elif project:
+            urlstr        = project.fileName()
+            modified_time = project.lastModified().toPyDateTime() 
+        else:
+            raise ValueError('Cannot get uri from arguments')
 
         if timestamp is None or timestamp < modified_time:
             cachemngr = componentmanager.get_service('@3liz.org/cache-manager;1')
-            project   = cachemngr.read_project(urlstr)
+            project   = cachemngr.read_project(urlstr, strict=strict)
             timestamp = modified_time
 
         return project, timestamp

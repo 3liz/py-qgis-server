@@ -118,6 +118,7 @@ def load_configuration():
     CONFIG.set('projects.cache', 'force_etag'          , getenv('QGSRV_CACHE_FORCE_ETAG','no')) 
     CONFIG.set('projects.cache', 'default_handler'     , getenv('QGSRV_CACHE_DEFAULT_HANDLER', 'file'))
     CONFIG.set('projects.cache', 'allow_storage_schemes', getenv('QGSRV_CACHE_ALLOW_STORAGE_SCHEMES', '*'))
+    CONFIG.set('projects.cache', 'check_interval'       , getenv('QGSRV_CACHE_CHECK_INTERVAL', '0'))
 
     # 
     CONFIG.add_section('projects.schemes')

@@ -32,15 +32,11 @@ class FileProtocolHandler:
     def __init__(self):
         pass
 
-    def get_project( self, url: urllib.parse.ParseResult, strict: Optional[bool]=None,
-                     project: Optional[QgsProject]=None,
-                     timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
-        """ Create or return a proect
+    def _check_file(self, path: Path) -> bool:
         """
-        # Securit check
-        path = Path(url.path)   
+        """
         if not path.is_absolute():
-            raise ValueError("file path must be absolute not %s" % path)
+            raise ValueError(f"file path must be absolute not {path}")
     
         exists = False
         if path.suffix not in ALLOWED_SFX:
@@ -52,7 +48,22 @@ class FileProtocolHandler:
         else:
             exists = path.is_file()
 
-        if not exists:
+        return path if exists else None
+
+
+    def get_project( self, url: Optional[urllib.parse.ParseResult], strict: Optional[bool]=None,
+                     project: Optional[QgsProject]=None,
+                     timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
+        """ Create or return a proect
+        """
+        if url:
+            path = self._check_file(Path(url.path))
+        elif project:
+            path = self._check_file(project.fileName())
+        else:
+            raise ValueError('Cannot get path from arguments')
+
+        if not path:
             LOGGER.error("File protocol handler: File not found: %s", str(path)) 
             raise FileNotFoundError(str(path))
 

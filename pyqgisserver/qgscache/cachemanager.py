@@ -13,8 +13,8 @@ import logging
 import urllib.parse
 
 from urllib.parse import urlparse, urlunparse, urljoin, parse_qs
-from typing import Tuple, Optional, Sequence
-from collections import namedtuple, OrderedDict
+from typing import Any, Tuple, Optional, Sequence, NamedTuple
+from collections import OrderedDict
 from pathlib import Path
 from datetime import datetime
 from enum import Enum
@@ -53,7 +53,9 @@ class UnreadableResourceError(Exception):
     pass
 
 
-CacheDetails = namedtuple("CacheDetails",('project','timestamp'))
+class CacheDetails(NamedTuple):
+    project: QgsProject 
+    timestamp: datetime
 
 
 CACHE_MANAGER_CONTRACTID = '@3liz.org/cache-manager;1'
@@ -183,7 +185,7 @@ class QgsCacheManager:
         """
         url    = urlparse(key)
         scheme = url.scheme or self._default_scheme
-        LOGGER.debug("Resolving '%s' protocol", scheme)
+        LOGGER.debug("Resolving '%s' protocol for '%s'", scheme, key)
         baseurl = self._aliases.get(scheme)
         if not baseurl:
             try:
@@ -216,16 +218,14 @@ class QgsCacheManager:
 
         return url
 
-    def get_project(self, key: str, strict: Optional[bool]=None) -> Tuple[QgsProject,datetime,bool]:
-        """ Load project 
+    def get_protocol_handler(self, key: str, scheme: Optional[str] ) -> Any:
+        """ Find protocol handler for the given scheme
         """
-        url = self.resolve_alias(key)
-    
-        scheme = url.scheme or self._default_scheme
+        scheme = scheme or self._default_scheme
         # Check for allowed schemes
         if self._allowed_schemes != '*' and scheme not in self._allowed_schemes:
             LOGGER.error("Scheme %s not allowed", scheme)
-            raise  PathNotAllowedError(key)
+            raise PathNotAllowedError(key)
         # Retrieve the protocol-handler
         try:
             store = componentmanager.get_service('@3liz.org/cache/protocol-handler;1?scheme=%s' % scheme)
@@ -233,8 +233,32 @@ class QgsCacheManager:
             # Fallback to Qgis storage handler
             store = QgisStorageHandler()
 
+        return store 
+
+    def refresh(self):
+        """ Refresh all entries
+
+            keys are returned from most recently user to the last recently,
+            then we have to update in reverse for preserving order 
+        """
+        keys = reversed([k for k,_ in self.items()])
+        for key in keys:
+            self.update_entry(key)
+
+    def get_project(self, key: str, strict: Optional[bool]=None, refresh: bool=True) -> Tuple[QgsProject,datetime,bool]:
+        """ Load project 
+        """
         # Get details for the project
         details = self._lru_cache.peek(key) or self._static_cache.get(key)
+
+        # We are asked not to refresh the entry
+        # return what is in cache
+        if details and not refresh:
+            return details.project, details.timestamp, False
+
+        url   = self.resolve_alias(key)
+        store = self.get_protocol_handler(key, url.scheme)
+
         if details is not None:
             project, timestamp  = store.get_project( url, strict=strict, **details._asdict())
             needupdate = timestamp != details.timestamp
@@ -244,13 +268,13 @@ class QgsCacheManager:
 
         return project, timestamp, needupdate
         
-    def update_entry(self, key: str, static_cache: bool=False) -> bool:
+    def update_entry(self, key: str, static_cache: bool=False, refresh: bool=True) -> bool:
         """ Update the cache
 
             :param key: The key of the entry to update
             :return: true if the entry has been updated
         """
-        project, timestamp, updated = self.get_project(key)
+        project, timestamp, updated = self.get_project(key, refresh=refresh)
         if static_cache or key in self._static_cache:
             self._static_cache[key] = CacheDetails(project, timestamp)
         else:
@@ -262,10 +286,10 @@ class QgsCacheManager:
         """
         return self._lru_cache.peek(key) or self._static_cache.get(key)
 
-    def lookup(self, key: str) -> Tuple[QgsProject, bool]:
+    def lookup(self, key: str, refresh: bool=True) -> Tuple[QgsProject, bool]:
         """ Lookup entry from key
         """
-        updated = self.update_entry(key)
+        updated = self.update_entry(key, refresh=refresh)
         if key in self._static_cache:
             return self._static_cache[key].project, updated
         else:
@@ -283,13 +307,13 @@ class QgsCacheManager:
             project.writeEntry("WCSUrl","/", "")
             project.writeEntry("WMTSUrl","/", "")
 
-    def read_project(self, path: str, strict: Optional[bool]=None) -> QgsProject:
+    def read_project(self, uri: str, strict: Optional[bool]=None) -> QgsProject:
         """ Read project from path
 
             May be used by protocol-handlers to instanciate project
-            from path.
+            from uri.
         """
-        LOGGER.debug("Reading Qgis project %s", path)
+        LOGGER.debug("Reading Qgis project %s", uri)
         project = self._create_project()
 
         readflags = QgsProject.ReadFlags()
@@ -299,8 +323,8 @@ class QgsCacheManager:
             readflags |= QgsProject.FlagDontLoadLayouts 
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
-        if not project.read(path,  readflags):
-            raise RuntimeError("Failed to read Qgis project %s", path)
+        if not project.read(uri,  readflags):
+            raise RuntimeError(f"Failed to read Qgis project {uri}")
 
         strict = self._strict_check if strict is None else strict
         if strict and not badlayerh.validateLayers(project):

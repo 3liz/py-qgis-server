@@ -23,7 +23,7 @@ import zmq
 import pickle
 import uuid
 
-from typing import TypeVar, Optional, Type
+from typing import TypeVar, Optional, Type, Callable
 
 from ..logger import setup_log_handler
 from ..utils import stats
@@ -140,7 +140,8 @@ def broadcast_socket( ctx: zmq.Context, broadcastaddr: str ) -> zmq.Socket:
 
 def run_worker(address: str, handler_factory: Type[RequestHandler], 
                identity: Optional[bytes]=None, broadcastaddr: Optional[str]=None,
-               maxcycles: Optional[int]=None) -> None:
+               maxcycles: Optional[int]=None,
+               postprocess=Callable[[],None]) -> None:
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()
@@ -160,8 +161,10 @@ def run_worker(address: str, handler_factory: Type[RequestHandler],
     try:
         LOGGER.info("Starting ZMQ worker loop")
         completed = 0
+        handler   = None
         while maxcycles is None or (maxcycles and completed < maxcycles):
             sock.send(WORKER_READY)
+            idle = False
             try:
                 client_id, corr_id, request = get()
                 supervisor.notify_busy()
@@ -169,6 +172,7 @@ def run_worker(address: str, handler_factory: Type[RequestHandler],
                 handler.handle_message()
                 completed += 1
             except zmq.error.Again:
+                idle = True
                 pass
             except zmq.ZMQError as err:
                 LOGGER.error("Worker Error %d: %s", err.errno, zmq.strerror(err.errno))
@@ -196,6 +200,14 @@ def run_worker(address: str, handler_factory: Type[RequestHandler],
                         supervisor.send_report(handler_factory.get_report())
             except zmq.error.Again:
                 pass
+
+            try:
+                # Run callbacks
+                if postprocess:
+                    postprocess(idle)
+            except Exception:
+                LOGGER.critical("Unhandled exception:\n%s", traceback.format_exc())
+
     except (KeyboardInterrupt, SystemExit):
         pass
 

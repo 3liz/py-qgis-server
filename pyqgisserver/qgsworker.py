@@ -19,7 +19,8 @@ import logging
 import traceback
 import hashlib
 
-from typing import Dict, Optional, Any
+from time import time
+from typing import Dict, Optional, Any, Tuple
 
 from qgis.PyQt.QtCore import Qt, QBuffer, QIODevice, QByteArray
 from qgis.core import QgsProject
@@ -205,43 +206,72 @@ class QgsRequestHandler(RequestHandler):
 
     @classmethod
     def init_server(cls) -> None:
-        if not hasattr(cls, 'qgis_server' ):
-            from .utils.qgis import init_qgis_server
+        """ Initialize qgis server
+        """
+        if hasattr(cls, 'qgis_server' ):
+            return
+        
+        from .utils.qgis import init_qgis_server
 
-            # Enable qgis server verbosity
-            if LOGGER.isEnabledFor(logging.DEBUG):
-                os.environ['QGIS_SERVER_LOG_LEVEL'] = '0'
-                os.environ['QGIS_DEBUG'] = '1'
+        # Enable qgis server verbosity
+        if LOGGER.isEnabledFor(logging.DEBUG):
+            os.environ['QGIS_SERVER_LOG_LEVEL'] = '0'
+            os.environ['QGIS_DEBUG'] = '1'
 
-            cache_config = confservice['projects.cache']
-            trust_mode_on = cache_config.getboolean('trust_layer_metadata')
-            if trust_mode_on:
-                os.environ['QGIS_SERVER_TRUST_LAYER_METADATA'] = 'yes'
+        cache_config = confservice['projects.cache']
+        trust_mode_on = cache_config.getboolean('trust_layer_metadata')
+        if trust_mode_on:
+            os.environ['QGIS_SERVER_TRUST_LAYER_METADATA'] = 'yes'
 
-            if cache_config.getboolean('disable_getprint'):
-                os.environ['QGIS_SERVER_DISABLE_GETPRINT'] = 'yes'
+        if cache_config.getboolean('disable_getprint'):
+            os.environ['QGIS_SERVER_DISABLE_GETPRINT'] = 'yes'
 
-            # Configure qgis api
-            for name,_ in qgis_api_endpoints(enabled_only=False):
-                configure_qgis_api(name)                         
-            
-            verbose = LOGGER.level<=logging.DEBUG or confservice.getboolean('logging','qgis_info')
+        # Get refresh interval
+        cls._cache_service        = get_cacheservice()
+        cls._cache_check_interval = cache_config.getint('check_interval')
+        cls._cache_last_check     = time()  
 
-            LOGGER.debug("Initializing qgis server")
-            qgsserver = init_qgis_server( enable_processing=False, 
-                                          logger=LOGGER, 
-                                          verbose=verbose)
+        # Configure qgis api
+        for name,_ in qgis_api_endpoints(enabled_only=False):
+            configure_qgis_api(name)                         
+        
+        verbose = LOGGER.level<=logging.DEBUG or confservice.getboolean('logging','qgis_info')
 
-            serverIface = qgsserver.serverInterface()
-            load_plugins(serverIface)
+        LOGGER.debug("Initializing qgis server")
+        qgsserver = init_qgis_server( enable_processing=False, 
+                                      logger=LOGGER, 
+                                      verbose=verbose)
 
-            if confservice['management'].getboolean('enabled'):
-                from .management.apis import register_management_apis
-                register_management_apis(serverIface)
+        serverIface = qgsserver.serverInterface()
+        load_plugins(serverIface)
 
-            preload_projects()
+        if confservice['management'].getboolean('enabled'):
+            from .management.apis import register_management_apis
+            register_management_apis(serverIface)
 
-            setattr(cls, 'qgis_server' , qgsserver )
+        preload_projects()
+
+        setattr(cls, 'qgis_server' , qgsserver )
+
+    @classmethod
+    def refresh_cache(cls) -> None:
+        if cls._cache_check_interval <= 0 or time() - cls._cache_check_refresh < cls._cache_check_interval:
+            return
+        LOGGER.debug("Refreshing cache")
+        cls._cache_service.refresh()
+        cls._cache_last_check = time()
+
+    @classmethod
+    def cache_lookup(cls, key) -> Tuple[QgsProject,bool]:
+        return cls._cache_service.lookup(key, refresh = cls._cache_check_interval <= 0)
+
+    @classmethod
+    def post_process(cls, idle: bool) -> None:
+        """ Post processing operation
+
+            At this time request has been replied and worker is not busy anymore
+        """
+        cls.refresh_cache()
 
     def compute_etag(self, scheme, project: QgsProject, request: QgsServerRequest) -> Optional[str]:
         """ Compute ETAG for GetCapabilities requests
@@ -279,7 +309,8 @@ class QgsRequestHandler(RequestHandler):
         """
         QgsRequestHandler.init_server()
 
-        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')), **kwargs)
+        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')), 
+                   postprocess=QgsRequestHandler.post_process, **kwargs)
 
     QGIS_NO_MAP_ERROR_MSG = "No project defined. For OWS services: please provide a SERVICE and a MAP parameter" 
 
@@ -310,7 +341,7 @@ class QgsRequestHandler(RequestHandler):
             iface = self.qgis_server.serverInterface()
             try:
                 LOGGER.debug("Handling request: %s", self.msgid)
-                project, updated = get_cacheservice().lookup(project_location)
+                project, updated = self.cache_lookup(project_location)
                 config_path = project.fileName()
                 if updated: 
                     # Needed to cleanup cached capabilities
