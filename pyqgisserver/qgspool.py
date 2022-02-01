@@ -112,8 +112,8 @@ class _Server:
     async def healthcheck(self) -> Awaitable[None]:
         while True:
             if self._pool.exitcode is not None and self._pool.exitcode != 0:
-                LOGGER.critical("Pool failure, exiting...")
-                raise SystemExit("Exiting because of unrecoverable error")
+                LOGGER.critical("Pool failure, exiting because of unrecoverable error...")
+                raise SystemExit(1)
             await asyncio.sleep(5)
     
     def start_supervisor(self):

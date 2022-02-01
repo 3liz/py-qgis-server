@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Ensure that exit code is non-zero on pool failure 
 * Set option to check for cache invalidation/refresh asynchronously
 * Use QgsProjectStorage for unhandled uri schemes
     - This allow support for all QgsProjectStorage extensions

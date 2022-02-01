@@ -2,27 +2,27 @@
 
 set -e
 
-PIP="pip3 install -U --user"
+VENV_PATH=/.local/venv
 
-$PIP setuptools
-$PIP --prefer-binary -r requirements.pip
-$PIP --prefer-binary -r requirements.txt
+PIP="$VENV_PATH/bin/pip"
+PIP_INSTALL="$VENV_PATH/bin/pip install -U"
 
-pip install --user -e ./
+echo "-- Creating virtualenv"
+python3 -m venv --system-site-packages $VENV_PATH
 
-export QGIS_DISABLE_MESSAGE_HOOKS=1
-export QGIS_NO_OVERRIDE_IMPORT=1
+echo "-- Installing required packages..."
+$PIP_INSTALL -q pip setuptools wheel
+$PIP_INSTALL -q --prefer-binary -r requirements.txt
 
-# Add /.local to path
-export PATH=$PATH:/.local/bin
+$PIP install -e ./
 
 if [ -e /amqp_src ]; then
-    pip3 install --user -e /amqp_src/
+    $PIP install -e /amqp_src/
 fi
 
 # Run the server locally
 echo "Running server..."
-qgisserver -b 0.0.0.0 -p 8080 --proxy -j1
+$VENV_PATH/bin/qgisserver -b 0.0.0.0 -p 8080 --proxy -j1
 
 
 

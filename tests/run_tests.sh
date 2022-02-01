@@ -2,16 +2,26 @@
 
 set -e
 
-# Add /.local to path
-export PATH=$PATH:/.local/bin
-
 echo "-- HOME is $HOME"
 
-echo "-- Installing required packages..."
-pip3 install -q --prefer-binary --user -r requirements.pip
-pip3 install -q --prefer-binary --user -r requirements.txt
+VENV_PATH=/.local/venv
 
-pip3 install -q --user -e ./
+PIP="$VENV_PATH/bin/pip"
+PIP_INSTALL="$VENV_PATH/bin/pip install -U"
+
+echo "-- Creating virtualenv"
+python3 -m venv --system-site-packages $VENV_PATH
+
+echo "-- Installing required packages..."
+$PIP_INSTALL -q pip setuptools wheel
+$PIP_INSTALL -q --prefer-binary -r requirements.pip
+$PIP_INSTALL -q --prefer-binary -r requirements.txt
+
+$PIP install -e ./
+
+if [ -e /amqp_src ]; then
+    $PIP install -e /amqp_src/
+fi
 
 export QGIS_DISABLE_MESSAGE_HOOKS=1
 export QGIS_NO_OVERRIDE_IMPORT=1
@@ -20,5 +30,5 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 export QT_LOGGING_RULES="*.debug=false;*.warning=false"
 
 # Run new tests
-cd tests/unittests && exec pytest -v $@
+cd tests/unittests && exec $VENV_PATH/bin/pytest -v $@
 

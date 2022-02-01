@@ -256,7 +256,6 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         LOGGER.info("Proxy configuration enabled")
         kwargs['xheaders'] = True
 
-    # Run
     try:
         # Fork processes
         # This is a *DEPRECATED* feature
@@ -320,10 +319,15 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             # Make sure that child processes are terminated
             print("Terminating child processes", file=sys.stderr)
             process.terminate_childs()
+        exit_code = 1
     except KeyboardInterrupt:
         print("Keyboard Interrupt", file=sys.stderr)
+        exit_code = 15
     except SystemExit as exc:
         print(exc, file=sys.stderr )
+        exit_code = exc.code
+    else:
+        exit_code = 0
 
     # Teardown
     if server is not None:
@@ -344,5 +348,6 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             broker_pr.terminate()
             broker_pr.join()
 
-
     print("Server shutdown", file=sys.stderr)
+    sys.exit(exit_code)
+
