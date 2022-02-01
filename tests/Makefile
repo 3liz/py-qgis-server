@@ -85,8 +85,8 @@ run: export RUN_COMMAND=./tests/run_server.sh
 run: up
 
 up:
-	docker-compose up -V  --remove-orphans --force-recreate --exit-code-from qgis-server
+	docker compose up -V  --remove-orphans --force-recreate --exit-code-from qgis-server
 
 stop:
-	docker-compose down -v --remove-orphans
+	docker compose down -v --remove-orphans
 
