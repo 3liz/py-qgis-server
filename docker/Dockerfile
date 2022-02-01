@@ -24,8 +24,8 @@ RUN mkdir -p /opt/local/ \
     && /opt/local/pyqgisserver/bin/pip install --no-cache-dir $PIP_OPTIONS   \
         "py-qgis-server==${BUILD_VERSION}" \
         py-amqp-client \
-    && ln -s /opt/local/servicemngr/bin/qgisserver \
-    && ln -s /opt/local/servicemngr/bin/qgisserver-worker \
+    && ln -s /opt/local/pyqgisserver/bin/qgisserver \
+    && ln -s /opt/local/pyqgisserver/bin/qgisserver-worker \
     && rm -rf /root/.cache /root/.ccache
 
 COPY install-lizmap-plugin /usr/local/bin/
