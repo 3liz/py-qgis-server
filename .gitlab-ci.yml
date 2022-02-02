@@ -8,6 +8,7 @@ stages:
 - docker
 - deploy
 - release
+- post-release
 
 #-----------------
 # Tests
@@ -63,7 +64,7 @@ build:
 include: '/docker/.gitlab-ci.yml'
 
 tickets:
-  stage: release
+  stage: post-release
   only:
     - tags
   image:
