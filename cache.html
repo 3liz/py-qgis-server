@@ -50,6 +50,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Cache</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#lru-cache">LRU cache</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#static-cache">Static cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#asynchronous-check">Asynchronous check</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="qgisapi.html">Expose Qgis Api</a></li>
@@ -95,6 +96,14 @@
 <p>Projects stored in the static cache are preloaded at startup from a configuration file.
 The file must have one project uri per line. Each uri is similar to the project uri passed in the ‘MAP’ query parameter of OWS requests.</p>
 <p>The path of the cache configuration file is given in the <a class="reference internal" href="configuration.html#cache-preload-config"><span class="std std-ref">CACHE_PRELOAD_CONFIG</span></a> configuration seting.</p>
+</section>
+<section id="asynchronous-check">
+<span id="async-cache"></span><h2>Asynchronous check<a class="headerlink" href="#asynchronous-check" title="Permalink to this headline"></a></h2>
+<p>Cache may be checked for invalidation/refresh synchronously or asynchronously depending on the value of the <a class="reference internal" href="configuration.html#cache-check-interval"><span class="std std-ref">CACHE_CHECK_INTERVAL</span></a> configuration setting.</p>
+<p>If the refresh interval value is set to a strict positive value (&gt;0) then the cache is checked for invalidation/refresh asynchronously every seconds set by the option’s value.</p>
+<p>If the refresh interval is set to a negative or null value (&lt;=0) then the cache is invalidated/refreshed synchronously at eeach requests.</p>
+<p>Depending of the backend storage and the loading time of your projects you may choose one or another invalidation strategy.</p>
+<p>With slow loading projects it is recommended to use asynchronous check in conjunction with static_cache.</p>
 </section>
 </section>
 

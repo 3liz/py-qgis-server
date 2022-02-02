@@ -464,9 +464,30 @@ Note that aliases are resolved before applying restrictions.
 
 :Type: str
 :Default: \*
-:Section: 
+:Section: projects.cache
 :Key: allow_storage_schemes
 :Env: QGSRV_CACHE_ALLOW_STORAGE_SCHEMES
+
+
+
+
+.. _CACHE_CHECK_INTERVAL:
+
+CACHE_CHECK_INTERVAL
+--------------------
+
+Set the time interval in seconds between two check for invalidation/refresh of the cache content.
+If set to a value > 0 then the cache is checked for invalidation/refresh asynchronously every 
+seconds defined by the option.
+If set to 0 (or negative value), the cache is checked for invalidation synchronously at each request. 
+When set to 0 with slow projects to load, user may experience latency, so it is recommended
+to use asynchronous check with such projects in conjunction with a static cache.
+
+
+:Type: int
+:Section: projects.cache
+:Key: refresh_interval
+:Env: QGSRV_CACHE_CHECK_INTERVAL
 
 
 

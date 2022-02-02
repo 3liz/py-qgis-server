@@ -28,4 +28,21 @@ The file must have one project uri per line. Each uri is similar to the project 
 
 The path of the cache configuration file is given in the :ref:`CACHE_PRELOAD_CONFIG` configuration seting. 
 
+.. _async_cache:
+
+Asynchronous check
+------------------
+
+Cache may be checked for invalidation/refresh synchronously or asynchronously depending on the value of the :ref:`CACHE_CHECK_INTERVAL` configuration setting.
+
+If the refresh interval value is set to a strict positive value (>0) then the cache is checked for invalidation/refresh asynchronously every seconds set by the option's value.
+
+If the refresh interval is set to a negative or null value (<=0) then the cache is invalidated/refreshed synchronously at eeach requests.
+
+Depending of the backend storage and the loading time of your projects you may choose one or another invalidation strategy.
+
+With slow loading projects it is recommended to use asynchronous check in conjunction with static_cache.
+
+
+
 
