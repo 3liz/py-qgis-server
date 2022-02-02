@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.15 - 2022-02-02
+
 * Install server in venv in docker image
 * Ensure that exit code is non-zero on pool failure 
 * Set option to check for cache invalidation/refresh asynchronously
