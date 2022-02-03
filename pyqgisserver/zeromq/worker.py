@@ -140,7 +140,6 @@ def broadcast_socket( ctx: zmq.Context, broadcastaddr: str ) -> zmq.Socket:
 
 def run_worker(address: str, handler_factory: Type[RequestHandler], 
                identity: Optional[bytes]=None, broadcastaddr: Optional[str]=None,
-               maxcycles: Optional[int]=None,
                postprocess=Callable[[],None]) -> None:
     """ Enter the message loop
     """
@@ -160,17 +159,15 @@ def run_worker(address: str, handler_factory: Type[RequestHandler],
 
     try:
         LOGGER.info("Starting ZMQ worker loop")
-        completed = 0
-        handler   = None
-        while maxcycles is None or (maxcycles and completed < maxcycles):
+        while True:
             sock.send(WORKER_READY)
             idle = False
+            handler = None
             try:
                 client_id, corr_id, request = get()
                 supervisor.notify_busy()
                 handler = handler_factory(sock, client_id, corr_id, request)
                 handler.handle_message()
-                completed += 1
             except zmq.error.Again:
                 idle = True
                 pass
@@ -178,7 +175,7 @@ def run_worker(address: str, handler_factory: Type[RequestHandler],
                 LOGGER.error("Worker Error %d: %s", err.errno, zmq.strerror(err.errno))
             except Exception as exc:
                 LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
-                if not handler.header_written:
+                if handler and not handler.header_written:
                     handler.status_code = 500
                     handler.send(bytes("Worker internal error".encode('ascii')))
                     # Got error 500, do not presume worker state

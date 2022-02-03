@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Remove 'maxcycle' option.
+
 ## 1.7.15 - 2022-02-02
 
 * Install server in venv in docker image

@@ -23,7 +23,7 @@ from glob import glob
 from multiprocessing import Process
 from multiprocessing.util import Finalize
 
-from typing import Callable, Awaitable, Optional, Dict, List
+from typing import Callable, Awaitable, Dict, List
 
 from .zeromq.supervisor import Supervisor
 from .zeromq.pool import Pool
@@ -195,22 +195,14 @@ def create_poolserver(numworkers: int) -> _Server:
     broadcastaddr = confservice['zmq']['broadcastaddr']
     timeout       = confservice['server'].getint('timeout')
 
-    maxcycles = confservice.getint('server', 'maxcycles', fallback=None)
-    if maxcycles is not None:
-        if maxcycles <= 0:
-            maxcycles = None
-        else:
-            LOGGER.info(f"Max cycles limit set to {maxcycles}")
-
-    p = Process(target=run_worker_pool, args=(numworkers, broadcastaddr, router, maxcycles))
+    p = Process(target=run_worker_pool, args=(numworkers, broadcastaddr, router))
     p.start()
 
     poolserver = _Server(broadcastaddr, p, timeout, numworkers)
     return poolserver
 
 
-def run_worker_pool(numworkers: int, broadcastaddr: str, router: str, 
-                    maxcycles: Optional[int]=None) -> None:
+def run_worker_pool(numworkers: int, broadcastaddr: str, router: str) -> None:
     """ Run a qgis worker pool
 
         Ensure that child processes run in the main thread
@@ -223,7 +215,7 @@ def run_worker_pool(numworkers: int, broadcastaddr: str, router: str,
 
     LOGGER.info("Starting worker pool")
     pool = Pool( numworkers, target=QgsRequestHandler.run, args=(router,),
-                 kwargs={ 'broadcastaddr': broadcastaddr, 'maxcycles': maxcycles } )
+                 kwargs={ 'broadcastaddr': broadcastaddr } )
 
     signal.signal(signal.SIGTERM,term_signal)
 
