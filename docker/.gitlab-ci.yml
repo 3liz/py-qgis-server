@@ -41,6 +41,7 @@ deploy_snap:
     name: snap
   only:
     refs:
+       - tags
        - master
   tags:
     - infrav3-plain
@@ -78,3 +79,4 @@ release:ltr:
     QGIS_FLAVOR: ltr
   dependencies:
     - build-docker:ltr
+

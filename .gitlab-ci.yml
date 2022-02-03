@@ -8,7 +8,7 @@ stages:
 - docker
 - deploy
 - release
-- post-release
+- post_release
 
 #-----------------
 # Tests
@@ -30,15 +30,6 @@ tests:ltr:
   extends: .tests
   variables:
     QGIS_FLAVOR: ltr
-
-check_tag:
-  stage: test
-  only:
-    - tags
-  tags:
-    - factory-plain
-  script:
-    - ./tests/check_tag.sh ${CI_COMMIT_REF_NAME}
 
 #---------------
 # Build
@@ -64,7 +55,7 @@ build:
 include: '/docker/.gitlab-ci.yml'
 
 tickets:
-  stage: post-release
+  stage: post_release
   only:
     - tags
   image:
