@@ -15,10 +15,11 @@
     module behaviors without the need for these to do explicit imports
 """
 
+import sys
 import logging
 
 from collections import namedtuple
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 class ComponentManagerError(Exception):
     pass
@@ -29,10 +30,38 @@ class FactoryNotFoundError(ComponentManagerError):
 class NoRegisteredFactoryError(ComponentManagerError):
     pass
 
+class EntryPointNotFoundError(ComponentManagerError):
+    pass
+
+
 
 LOGGER = logging.getLogger('SRVLOG')
 
 FactoryEntry = namedtuple('FactoryEntry',('create_instance', 'service'))
+
+
+def _entry_points( group: str, name: Optional[str] = None):
+    """ Return entry points
+    """
+    ver = sys.version_info[:2]
+    if ver >= (3,10):
+        from importlib import metadata
+        # See https://docs.python.org/3.10/library/importlib.metadata.html
+        return metadata.entry_points.select(group=group, name=name)
+    elif ver >= (3,8):
+        from importlib import metadata
+        # Return a dict
+        # see https://docs.python.org/3.8/library/importlib.metadata.html
+        eps = metadata.entry_points().get(group,[])
+        if name:
+            eps = [ep for ep in eps if  ep.name == name]
+        return eps
+    else:
+        from pkg_resources import iter_entry_points
+        eps = iter_entry_points(group)
+        if name:
+            eps = [ep for ep in eps if ep.name == name]
+        return eps
 
 
 class ComponentManager:
@@ -47,10 +76,14 @@ class ComponentManager:
 
             Loaded modules will do self-registration
         """
-        from pkg_resources import iter_entry_points
-        for ep in iter_entry_points(category):
+        for ep in _entry_points(category):
             LOGGER.info("Loading module: %s:%s", category, ep.name)
             ep.load()(*args, **kwargs)
+
+    def load_entrypoint( self, category: str, name: str) -> Any:
+        for ep in _entry_points(category,name):
+            return ep.load()
+        raise EntryPointNotFoundError(name)
 
     def register_factory( self, contractID: str, factory: Callable[[],None] ) -> None:
         """ Register a factory for the given contract ID
@@ -111,6 +144,12 @@ def register_entrypoints( category: str, *args, **kwargs ) -> None:
     """ Alias to component_manager.register_components
     """
     gComponentManager.register_entrypoints( category, *args, **kwargs )
+
+
+def load_entrypoint( category: str, name: str ) -> Any:
+    """ Alias to component_manager.load_entrypoint
+    """
+    return gComponentManager.load_entrypoint( category, name )
 
 #
 # Declare factories or services with decorators

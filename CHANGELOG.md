@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Implement configurable monitor backend
 * Remove 'maxcycle' option.
 
 ## 1.7.15 - 2022-02-02

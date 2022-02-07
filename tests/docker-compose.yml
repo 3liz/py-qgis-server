@@ -31,6 +31,8 @@ services:
             QGSRV_SERVER_SSL_KEY: /src/tests/certs/localhost.key
             QGSRV_SERVER_TIMEOUT: ${REQUEST_TIMEOUT}
             QGSRV_CACHE_STRICT_CHECK: ${STRICT_CHECK}
+            QGSRV_SERVER_MONITOR: test
+            QGSRV_MONITOR_TAG_EXTRA_DATA: "monitor.test"
             PYTEST_ADDOPTS: ${PYTEST_ADDOPTS}
         user: ${BECOME_USER}
         volumes:

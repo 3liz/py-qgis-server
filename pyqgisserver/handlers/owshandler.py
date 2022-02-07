@@ -17,9 +17,15 @@ from ..monitor import Monitor
 
 from .basehandler import BaseHandler
 
-from typing import Optional, Awaitable, List, Dict
+from typing import Any, Union, Optional, Awaitable, List, Dict
 
 LOGGER = logging.getLogger('SRVLOG')
+
+
+def _decode( b: Union[str,bytes] ) -> str:
+    if not isinstance(b,str):
+        return b.decode('utf-8')
+    return b
 
 
 class AsyncClientHandler(BaseHandler):
@@ -66,6 +72,8 @@ class AsyncClientHandler(BaseHandler):
 
     async def handle_request(self, method: str, endpoint: Optional[str]=None) -> Awaitable[None]:
         reqtime = time()
+
+        self._endpoint = endpoint
         try:
             delta = None
             query = self.encode_arguments()
@@ -138,9 +146,19 @@ class AsyncClientHandler(BaseHandler):
         if status >= 500:
             self._stats.num_errors +=1
 
-        if self._monitor:
-            self._monitor.emit( status, self.request.arguments,  delta, 
-                                meta=self.request.headers)
+        # Send monitoring info
+        self.emit( status, delta )
+
+    def emit(self, status: int, response_time: float) -> None:
+        if not self._monitor:
+            return
+        params = self.get_monitor_params()
+        if params:
+            params.update(
+                RESPONSE_TIME = response_time,
+                RESPONSE_STATUS = status,
+            )
+            self._monitor.emit( params, meta=self.request.headers )
 
     async def get(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         """ Handle Get method
@@ -168,13 +186,29 @@ class AsyncClientHandler(BaseHandler):
         """
         pass
 
-
+    def get_monitor_params( self ) -> Optional[Dict[str,Any]]:
+        """ Emit monitoring info
+        """
+        return None
 
 class OwsHandler(AsyncClientHandler):
 
     def initialize( self, *args, **kwargs ) -> None:
         super().initialize(*args, **kwargs )
         self.ogc_scheme = 'OWS'
+
+    MONITOR_ARGUMENTS = (
+        'MAP',
+        'SERVICE',
+        'REQUEST',
+    )
+
+    def get_monitor_params( self ) -> Dict[str,Any]:
+        """ Override
+        """
+        args = self.request.arguments
+        params = { k:_decode(args.get(k,["__unknown__"])[0]) for k in self.MONITOR_ARGUMENTS }
+        return params
 
 
 class _FilterHandlerMixIn:
@@ -199,9 +233,10 @@ class OwsFilterHandler(_FilterHandlerMixIn,OwsHandler):
 class OwsApiHandler(AsyncClientHandler):
     """ Handle Qgis api
     """
-    def initialize( self, *args, **kwargs ) -> None:
-        super().initialize(*args, **kwargs )
+    def initialize( self, service: str, **kwargs ) -> None:
+        super().initialize(**kwargs )
         self.ogc_scheme = 'OAF'
+        self._service_name = service.upper()
 
     async def get(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         """ Fix issue with the landing page api when not 
@@ -227,4 +262,14 @@ class OwsApiHandler(AsyncClientHandler):
 
 class OwsApiFilterHandler(_FilterHandlerMixIn, OwsApiHandler):
     pass
+
+    def get_monitor_params( self ) -> None:
+        """ Override
+        """
+        params = dict(
+            MAP = self.request.arguments.get('MAP','__unknown__'),
+            SERVICE = self._service_name,
+            REQUEST = self._endpoint or '__unknown__',
+        )
+        return params
 

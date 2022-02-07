@@ -90,3 +90,13 @@ up:
 stop:
 	docker compose down -v --remove-orphans
 
+amqp-run: export RUN_COMMAND=./tests/run_server.sh
+amqp-run:
+	docker compose \
+	-f docker-compose.yml \
+	-f docker-compose.amqp.yml up -V --remove-orphans --force-recreate -d
+
+
+
+
+

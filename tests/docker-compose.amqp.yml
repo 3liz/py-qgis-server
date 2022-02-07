@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+    qgis-server:
+        environment:
+            QGSRV_SERVER_MONITOR: amqp
+            AMQP_ROUTING: "test.local"
+        volumes:
+            - ${AMQP_SRC}:/amqp_src
+    amqp:
+        image: rabbitmq:3-management
+        ports:
+            - 127.0.0.1:5672:5672
+            - 127.0.0.1:15672:15672
+
+

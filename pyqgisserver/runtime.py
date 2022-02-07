@@ -91,7 +91,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
     end = r"(?:\.html|\.json|/?)"
 
-    ows_api_endpoints = [
+    wfs3_api_endpoints = [
         rf"/wfs3{end}",
         rf"/wfs3/collections(?:/[^/]+(?:/items)?)?{end}",
         rf"/wfs3/conformance{end}",
@@ -111,28 +111,33 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     if cfg.getboolean('status_page'):
         handlers.append( ("/status/?", StatusHandler) )
 
+    def _ows_args( *args, **kwargs ):
+        rv = ows_kwargs.copy()
+        rv.update( *args, **kwargs )
+        return rv
+
     # Load filters
     filters = load_access_policies()
     if filters:
         for uri,fltrs in filters.items():
-            kw = ows_kwargs.copy()
-            kw.update( filters = fltrs)
+            kw = _ows_args(filters = fltrs)
             # Add ow endpoint
             path = f"{root}/{uri.strip('/')}" if uri else root
             # Add service endpoint
             add_handler( f"{path}(?P<endpoint>/?)", OwsFilterHandler, kw )
-            for endp in ows_api_endpoints:
+            for endp in wfs3_api_endpoints:
                 add_handler( rf"{path}(?P<endpoint>{endp})", OwsApiFilterHandler, kw )
     else:
         add_handler( rf"{root}(?P<endpoint>/?)", OwsHandler, ows_kwargs)
-        for endp in ows_api_endpoints:
-            add_handler( rf"{root}(?P<endpoint>{endp})", OwsApiHandler, ows_kwargs )
-
+        kw = _ows_args(service='WFS3')
+        for endp in wfs3_api_endpoints:
+            add_handler( rf"{root}(?P<endpoint>{endp})", OwsApiHandler, kw )
     #
     # Add qgis api endpoints
     #
     for name,endpoint in qgis_api_endpoints():
-        add_handler( rf"(?P<endpoint>/{endpoint.strip('/')}/.*)", OwsApiHandler, ows_kwargs )
+        kw = _ows_args(service = name)
+        add_handler( rf"(?P<endpoint>/{endpoint.strip('/')}/.*)", OwsApiHandler, kw )
 
     return handlers
 

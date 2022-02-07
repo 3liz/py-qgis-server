@@ -43,6 +43,10 @@ setup(
             'qgisserver = pyqgisserver.server:main',
             'qgisserver-worker = pyqgisserver.qgsworker:main',
         ],
+        'py_qgis_server.monitors':[
+            'amqp = pyqgisserver.monitors.amqp:get_monitor_service',
+            'test = pyqgisserver.monitors.test:get_monitor_service',
+        ]
     },
     # Add manifest to main package
     include_package_data=True,
