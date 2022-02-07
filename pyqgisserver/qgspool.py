@@ -142,14 +142,12 @@ class _Server:
     def terminate(self):
         """ Terminate handler
         """
-        LOGGER.info("Stopping pool server")
         self._restart_handler.close()
         if self._healthcheck:
             self._healthcheck.cancel()
         self._sock.close()
         if self._supervisor:
             self._supervisor.stop()
-        LOGGER.info("Stopping worker pool")
         self._terminate()
 
     def broadcast(self, command: bytes ) -> None:

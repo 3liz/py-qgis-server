@@ -322,14 +322,14 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             raise
         else: 
             # Make sure that child processes are terminated
-            print("Terminating child processes", file=sys.stderr)
+            print("Terminating child processes", file=sys.stderr, flush=True)
             process.terminate_childs()
-        exit_code = 1
+            exit_code = 1
     except KeyboardInterrupt:
-        print("Keyboard Interrupt", file=sys.stderr)
+        print("Keyboard Interrupt", flush=True)
         exit_code = 15
     except SystemExit as exc:
-        print(exc, file=sys.stderr )
+        print("Exiting with code:", exc.code, flush=True)
         exit_code = exc.code
     else:
         exit_code = 0
@@ -343,16 +343,16 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     if application is not None:
         application.terminate()
         application = None
-        print("{}: Server instance stopped".format(os.getpid()), file=sys.stderr)
+        print("PID {}: Server instance stopped".format(os.getpid()), flush=True)
     if process.task_id() is None:
         if worker_pool:
-            print("Stopping workers")
+            print("Stopping workers", flush=True)
             worker_pool.terminate()
         if broker_pr:
-            print("Stopping broker")
+            print("Stopping broker", flush=True)
             broker_pr.terminate()
             broker_pr.join()
 
-    print("Server shutdown", file=sys.stderr)
+    print("Server shutdown", flush=True)
     sys.exit(exit_code)
 
