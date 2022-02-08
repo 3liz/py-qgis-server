@@ -19,6 +19,7 @@ import logging
 import traceback
 import hashlib
 
+from datetime import datetime
 from time import time
 from typing import Dict, Optional, Any, Tuple
 
@@ -138,9 +139,10 @@ class Response(QgsServerResponse):
                 LOGGER.debug("Sending EOF")
                 self._handler.send( b'', False )
         except Exception:
+            trace = traceback.format_exc()
             LOGGER.error("Caught Exception (worker: %s, msg: %s):\n%s",
                          self._handler.identity, self._handler.msgid,
-                         traceback.format_exc())
+                         trace)
             del self._handler.headers['Content-Type']
             self.sendError(500, "Internal server error")
 
@@ -273,31 +275,41 @@ class QgsRequestHandler(RequestHandler):
         """
         cls.refresh_cache()
 
-    def compute_etag(self, scheme, project: QgsProject, request: QgsServerRequest) -> Optional[str]:
+    @classmethod
+    def get_modified_time(cls, key: str) -> datetime:
+        return cls._cache_service.get_modified_time(key)
+
+    def compute_etag(self, uri: str, request: QgsServerRequest ) -> Optional[str]:
         """ Compute ETAG for GetCapabilities requests
         """
         conf = confservice['projects.cache']
-        compute = conf.getboolean('force_etag') or conf.getboolean('trust_layer_metadata')
-
-        if compute and scheme == 'OWS':
+        if conf.getboolean('force_etag') or conf.getboolean('trust_layer_metadata'):
             owsrequest = request.parameter('REQUEST') or ""
             if owsrequest.lower() == "getcapabilities":
                 hasher = hashlib.sha1()
                 hasher.update(request.parameter('SERVICE').lower().encode())
                 hasher.update((request.parameter('VERSION') or "").lower().encode())
-                hasher.update(project.fileName().encode())
-                hasher.update(project.lastModified().toString(Qt.ISODate).encode())
+                hasher.update(uri.encode())
+                hasher.update(self.get_modified_time(uri).isoformat().encode())
                 return '"%s"' % hasher.hexdigest()
 
-    def check_etag_header(self, scheme, project: QgsProject, request: QgsServerRequest,
+    def set_etag_header( self, uri: str, request: QgsServerRequest,
+                         response: Response) -> Optional[str]:
+        """ Compute and set etag
+        """
+        computed_etag = self.compute_etag(uri, request)
+        if computed_etag:
+            response.setExtraHeader("Etag", computed_etag)
+
+        return computed_etag
+        
+    def check_etag_header(self, uri: str, request: QgsServerRequest,
                           response: Response) -> bool:
         """ Compute etag and check header
         """
-        computed_etag = self.compute_etag(scheme, project, request)
+        computed_etag = self.set_etag_header(uri, request, response)
         if computed_etag is None:
             return False
-
-        response.setExtraHeader("Etag", computed_etag)
 
         # Check etag header
         etag = self.request.headers.get("If-None-Match","")
@@ -317,6 +329,8 @@ class QgsRequestHandler(RequestHandler):
     def handle_message(self) -> None:
         """ Override this method to handle_messages
         """
+        LOGGER.debug("Handling request: %s", self.msgid)
+
         project_location = self.request.headers.pop('X-Map-Location', None)
         ogc_scheme       = self.request.headers.pop('X-Ogc-Scheme'  , None)
 
@@ -326,47 +340,65 @@ class QgsRequestHandler(RequestHandler):
         if not project_location:
             # Try to get project from environment
             project_location = os.getenv("QGIS_PROJECT_FILE")
+    
+        if ogc_scheme == 'OWS': 
+            if not project_location and request.parameter('SERVICE'):
+                # Prevent qgis for returning 500 when MAP is not defined for
+                # OWS services
+                LOGGER.error("No project defined for %s", request.parameter('SERVICE'))
+                # A project is required
+                exception = QgsServerException(self.QGIS_NO_MAP_ERROR_MSG, 400)
+                response.write(exception)
+                response.finish()
+                return
 
-        if not project_location and ogc_scheme == 'OWS' and request.parameter('SERVICE'):
-            # Prevent qgis for returning 500 when MAP is not defined for
-            # OWS services
-            LOGGER.error("No project defined for %s", request.parameter('SERVICE'))
-            # A project is required
-            exception = QgsServerException(self.QGIS_NO_MAP_ERROR_MSG, 400)
-            response.write(exception)
-            response.finish()
+            # Handle HEAD method for OWS requests
+            # Note that Qgis Server return 501 on head method on OWS methods
+            if request.method() == QgsServerRequest.HeadMethod:
+                # We can compute etag without loading resource
+                if project_location:
+                    self.set_etag_header(project_location, request, response)
+                    response.finish()
+                    return
+
+        self.handle_qgis_request(ogc_scheme, project_location, request, response)
+
+    def handle_qgis_request(self, ogc_scheme: str, project_location:str, request: Request, response: Response ) -> None:
+        """ Handle request passed to Qgis
+        """
+        if not project_location:
+            # Pass request directly
+            self.qgis_server.handleRequest(request, response)
             return
 
-        if project_location:
-            iface = self.qgis_server.serverInterface()
-            try:
-                LOGGER.debug("Handling request: %s", self.msgid)
-                project, updated = self.cache_lookup(project_location)
-                config_path = project.fileName()
-                if updated: 
-                    # Needed to cleanup cached capabilities
-                    LOGGER.debug("Cleaning config cache entry %s", config_path)
-                    iface.removeConfigCacheEntry(config_path)
-                # Check etag
-                if self.check_etag_header(ogc_scheme, project, request, response):
+        # Handle cached project
+        iface = self.qgis_server.serverInterface()
+        try:
+            project, updated = self.cache_lookup(project_location)
+            config_path = project.fileName()
+            if updated: 
+                # Needed to cleanup cached capabilities
+                LOGGER.debug("Cleaning config cache entry %s", config_path)
+                iface.removeConfigCacheEntry(config_path)
+            # Check etag for OWS requests
+            if ogc_scheme == 'OWS':
+                if self.check_etag_header(project_location, request, response):
                     response.setStatusCode(304)
                     response.finish()
                     return
 
-            except StrictCheckingError:
-                response.sendError(422,f"Invalid layers for project '{project_location}' - strict mode on")
-            except UnreadableResourceError:
-                response.sendError(422,f"Cannot read project resource '{project_location}'")
-            except PathNotAllowedError:
-                response.sendError(403,"Project path not allowed")
-            except FileNotFoundError:
-                response.sendError(404,f"Project '{project_location}' not found")
-            else:
-                # See https://github.com/qgis/QGIS/pull/9773
-                iface.setConfigFilePath(config_path)
-                self.qgis_server.handleRequest(request, response, project=project)
+        except StrictCheckingError:
+            response.sendError(422,f"Invalid layers for project '{project_location}' - strict mode on")
+        except UnreadableResourceError:
+            response.sendError(422,f"Cannot read project resource '{project_location}'")
+        except PathNotAllowedError:
+            response.sendError(403,"Project path not allowed")
+        except FileNotFoundError:
+            response.sendError(404,f"Project '{project_location}' not found")
         else:
-            self.qgis_server.handleRequest(request, response)
+            # See https://github.com/qgis/QGIS/pull/9773
+            iface.setConfigFilePath(config_path)
+            self.qgis_server.handleRequest(request, response, project=project)
 
     @classmethod
     def get_report(cls):

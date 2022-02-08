@@ -130,5 +130,18 @@ class Tests(HTTPTestCase):
                               headers={ 'If-None-Match': etag })
         assert rv.status_code == 304
 
+    def test_head_getcapabilities_request(self):
+        """ Test HEAD request returning Etag
+        """
+        rv = self.client.head( "?MAP=france_parts.qgs&SERVICE=WFS&request=GetCapabilities" )
+        assert rv.status_code == 200
+
+        etag = rv.headers.get('Etag')
+        assert etag is not None
+
+        # Redo GET request
+        rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WFS&request=GetCapabilities" )
+        assert rv.status_code == 200
+        assert rv.headers.get('Etag') == etag
 
 

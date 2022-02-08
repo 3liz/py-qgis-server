@@ -199,3 +199,22 @@ def test_preload_projects(data) -> None:
     details = cacheservice.peek('raster_layer.qgs')
     assert details is None
 
+
+def test_get_modified_time(data) -> None:
+    """ Test modified time
+    """
+    cacheservice = QgsCacheManager()
+
+    path = data / 'france_parts.qgs'
+    modified_time1 = cacheservice.get_modified_time('file:france_parts.qgs')
+    
+    # Check that no files is loaded
+    assert cacheservice.peek('file:france_parts.qgs') is None
+
+    # Update file
+    path.touch()
+    modified_time2 = cacheservice.get_modified_time('file:france_parts.qgs')
+
+    assert modified_time2 > modified_time1
+
+

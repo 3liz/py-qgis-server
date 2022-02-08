@@ -85,15 +85,9 @@ class QgisStorageHandler:
     def __init__(self):
         pass
 
-    def get_project( self, url: urllib.parse.ParseResult, strict: Optional[bool]=None,
-                     project: Optional[QgsProject]=None,
-                     timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
-        """ Create or return a project
-        """
-        uri = urlunparse(url)
-
+    def get_storage_metadata( self, uri: str ):
         # Check out for storage
-        storage = QgsApplication.projectStorageRegistry().projectStorageFromUri( uri )
+        storage = QgsApplication.projectStorageRegistry().projectStorageFromUri(uri)
         if not storage:
             LOGGER.error("No project storage found for %s", uri)
             raise FileNotFoundError(uri)
@@ -101,6 +95,22 @@ class QgisStorageHandler:
         if not res:
             LOGGER.error("Failed to read storage metadata for %s", uri)
             raise FileNotFoundError(uri)
+        return metadata
+
+    def get_modified_time( self, url: urllib.parse.ParseResult) -> datetime:
+        """ Return the modified date time of the project referenced by its url
+        """
+        metadata = self.get_storage_metadata(urlunparse(url))
+        return metadata.lastModified.toPyDateTime()
+
+    def get_project( self, url: urllib.parse.ParseResult, strict: Optional[bool]=None,
+                     project: Optional[QgsProject]=None,
+                     timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
+        """ Create or return a project
+        """
+        uri = urlunparse(url)
+
+        metadata = self.get_storage_metadata(uri)
         modified_time = metadata.lastModified.toPyDateTime()
 
         if timestamp is None or timestamp < modified_time:
@@ -245,11 +255,35 @@ class QgsCacheManager:
         for key in keys:
             self.update_entry(key)
 
+    def peek(self, key:str) -> CacheDetails:
+        """ Return cache details 
+        """
+        return self._lru_cache.peek(key) or self._static_cache.get(key)
+
+    def get_modified_time(self, key: str) -> datetime:
+        """ Get the modified time for the given project uri
+        """
+        details = self.peek(key)
+        if details:
+            # Trust Qgis to return modified time
+            last_modified = details.project.lastModified()
+            if not last_modified.isValid():
+                # Occurs if resource is not valid 
+                LOGGER.error("QgsProject::lastModified() returned invalid date time for %s", 
+                             details.project.fileName())
+                raise FileNotFoundError(key)
+            return last_modified.toPyDateTime().replace(microsecond=0)
+
+        # Get modified 
+        url = self.resolve_alias(key)
+        store = self.get_protocol_handler(key, url.scheme)
+        return store.get_modified_time(url).replace(microsecond=0)
+
     def get_project(self, key: str, strict: Optional[bool]=None, refresh: bool=True) -> Tuple[QgsProject,datetime,bool]:
         """ Load project 
         """
         # Get details for the project
-        details = self._lru_cache.peek(key) or self._static_cache.get(key)
+        details = self.peek(key)
 
         # We are asked not to refresh the entry
         # return what is in cache
@@ -280,11 +314,6 @@ class QgsCacheManager:
         else:
             self._lru_cache[key] = CacheDetails(project, timestamp)
         return updated
-
-    def peek(self, key: str) -> Optional[CacheDetails]:
-        """ Return entry if it exists
-        """
-        return self._lru_cache.peek(key) or self._static_cache.get(key)
 
     def lookup(self, key: str, refresh: bool=True) -> Tuple[QgsProject, bool]:
         """ Lookup entry from key

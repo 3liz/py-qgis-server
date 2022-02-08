@@ -120,11 +120,14 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     filters = load_access_policies()
     if filters:
         for uri,fltrs in filters.items():
-            kw = _ows_args(filters = fltrs)
-            # Add ow endpoint
+            kw = _ows_args(filters=fltrs)
+            # Add ows endpoint
             path = f"{root}/{uri.strip('/')}" if uri else root
             # Add service endpoint
             add_handler( f"{path}(?P<endpoint>/?)", OwsFilterHandler, kw )
+
+            # Add wfs3 endpoints
+            kw.update(service='WFS3')
             for endp in wfs3_api_endpoints:
                 add_handler( rf"{path}(?P<endpoint>{endp})", OwsApiFilterHandler, kw )
     else:
@@ -136,7 +139,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     # Add qgis api endpoints
     #
     for name,endpoint in qgis_api_endpoints():
-        kw = _ows_args(service = name)
+        kw = _ows_args(service=name)
         add_handler( rf"(?P<endpoint>/{endpoint.strip('/')}/.*)", OwsApiHandler, kw )
 
     return handlers

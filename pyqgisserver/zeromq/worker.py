@@ -174,10 +174,14 @@ def run_worker(address: str, handler_factory: Type[RequestHandler],
             except zmq.ZMQError as err:
                 LOGGER.error("Worker Error %d: %s", err.errno, zmq.strerror(err.errno))
             except Exception as exc:
-                LOGGER.error("Worker Error %s\n%s", exc, traceback.format_exc())
+                LOGGER.error("Worker Error %s\n%s", exc)
+                # Print trace outside LOGGER because 
+                # logging output in sub-processe
+                # is not captured by pytest
+                traceback.print_exc()
                 if handler and not handler.header_written:
                     handler.status_code = 500
-                    handler.send(bytes("Worker internal error".encode('ascii')))
+                    handler.send("Worker internal error".encode())
                     # Got error 500, do not presume worker state
                     break
             finally:

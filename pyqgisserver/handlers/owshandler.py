@@ -103,7 +103,7 @@ class AsyncClientHandler(BaseHandler):
             delta  = time() - reqtime
 
             log_rrequest(proxy_url, status, method, query, delta, hdrs)
-           
+          
             # Send response
             for k,v in hdrs.items():
                 self.set_header(k,v)
@@ -169,22 +169,16 @@ class AsyncClientHandler(BaseHandler):
         """ Handle Post method
         """
         await self.handle_request('POST', endpoint)
-        
+
+    async def head(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+        """ Handle HEAD method
+        """
+        await self.handle_request('HEAD', endpoint)
+
     def options(self, endpoint: Optional[str]=None) -> None:
         """ Implement OPTIONS for validating CORS
         """
         self.set_option_headers('GET, POST, OPTIONS')
-
-    def head(self, endpoint: Optional[str]=None) -> Awaitable[None]:
-        """ Handle HEAD method
-
-            HEAD method is not forwarded because qgis server 
-            return 501.
-            
-            Because of this the actuel HEAD method does not return anything meaningful about 
-            the resources referenced from the url - may this will change it the future.
-        """
-        pass
 
     def get_monitor_params( self ) -> Optional[Dict[str,Any]]:
         """ Emit monitoring info
@@ -246,9 +240,6 @@ class OwsApiHandler(AsyncClientHandler):
  
     async def delete(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         await self.handle_request('DELETE', endpoint)
-
-    async def head(self, endpoint: Optional[str]=None) -> Awaitable[None]:
-        await self.handle_request('HEAD', endpoint)
 
     async def put(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         await self.handle_request('PUT', endpoint)

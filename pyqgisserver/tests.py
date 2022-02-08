@@ -144,3 +144,7 @@ class OWSTestClient:
         return HTTPTestResponse(self._testcase.fetch(path, method='OPTIONS', 
                                 headers=headers, raise_error=False))
 
+    def head( self, query: str, headers: Optional[Dict]=None, path: str='/ows/') -> HTTPTestResponse:
+        return HTTPTestResponse(self._testcase.fetch(path + query, method='HEAD',
+                                headers=headers, raise_error=False))
+

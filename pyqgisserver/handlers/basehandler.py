@@ -49,6 +49,9 @@ class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self) -> None:
         """ Override defaults HTTP headers 
         """
+        # XXX By default tornado set Content-Type to xml/text
+        # this may have unwanted side effects
+        self.clear_header("Content-Type")
         self.set_header("Server",f"Py-Qgis-Server {__version__}")
 
     def on_connection_close(self) -> None:

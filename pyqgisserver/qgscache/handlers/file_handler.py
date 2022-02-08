@@ -50,6 +50,11 @@ class FileProtocolHandler:
 
         return path if exists else None
 
+    def get_modified_time( self, url: urllib.parse.ParseResult) -> datetime:
+        """ Return the modified date time of the project referenced by its url
+        """
+        path = self._check_file(Path(url.path))
+        return datetime.fromtimestamp(path.stat().st_mtime)
 
     def get_project( self, url: Optional[urllib.parse.ParseResult], strict: Optional[bool]=None,
                      project: Optional[QgsProject]=None,

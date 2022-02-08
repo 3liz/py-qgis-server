@@ -126,6 +126,12 @@ class PostgresProtocolHandler:
         cnf = componentmanager.get_service('@3liz.org/config-service;1')
         self._insecure = cnf.getboolean('projects.cache','insecure', fallback=False)
 
+    def get_modified_time( self, url: urllib.parse.ParseResult) -> datetime:
+        """ Return the modified date time of the project referenced by its url
+        """
+        _, modified_time = _check_unsafe_url( self._insecure, url )
+        return modified_time
+
     def get_project( self, url: Optional[urllib.parse.ParseResult], strict: Optional[bool]=None,
                      project: Optional[QgsProject]=None,
                      timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
