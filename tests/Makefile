@@ -96,6 +96,12 @@ amqp-run:
 	-f docker-compose.yml \
 	-f docker-compose.amqp.yml up -V --remove-orphans --force-recreate -d
 
+postgres-run: export RUN_COMMAND=./tests/run_server.sh
+postgres-run:
+	docker compose \
+	-f docker-compose.yml \
+	-f docker-compose.postgres.yml up -V --remove-orphans --force-recreate -d
+
 
 
 

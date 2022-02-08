@@ -126,11 +126,3 @@ class Monitor(MonitorBase):
         setattr(cls,'_instance', inst)
         return inst
 
-
-# Entry point
-def get_monitor_service() -> Monitor:
-    """ Entry point for 'amqp' monitor
-    """
-    return Monitor.initialize()
-
-

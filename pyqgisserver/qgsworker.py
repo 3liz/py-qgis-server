@@ -276,10 +276,10 @@ class QgsRequestHandler(RequestHandler):
         cls.refresh_cache()
 
     @classmethod
-    def get_modified_time(cls, key: str) -> datetime:
-        return cls._cache_service.get_modified_time(key)
+    def get_modified_time(cls, key: str, from_cache: bool=True) -> datetime:
+        return cls._cache_service.get_modified_time(key, from_cache=from_cache)
 
-    def compute_etag(self, uri: str, request: QgsServerRequest ) -> Optional[str]:
+    def compute_etag(self, uri: str, last_modified: datetime, request: QgsServerRequest) -> Optional[str]:
         """ Compute ETAG for GetCapabilities requests
         """
         conf = confservice['projects.cache']
@@ -290,24 +290,24 @@ class QgsRequestHandler(RequestHandler):
                 hasher.update(request.parameter('SERVICE').lower().encode())
                 hasher.update((request.parameter('VERSION') or "").lower().encode())
                 hasher.update(uri.encode())
-                hasher.update(self.get_modified_time(uri).isoformat().encode())
+                hasher.update(last_modified.isoformat().encode())
                 return '"%s"' % hasher.hexdigest()
 
-    def set_etag_header( self, uri: str, request: QgsServerRequest,
-                         response: Response) -> Optional[str]:
+    def set_etag_header(self, uri: str, last_modified: datetime, request: QgsServerRequest,
+                        response: Response ) -> Optional[str]:
         """ Compute and set etag
         """
-        computed_etag = self.compute_etag(uri, request)
+        computed_etag = self.compute_etag(uri, last_modified, request )
         if computed_etag:
             response.setExtraHeader("Etag", computed_etag)
 
         return computed_etag
-        
-    def check_etag_header(self, uri: str, request: QgsServerRequest,
+
+    def check_etag_header(self, uri: str, last_modified: datetime, request: QgsServerRequest,
                           response: Response) -> bool:
         """ Compute etag and check header
         """
-        computed_etag = self.set_etag_header(uri, request, response)
+        computed_etag = self.set_etag_header(uri, last_modified, request, response)
         if computed_etag is None:
             return False
 
@@ -340,7 +340,7 @@ class QgsRequestHandler(RequestHandler):
         if not project_location:
             # Try to get project from environment
             project_location = os.getenv("QGIS_PROJECT_FILE")
-    
+   
         if ogc_scheme == 'OWS': 
             if not project_location and request.parameter('SERVICE'):
                 # Prevent qgis for returning 500 when MAP is not defined for
@@ -357,13 +357,14 @@ class QgsRequestHandler(RequestHandler):
             if request.method() == QgsServerRequest.HeadMethod:
                 # We can compute etag without loading resource
                 if project_location:
-                    self.set_etag_header(project_location, request, response)
+                    last_modified = self.get_modified_time(project_location, from_cache=False)
+                    self.set_etag_header(project_location, last_modified, request, response)
                     response.finish()
                     return
 
         self.handle_qgis_request(ogc_scheme, project_location, request, response)
 
-    def handle_qgis_request(self, ogc_scheme: str, project_location:str, request: Request, response: Response ) -> None:
+    def handle_qgis_request(self, ogc_scheme: str, project_location: str, request: Request, response: Response ) -> None:
         """ Handle request passed to Qgis
         """
         if not project_location:
@@ -380,9 +381,18 @@ class QgsRequestHandler(RequestHandler):
                 # Needed to cleanup cached capabilities
                 LOGGER.debug("Cleaning config cache entry %s", config_path)
                 iface.removeConfigCacheEntry(config_path)
+
+            last_modified = self.get_modified_time(project_location)
+
+            # Set the project uri in separate header, this
+            # is useful for invalidating front-end cache from
+            # key
+            response.setExtraHeader('X-Qgis-Project-Uri', project_location)
+            response.setExtraHeader('Last-Modified'     , last_modified.astimezone().isoformat())
+
             # Check etag for OWS requests
             if ogc_scheme == 'OWS':
-                if self.check_etag_header(project_location, request, response):
+                if self.check_etag_header(project_location, last_modified, request, response):
                     response.setStatusCode(304)
                     response.finish()
                     return

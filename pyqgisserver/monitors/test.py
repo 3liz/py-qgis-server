@@ -25,14 +25,9 @@ class Monitor(MonitorBase):
         data.update(params)
         self.messages.append((data,meta))
 
+_instance = Monitor()
 
-__instance = Monitor()
-
-
-# Entry point
-def get_monitor_service() -> Monitor:
-    """ Entry point for 'amqp' monitor
-    """
-    return __instance
-
+# Entrypoint
+def initialize() -> Monitor:
+    return _instance
 

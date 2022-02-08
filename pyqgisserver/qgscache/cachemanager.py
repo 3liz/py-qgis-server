@@ -260,11 +260,16 @@ class QgsCacheManager:
         """
         return self._lru_cache.peek(key) or self._static_cache.get(key)
 
-    def get_modified_time(self, key: str) -> datetime:
+    def get_modified_time(self, key: str, from_cache: bool=True) -> datetime:
         """ Get the modified time for the given project uri
         """
         details = self.peek(key)
         if details:
+
+            if from_cache:
+                # Return from cached resource
+                return details.timestamp.replace(microsecond=0)
+
             # Trust Qgis to return modified time
             last_modified = details.project.lastModified()
             if not last_modified.isValid():
@@ -272,12 +277,14 @@ class QgsCacheManager:
                 LOGGER.error("QgsProject::lastModified() returned invalid date time for %s", 
                              details.project.fileName())
                 raise FileNotFoundError(key)
-            return last_modified.toPyDateTime().replace(microsecond=0)
+            last_modified = last_modified.toPyDateTime()
+        else:
+            # Get modified 
+            url = self.resolve_alias(key)
+            store = self.get_protocol_handler(key, url.scheme)
+            last_modified = store.get_modified_time(url)
 
-        # Get modified 
-        url = self.resolve_alias(key)
-        store = self.get_protocol_handler(key, url.scheme)
-        return store.get_modified_time(url).replace(microsecond=0)
+        return last_modified.replace(microsecond=0)
 
     def get_project(self, key: str, strict: Optional[bool]=None, refresh: bool=True) -> Tuple[QgsProject,datetime,bool]:
         """ Load project 
