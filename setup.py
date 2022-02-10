@@ -46,6 +46,9 @@ setup(
         'py_qgis_server.monitors':[
             'amqp = pyqgisserver.monitors.amqp:Monitor',
             'test = pyqgisserver.monitors.test',
+        ],
+        'py_qgis_server.cache.observers':[
+            'test = pyqgisserver.qgscache.observers.test:observe',
         ]
     },
     # Add manifest to main package

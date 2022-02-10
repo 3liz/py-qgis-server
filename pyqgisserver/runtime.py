@@ -37,6 +37,7 @@ from .qgspool import create_poolserver
 
 from .monitor import Monitor
 from .stats import Stats
+from .qgscache.observer import declare_cache_observers, start_cache_observer
 
 from pyqgisservercontrib.core.filters import ServerFilter
 
@@ -264,6 +265,9 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         LOGGER.info("Proxy configuration enabled")
         kwargs['xheaders'] = True
 
+    # Check for declared cache observers
+    declare_cache_observers()
+
     try:
         # Fork processes
         # This is a *DEPRECATED* feature
@@ -313,6 +317,12 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         # Initialize pool supervisor
         worker_pool.start_supervisor()
 
+        # Start cache observer
+        cache_observer = start_cache_observer()
+        
+        # XXX This trigger a deprecation warning in python 3.10
+        # but there is no clear alternative with tornado atm
+        # See https://github.com/tornadoweb/tornado/issues/3033
         loop = asyncio.get_event_loop()
         loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
         LOGGER.info("Starting processing requests")
@@ -348,6 +358,8 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
         application = None
         print("PID {}: Server instance stopped".format(os.getpid()), flush=True)
     if process.task_id() is None:
+        if cache_observer:
+            cache_observer.stop()
         if worker_pool:
             print("Stopping workers", flush=True)
             worker_pool.terminate()

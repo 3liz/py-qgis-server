@@ -11,9 +11,10 @@
 
 import logging
 import urllib.parse
+import traceback
 
 from urllib.parse import urlparse, urlunparse, urljoin, parse_qs
-from typing import Any, Tuple, Optional, Sequence, NamedTuple
+from typing import Any, Tuple, Optional, Sequence, NamedTuple, Callable
 from collections import OrderedDict
 from pathlib import Path
 from datetime import datetime
@@ -22,6 +23,8 @@ from itertools import chain
 
 from ..utils.lru import lrucache
 from ..config import confservice
+
+from .types import UpdateState
 
 from qgis.PyQt.QtCore import Qt 
 from qgis.core import (QgsApplication,
@@ -148,6 +151,7 @@ class QgsCacheManager:
         self._disable_owsurls      = cnf.getboolean('disable_owsurls', fallback=False)
         self._aliases = {}
         self._default_scheme = cnf.get('default_handler')
+        self._observers = []   
 
         allowed_schemes = cnf.get('allow_storage_schemes')
         if allowed_schemes != '*':
@@ -159,6 +163,25 @@ class QgsCacheManager:
 
         # Load protocol handlers
         componentmanager.register_entrypoints('qgssrv_contrib_protocol_handler')
+
+    def add_observer( self, observer: Callable[[str,datetime,int],None] ) -> None: 
+        """ Add observer for cache invalidation
+        """
+        self._observers.append(observer)
+
+    def notify_observers( self, key: str, modified_time: datetime,
+                          state: UpdateState) -> None:
+        """ Notify all observers
+        """
+        if not self._observers:
+            return
+
+        modified_time = modified_time.replace(microsecond=0)
+        for obs in self._observers:
+            try:
+                obs(key, modified_time, int(state))
+            except Exception:
+                LOGGER.critical("Uncaugh error in observer: %s\n%s", obs, traceback.format_exc())
 
     @property
     def trust_mode_on(self) -> bool:
@@ -286,7 +309,7 @@ class QgsCacheManager:
 
         return last_modified.replace(microsecond=0)
 
-    def get_project(self, key: str, strict: Optional[bool]=None, refresh: bool=True) -> Tuple[QgsProject,datetime,bool]:
+    def get_project(self, key: str, strict: Optional[bool]=None, refresh: bool=True) -> Tuple[QgsProject,datetime,UpdateState]:
         """ Load project 
         """
         # Get details for the project
@@ -295,41 +318,46 @@ class QgsCacheManager:
         # We are asked not to refresh the entry
         # return what is in cache
         if details and not refresh:
-            return details.project, details.timestamp, False
+            return details.project, details.timestamp, UpdateState.UNCHANGED
 
         url   = self.resolve_alias(key)
         store = self.get_protocol_handler(key, url.scheme)
 
         if details is not None:
             project, timestamp  = store.get_project( url, strict=strict, **details._asdict())
-            needupdate = timestamp != details.timestamp
+            update = UpdateState.UPDATED if timestamp != details.timestamp else UpdateState.UNCHANGED
         else:
             project, timestamp = store.get_project(url, strict=strict)
-            needupdate = True
+            update = UpdateState.INSERTED
 
-        return project, timestamp, needupdate
+        return project, timestamp, update
         
-    def update_entry(self, key: str, static_cache: bool=False, refresh: bool=True) -> bool:
+    def update_entry(self, key: str, static_cache: bool=False, refresh: bool=True) -> UpdateState:
         """ Update the cache
 
             :param key: The key of the entry to update
             :return: true if the entry has been updated
         """
-        project, timestamp, updated = self.get_project(key, refresh=refresh)
+        project, timestamp, update = self.get_project(key, refresh=refresh)
         if static_cache or key in self._static_cache:
             self._static_cache[key] = CacheDetails(project, timestamp)
         else:
             self._lru_cache[key] = CacheDetails(project, timestamp)
-        return updated
 
-    def lookup(self, key: str, refresh: bool=True) -> Tuple[QgsProject, bool]:
+        if update:
+            LOGGER.info("Updated project '%s' in cache", key),
+            self.notify_observers(key, timestamp, update)
+
+        return update
+
+    def lookup(self, key: str, refresh: bool=True) -> Tuple[QgsProject, UpdateState]:
         """ Lookup entry from key
         """
-        updated = self.update_entry(key, refresh=refresh)
+        update = self.update_entry(key, refresh=refresh)
         if key in self._static_cache:
-            return self._static_cache[key].project, updated
+            return self._static_cache[key].project, update
         else:
-            return self._lru_cache[key].project, updated
+            return self._lru_cache[key].project, update
 
     def prepare_project(self, project: QgsProject ) -> None:
         """ Set project configuration

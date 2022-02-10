@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Implement configurable cache observers
 * Add 'Last-Modified' header
 * Support Etag in HEAD methods for OWS requests
 * Implement configurable monitor backend

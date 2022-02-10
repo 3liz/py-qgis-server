@@ -228,7 +228,7 @@ if __name__ == '__main__':
         except RequestGatewayError:
             LOGGER.error("%d -> GATEWAY ERROR", index)
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
     loop.add_signal_handler(signal.SIGINT, loop.stop)
     loop.run_until_complete(asyncio.wait([fetch(i+1) for i in range(args.count)]))
     

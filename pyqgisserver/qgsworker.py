@@ -34,10 +34,15 @@ from .qgscache.cachemanager import (get_cacheservice,
                                     preload_projects,
                                     StrictCheckingError,
                                     UnreadableResourceError,
-                                    PathNotAllowedError)
+                                    PathNotAllowedError,
+                                    UpdateState)
+
+from .qgscache.observer import Client as CacheObserver
 
 from .plugins import load_plugins
 from .config import confservice, configure_qgis_api, qgis_api_endpoints
+
+
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -232,6 +237,12 @@ class QgsRequestHandler(RequestHandler):
         cls._cache_service        = get_cacheservice()
         cls._cache_check_interval = cache_config.getint('check_interval')
         cls._cache_last_check     = time()  
+       
+        # Attach cache observer
+        if cache_config.getboolean('has_observers'):
+            LOGGER.info("Attaching worker cache observer")
+            cls._cache_observer = CacheObserver()
+            cls._cache_service.add_observer(cls._cache_observer.observe)
 
         # Configure qgis api
         for name,_ in qgis_api_endpoints(enabled_only=False):
@@ -264,7 +275,7 @@ class QgsRequestHandler(RequestHandler):
         cls._cache_last_check = time()
 
     @classmethod
-    def cache_lookup(cls, key) -> Tuple[QgsProject,bool]:
+    def cache_lookup(cls, key) -> Tuple[QgsProject, UpdateState]:
         return cls._cache_service.lookup(key, refresh = cls._cache_check_interval <= 0)
 
     @classmethod

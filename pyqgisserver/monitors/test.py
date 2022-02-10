@@ -1,3 +1,11 @@
+#
+# Copyright 2022 3liz
+# Author David Marteau
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 """ Store monitoring data in memory table
 
     Used for testing purposes
