@@ -204,6 +204,11 @@ class OwsHandler(AsyncClientHandler):
         params = { k:_decode(args.get(k,["__unknown__"])[0]) for k in self.MONITOR_ARGUMENTS }
         return params
 
+    def prepare(self) -> None:
+        super().prepare()
+        # Replace query arguments to upper case: (it's ok for OWS)
+        self.request.arguments = { k.upper():v for (k,v) in self.request.arguments.items() }
+
 
 class _FilterHandlerMixIn:
     """ Handle filter handlers
@@ -231,6 +236,22 @@ class OwsApiHandler(AsyncClientHandler):
         super().initialize(**kwargs )
         self.ogc_scheme = 'OAF'
         self._service_name = service.upper()
+
+    def prepare(self) -> None:
+        super().prepare()
+        # Replace MAP key with uppercase
+        args = self.request.arguments
+        if 'MAP' in args:
+            return 
+        for k in args:
+            if k.upper() == 'MAP':
+                key = k
+                val = args[k]
+                break
+        else:
+            return
+        del args[key]
+        args['MAP'] = val
 
     async def get(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         """ Fix issue with the landing page api when not 

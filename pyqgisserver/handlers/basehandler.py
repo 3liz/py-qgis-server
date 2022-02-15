@@ -36,8 +36,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def prepare(self) -> None:
         self.has_body_arguments = len(self.request.body_arguments)>0
-        # Replace query arguments to upper case:
-        self.request.arguments = { k.upper():v for (k,v) in self.request.arguments.items() }
 
     def encode_arguments(self) -> str:
         return '?'+urlencode({k:v[0] for k,v in self.request.arguments.items()})
@@ -104,10 +102,8 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         message = self._reason
 
-        if "exc_info" in kwargs:
-            exception = kwargs['exc_info'][1]
-            # Error was caused by a exception
-            message = "{}".format(exception)
+        #if "exc_info" in kwargs:
+        #    exception = kwargs['exc_info'][1]
                
         self.logger.error("%s", message)
         response = dict(status="error" if status_code != 200 else "ok",
