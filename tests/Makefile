@@ -90,18 +90,14 @@ up:
 stop:
 	docker compose down -v --remove-orphans
 
-amqp-run: export RUN_COMMAND=./tests/run_server.sh
-amqp-run:
+#
+# Run server with extra services
+#
+%-run: export RUN_COMMAND=./tests/run_server.sh
+%-run:
 	docker compose \
 	-f docker-compose.yml \
-	-f docker-compose.amqp.yml up -V --remove-orphans --force-recreate -d
-
-postgres-run: export RUN_COMMAND=./tests/run_server.sh
-postgres-run:
-	docker compose \
-	-f docker-compose.yml \
-	-f docker-compose.postgres.yml up -V --remove-orphans --force-recreate -d
-
+	-f docker-compose.$*.yml up -V --remove-orphans --force-recreate -d
 
 
 

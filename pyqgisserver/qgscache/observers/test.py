@@ -16,6 +16,9 @@ LOGGER=logging.getLogger('SRVLOG')
 
 notify_data = {}
 
+def init() -> None:
+    pass
+
 def observe(key: str, datetime: datetime, insert: bool) -> None:
     LOGGER.debug("*** TEST CACHE OBSERVER: Received update notification for %s %s [Inserted: %s]", key, datetime, insert)
     notify_data[key] = (key,datetime,insert)

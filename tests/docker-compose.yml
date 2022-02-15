@@ -19,7 +19,7 @@ services:
             QGSRV_PROJECTS_SCHEMES_BAR: file:foobar?data={path}
             QGSRV_SERVER_PROFILES: /src/tests/profiles.yml
             QGSRV_SERVER_RESTARTMON: /src/.qgis-restart
-            QGSRV_SERVER_HTTP_PROXY: 'yes'
+            QGSRV_SERVER_HTTP_PROXY: 'no'
             QGSRV_LOGGING_LEVEL: DEBUG
             QGSRV_DATA_PATH: /.local/share/qgis-server
             QGSRV_SERVER_STATUS_PAGE: 'yes'
@@ -46,9 +46,17 @@ services:
         ports:
             - ${SERVER_HTTP_PORT}:8080
             - ${MANAGEMENT_HTTP_PORT}:19876
+        networks:
+            - backend
         deploy:
             resources:
                 limits:
                     cpus: ${CPU_LIMITS}
                     memory: ${MEMORY_LIMITS}
-        
+networks:
+  backend:
+     ipam:
+       driver: default
+       config:
+         - subnet: 172.199.0.0/16
+ 

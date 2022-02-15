@@ -245,6 +245,7 @@ class ConfigService:
             # Look in environment
             # Note that the section must exists
             if self.allow_env:
+                LOGGER.debug("Looking for option '%s.%s' in environment", section, option)
                 varname  = 'QGSRV_%s_%s' % (section.upper(), option.upper())
                 varname  = functools.reduce( lambda s,c: s.replace(c,'_'), ENV_REPLACE_CHARS, varname)
                 varvalue = os.getenv(varname)

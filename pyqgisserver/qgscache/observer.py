@@ -109,7 +109,9 @@ class Server:
             for name in self._declared_observers:
                 try:
                     LOGGER.debug("*** Loading cache observer '%s'", name)
-                    yield cm.load_entrypoint('py_qgis_server.cache.observers',name)
+                    observer = cm.load_entrypoint('py_qgis_server.cache.observers',name)
+                    observer.init()
+                    yield observer
                 except cm.EntryPointNotFoundError:
                     LOGGER.error("Failed to load cache trigger component: %s", name)
 
@@ -168,7 +170,7 @@ class Server:
         """
         for obs in self._observers:
             try:
-                obs(key, modified_time, state == UpdateState.INSERTED)
+                obs.observe(key, modified_time, state == UpdateState.INSERTED)
             except Exception:
                 LOGGER.critical("Uncaugh error in observer: %s\n%s", obs, traceback.format_exc())
 

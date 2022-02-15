@@ -10,3 +10,5 @@ services:
         volumes:
             - ${PG_RUN}:/var/run/postgresql
             - ${PGPASSFILE}:/.pgpass
+        networks:
+            - backend

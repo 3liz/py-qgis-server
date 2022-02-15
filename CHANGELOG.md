@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Add BAN cache observer
 * Fix parameter's case in OGC API requests
    - Fix https://github.com/3liz/py-qgis-server/issues/34
 * Implement configurable cache observers

@@ -48,7 +48,8 @@ setup(
             'test = pyqgisserver.monitors.test',
         ],
         'py_qgis_server.cache.observers':[
-            'test = pyqgisserver.qgscache.observers.test:observe',
+            'test = pyqgisserver.qgscache.observers.test',
+            'ban  = pyqgisserver.qgscache.observers.ban',
         ]
     },
     # Add manifest to main package

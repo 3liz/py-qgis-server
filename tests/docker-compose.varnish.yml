@@ -1,0 +1,28 @@
+#
+# See https://www.varnish-software.com/developers/tutorials/running-varnish-docker/
+# 
+# References:
+# - https://book.varnish-software.com/4.0/chapters/VCL_Basics.html
+#
+version: '3.8'
+services:
+    qgis-server:
+        environment:
+            QGSRV_CACHE_OBSERVERS: ban
+            QGSRV_CACHE_OBSERVERS_BAN_SERVER_ADDRESS: "http://varnish:80"
+            QGSRV_CACHE_CHECK_INTERVAL: 10
+    varnish:
+        image: varnish:7.0.2
+        environment:
+            VARNISH_SIZE: 500M
+        volumes:
+            - ${PWD}/varnish.vcl:/etc/varnish/default.vcl:ro
+            - ${PWD}/varnish.secret:/etc/varnish/secret:ro
+        command: ["-S", "/etc/varnish/secret"]
+        tmpfs:
+            - /var/lib/varnish:exec
+        ports:
+            - 127.0.0.1:8889:80
+        networks:
+            - backend
+

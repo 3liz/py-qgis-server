@@ -268,7 +268,7 @@ class QgsRequestHandler(RequestHandler):
 
     @classmethod
     def refresh_cache(cls) -> None:
-        if cls._cache_check_interval <= 0 or time() - cls._cache_check_refresh < cls._cache_check_interval:
+        if cls._cache_check_interval <= 0 or time() - cls._cache_last_check < cls._cache_check_interval:
             return
         LOGGER.debug("Refreshing cache")
         cls._cache_service.refresh()
@@ -397,9 +397,9 @@ class QgsRequestHandler(RequestHandler):
 
             # Set the project uri in separate header, this
             # is useful for invalidating front-end cache from
-            # key
-            response.setExtraHeader('X-Qgis-Project-Uri', project_location)
-            response.setExtraHeader('Last-Modified'     , last_modified.astimezone().isoformat())
+            # ke
+            response.setExtraHeader('X-Map-Id'      , project_location)
+            response.setExtraHeader('Last-Modified' , last_modified.astimezone().isoformat())
 
             # Check etag for OWS requests
             if ogc_scheme == 'OWS':
