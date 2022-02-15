@@ -53,4 +53,16 @@ class Tests(HTTPTestCase):
         assert rv.status_code == 404
 
 
+    def test_wfs3_limit_parameter(self):
+        """ Test parameters in wfs3
+        """
+        rv = self.client.get( '', path="/ows/wfs3/collections/france_parts/items.json?MAP=france_parts&limit=1" )
+        assert rv.status_code == 200
+        data = rv.json()
+        assert len(data['features']) == 1
+
+        rv = self.client.get( '', path="/ows/wfs3/collections/france_parts/items.json?MAP=france_parts&limit=2" )
+        assert rv.status_code == 200
+        data = rv.json()
+        assert len(data['features']) == 2
 

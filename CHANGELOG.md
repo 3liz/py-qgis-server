@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Fix parameter's case in OGC API requests
+   - Fix https://github.com/3liz/py-qgis-server/issues/34
 * Implement configurable cache observers
 * Add 'Last-Modified' header
 * Support Etag in HEAD methods for OWS requests

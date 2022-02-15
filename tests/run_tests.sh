@@ -29,6 +29,8 @@ export QGIS_NO_OVERRIDE_IMPORT=1
 # Disable qDebug stuff that bloats test outputs
 export QT_LOGGING_RULES="*.debug=false;*.warning=false"
 
+export QGSRV_SERVER_HTTP_PROXY=yes
+
 # Run new tests
 cd tests/unittests && exec $VENV_PATH/bin/pytest -v $@
 
