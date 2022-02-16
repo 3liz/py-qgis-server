@@ -54,7 +54,14 @@ sub vcl_backend_response {
 
     # Set grace period long enough to get 
     # the response from long loading projects 
-    set beresp.grace = 10m; 
+    set beresp.grace = 10m;
+
+    # Keep the response in cache for 24 hours if the response has
+    # validating headers.
+    if (beresp.http.ETag || beresp.http.Last-Modified) {
+        set beresp.keep = 24h;
+    }
+
     return (deliver);
 }
 

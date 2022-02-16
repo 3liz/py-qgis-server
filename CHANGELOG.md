@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.16 - 2022-02-16
+
 * Add BAN cache observer
 * Fix parameter's case in OGC API requests
    - Fix https://github.com/3liz/py-qgis-server/issues/34
