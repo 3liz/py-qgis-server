@@ -161,6 +161,12 @@ class QgsCacheManager:
         # Set the base url for file protocol
         self._aliases['file'] = 'file:///%s/' % cnf.get('rootdir').strip('/')
 
+        if self._disable_getprint:
+            LOGGER.info("** Cache: Getprint disabled")
+
+        if self._trust_layer_metadata:
+            LOGGER.info("** Cache: Trust Layer Metadata on")
+
         # Load protocol handlers
         componentmanager.register_entrypoints('qgssrv_contrib_protocol_handler')
 
