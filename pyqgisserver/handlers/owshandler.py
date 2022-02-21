@@ -213,9 +213,7 @@ class OwsHandler(AsyncClientHandler):
 class _FilterHandlerMixIn:
     """ Handle filter handlers
     """
-    def initialize(self, filters: Optional[List]=None, **kwargs) -> None:
-        super().initialize(**kwargs)
-        
+    def initfilters(self, filters: Optional[List]) -> None:
         self._filters = filters or []
 
     async def prepare(self) -> Awaitable[None]:
@@ -225,8 +223,11 @@ class _FilterHandlerMixIn:
             await filt.apply( self )
 
 
-class OwsFilterHandler(_FilterHandlerMixIn,OwsHandler):
-    pass
+class OwsFilterHandler(_FilterHandlerMixIn, OwsHandler):
+    def initialize(self, filters: Optional[List]=None, **kwargs) -> None:
+        assert 'service' not in kwargs
+        super().initialize(**kwargs)
+        self.initfilters(filters)
 
 
 class OwsApiHandler(AsyncClientHandler):
@@ -271,10 +272,6 @@ class OwsApiHandler(AsyncClientHandler):
     async def options(self, endpoint: Optional[str]=None) -> Awaitable[None]:
         await self.handle_request('OPTIONS', endpoint)
 
-
-class OwsApiFilterHandler(_FilterHandlerMixIn, OwsApiHandler):
-    pass
-
     def get_monitor_params( self ) -> None:
         """ Override
         """
@@ -284,4 +281,11 @@ class OwsApiFilterHandler(_FilterHandlerMixIn, OwsApiHandler):
             REQUEST = self._endpoint or '__unknown__',
         )
         return params
+
+
+class OwsApiFilterHandler(_FilterHandlerMixIn, OwsApiHandler):
+    def initialize(self, filters: Optional[List]=None, **kwargs) -> None:
+        super().initialize(**kwargs)
+        self.initfilters(filters)
+
 

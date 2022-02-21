@@ -125,10 +125,10 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
             # Add ows endpoint
             path = f"{root}/{uri.strip('/')}" if uri else root
             # Add service endpoint
-            add_handler( f"{path}(?P<endpoint>/?)", OwsFilterHandler, kw )
+            add_handler( rf"{path}(?P<endpoint>/?)", OwsFilterHandler, kw )
 
             # Add wfs3 endpoints
-            kw.update(service='WFS3')
+            kw = _ows_args(filters=fltrs, service='WFS3')
             for endp in wfs3_api_endpoints:
                 add_handler( rf"{path}(?P<endpoint>{endp})", OwsApiFilterHandler, kw )
     else:
