@@ -58,6 +58,8 @@ deploy_snap:
   environment:
     name: production
   when: manual
+  # See https://about.gitlab.com/blog/2021/05/20/dag-manual-fix/#what-if-i-dont-want-this-new-behavior
+  allow_failure: false
   only:
     refs:
       - tags

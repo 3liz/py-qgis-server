@@ -58,9 +58,13 @@ tickets:
   stage: post_release
   only:
     - tags
+  needs:
+    - "release:release" 
+    - "release:ltr"
   image:
     name: registry.snap.lizlan:5000/infra/ci-tools:latest
   script:
     - create_ticket.py
   tags:
     - factory-plain
+
