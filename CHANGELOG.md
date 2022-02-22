@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Add more information in the `--version` to display all versions related to QGIS Server : GDAL, PROJ, Qt…
+
 ## 1.7.16 - 2022-02-16
 
 * Add BAN cache observer
@@ -19,9 +21,9 @@
 * Ensure that exit code is non-zero on pool failure 
 * Set option to check for cache invalidation/refresh asynchronously
 * Use QgsProjectStorage for unhandled uri schemes
-    - This allow support for all QgsProjectStorage extensions
+    - This allows support for all QgsProjectStorage extensions
 * Add `ALLOW_STORAGE_SCHEMES` configuration for restricting allowed project schemes
-* Fix api managment:
+* Fix api management:
     - Follow backport for https://github.com/qgis/QGIS/issues/45439
     - Fix regression from static cache implementation
 
