@@ -29,8 +29,7 @@ def print_version(verbose=False) -> None:
     """ Display version infos
     """
     program = os.path.basename(sys.argv[0])
-    print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**__manifest__),
-          file=sys.stderr)
+    print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**__manifest__))
     print_qgis_version(verbose=verbose)
 
 

@@ -174,7 +174,7 @@ def print_qgis_version(verbose: bool=False) -> None:
         print(f"QGIS {Qgis.QGIS_VERSION} '{Qgis.QGIS_RELEASE_NAME}' ({Qgis.QGIS_VERSION_INT})")
     else:
         from qgis.core import QgsCommandLineUtils
-        print(QgsCommandLineUtils.allVersions(), file=sys.stderr)
+        print(QgsCommandLineUtils.allVersions())
 
     if verbose:
         start_qgis_application(verbose=True)
