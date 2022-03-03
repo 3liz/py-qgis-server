@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.7.17 - 2022-03-03
+
+* Output 'version' infos to stdout
+* Fix handler arguments when using ACL filters
+* Increase cache manager logging verbosity
 * Add more information in the `--version` to display all versions related to QGIS Server : GDAL, PROJ, Qt…
 
 ## 1.7.16 - 2022-02-16
