@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Fix regression on response time in monitor response
+
 ## 1.7.17 - 2022-03-03
 
 * Output 'version' infos to stdout

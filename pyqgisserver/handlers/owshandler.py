@@ -155,7 +155,8 @@ class AsyncClientHandler(BaseHandler):
         params = self.get_monitor_params()
         if params:
             params.update(
-                RESPONSE_TIME = response_time,
+                # RESPONSE TIME MUST BE IN MILLISECONDS
+                RESPONSE_TIME = int(response_time*1000.0),
                 RESPONSE_STATUS = status,
             )
             self._monitor.emit( params, meta=self.request.headers )
