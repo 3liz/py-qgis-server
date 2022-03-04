@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.18 - 2022-03-04
+
 * Fix regression on response time in monitor response
 
 ## 1.7.17 - 2022-03-03
