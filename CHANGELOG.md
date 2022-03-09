@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Change entrypoint for access policy extension
+
 ## 1.7.18 - 2022-03-04
 
 * Fix regression on response time in monitor response

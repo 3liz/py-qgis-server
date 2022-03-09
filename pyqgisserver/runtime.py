@@ -55,7 +55,7 @@ def load_access_policies() -> Optional[Mapping[str,List[ServerFilter]]]:
     import pyqgisservercontrib.core.componentmanager as cm
 
     collection = []
-    cm.register_entrypoints('qgssrv_contrib_access_policy', collection) 
+    cm.register_entrypoints('py_qgis_server.access_policy', collection) 
 
     if not collection:
         return None
