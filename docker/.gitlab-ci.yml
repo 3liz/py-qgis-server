@@ -36,7 +36,7 @@ build-docker:ltr:
 deploy_snap:
   stage: deploy
   script:
-    - $HOME/bin/lzmservicectl update -C MUTU map --annotate="Updated image ($CI_COMMIT_SHORT_SHA)"
+    - $FACTORY_SCRIPTS/update-service map
   environment:
     name: snap
   only:
