@@ -8,7 +8,6 @@ services:
             PYTHONWARNINGS: 'd'
             PIP_CACHE_DIR: /.cache
             USER: ${USER}
-            PGSERVICEFILE: /src/tests/.pg_service.conf
             QGIS_OPTIONS_PATH: /src/tests/qgis
             QGIS_SERVER_TRUST_LAYER_METADATA: 'yes'
             QGSRV_SERVER_WORKERS: ${WORKERS}

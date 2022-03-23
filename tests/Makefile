@@ -35,15 +35,6 @@ PGUSER ?= $(USER)
 PGDATABASE ?= $(USER)
 PGAPPNAME ?= py-qgis-server-tests
 
-ifdef PGPASSFILE
-PGPASSFILE_VOL=-v $(PGPASSFILE):/.pgpass
-PGPASSFILE_ENV=-e PGPASSFILE:/.pgpass
-endif
-
-ifdef PG_RUN
-PG_RUN_VOL=-v $(PG_RUN):/var/run/postgresql
-endif
-
 TESTS_CPU_LIMITS:=2.0
 TESTS_MEMORY_LIMITS:=2g
 
@@ -68,10 +59,10 @@ env: local
 		CPU_LIMITS=$(TESTS_CPU_LIMITS)
 		MEMORY_LIMITS=$(TESTS_MEMORY_LIMITS)
 		WITH_SSL=$(WITH_SSL)
-		PGDATABASE=$(PGDATABASE)
 		PGPASSFILE=${PGPASSFILE}
 		PGAPPNAME=$(PGAPPNAME)
-		PGHOST=$(PGHOST)
+		PGUSER=$(PGAPPNAME)
+		PGDATABASE=$(PGDATABASE)
 		PG_RUN=$(PG_RUN)
 		REQUEST_TIMEOUT=$(REQUEST_TIMEOUT)
 		STRICT_CHECK=$(STRICT_CHECK)
@@ -80,6 +71,13 @@ env: local
 
 test: export RUN_COMMAND=./tests/run_tests.sh
 test: env up 
+
+%-test: export RUN_COMMAND=./tests/run_tests.sh
+%-test: env
+	docker compose \
+	-f docker-compose.yml \
+	-f docker-compose.$*.yml up -V --remove-orphans --force-recreate --exit-code-from qgis-server
+
 
 run: export RUN_COMMAND=./tests/run_server.sh
 run: up
