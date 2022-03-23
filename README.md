@@ -47,7 +47,7 @@ See the QGIS [roadmap](https://www.qgis.org/en/site/getinvolved/development/road
 
 ## Documentation:
 
-Latest documentation is available on [ReadTheDoc](https://py-qgis-server.readthedocs.io/en/latest/index.html)
+Latest documentation is available on [docs.3liz.org](https://docs.3liz.org/py-qgis-server/)
 
 ## Installation
 
@@ -146,9 +146,10 @@ http://myserver:8080/ows/wfs3/collections.html?MAP=<qgis_project_spec>
 
 ### Accessing the Qgis landing page and other qgis API
 
-By default the landing page is not enabled, see the [documentation](https://py-qgis-server.readthedocs.io/en/latest/index.html#api-enabled-landing-page) on how to enable the landing page.
+By default, the landing page is not enabled, see the
+[documentation](https://docs.3liz.org/py-qgis-server/configuration.html#api-enabled-landing-page) on how to enable the landing page.
 
-Qgis api may be exposed on demand by [configuring the api endpoints](https://py-qgis-server.readthedocs.io/en/latest/qgisapi.html)
+Qgis api may be exposed on demand by [configuring the api endpoints](https://docs.3liz.org/py-qgis-server/qgisapi.html)
 
 
 #### Using with lizmap
@@ -169,7 +170,7 @@ relativeWMSPath=true
 
 The configuration can be done either as configuration .ini file in or as environment variables.
 
-The precedences of the gonfiguration parameters is the following (from lowest to highest)
+The precedences of the configuration parameters is the following (from lowest to highest)
 
 - Defaults values
 - Environment variables
@@ -178,7 +179,7 @@ The precedences of the gonfiguration parameters is the following (from lowest to
 
 #### Configuration parameters
 
-Please look at [the documentation](https://py-qgis-server.readthedocs.io/en/latest/index.html) for configuration options
+Please look at [the documentation](https://docs.3liz.org/py-qgis-server/index.html) for configuration options
 
 ## Logging
 
