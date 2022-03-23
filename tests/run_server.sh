@@ -10,8 +10,9 @@ PIP_INSTALL="$VENV_PATH/bin/pip install -U"
 echo "-- Creating virtualenv"
 python3 -m venv --system-site-packages $VENV_PATH
 
-$PIP_INSTALL pip setuptools wheel
-$PIP_INSTALL --prefer-binary -r requirements.txt
+echo "-- Installing required packages..."
+$PIP_INSTALL -q pip setuptools wheel
+$PIP_INSTALL -q --prefer-binary -r requirements.txt
 
 $PIP install -e ./
 

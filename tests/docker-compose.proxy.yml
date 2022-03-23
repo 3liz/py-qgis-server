@@ -1,0 +1,89 @@
+version: '3.8'
+services:
+    map-server:
+        image: ${QGIS_IMAGE}
+        working_dir: /src
+        command: ./tests/run_proxy.sh
+        environment:
+            PYTHONWARNINGS: 'd'
+            PIP_CACHE_DIR: /.cache
+            USER: ${USER}
+            QGSRV_SERVER_PROFILES: /src/tests/profiles.yml
+            QGSRV_SERVER_RESTARTMON: /src/.qgis-restart
+            QGSRV_SERVER_HTTP_PROXY: 'no'
+            QGSRV_LOGGING_LEVEL: DEBUG
+            QGSRV_SERVER_STATUS_PAGE: 'yes'
+            QGSRV_MANAGEMENT_ENABLED: 'yes'
+            QGSRV_MANAGEMENT_INTERFACES: '0.0.0.0'
+            QGSRV_API_ENABLED_LANDING_PAGE: 'yes'
+            QGSRV_CACHE_ROOTDIR: /src/tests/data
+            QGSRV_DATA_PATH: /.local/share/qgis-server
+            QGSRV_SERVER_SSL_CERT: /src/tests/certs/localhost.crt
+            QGSRV_SERVER_SSL_KEY: /src/tests/certs/localhost.key
+            QGSRV_SERVER_SSL: ${WITH_SSL}
+            QGSRV_SERVER_MONITOR: test
+            QGSRV_CACHE_OBSERVERS: test
+            QGSRV_MONITOR_TAG_EXTRA_DATA: "monitor.test"
+        user: ${BECOME_USER}
+        volumes:
+            - ${SRCDIR}:/src 
+            - ${PWD}/.local:/.local
+            - ${PWD}/server.conf:/server.conf
+            - ${PWD}/.cache:/.cache
+            - ${PLUGINPATH}:/plugins
+            - ${PROJECTPATH}:/src/tests/data
+        ports:
+            - ${SERVER_HTTP_PORT}:8080
+            - ${MANAGEMENT_HTTP_PORT}:19876
+        expose:
+            - "18080"
+            - "18090"
+            - "18091"
+        networks:
+            - backend
+    qgis-worker:
+        image: ${QGIS_IMAGE}
+        working_dir: /src
+        command: ./tests/run_worker.sh
+        environment:
+            PYTHONWARNINGS: 'd'
+            PIP_CACHE_DIR: /.cache
+            USER: ${USER}
+            PGSERVICEFILE: /src/tests/.pg_service.conf
+            QGIS_OPTIONS_PATH: /src/tests/qgis
+            QGIS_SERVER_TRUST_LAYER_METADATA: 'yes'
+            QGSRV_ZMQ_HOSTADDR: map-server
+            QGSRV_CACHE_ROOTDIR: /src/tests/data
+            QGSRV_SERVER_PLUGINPATH: /plugins
+            QGSRV_PROJECTS_SCHEMES_TEST:  /src/tests/data/
+            QGSRV_PROJECTS_SCHEMES_FOO: file:foobar/
+            QGSRV_PROJECTS_SCHEMES_BAR: file:foobar?data={path}
+            QGSRV_SERVER_PROFILES: /src/tests/profiles.yml
+            QGSRV_SERVER_RESTARTMON: /src/.qgis-restart
+            QGSRV_SERVER_HTTP_PROXY: 'no'
+            QGSRV_LOGGING_LEVEL: DEBUG
+            QGSRV_DATA_PATH: /.local/share/qgis-server
+            QGSRV_SERVER_TIMEOUT: ${REQUEST_TIMEOUT}
+            QGSRV_CACHE_STRICT_CHECK: ${STRICT_CHECK}
+        user: ${BECOME_USER}
+        volumes:
+            - ${SRCDIR}:/src 
+            - ${PWD}/.local:/.local
+            - ${PWD}/server.conf:/server.conf
+            - ${PWD}/.cache:/.cache
+            - ${PLUGINPATH}:/plugins
+            - ${PROJECTPATH}:/src/tests/data
+        networks:
+            - backend
+        deploy:
+            resources:
+                limits:
+                    cpus: ${CPU_LIMITS}
+                    memory: ${MEMORY_LIMITS}
+networks:
+  backend:
+     ipam:
+       driver: default
+       config:
+         - subnet: 172.199.0.0/16
+ 

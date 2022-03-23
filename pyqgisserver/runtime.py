@@ -231,12 +231,11 @@ def create_ssl_options():
     return ssl_ctx
 
 
-def run_server( port: int, address: str="", jobs: int=1,  user: str=None, workers: int=0) -> None:
+def run_server( port: int, address: str="", user: str=None, workers: int=0) -> None:
     """ Run the server
 
         :param port: port number
         :param address: interface address to bind to (default to any)
-        :param jobs: Number of jobs to fork (default to 1: i.e no fork)
         :user: User to setuid after opening ports (default no setuid)
     """
     import traceback
@@ -269,35 +268,9 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
     declare_cache_observers()
 
     try:
-        # Fork processes
-        # This is a *DEPRECATED* feature
-        if jobs > 1:
-
-            def close_sockets(sockets):
-                for sock in sockets:
-                    sock.close()
-
-            print(("DEPRECATION WARNING: "
-                   "the 'jobs' option is deprecated "
-                   "and will be removed in near future"),
-                  file=sys.stderr, flush=True)
-
-            sockets = bind_sockets(port, address=address)
-            if  process.fork_processes(jobs) is None: # We are in the main process
-                close_sockets(sockets)
-                broker_pr   = create_broker_process(ipcaddr)
-                worker_pool = create_poolserver(workers) if workers>0 else None
-                set_signal_handlers()
-
-                # Note that manage_processes(...) never return in main process 
-                # and call exit(0) which will be caught by SystemExit exception
-                process.manage_processes(max_restarts=5, logger=LOGGER)
-
-                assert False, "Not Reached"
-        else:
-            broker_pr   = create_broker_process(ipcaddr)
-            worker_pool = create_poolserver(workers) if workers>0 else None
-            sockets = bind_sockets(port, address=address)
+        broker_pr   = create_broker_process(ipcaddr)
+        worker_pool = create_poolserver(workers) if workers>0 else None
+        sockets = bind_sockets(port, address=address)
 
         LOGGER.info("Running server on port %s:%s", address, port)
 
@@ -315,7 +288,8 @@ def run_server( port: int, address: str="", jobs: int=1,  user: str=None, worker
             management.stats = application.stats
 
         # Initialize pool supervisor
-        worker_pool.start_supervisor()
+        if worker_pool:
+            worker_pool.start_supervisor()
 
         # Start cache observer
         cache_observer = start_cache_observer()

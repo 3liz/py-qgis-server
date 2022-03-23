@@ -128,14 +128,18 @@ def load_configuration():
     CONFIG.add_section('zmq')
     # Identity prefix used in 0MQ worker socket 
     CONFIG.set('zmq', 'identity'     , getenv('QGSRV_ZMQ_IDENTITY' ,'OWS-SERVER'))
-    # Address to bind 0MQ socket - used only with proxy/worker configuration
-    CONFIG.set('zmq', 'bindaddr'     , getenv('QGSRV_ZMQ_INADDR'   ,'tcp://*:18080'))
     # Control the maximum lenghth of the waiting queue
     CONFIG.set('zmq', 'maxqueue'     , getenv('QGSRV_ZMQ_MAXQUEUE' ,'1000'))
     # Control the lifetime of requests on the waiting queue 
     CONFIG.set('zmq', 'timeout'      , getenv('QGSRV_ZMQ_TIMEOUT'  ,'15000'))
+    # Host Address to bind/connect 0MQ sockets - used only with proxy/worker configuration
+    CONFIG.set('zmq', 'hostaddr'     , getenv('QGSRV_ZMQ_HOSTADDR'   ,'*'))
+    # Address to bind 0MQ socket - used only with proxy/worker configuration
+    CONFIG.set('zmq', 'bindaddr'     , getenv('QGSRV_ZMQ_INADDR'   ,'tcp://${zmq:hostaddr}:18080'))
     # Address to bind broadcast address to - used only with proxy/worker configuration
-    CONFIG.set('zmq', 'broadcastaddr', getenv('QGSRV_ZMQ_BROADCASTADDR','tcp://*:18090'))
+    CONFIG.set('zmq', 'broadcastaddr', getenv('QGSRV_ZMQ_BROADCASTADDR','tcp://${zmq:hostaddr}:18090'))
+    # Address to bind cache observer - used only with proxy/worker configuration
+    CONFIG.set('zmq', 'cache_observer_addr', getenv('QGSRV_ZMQ_CACHEOBSERVERADDR','tcp://${zmq:hostaddr}:18091'))
 
     #
     # Monitoring (AMQP)

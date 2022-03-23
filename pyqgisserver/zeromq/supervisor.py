@@ -40,16 +40,23 @@ class Client:
     def __init__(self) -> None:
         """ Supervised client notifier
         """
-        address = _get_ipc('supervisor')
+        try:
+            address = _get_ipc('supervisor')
+        except KeyError:
+            self._sock = None
+            LOGGER.warning("Supervisor disabled")
+        else:
+            ctx = zmq.Context.instance()
+            self._sock = ctx.socket(zmq.PUSH)
+            self._sock.setsockopt(zmq.IMMEDIATE, 1) # Do no queue if no connection
+            self._sock.connect(address)
 
-        ctx = zmq.Context.instance()
-        self._sock = ctx.socket(zmq.PUSH)
-        self._sock.setsockopt(zmq.IMMEDIATE, 1) # Do no queue if no connection
-        self._sock.connect(address)
         self._pid = os.getpid()
         self._busy = False
 
-    def _send(self, data: Any ) -> None: 
+    def _send(self, data: Any ) -> None:
+        if not self._sock:
+            return
         try:
             self._sock.send_pyobj((self._pid, data), flags=zmq.DONTWAIT)
         except zmq.ZMQError as err:
@@ -71,7 +78,8 @@ class Client:
             self._send(b'BUSY')
 
     def close(self) -> None:
-        self._sock.close()
+        if self._sock:
+            self._sock.close()
 
     def send_report(self, data: Any) -> None:
         self._send(_Report(data=data))

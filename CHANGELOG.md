@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Fix proxy/worker configuration
+   - The configuration was broken since supervision was implemented
 * Change entrypoint for access policy extension
 
 ## 1.7.18 - 2022-03-04

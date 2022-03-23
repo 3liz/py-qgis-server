@@ -42,8 +42,6 @@ from .qgscache.observer import Client as CacheObserver
 from .plugins import load_plugins
 from .config import confservice, configure_qgis_api, qgis_api_endpoints
 
-
-
 LOGGER = logging.getLogger('SRVLOG')
 
 HTTP_METHODS = {
@@ -446,7 +444,7 @@ def main():
     import os
     import sys
     import argparse
-    from .version import __version__
+    from .version import __manifest__
     from .config  import (confservice, load_configuration, read_config_file, validate_config_path)
     from .logger import setup_log_handler
 
@@ -454,22 +452,26 @@ def main():
     parser.add_argument('-d','--debug', action='store_true', default=False, help="debug mode") 
     parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
                         default=None, help="Configuration file")
-    parser.add_argument('--host'     , metavar="host"   , default='localhost' , help="router host")   
-    parser.add_argument('--router'   , metavar='address', default='tcp://{host}:18080', help="router address")
-    parser.add_argument('--broadcast', metavar='address', default='tcp://{host}:18090', help="broadcast address")
-    parser.add_argument('--identity' , default="", help="Set worker identity")
-    parser.add_argument('--rootdir'  , default=argparse.SUPPRESS, metavar='PATH', help='Path to qgis projects')
-    parser.add_argument('--version'  , action='store_true', default=False, help="Return version number and exit")
+    parser.add_argument('--proxy-host' , dest="hostaddr", metavar="host"   , default='localhost' , help="router host")   
+    parser.add_argument('--identity'   , default="", help="Set worker identity")
+    parser.add_argument('--rootdir'    , default=argparse.SUPPRESS, metavar='PATH', help='Path to qgis projects')
+    parser.add_argument('--version'    , action='store_true', default=False, help="Return version number and exit")
 
     args = parser.parse_args()
 
-    def print_version():
+    def print_version(verbose=False) -> None:
+        """ Display version infos
+        """
+        from .utils.qgis import print_qgis_version
         program = os.path.basename(sys.argv[0])
-        print("{name} {version}".format(name=program, version=__version__), file=sys.stderr)
+        print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**__manifest__))
+        print_qgis_version(verbose=verbose)
 
     if args.version:
-        print_version()
+        print_version(verbose=args.debug)
         sys.exit(1)
+    else:
+        print_version()
 
     load_configuration()
 
@@ -482,7 +484,8 @@ def main():
         if name in args:
             confservice.set( section, name, str(getattr(args,name)))
 
-    set_arg( 'projects.cache'  , 'rootdir' )
+    set_arg('projects.cache', 'rootdir')
+    set_arg('zmq', 'hostaddr')
 
     if args.debug:
         # Force debug mode
@@ -495,9 +498,10 @@ def main():
     setup_log_handler(confservice.get('logging','level'))
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
 
-    broadcastaddr = args.broadcast.format(host=args.host)
+    broadcastaddr = confservice.get('zmq','broadcastaddr')
+    router = confservice.get('zmq', 'bindaddr')
 
-    QgsRequestHandler.run(args.router.format(host=args.host), identity=args.identity,
+    QgsRequestHandler.run(router, identity=args.identity,
                           broadcastaddr=broadcastaddr)
 
     print("Qgis worker terminated", file=sys.stderr)

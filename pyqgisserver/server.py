@@ -24,7 +24,6 @@ from .runtime import run_server
 LOGGER = logging.getLogger('SRVLOG')
 
 
-
 def print_version(verbose=False) -> None:
     """ Display version infos
     """
@@ -49,7 +48,6 @@ def read_configuration(argv: List[str]=None) -> argparse.Namespace:
     cli_parser.add_argument('-p','--port'    , type=int, help="http port", dest='port', default=argparse.SUPPRESS)
     cli_parser.add_argument('-b','--bind'    , metavar='IP',  default=argparse.SUPPRESS, help="interface to bind to", dest='interfaces')
     cli_parser.add_argument('-w','--workers' , metavar='NUM', type=int, default=argparse.SUPPRESS, help="num workers", dest='workers')
-    cli_parser.add_argument('-j','--jobs'    , metavar='NUM', type=int, default=1, help="[DEPRECATED] num server instances", dest='jobs')
     cli_parser.add_argument('-u','--setuid'  , default='', help="uid to switch to", dest='setuid')
     cli_parser.add_argument('--rootdir'  , default=argparse.SUPPRESS, metavar='PATH', help='path to qgis projects')
     cli_parser.add_argument('--proxy'    , action='store_true', default=False, help='run only as proxy')
@@ -106,7 +104,7 @@ def main() -> None:
         # Do not run any qgis workers
         workers = 0
 
-    run_server( port=args.port, address=args.interfaces, jobs=args.jobs, user=args.setuid, workers=workers )
+    run_server( port=args.port, address=args.interfaces, user=args.setuid, workers=workers )
 
     
 

@@ -99,6 +99,11 @@ stop:
 	-f docker-compose.yml \
 	-f docker-compose.$*.yml up -V --remove-orphans --force-recreate -d
 
+run-proxy: 
+	docker compose -f docker-compose.proxy.yml \
+		up -V --remove-orphans --force-recreate -d
 
+stop-proxy:
+	docker compose -f docker-compose.proxy.yml down -v --remove-orphans
 
 
