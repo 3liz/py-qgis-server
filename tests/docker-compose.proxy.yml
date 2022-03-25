@@ -16,7 +16,6 @@ services:
             QGSRV_MANAGEMENT_ENABLED: 'yes'
             QGSRV_MANAGEMENT_INTERFACES: '0.0.0.0'
             QGSRV_API_ENABLED_LANDING_PAGE: 'yes'
-            QGSRV_CACHE_ROOTDIR: /src/tests/data
             QGSRV_DATA_PATH: /.local/share/qgis-server
             QGSRV_SERVER_SSL_CERT: /src/tests/certs/localhost.crt
             QGSRV_SERVER_SSL_KEY: /src/tests/certs/localhost.key

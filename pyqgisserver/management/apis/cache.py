@@ -27,7 +27,7 @@ class CacheCollection(RequestHandler):
         """ Return plugin info
         """
         if not key:
-            raise HTTPError(403)
+            raise HTTPError(400,reason="Missing project specification")
 
         # We don't want to update the cache
         # Unless the project is not loaded

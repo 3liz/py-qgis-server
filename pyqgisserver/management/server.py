@@ -62,6 +62,7 @@ class _ReportHandler(_PoolHandler):
 
         self.write_json({'workers': reports, 'num_workers': self._poolserver.num_workers }) 
 
+
 class _RootHandler(BaseHandler):
 
     def get(self) -> None:
@@ -98,7 +99,8 @@ def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web
     """
     kwargs =  {
         'client': client, 
-        'timeout': confservice['server'].getint('timeout')
+        'timeout': confservice['server'].getint('timeout'),
+        'service': 'Managment',
     }
 
     handlers = [

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fix regression in managment api
 * Fix proxy/worker configuration
    - The configuration was broken since supervision was implemented
 * Change entrypoint for access policy extension
