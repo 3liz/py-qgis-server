@@ -23,7 +23,7 @@ import zmq
 import pickle
 import uuid
 
-from typing import TypeVar, Optional, Type, Callable
+from typing import TypeVar, Optional, Type, Callable, Any
 
 from ..logger import setup_log_handler
 from ..utils import stats
@@ -67,7 +67,7 @@ class RequestHandler:
             self._correlation_id,
             data])
 
-    def send( self, data: bytes, send_more: bool=False ) -> None:
+    def send( self, data: bytes, send_more: bool=False, extra: Any = None ) -> None:
         """ Send data
         """
         if not self.header_written:
@@ -76,11 +76,11 @@ class RequestHandler:
             if send_more and self.status_code==200:
                 self.status_code = 206
             # Create a Header Message
-            message = pickle.dumps(ReplyMessage(self.status_code, headers=self.headers, data=data),-1)
+            message = pickle.dumps(ReplyMessage(self.status_code, headers=self.headers, data=data, extra=extra),-1)
             self._write( message ) 
             self.header_written = True
         elif self.status_code == 206:
-            self._write(pickle.dumps((data, send_more),-1))
+            self._write(pickle.dumps((data, send_more, extra),-1))
             if not send_more:
                 self.status_code = 200
 

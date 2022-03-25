@@ -75,6 +75,7 @@ class AsyncClientHandler(BaseHandler):
 
         self._endpoint = endpoint
         try:
+            response = None
             delta = None
             query = self.encode_arguments()
 
@@ -147,17 +148,19 @@ class AsyncClientHandler(BaseHandler):
             self._stats.num_errors +=1
 
         # Send monitoring info
-        self.emit( status, delta )
+        self.emit( status, delta, response.extra or {})
 
-    def emit(self, status: int, response_time: float) -> None:
+    def emit(self, status: int, response_time: float, extra: Dict) -> None:
         if not self._monitor:
             return
+
         params = self.get_monitor_params()
         if params:
             params.update(
                 # RESPONSE TIME MUST BE IN MILLISECONDS
                 RESPONSE_TIME = int(response_time*1000.0),
-                RESPONSE_STATUS = status,
+                RESPONSE_STATUS  = status,
+                RESPONSE_MEMUSED = extra.get('mem_used',-1)
             )
             self._monitor.emit( params, meta=self.request.headers )
 

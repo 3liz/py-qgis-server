@@ -19,9 +19,10 @@ import logging
 import traceback
 import hashlib
 
+
 from datetime import datetime
 from time import time
-from typing import Dict, Optional, Any, Tuple
+from typing import Dict, Optional, Any, Tuple, Callable
 
 from qgis.PyQt.QtCore import Qt, QBuffer, QIODevice, QByteArray
 from qgis.core import QgsProject
@@ -82,15 +83,20 @@ class Response(QgsServerResponse):
         The data is written at 'flush()' call.
     """
 
-    def __init__(self, handler: RequestHandler ) -> None:
+    def __init__(self, handler: RequestHandler, extra_data: Callable ) -> None:
         super().__init__()
         self._handler = handler
         self._buffer = QBuffer()
         self._buffer.open(QIODevice.ReadWrite)
         self._numbytes = 0
         self._finish   = False
+        self._extra_data  = extra_data
 
         self._extra_headers = {}
+
+    def get_extra_data(self):
+        if self._extra_data:
+            return self._extra_data()
         
     def setExtraHeader( self, key: str, value: str ) -> None:
         # Keep extra headers so we may 
@@ -120,6 +126,8 @@ class Response(QgsServerResponse):
             Headers will be written at the first call to flush()
         """
         try:
+            extra = self.get_extra_data()
+
             self._buffer.seek(0)
             bytesAvail = self._buffer.bytesAvailable()
             LOGGER.debug("%s: Flushing response data: (%d bytes)",self._handler.identity, bytesAvail)
@@ -131,16 +139,16 @@ class Response(QgsServerResponse):
             send_more = not self._finish or self._handler.header_written
             if bytesAvail:
                 LOGGER.debug("Sending bytes %s (send_more: %s)", bytesAvail, send_more)
-                self._handler.send( bytes(self._buffer.data()), send_more )
+                self._handler.send( bytes(self._buffer.data()), send_more, extra )
                 self._buffer.buffer().clear()
             else:
                 # Return empty response
                 LOGGER.debug("Sending empty response (send_more: %s)", send_more)
-                self._handler.send( b'', send_more )
+                self._handler.send( b'', send_more, extra )
             # push the sentinel
             if send_more and self._finish:
                 LOGGER.debug("Sending EOF")
-                self._handler.send( b'', False )
+                self._handler.send( b'', False, extra )
         except Exception:
             trace = traceback.format_exc()
             LOGGER.error("Caught Exception (worker: %s, msg: %s):\n%s",
@@ -235,7 +243,19 @@ class QgsRequestHandler(RequestHandler):
         cls._cache_service        = get_cacheservice()
         cls._cache_check_interval = cache_config.getint('check_interval')
         cls._cache_last_check     = time()  
-       
+      
+        cls._pid = os.getpid()
+        cls._advanced_report = cache_config.getboolean('advanced_report')
+
+        if cls._advanced_report:
+            try:
+                import psutil
+                cls._process = psutil.Process(cls._pid)
+            except ImportError:
+                LOGGER.warning("No 'PSUtil' module, advanced report will be disabled")
+                cls._advanced_report = False
+                cls._process = None
+
         # Attach cache observer
         if cache_config.getboolean('has_observers'):
             LOGGER.info("Attaching worker cache observer")
@@ -269,7 +289,13 @@ class QgsRequestHandler(RequestHandler):
         if cls._cache_check_interval <= 0 or time() - cls._cache_last_check < cls._cache_check_interval:
             return
         LOGGER.debug("Refreshing cache")
-        cls._cache_service.refresh()
+        iface = cls.qgis_server.serverInterface()
+        for (key, state) in cls._cache_service.refresh():
+            # Remove from Qgis server ConfigCache
+            if state == UpdateState.UPDATED:
+                details = cls._cache_service.peek(key)
+                iface.removeConfigCacheEntry(details.project.fileName())
+        
         cls._cache_last_check = time()
 
     @classmethod
@@ -335,6 +361,16 @@ class QgsRequestHandler(RequestHandler):
 
     QGIS_NO_MAP_ERROR_MSG = "No project defined. For OWS services: please provide a SERVICE and a MAP parameter" 
 
+    def init_extra_report(self) -> Dict:
+        if self._advanced_report:
+            start_mem = self._process.memory_info().rss
+            def _extra_report():
+                return {
+                    'pid'     : self._pid,
+                    'mem_used': self._process.memory_info().rss - start_mem,
+                }
+            return _extra_report
+
     def handle_message(self) -> None:
         """ Override this method to handle_messages
         """
@@ -343,8 +379,10 @@ class QgsRequestHandler(RequestHandler):
         project_location = self.request.headers.pop('X-Map-Location', None)
         ogc_scheme       = self.request.headers.pop('X-Ogc-Scheme'  , None)
 
+        extra_report = self.init_extra_report()
+
         request  = Request(self)
-        response = Response(self)
+        response = Response(self, extra_report)
 
         if not project_location:
             # Try to get project from environment
@@ -394,8 +432,7 @@ class QgsRequestHandler(RequestHandler):
             last_modified = self.get_modified_time(project_location)
 
             # Set the project uri in separate header, this
-            # is useful for invalidating front-end cache from
-            # ke
+            # is useful for invalidating front-end cache
             response.setExtraHeader('X-Map-Id'      , project_location)
             response.setExtraHeader('Last-Modified' , last_modified.astimezone().isoformat())
 

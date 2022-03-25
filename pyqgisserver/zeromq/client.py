@@ -48,7 +48,8 @@ class AsyncResponseHandler:
         self._chunks = None
         self._has_more = False
         self.data = None
-    
+        self.extra = None
+
     def _set_exception(self, exc: Exception) -> None:
         self._has_more = False
         self._future.set_exception(exc)
@@ -60,10 +61,11 @@ class AsyncResponseHandler:
             future.
         """
         if self.headers is None:
-            status, hdrs, body = pickle.loads(data)
+            status, hdrs, body, extra = pickle.loads(data)
             self.headers = hdrs
             self.data    = body
             self.status  = status
+            self.extra   = extra
             # We are waiting for more data
             # Create a queue to collect the remaining chunks
             if self.status == 206:
@@ -72,16 +74,17 @@ class AsyncResponseHandler:
             # Send the result
             self._future.set_result(self)
         elif self._has_more:
-            body, has_more = pickle.loads(data)
+            body, has_more, extra = pickle.loads(data)
             self._has_more = has_more
             self._chunks.put_nowait((body,has_more))
+            self.extra = extra
 
     def _done(self) -> bool:
         """ Check if there is more data to come
         """
         return not self._has_more and self._future.done()
 
-    async def _get(self, timeout: int) -> Any:
+    async def _get(self, timeout: int) -> 'AsyncResponseHandler':
         """ wait for result and return the parsed 
             result
         """
@@ -148,7 +151,7 @@ class AsyncClient:
         self._polling = False
 
     async def fetch( self, query: str, method: str='GET', headers: Mapping[str,str]={}, 
-                     data: Any=None, timeout: int=5) -> Any:
+                     data: Any=None, timeout: int=5) -> AsyncResponseHandler:
         """ Send a request message to the worker
         """
         # Send request

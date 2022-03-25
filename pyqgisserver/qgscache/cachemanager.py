@@ -14,7 +14,7 @@ import urllib.parse
 import traceback
 
 from urllib.parse import urlparse, urlunparse, urljoin, parse_qs
-from typing import Any, Tuple, Optional, Sequence, NamedTuple, Callable
+from typing import Any, Tuple, Optional, Sequence, NamedTuple, Callable, Generator
 from collections import OrderedDict
 from pathlib import Path
 from datetime import datetime
@@ -274,15 +274,14 @@ class QgsCacheManager:
 
         return store 
 
-    def refresh(self):
+    def refresh(self) -> Generator[Tuple[str,UpdateState], None, None]:
         """ Refresh all entries
 
             keys are returned from most recently user to the last recently,
             then we have to update in reverse for preserving order 
         """
         keys = reversed([k for k,_ in self.items()])
-        for key in keys:
-            self.update_entry(key)
+        return ((key, self.update_entry(key)) for key in keys)
 
     def peek(self, key:str) -> CacheDetails:
         """ Return cache details 

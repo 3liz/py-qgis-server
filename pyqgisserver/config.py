@@ -120,6 +120,7 @@ def load_configuration():
     CONFIG.set('projects.cache', 'allow_storage_schemes', getenv('QGSRV_CACHE_ALLOW_STORAGE_SCHEMES', '*'))
     CONFIG.set('projects.cache', 'check_interval'      , getenv('QGSRV_CACHE_CHECK_INTERVAL', '0'))
     CONFIG.set('projects.cache', 'observers'           , getenv('QGSRV_CACHE_OBSERVERS', ''))
+    CONFIG.set('projects.cache', 'advanced_report'     , getenv('QGSRV_CACHE_ADVANCED_REPORT', 'no'))
 
     # 
     CONFIG.add_section('projects.schemes')
