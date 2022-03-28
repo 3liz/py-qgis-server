@@ -154,6 +154,9 @@ class AsyncClientHandler(BaseHandler):
         if not self._monitor:
             return
 
+        if extra:
+            LOGGER.debug("### Adv. Metrics => %s", extra)
+
         params = self.get_monitor_params()
         if params:
             params.update(
