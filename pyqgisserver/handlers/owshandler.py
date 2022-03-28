@@ -160,7 +160,7 @@ class AsyncClientHandler(BaseHandler):
                 # RESPONSE TIME MUST BE IN MILLISECONDS
                 RESPONSE_TIME = int(response_time*1000.0),
                 RESPONSE_STATUS  = status,
-                RESPONSE_MEMUSED = extra.get('mem_used',-1)
+                RESPONSE_MEMUSED = extra.get('mem_used',0)
             )
             self._monitor.emit( params, meta=self.request.headers )
 
