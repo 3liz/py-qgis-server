@@ -2,10 +2,13 @@
 
 ## Unreleased
 
+## 1.7.19 - 2022-03-31
+
 * Fix extra argument in logging format string when handling 
   worker exception
+* Enhanced request metrics returned from workers
 * Fix regression in managment api
-* Fix proxy/worker configuration
+* Fix proxy/worker runtime configuration
    - The configuration was broken since supervision was implemented
 * Change entrypoint for access policy extension
 
