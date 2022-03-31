@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Fix extra argument in logging format string when handling 
+  worker exception
 * Fix regression in managment api
 * Fix proxy/worker configuration
    - The configuration was broken since supervision was implemented

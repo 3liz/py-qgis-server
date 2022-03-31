@@ -174,7 +174,7 @@ def run_worker(address: str, handler_factory: Type[RequestHandler],
             except zmq.ZMQError as err:
                 LOGGER.error("Worker Error %d: %s", err.errno, zmq.strerror(err.errno))
             except Exception as exc:
-                LOGGER.error("Worker Error %s\n%s", exc)
+                LOGGER.error("Worker Error %s", exc)
                 # Print trace outside LOGGER because 
                 # logging output in sub-processe
                 # is not captured by pytest
