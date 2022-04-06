@@ -27,21 +27,18 @@ class CacheCollection(RequestHandler):
         """ Return plugin info
         """
         if not key:
+            # Try to get key from param
+            key = self.request.parameter('MAP')
+
+        if not key:
             raise HTTPError(400,reason="Missing project specification")
 
-        # We don't want to update the cache
-        # Unless the project is not loaded
         cache = get_cacheservice()
-        try:
-            project, _, _ = cache.get_project(key, strict=False)
-        except cache.UnreadableResourceError:
-            raise HTTPError(422,reason=f"Cannot read project resource '{key}'") from None
-        except cache.PathNotAllowedError:
-            raise HTTPError(403,reason="Project path not allowed") from None
-        except FileNotFoundError:
-            raise HTTPError(404,reason=f"Project '{key}' not found") from None
-        
-        self.write(get_project_summary(key, project))  
+        details = cache.peek(key)
+        if not details:
+            raise HTTPError(404,reason=f"Project '{key}' not in cache")
+ 
+        self.write(get_project_summary(key, details.project))  
                 
         
 def register( serverIface ):
@@ -49,7 +46,7 @@ def register( serverIface ):
     """
     register_handlers(serverIface, "/cache","CacheManagment",
                       [
-                          (r'/(?P<key>.+)$', CacheCollection),
+                          (r'/content/(?P<key>.+)$', CacheCollection),
                           (r'/', CacheCollection),
                       ])
                       

@@ -19,7 +19,6 @@ from collections import OrderedDict
 from pathlib import Path
 from datetime import datetime
 from enum import Enum
-from itertools import chain
 
 from ..utils.lru import lrucache
 from ..config import confservice
@@ -78,7 +77,6 @@ def _merge_qs( query1: str, query2: str ) -> str:
 class CacheType(Enum): 
     LRU = 'lru'
     STATIC = 'static'
-    ALL = 'all'
 
 
 class QgisStorageHandler:
@@ -106,7 +104,7 @@ class QgisStorageHandler:
         metadata = self.get_storage_metadata(urlunparse(url))
         return metadata.lastModified.toPyDateTime()
 
-    def get_project( self, url: urllib.parse.ParseResult, strict: Optional[bool]=None,
+    def get_project( self, url: urllib.parse.ParseResult,
                      project: Optional[QgsProject]=None,
                      timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
         """ Create or return a project
@@ -118,7 +116,7 @@ class QgisStorageHandler:
 
         if timestamp is None or timestamp < modified_time:
             cachmngr  = componentmanager.get_service('@3liz.org/cache-manager;1')
-            project   = cachmngr.read_project(uri, strict=strict)
+            project   = cachmngr.read_project(uri)
             timestamp = modified_time
 
         return project, timestamp
@@ -197,27 +195,11 @@ class QgsCacheManager:
     def strict_mode_on(self) -> bool:
         return self._strict_check
 
-    def clear(self) -> None:
-        """ Clear the whole cache
-        """
-        self._lru_cache.clear()
-        self._static_cache.clear()
-
-    def items(self, cachetype: CacheType = CacheType.ALL) -> Sequence[Tuple[str,CacheDetails]]:
-        if cachetype == CacheType.ALL:
-            return chain(self._lru_cache.items(), self._static_cache.items())
-        elif cachetype == CacheType.LRU:
+    def items(self, cachetype: CacheType = CacheType.LRU) -> Sequence[Tuple[str,CacheDetails]]:
+        if cachetype == CacheType.LRU:
             return self._lru_cache.items()
         elif cachetype == CacheType.STATIC:
             return self._static_cache.items()
-
-    def remove_entry(self, key: str) -> None:
-        """ Remove cache entry
-        """
-        if key in self._static_cache:
-            del self._static_cache[key]
-        else:
-            del self._lru_cache[key]
 
     def resolve_alias(self, key: str ) -> urllib.parse.ParseResult:
         """ Resolve scheme from configuration variables
@@ -280,20 +262,29 @@ class QgsCacheManager:
             keys are returned from most recently user to the last recently,
             then we have to update in reverse for preserving order 
         """
-        keys = reversed([k for k,_ in self.items()])
+        # Update static cache;
+        for key,_ in self.items(CacheType.STATIC):
+            self.update_static_entry(key)
+
+        # Update both caches
+        keys = reversed([k for k,_ in self.items(CacheType.LRU)])
         return ((key, self.update_entry(key)) for key in keys)
 
-    def peek(self, key:str) -> CacheDetails:
+    def peek(self, key:str, cachetype: Optional[CacheType] = None) -> CacheDetails:
         """ Return cache details 
         """
-        return self._lru_cache.peek(key) or self._static_cache.get(key)
+        if cachetype == CacheType.LRU:
+            return self._lru_cache.peek(key)
+        elif cachetype == CacheType.STATIC:
+            return self._static_cache.get(key)
+        else:
+            return self._lru_cache.peek(key) or self._static_cache.get(key)
 
     def get_modified_time(self, key: str, from_cache: bool=True) -> datetime:
         """ Get the modified time for the given project uri
         """
         details = self.peek(key)
         if details:
-
             if from_cache:
                 # Return from cached resource
                 return details.timestamp.replace(microsecond=0)
@@ -314,55 +305,74 @@ class QgsCacheManager:
 
         return last_modified.replace(microsecond=0)
 
-    def get_project(self, key: str, strict: Optional[bool]=None, refresh: bool=True) -> Tuple[QgsProject,datetime,UpdateState]:
-        """ Load project 
+    def _get_project_details(self, key: str, 
+                             details: Optional[CacheDetails]) -> Tuple[CacheDetails, bool]: 
+        """ Return updated project details
         """
-        # Get details for the project
-        details = self.peek(key)
-
-        # We are asked not to refresh the entry
-        # return what is in cache
-        if details and not refresh:
-            return details.project, details.timestamp, UpdateState.UNCHANGED
-
         url   = self.resolve_alias(key)
         store = self.get_protocol_handler(key, url.scheme)
 
         if details is not None:
-            project, timestamp  = store.get_project( url, strict=strict, **details._asdict())
+            project, timestamp  = store.get_project(url, **details._asdict())
             update = UpdateState.UPDATED if timestamp != details.timestamp else UpdateState.UNCHANGED
         else:
-            project, timestamp = store.get_project(url, strict=strict)
+            project, timestamp = store.get_project(url)
             update = UpdateState.INSERTED
 
-        return project, timestamp, update
-        
-    def update_entry(self, key: str, static_cache: bool=False, refresh: bool=True) -> UpdateState:
-        """ Update the cache
+        return CacheDetails(project, timestamp), update
 
-            :param key: The key of the entry to update
-            :return: true if the entry has been updated
+    def update_static_entry( self, key: str ) -> UpdateState:
+        """ Update static cache
         """
-        project, timestamp, update = self.get_project(key, refresh=refresh)
-        if static_cache or key in self._static_cache:
-            self._static_cache[key] = CacheDetails(project, timestamp)
-        else:
-            self._lru_cache[key] = CacheDetails(project, timestamp)
+        details, update = self._get_project_details(key, self._static_cache.get(key))
+        self._static_cache[key] = details
+        return update
 
+    def update_entry(self, key: str) -> UpdateState:
+        """ Update LRU entry
+        """
+        # Get details for the project
+        details = self._lru_cache.peek(key)
+
+        # Lookup in static cache
+        if not details and key in self._static_cache:
+            details = self._static_cache[key]
+            details, update = self._get_project_details(key, details)
+            if update == UpdateState.UPDATED:
+                self._static_cache[key] = details
+            # LRU is updated
+            update = UpdateState.INSERTED
+        else:
+            details, update = self._get_project_details(key, details)
+
+        self._lru_cache[key] = details
+
+        # Notify
         if update:
             LOGGER.info("Updated project '%s' in cache", key),
-            self.notify_observers(key, timestamp, update)
+            self.notify_observers(key, details.timestamp, update)
 
         return update
 
-    def lookup(self, key: str, refresh: bool=True) -> Tuple[QgsProject, UpdateState]:
+    def lookup(self, key: str, refresh: bool = True) -> Tuple[QgsProject, UpdateState]:
         """ Lookup entry from key
+
+            If refresh is False, return actual cache
+            content without refresh.
         """
-        update = self.update_entry(key, refresh=refresh)
-        if key in self._static_cache:
-            return self._static_cache[key].project, update
-        else:
-            return self._lru_cache[key].project, update
+        if not refresh:
+            # Lookup LRU
+            details = self.peek(key, CacheType.LRU)
+            if details:
+                return details.project, UpdateState.UNCHANGED
+            # Update from static cache
+            details = self.peek(key, CacheType.STATIC)
+            if details:
+                self._lru_cache[key] = details
+                return details.project, UpdateState.UPDATED
+           
+        update = self.update_entry(key)
+        return self._lru_cache[key].project, update
 
     def prepare_project(self, project: QgsProject ) -> None:
         """ Set project configuration
@@ -376,7 +386,7 @@ class QgsCacheManager:
             project.writeEntry("WCSUrl","/", "")
             project.writeEntry("WMTSUrl","/", "")
 
-    def read_project(self, uri: str, strict: Optional[bool]=None) -> QgsProject:
+    def read_project(self, uri: str) -> QgsProject:
         """ Read project from path
 
             May be used by protocol-handlers to instanciate project
@@ -395,8 +405,7 @@ class QgsCacheManager:
         if not project.read(uri,  readflags):
             raise RuntimeError(f"Failed to read Qgis project {uri}")
 
-        strict = self._strict_check if strict is None else strict
-        if strict and not badlayerh.validateLayers(project):
+        if self._strict_check and not badlayerh.validateLayers(project):
             raise StrictCheckingError
 
         self.prepare_project(project)
@@ -449,7 +458,7 @@ def preload_projects_file( path: Path, cacheservice: QgsCacheManager ) ->  int:
         for p in filter(None,(line.strip('\n ').partition('#')[0] for line in fp.readlines())):
             p = p.strip(' ')
             try:
-                cacheservice.update_entry(p, static_cache=True)
+                cacheservice.update_static_entry(p)
             except StrictCheckingError:
                 LOGGER.error("Preload: '%s' as invalid layers - strict mode on" , p)
             except PathNotAllowedError:

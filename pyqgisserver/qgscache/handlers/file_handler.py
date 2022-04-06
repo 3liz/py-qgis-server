@@ -56,7 +56,7 @@ class FileProtocolHandler:
         path = self._check_file(Path(url.path))
         return datetime.fromtimestamp(path.stat().st_mtime)
 
-    def get_project( self, url: Optional[urllib.parse.ParseResult], strict: Optional[bool]=None,
+    def get_project( self, url: Optional[urllib.parse.ParseResult],
                      project: Optional[QgsProject]=None,
                      timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
         """ Create or return a proect
@@ -75,7 +75,7 @@ class FileProtocolHandler:
         modified_time = datetime.fromtimestamp(path.stat().st_mtime)
         if timestamp is None or timestamp < modified_time:
             cachmngr  = componentmanager.get_service('@3liz.org/cache-manager;1')
-            project   = cachmngr.read_project(str(path), strict=strict)
+            project   = cachmngr.read_project(str(path))
             timestamp = modified_time
 
         return project, timestamp

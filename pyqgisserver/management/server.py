@@ -13,6 +13,8 @@ import os
 import tornado.web
 import logging
 
+from urllib.parse import quote_plus
+
 from ..logger import log_request
 from ..config import confservice
 from ..handlers import (BaseHandler, StatusHandler, OwsApiHandler as QgisHandler, NotFoundHandler)
@@ -58,8 +60,14 @@ class _ReportHandler(_PoolHandler):
         reports = await self._poolserver.get_reports()
         for w in reports:
             for entry in w['cache']:
-                entry.update(link=f"{req.protocol}://{req.host}/cache/{entry['key']}")
-
+                key = entry['key']
+                # Take care of absolute path
+                # see https://github.com/3liz/py-qgis-server/issues/40
+                if key.startswith('/'):
+                    # Use MAP parameter
+                    entry.update(link=f"{req.protocol}://{req.host}/cache/content/?MAP={quote_plus(key)}")
+                else:
+                    entry.update(link=f"{req.protocol}://{req.host}/cache/content/{quote_plus(key)}")
         self.write_json({'workers': reports, 'num_workers': self._poolserver.num_workers }) 
 
 

@@ -132,7 +132,7 @@ class PostgresProtocolHandler:
         _, modified_time = _check_unsafe_url( self._insecure, url )
         return modified_time
 
-    def get_project( self, url: Optional[urllib.parse.ParseResult], strict: Optional[bool]=None,
+    def get_project( self, url: Optional[urllib.parse.ParseResult],
                      project: Optional[QgsProject]=None,
                      timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
         """ Create or return a project
@@ -151,7 +151,7 @@ class PostgresProtocolHandler:
 
         if timestamp is None or timestamp < modified_time:
             cachemngr = componentmanager.get_service('@3liz.org/cache-manager;1')
-            project   = cachemngr.read_project(urlstr, strict=strict)
+            project   = cachemngr.read_project(urlstr)
             timestamp = modified_time
 
         return project, timestamp

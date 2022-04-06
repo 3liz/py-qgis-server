@@ -42,6 +42,10 @@ class RequestHandler:
     def prepare(self):
         """
         """
+    
+    @property
+    def request(self) -> QgsServerRequest:
+        return self._request
 
     def public_url(self, path="", rootpath: Optional[str]=None) -> str:
         """ Return the public base url

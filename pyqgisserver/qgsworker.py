@@ -36,7 +36,8 @@ from .qgscache.cachemanager import (get_cacheservice,
                                     StrictCheckingError,
                                     UnreadableResourceError,
                                     PathNotAllowedError,
-                                    UpdateState)
+                                    UpdateState,
+                                    CacheType)
 
 from .qgscache.observer import Client as CacheObserver
 
@@ -460,16 +461,20 @@ class QgsRequestHandler(RequestHandler):
     def get_report(cls):
         report = super(QgsRequestHandler,cls).get_report()
 
-        def _to_json(key: str, project: QgsProject):
+        def _to_json(key: str, project: QgsProject, static: bool):
             return dict(
                 key=key,
                 filename=project.fileName(),
                 last_modified=project.lastModified().toString(Qt.ISODate),
                 num_layers=project.count(),
+                static=static,
             )
 
+        items = { k:(d,False) for k,d in get_cacheservice().items(CacheType.LRU) }
+        items.update( (k,(d,True)) for (k,d) in get_cacheservice().items(CacheType.STATIC) )
+        
         report.update(
-            cache=[_to_json(k,d.project) for (k,d) in get_cacheservice().items()]
+            cache=[_to_json(k,d.project,static) for (k,(d,static)) in items.items()]
         )
         return report
 
