@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.7.20 - 2022-05-02
+
 * Fix attribute dereference on undefined response 
 * Fix invalid url in managment cache api
 
