@@ -76,14 +76,16 @@ test: env up
 %-test: env
 	docker compose \
 	-f docker-compose.yml \
-	-f docker-compose.$*.yml up -V --remove-orphans --force-recreate --exit-code-from qgis-server
+	-f docker-compose.$*.yml up -V --quiet-pull --remove-orphans \
+		--force-recreate --exit-code-from qgis-server
 
 
 run: export RUN_COMMAND=./tests/run_server.sh
 run: up
 
 up:
-	docker compose up -V  --remove-orphans --force-recreate --exit-code-from qgis-server
+	docker compose up -V --quiet-pull  --remove-orphans \
+		--force-recreate --exit-code-from qgis-server
 
 stop:
 	docker compose down -v --remove-orphans
@@ -95,11 +97,11 @@ stop:
 %-run:
 	docker compose \
 	-f docker-compose.yml \
-	-f docker-compose.$*.yml up -V --remove-orphans --force-recreate -d
+	-f docker-compose.$*.yml up -V --quiet-pull --remove-orphans --force-recreate -d
 
 run-proxy: 
 	docker compose -f docker-compose.proxy.yml \
-		up -V --remove-orphans --force-recreate -d
+		up -V --quiet-pull --remove-orphans --force-recreate -d
 
 stop-proxy:
 	docker compose -f docker-compose.proxy.yml down -v --remove-orphans
