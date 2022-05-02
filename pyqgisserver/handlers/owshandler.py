@@ -75,6 +75,7 @@ class AsyncClientHandler(BaseHandler):
 
         self._endpoint = endpoint
         try:
+            extra = None
             response = None
             delta = None
             query = self.encode_arguments()
@@ -130,6 +131,8 @@ class AsyncClientHandler(BaseHandler):
                     # with (potentially empty) chunk
                     self.write(response.data)
 
+            extra = response.extra
+
         except RequestTimeoutError:
             status = 504
             delta = time() - reqtime
@@ -148,7 +151,7 @@ class AsyncClientHandler(BaseHandler):
             self._stats.num_errors +=1
 
         # Send monitoring info
-        self.emit( status, delta, response.extra or {})
+        self.emit( status, delta, extra or {})
 
     def emit(self, status: int, response_time: float, extra: Dict) -> None:
         if not self._monitor:

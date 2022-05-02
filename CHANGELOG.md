@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Fix attribute dereference on undefined response 
+* Fix invalid url in managment cache api
+
 ## 1.7.19 - 2022-03-31
 
 * Fix extra argument in logging format string when handling 
