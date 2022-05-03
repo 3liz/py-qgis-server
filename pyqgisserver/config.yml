@@ -129,6 +129,18 @@ config_options:
       key: cross_origin
       tags: [ http, security ]
 
+    - name: SERVER_MEMORY_HIGH_WATER_MARK
+      label: Memory high water mark
+      description: |
+          Set memory high water mark as fraction of total memory. Workers are 
+          restarted if total memory percent usage of workers exceed that value.
+      default: 0.9
+      type: float
+      section: server
+      key: memory_high_water_mark
+      tags: [ workers, memory ]
+      version_added: '1.7.21'
+
     #==========
     # Logging  
     #==========

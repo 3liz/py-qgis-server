@@ -19,6 +19,10 @@ import logging
 import traceback
 import hashlib
 
+try:
+    import psutil
+except ImportError:
+    psutil = None
 
 from datetime import datetime
 from time import time
@@ -249,10 +253,9 @@ class QgsRequestHandler(RequestHandler):
         cls._advanced_report = cache_config.getboolean('advanced_report')
 
         if cls._advanced_report:
-            try:
-                import psutil
+            if psutil is not None:
                 cls._process = psutil.Process(cls._pid)
-            except ImportError:
+            else:
                 LOGGER.warning("No 'PSUtil' module, advanced report will be disabled")
                 cls._advanced_report = False
                 cls._process = None

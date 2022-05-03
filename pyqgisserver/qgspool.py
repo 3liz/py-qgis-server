@@ -34,6 +34,13 @@ from .qgsworker import QgsRequestHandler
 
 from pyqgisservercontrib.core.watchfiles import watchfiles
 
+
+try:
+    import psutil
+except ImportError:
+    psutil = None
+
+
 LOGGER=logging.getLogger('SRVLOG')
 
 class _RestartHandler:
@@ -81,7 +88,8 @@ class _RestartHandler:
 class _Server:
 
     def __init__(self, broadcastaddr: str, pool: Process,  timeout: int,
-                 num_workers: int) -> None:
+                 num_workers: int,
+                 high_water_mark: float = 1.0) -> None:
 
         ctx = zmq.Context.instance()
         pub = ctx.socket(zmq.PUB)
@@ -92,6 +100,8 @@ class _Server:
         self._timeout = timeout 
         self._sock = pub
         self._num_workers = num_workers
+
+        self._high_water_mark = high_water_mark
 
         LOGGER.debug("Started pool server")
         self._pool = pool
@@ -111,9 +121,14 @@ class _Server:
 
     async def healthcheck(self) -> Awaitable[None]:
         while True:
+            # Check for exitcode
             if self._pool.exitcode is not None and self._pool.exitcode != 0:
                 LOGGER.critical("Pool failure, exiting because of unrecoverable error...")
                 raise SystemExit(1)
+            # Check high water mark
+            if self.memory_fraction() > self._high_water_mark:
+                LOGGER.warn("High memory water mark reached: restarting workers %s", self._high_water_mark)
+                #self.restart()
             await asyncio.sleep(5)
     
     def start_supervisor(self):
@@ -182,6 +197,16 @@ class _Server:
                 break
         return self._supervisor.reports
 
+    def memory_fraction(self) -> float:
+        """ Return total memory fraction used by pool
+        """
+        if psutil is not None:
+            p = psutil.Process(self._pool.pid)
+            mem = sum(child.memory_percent() for child in p.children(recursive=True))
+        else:
+            mem = 0
+        return mem / 100.0
+
 
 def create_poolserver(numworkers: int) -> _Server:
     """ Run workers pool in its own process
@@ -193,10 +218,13 @@ def create_poolserver(numworkers: int) -> _Server:
     broadcastaddr = confservice['zmq']['broadcastaddr']
     timeout       = confservice['server'].getint('timeout')
 
+    high_water_mark = float(confservice['server']['memory_high_water_mark'])
+
     p = Process(target=run_worker_pool, args=(numworkers, broadcastaddr, router))
     p.start()
 
-    poolserver = _Server(broadcastaddr, p, timeout, numworkers)
+    poolserver = _Server(broadcastaddr, p, timeout, numworkers, 
+                         high_water_mark = high_water_mark)
     return poolserver
 
 

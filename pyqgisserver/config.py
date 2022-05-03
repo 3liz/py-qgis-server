@@ -63,15 +63,17 @@ def load_configuration():
     CONFIG.set('server', 'timeout'       , getenv('QGSRV_SERVER_TIMEOUT', '20'))
     CONFIG.set('server', 'enable_filters', getenv('QGSRV_SERVER_ENABLE_FILTERS', 'yes'))
     CONFIG.set('server', 'http_proxy'    , getenv('QGSRV_SERVER_HTTP_PROXY', 'no'))
-    CONFIG.set('server', 'proxy_url'     , getenv('QGSRV_SERVER_PROXY_URL' , ''))
-    CONFIG.set('server', 'restartmon'    , getenv('QGSRV_SERVER_RESTARTMON' , ''))
-    CONFIG.set('server', 'pluginpath'    , getenv('QGSRV_SERVER_PLUGINPATH' , ''))
-    CONFIG.set('server', 'ssl'           , getenv('QGSRV_SERVER_SSL' , 'no'))
+    CONFIG.set('server', 'proxy_url'     , getenv('QGSRV_SERVER_PROXY_URL', ''))
+    CONFIG.set('server', 'restartmon'    , getenv('QGSRV_SERVER_RESTARTMON', ''))
+    CONFIG.set('server', 'pluginpath'    , getenv('QGSRV_SERVER_PLUGINPATH', ''))
+    CONFIG.set('server', 'ssl'           , getenv('QGSRV_SERVER_SSL', 'no'))
     CONFIG.set('server', 'ssl_cert'      , getenv('QGSRV_SERVER_SSL_CERT', ''))
-    CONFIG.set('server', 'ssl_key'       , getenv('QGSRV_SERVER_SSL_KEY' , ''))
-    CONFIG.set('server', 'cross_origin'  , getenv('QGSRV_SERVER_CROSS_ORIGIN' , 'yes'))
-    CONFIG.set('server', 'status_page'   , getenv('QGSRV_SERVER_STATUS_PAGE'  , 'no'))
-    CONFIG.set('server', 'allow_headers' , getenv('QGSRV_SERVER_ALLOW_HEADERS' , 'X-Qgis-,X-Lizmap-'))
+    CONFIG.set('server', 'ssl_key'       , getenv('QGSRV_SERVER_SSL_KEY', ''))
+    CONFIG.set('server', 'cross_origin'  , getenv('QGSRV_SERVER_CROSS_ORIGIN', 'yes'))
+    CONFIG.set('server', 'status_page'   , getenv('QGSRV_SERVER_STATUS_PAGE', 'no'))
+    CONFIG.set('server', 'allow_headers' , getenv('QGSRV_SERVER_ALLOW_HEADERS', 'X-Qgis-,X-Lizmap-'))
+    CONFIG.set('server', 'memory_high_water_mark', 
+               getenv('QGSRV_SERVER_MEMORY_HIGH_WATER_MARK', '0.9'))
 
     #
     # Logging
