@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Add `memory_high_water_mark` configuration option
+    - Restart workers gracefully on high memory usage
+
 ## 1.7.20 - 2022-05-02
 
 * Fix attribute dereference on undefined response 

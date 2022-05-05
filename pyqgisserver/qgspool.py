@@ -128,7 +128,7 @@ class _Server:
             # Check high water mark
             if self.memory_fraction() > self._high_water_mark:
                 LOGGER.warn("High memory water mark reached: restarting workers %s", self._high_water_mark)
-                #self.restart()
+                self.restart()
             await asyncio.sleep(5)
     
     def start_supervisor(self):
