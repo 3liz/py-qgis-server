@@ -78,7 +78,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     """
     cfg = confservice['server']
 
-    monitor = Monitor.initialize()
+    monitor = Monitor.instance()
 
     root = r"/ows"
 

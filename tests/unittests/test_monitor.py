@@ -10,7 +10,7 @@ class Tests(HTTPTestCase):
     def test_monitor_data(self):
         """ Test getcapabilities hrefs
         """
-        monitor = Monitor.initialize()
+        monitor = Monitor.instance()
         assert monitor is not None
 
         monitor.messages.clear()

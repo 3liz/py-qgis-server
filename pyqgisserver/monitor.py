@@ -9,7 +9,7 @@ LOGGER = logging.getLogger('SRVLOG')
 class Monitor:
 
     @classmethod
-    def initialize(cls) -> 'Monitor':
+    def instance(cls) -> 'Monitor':
 
         if hasattr(cls,'_instance'):
             return cls._instance

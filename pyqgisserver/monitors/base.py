@@ -2,6 +2,8 @@
 """
 import os
 
+from typing import Dict, Any
+
 TAG_PREFIX_LEGACY = 'AMQP_GLOBAL_TAG_'
 TAG_PREFIX = 'QGSRV_MONITOR_TAG_'
 
@@ -17,3 +19,7 @@ class MonitorBase:
         tags =  { t:v for (t,v) in _get_tags(TAG_PREFIX) if t }
         tags.update( (t,v) for (t,v) in _get_tags(TAG_PREFIX_LEGACY) if t )
         self.global_tags = tags
+
+    def emit( self, params: Dict[str,Any], meta: Dict ) -> None:
+        raise NotImplementedError("Subclasses must implement this")
+ 
