@@ -88,20 +88,20 @@ class Response(QgsServerResponse):
         The data is written at 'flush()' call.
     """
 
-    def __init__(self, handler: RequestHandler, extra_data: Callable ) -> None:
+    def __init__(self, handler: RequestHandler, metadata_fn: Callable ) -> None:
         super().__init__()
         self._handler = handler
         self._buffer = QBuffer()
         self._buffer.open(QIODevice.ReadWrite)
         self._numbytes = 0
         self._finish   = False
-        self._extra_data  = extra_data
+        self._metadata_fn  = metadata_fn
 
         self._extra_headers = {}
 
-    def get_extra_data(self):
-        if self._extra_data:
-            return self._extra_data()
+    def get_metadata(self):
+        if self._metadata_fn:
+            return self._metadata_fn()
         
     def setExtraHeader( self, key: str, value: str ) -> None:
         # Keep extra headers so we may 
@@ -131,7 +131,7 @@ class Response(QgsServerResponse):
             Headers will be written at the first call to flush()
         """
         try:
-            extra = self.get_extra_data()
+            meta = self.get_metadata()
 
             self._buffer.seek(0)
             bytesAvail = self._buffer.bytesAvailable()
@@ -144,16 +144,16 @@ class Response(QgsServerResponse):
             send_more = not self._finish or self._handler.header_written
             if bytesAvail:
                 LOGGER.debug("Sending bytes %s (send_more: %s)", bytesAvail, send_more)
-                self._handler.send( bytes(self._buffer.data()), send_more, extra )
+                self._handler.send( bytes(self._buffer.data()), send_more, meta )
                 self._buffer.buffer().clear()
             else:
                 # Return empty response
                 LOGGER.debug("Sending empty response (send_more: %s)", send_more)
-                self._handler.send( b'', send_more, extra )
+                self._handler.send( b'', send_more, meta )
             # push the sentinel
             if send_more and self._finish:
                 LOGGER.debug("Sending EOF")
-                self._handler.send( b'', False, extra )
+                self._handler.send( b'', False, meta )
         except Exception:
             trace = traceback.format_exc()
             LOGGER.error("Caught Exception (worker: %s, msg: %s):\n%s",
@@ -365,15 +365,15 @@ class QgsRequestHandler(RequestHandler):
 
     QGIS_NO_MAP_ERROR_MSG = "No project defined. For OWS services: please provide a SERVICE and a MAP parameter" 
 
-    def init_extra_report(self) -> Dict:
+    def init_metadata_report(self) -> Dict:
         if self._advanced_report:
             start_mem = self._process.memory_info().rss
-            def _extra_report():
+            def _metadata_report():
                 return {
                     'pid'     : self._pid,
                     'mem_used': self._process.memory_info().rss - start_mem,
                 }
-            return _extra_report
+            return _metadata_report
 
     def handle_message(self) -> None:
         """ Override this method to handle_messages
@@ -383,10 +383,10 @@ class QgsRequestHandler(RequestHandler):
         project_location = self.request.headers.pop('X-Map-Location', None)
         ogc_scheme       = self.request.headers.pop('X-Ogc-Scheme'  , None)
 
-        extra_report = self.init_extra_report()
+        metadata_report = self.init_metadata_report()
 
         request  = Request(self)
-        response = Response(self, extra_report)
+        response = Response(self, metadata_report)
 
         if not project_location:
             # Try to get project from environment

@@ -24,7 +24,7 @@ ReplyMessage = namedtuple( "ReplyMessage", (
     "status",
     "headers",
     "data",
-    "extra",
+    "meta",
 ))
 
 

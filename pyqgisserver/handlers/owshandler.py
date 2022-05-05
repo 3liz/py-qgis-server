@@ -75,7 +75,7 @@ class AsyncClientHandler(BaseHandler):
 
         self._endpoint = endpoint
         try:
-            extra = None
+            meta = None
             response = None
             delta = None
             query = self.encode_arguments()
@@ -131,7 +131,7 @@ class AsyncClientHandler(BaseHandler):
                     # with (potentially empty) chunk
                     self.write(response.data)
 
-            extra = response.extra
+            meta = response.metadata
 
         except RequestTimeoutError:
             status = 504
@@ -151,14 +151,14 @@ class AsyncClientHandler(BaseHandler):
             self._stats.num_errors +=1
 
         # Send monitoring info
-        self.emit( status, delta, extra or {})
+        self.emit( status, delta, meta or {})
 
-    def emit(self, status: int, response_time: float, extra: Dict) -> None:
+    def emit(self, status: int, response_time: float, meta: Dict) -> None:
         if not self._monitor:
             return
 
-        if extra:
-            LOGGER.debug("### Adv. Metrics => %s", extra)
+        if meta:
+            LOGGER.debug("### Adv. Metrics => %s", meta)
 
         params = self.get_monitor_params()
         if params:
@@ -166,7 +166,7 @@ class AsyncClientHandler(BaseHandler):
                 # RESPONSE TIME MUST BE IN MILLISECONDS
                 RESPONSE_TIME = int(response_time*1000.0),
                 RESPONSE_STATUS  = status,
-                RESPONSE_MEMUSED = extra.get('mem_used',0)
+                RESPONSE_MEMUSED = meta.get('mem_used',0)
             )
             self._monitor.emit( params, meta=self.request.headers )
 

@@ -48,7 +48,7 @@ class AsyncResponseHandler:
         self._chunks = None
         self._has_more = False
         self.data = None
-        self.extra = None
+        self.metadata = None
 
     def _set_exception(self, exc: Exception) -> None:
         self._has_more = False
@@ -61,11 +61,11 @@ class AsyncResponseHandler:
             future.
         """
         if self.headers is None:
-            status, hdrs, body, extra = pickle.loads(data)
-            self.headers = hdrs
-            self.data    = body
-            self.status  = status
-            self.extra   = extra
+            status, hdrs, body, meta = pickle.loads(data)
+            self.headers  = hdrs
+            self.data     = body
+            self.status   = status
+            self.metadata = meta
             # We are waiting for more data
             # Create a queue to collect the remaining chunks
             if self.status == 206:
