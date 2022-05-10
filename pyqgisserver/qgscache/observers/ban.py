@@ -49,6 +49,6 @@ async def ban( key: str) -> None:
     
 
 
-def observe(key: str, datetime: datetime, insert: bool) -> None:
+def observe(key: str, datetime: datetime, inserted: bool) -> None:
     asyncio.create_task(ban(key))
 

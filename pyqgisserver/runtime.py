@@ -32,7 +32,6 @@ from .handlers import (StatusHandler,
 
 from .zeromq import client, broker
 
-from .utils import process
 from .qgspool import create_poolserver
 
 from .monitor import Monitor
@@ -169,18 +168,6 @@ class Application(tornado.web.Application):
         self._broker_client.terminate()
 
 
-def terminate_handler( signum: int, frame ) -> None:
-    if signum == signal.SIGTERM:
-        if process.task_id() is None:
-            sys.stderr.write("Terminating child processes.\n")
-            process.terminate_childs()
-
-
-def set_signal_handlers() -> None:
-    signal.signal(signal.SIGTERM, terminate_handler)
-    signal.signal(signal.SIGINT , terminate_handler)
-
-
 def setuid( username: str) -> None:
     """ setuid to username uid """
     from pwd import getpwnam, getpwuid
@@ -252,8 +239,9 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
     if user:
         setuid(user)
 
-    worker_pool   = None
-    broker_pr     = None
+    worker_pool = None
+    broker_pr = None
+    cache_observer = None
 
     # Setup ssl config
     if confservice.getboolean('server','ssl'):
@@ -293,7 +281,10 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
 
         # Start cache observer
         cache_observer = start_cache_observer()
-        
+
+        if management:
+            management.cache_observer = cache_observer
+
         # XXX This trigger a deprecation warning in python 3.10
         # but there is no clear alternative with tornado atm
         # See https://github.com/tornadoweb/tornado/issues/3033
@@ -303,15 +294,7 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
         loop.run_forever()
     except Exception:
         traceback.print_exc()
-        if process.task_id() is not None:
-            # Let a chance to the child process to 
-            # restart
-            raise
-        else: 
-            # Make sure that child processes are terminated
-            print("Terminating child processes", file=sys.stderr, flush=True)
-            process.terminate_childs()
-            exit_code = 1
+        exit_code = 1
     except KeyboardInterrupt:
         print("Keyboard Interrupt", flush=True)
         exit_code = 15
@@ -331,16 +314,15 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
         application.terminate()
         application = None
         print("PID {}: Server instance stopped".format(os.getpid()), flush=True)
-    if process.task_id() is None:
-        if cache_observer:
-            cache_observer.stop()
-        if worker_pool:
-            print("Stopping workers", flush=True)
-            worker_pool.terminate()
-        if broker_pr:
-            print("Stopping broker", flush=True)
-            broker_pr.terminate()
-            broker_pr.join()
+    if cache_observer:
+        cache_observer.stop()
+    if worker_pool:
+        print("Stopping workers", flush=True)
+        worker_pool.terminate()
+    if broker_pr:
+        print("Stopping broker", flush=True)
+        broker_pr.terminate()
+        broker_pr.join()
 
     print("Server shutdown", flush=True)
     sys.exit(exit_code)

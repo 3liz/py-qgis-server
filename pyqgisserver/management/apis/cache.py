@@ -24,7 +24,7 @@ LOGGER = logging.getLogger('SRVLOG')
 class CacheCollection(RequestHandler):
 
     def get(self, key: str=None) -> None: 
-        """ Return plugin info
+        """ Return project cache info
         """
         if not key:
             # Try to get key from param
@@ -34,13 +34,11 @@ class CacheCollection(RequestHandler):
             raise HTTPError(400,reason="Missing project specification")
 
         cache = get_cacheservice()
-        details = cache.peek(key)
-        if not details:
-            raise HTTPError(404,reason=f"Project '{key}' not in cache")
+        project, _ = cache.lookup(key, refresh=False)
  
-        self.write(get_project_summary(key, details.project))  
-                
-        
+        self.write(get_project_summary(key, project))  
+    
+ 
 def register( serverIface ):
     """ Register plugins api handlers
     """
@@ -49,5 +47,4 @@ def register( serverIface ):
                           (r'/content/(?P<key>.+)$', CacheCollection),
                           (r'/', CacheCollection),
                       ])
-                      
 

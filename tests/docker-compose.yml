@@ -47,7 +47,8 @@ services:
             - ${SERVER_HTTP_PORT}:8080
             - ${MANAGEMENT_HTTP_PORT}:19876
         networks:
-            - backend
+            backend:
+                ipv4_address: 172.199.0.2 
         deploy:
             resources:
                 limits:

@@ -51,6 +51,19 @@ class _RestartHandler(_PoolHandler):
         self.write_json({ 'status': 'ok' }) 
 
 
+def _get_cache_link(key: str, req) -> str:
+    """ Build cache link
+
+        Take care of absolute path
+        See https://github.com/3liz/py-qgis-server/issues/40
+    """
+    if key.startswith('/'):
+        # Use MAP parameter
+        return f"{req.protocol}://{req.host}/cache/content/?MAP={quote_plus(key)}"
+    else:
+        return f"{req.protocol}://{req.host}/cache/content/{quote_plus(key)}"
+
+
 class _ReportHandler(_PoolHandler):
 
     async def get(self) -> Awaitable[None]:
@@ -60,14 +73,7 @@ class _ReportHandler(_PoolHandler):
         reports = await self._poolserver.get_reports()
         for w in reports:
             for entry in w['cache']:
-                key = entry['key']
-                # Take care of absolute path
-                # see https://github.com/3liz/py-qgis-server/issues/40
-                if key.startswith('/'):
-                    # Use MAP parameter
-                    entry.update(link=f"{req.protocol}://{req.host}/cache/content/?MAP={quote_plus(key)}")
-                else:
-                    entry.update(link=f"{req.protocol}://{req.host}/cache/content/{quote_plus(key)}")
+                entry.update(link=_get_cache_link(entry['key'], req))
         self.write_json({'workers': reports, 'num_workers': self._poolserver.num_workers }) 
 
 
@@ -101,6 +107,37 @@ class _RootHandler(BaseHandler):
         self.set_option_headers()
 
 
+class _CacheHandler(QgisHandler):
+
+    async def get(self, key: str=None) -> None: 
+        """ Return project cache info
+        """
+        if not key:
+            # Try to get key from param
+            key = self.get_argument('MAP',default=None) 
+
+        cache_observer = self.application.cache_observer
+        if not key:
+            """ Send the collection of cached objects
+            """
+            req = self.request
+            def _link( key, item ):
+                return dict(
+                    name=key,
+                    last_modified=item.modified_time.astimezone().isoformat(),
+                    link=_get_cache_link(key, req),
+                )
+            cached = [_link(key, item) for key, item in cache_observer.items()]
+            self.write_json({'cached': cached})
+            return
+        else:
+            if not cache_observer.find(key):
+                self.send_error(404, reason=f"Project '{key}' not in cache")  
+                return
+
+        # Delegate to server api
+        await super().handle_request('GET')
+
 
 def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
     """
@@ -116,6 +153,8 @@ def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web
         (r"/status", StatusHandler),
         (r"/pool/(restart)", _RestartHandler, {'poolserver': poolserver}),
         (r"/pool/?"         ,_ReportHandler,  {'poolserver': poolserver}),
+        (r"/cache/content/(?P<key>.+)", _CacheHandler, kwargs),
+        (r"/cache/?"                  , _CacheHandler, kwargs),
         # Forward to Qgis api handlers
         (r"/.+"             , QgisHandler, kwargs),
     ]

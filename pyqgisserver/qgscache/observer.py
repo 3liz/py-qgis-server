@@ -20,7 +20,7 @@ import traceback
 import logging
 
 from datetime import datetime
-from typing import Awaitable, Any, NamedTuple
+from typing import Optional, Awaitable, Any, NamedTuple, Iterable, Tuple
 
 from ..zeromq.utils import _get_ipc
 from ..config  import confservice
@@ -67,6 +67,7 @@ class Client:
 class Server:
 
     _declared_observers = []
+    _enabled = False
 
     @classmethod
     def declare_observers(cls):
@@ -78,7 +79,9 @@ class Server:
         names = (name.strip() for name in confservice.get('projects.cache','observers', fallback="").split(','))
         cls._declared_observers = list(name for name in names if name)
 
-        confservice.set('projects.cache','has_observers', 'yes' if cls._declared_observers else 'no')
+        if cls._declared_observers or confservice.getboolean('management','enabled'):
+            cls._enabled = True
+            confservice.set('projects.cache','has_observers', 'yes' if cls._declared_observers else 'no')
 
     def __init__(self)-> None:
         """ Run Observer
@@ -118,7 +121,7 @@ class Server:
         self._observers = list(_load_observers())
 
     def run(self) -> None:
-        if self._observers:
+        if self._enabled:
             self._task = asyncio.ensure_future(self._run_async())
 
     async def _run_async(self) -> Awaitable[None]:
@@ -174,12 +177,23 @@ class Server:
             except Exception:
                 LOGGER.critical("Uncaugh error in observer: %s\n%s", obs, traceback.format_exc())
 
+    def find(self, key:str) -> Optional[_CacheUpdate]:
+        """ return entry
+        """
+        return self._last_updates.get(key)
+
+    def items(self) -> Iterable[Tuple[str,_CacheUpdate]]:
+        return self._last_updates.items()
+
 
 def declare_cache_observers() -> None:
     Server.declare_observers()
+
 
 def start_cache_observer() -> Server:
     server = Server()
     server.run()
     return server
+
+
 

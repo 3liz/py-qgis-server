@@ -339,8 +339,9 @@ class QgsCacheManager:
             details = self._static_cache[key]
             details, update = self._get_project_details(key, details)
             if update == UpdateState.UPDATED:
+                # Update the static cache
                 self._static_cache[key] = details
-            # LRU is updated
+            # LRU is updated with new content
             update = UpdateState.INSERTED
         else:
             details, update = self._get_project_details(key, details)
@@ -357,8 +358,8 @@ class QgsCacheManager:
     def lookup(self, key: str, refresh: bool = True) -> Tuple[QgsProject, UpdateState]:
         """ Lookup entry from key
 
-            If refresh is False, return actual cache
-            content without refresh.
+            If refresh is False, return actual cache 
+            content without refreshing/updating the entry.
         """
         if not refresh:
             # Lookup LRU
@@ -370,7 +371,8 @@ class QgsCacheManager:
             if details:
                 self._lru_cache[key] = details
                 return details.project, UpdateState.UPDATED
-           
+        
+        # Not found in cache, update the actual entry
         update = self.update_entry(key)
         return self._lru_cache[key].project, update
 

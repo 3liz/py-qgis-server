@@ -14,11 +14,14 @@ vcl 4.1;
 
 import std;
 
+# Cf https://www.getpagespeed.com/server-setup/varnish/varnish-5-2-grace-mode
+import xkey;
+
 # acl for administrative requests (i.e BAN)
 # Set this to the configured network between admin backend
 # and varnish
-acl purge {
-  "172.199.0.0"/16; // Our backend network
+acl purge_acl {
+  "172.199.0.2"; // Our backend network
 }
 
 # Default backend definition. Set this to point to your content server.
@@ -26,6 +29,7 @@ backend default {
     .host = "qgis-server";
     .port = "8080";
 }
+
 
 sub vcl_recv {
     # Happens before we check if we have this in cache already.
@@ -35,14 +39,16 @@ sub vcl_recv {
 
     # Handle BAN request
     if (req.method == "BAN") {
-        if (!client.ip ~ purge) {
+        if (!client.ip ~ purge_acl) {
             return(synth(405,"Not Allowed"));
         }
-        if (std.ban("obj.http.X-Map-Id ~ " + req.http.X-Map-Id)) {
-            return(synth(200,"Ban Added"));
-        } else {
-            return(synth(400, std.ban_error()));
-        }
+        set req.http.n-gone = xkey.softpurge(req.http.X-Map-Id);
+        return(synth(200,"Ban Added for "+req.http.n-gone+" objects"));
+    }
+
+    # Do not cache other than WMTS or GetCapabilities
+    if(req.url !~ "(?i)(&|\?)service=wmts" && req.url !~ "(?i)(&|\?)request=getcapabilities") {
+        return(pass);
     }
 }
 
@@ -61,6 +67,9 @@ sub vcl_backend_response {
     if (beresp.http.ETag || beresp.http.Last-Modified) {
         set beresp.keep = 24h;
     }
+
+    # Set the xkey tag so that we may use it in softpurge
+    set beresp.http.xkey = beresp.http.X-Map-Id;
 
     return (deliver);
 }

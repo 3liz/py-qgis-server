@@ -12,7 +12,7 @@ services:
             QGSRV_CACHE_OBSERVERS_BAN_SERVER_ADDRESS: "http://varnish:80"
             QGSRV_CACHE_CHECK_INTERVAL: 10
     varnish:
-        image: varnish:7.0.2
+        image: varnish:7.1-alpine
         environment:
             VARNISH_SIZE: 500M
         volumes:
@@ -20,7 +20,7 @@ services:
             - ${PWD}/varnish.secret:/etc/varnish/secret:ro
         command: ["-S", "/etc/varnish/secret"]
         tmpfs:
-            - /var/lib/varnish:exec
+            - /var/lib/varnish/varnishd:exec
         ports:
             - 127.0.0.1:8889:80
         networks:
