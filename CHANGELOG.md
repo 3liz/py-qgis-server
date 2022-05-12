@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Root access '/' return 403 instead of 404
+* Management api `/cache/` now return the collection of cached projects.
 * Add `memory_high_water_mark` configuration option
     - Restart workers gracefully on high memory usage
 

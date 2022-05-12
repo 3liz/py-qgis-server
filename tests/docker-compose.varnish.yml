@@ -25,4 +25,6 @@ services:
             - 127.0.0.1:8889:80
         networks:
             - backend
+        depends_on:
+            - qgis-server
 

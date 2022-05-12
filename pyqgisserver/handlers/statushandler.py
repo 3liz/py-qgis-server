@@ -18,8 +18,16 @@ LOGGER=logging.getLogger('SRVLOG')
 
 
 class PingHandler(BaseHandler):
+    
+    def set_default_headers(self) -> None:
+        super().set_default_headers()
+        # Disable cache because this is healtcheck requests
+        self.set_header("Cache-control","no-store")
+        self.set_header("X-Server-Status","ok")
+        
     def get(self):
         self.write_json({ 'status': 'ok' })
+
     def head(self):
         pass
 
@@ -48,3 +56,7 @@ class StatusHandler(BaseHandler):
         response.update(stats.json())
 
         self.write_json(response)
+
+       
+
+

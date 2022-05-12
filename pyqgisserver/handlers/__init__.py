@@ -1,5 +1,17 @@
 
-from .basehandler import BaseHandler, NotFoundHandler # noqa F401
-from .statushandler import StatusHandler, PingHandler # noqa F401
-from .owshandler  import OwsHandler, OwsFilterHandler, OwsApiHandler, OwsApiFilterHandler # noqa F401
+from .basehandler import ( # noqa F401
+    BaseHandler, 
+    NotFoundHandler,
+    ErrorHandler
+)
+from .statushandler import ( # noqa F401 
+    StatusHandler, 
+    PingHandler
+)
+from .owshandler import ( # noqa F401
+    OwsHandler, 
+    OwsFilterHandler, 
+    OwsApiHandler, 
+    OwsApiFilterHandler
+)
 

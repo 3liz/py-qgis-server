@@ -5,8 +5,6 @@ SHELL:=bash
 # 
 #  Makefile for running server in docker containers
 #
-COMMITID=$(shell git rev-parse --short HEAD)
-
 FLAVOR:=ltr
 
 REGISTRY_URL ?= 3liz
@@ -28,8 +26,11 @@ PLUGINPATH:=$(SRCDIR)/tests/plugins
 local:
 	mkdir -p $$(pwd)/.local  $$(pwd)/.cache
 
-clean:
+_clean:
 	rm -rf $$(pwd)/.local $$(pwd)/.cache
+	
+
+clean: _clean env
 
 PGUSER ?= $(USER)
 PGDATABASE ?= $(USER)
@@ -67,6 +68,7 @@ env: local
 		REQUEST_TIMEOUT=$(REQUEST_TIMEOUT)
 		STRICT_CHECK=$(STRICT_CHECK)
 		PYTEST_ADDOPTS=$(PYTEST_ADDOPTS)
+		COMPOSE_PROJECT_NAME=test-py-qgis-server
 		EOF
 
 test: export RUN_COMMAND=./tests/run_tests.sh

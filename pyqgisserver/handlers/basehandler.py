@@ -138,4 +138,12 @@ class NotFoundHandler(BaseHandler):
             reason="Invalid resource path."
         )
 
+class ErrorHandler(BaseHandler):
+    def initialize(self, status_code: int) -> None:
+        super().initialize()
+        self.set_status(status_code)
+
+    def prepare(self) -> None:
+        raise HTTPError(self._status_code)
+
 

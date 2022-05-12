@@ -28,7 +28,8 @@ from .handlers import (StatusHandler,
                        OwsApiHandler,
                        OwsApiFilterHandler,
                        PingHandler, 
-                       NotFoundHandler)
+                       NotFoundHandler,
+                       ErrorHandler)
 
 from .zeromq import client, broker
 
@@ -81,13 +82,13 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
     root = r"/ows"
 
-    ows_kwargs = {
-        'client'      : client,
-        'monitor'     : monitor,
-        'timeout'     : cfg.getint('timeout'),
-        'http_proxy'  : cfg.getboolean('http_proxy'),
-        'allowed_hdrs': tuple(k.upper() for k in cfg.get('allow_headers').split(','))
-    }
+    ows_kwargs = dict(
+        client       = client,
+        monitor      = monitor,
+        timeout      = cfg.getint('timeout'),
+        http_proxy   = cfg.getboolean('http_proxy'),
+        allowed_hdrs = tuple(k.upper() for k in cfg.get('allow_headers').split(','))
+    )
 
     end = r"(?:\.html|\.json|/?)"
 
@@ -100,6 +101,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     ] 
 
     handlers = [
+        (r"/", ErrorHandler, dict(status_code=403)),
         (r"/ping", PingHandler),
     ]
 
@@ -242,6 +244,7 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
     worker_pool = None
     broker_pr = None
     cache_observer = None
+    management = None
 
     # Setup ssl config
     if confservice.getboolean('server','ssl'):
@@ -268,7 +271,6 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
         server = HTTPServer(application, **kwargs)
         server.add_sockets(sockets)
 
-        management = None
         # Activate management
         if confservice['management'].getboolean('enabled'):
             from .management.server import start_management_server

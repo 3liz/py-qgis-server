@@ -24,6 +24,17 @@ acl purge_acl {
   "172.199.0.2"; // Our backend network
 }
 
+# Default probe
+probe default {
+  .request =
+    "HEAD /ping HTTP/1.1"
+    "Connection: close"
+    "Host: qgis.server"
+    "User-Agent: Varnish Health Probe";
+  .interval = 10s;
+  .timeout  = 2s;
+}
+
 # Default backend definition. Set this to point to your content server.
 backend default {
     .host = "qgis-server";
