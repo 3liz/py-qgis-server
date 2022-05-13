@@ -28,7 +28,6 @@ local:
 
 _clean:
 	rm -rf $$(pwd)/.local $$(pwd)/.cache
-	
 
 clean: _clean env
 

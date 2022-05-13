@@ -19,7 +19,8 @@ from .config import load_configuration
 from .runtime import (Application, 
                       create_poolserver,
                       create_broker_process,
-                      configure_ipc_addresses)
+                      configure_ipc_addresses,
+                      initialize_middleware)
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -78,7 +79,7 @@ class HTTPTestCase(AsyncHTTPTestCase):
     def get_app(self) -> Application:
         ipcaddr = TestRuntime.instance().ipcaddr
         self._application = Application(ipcaddr)
-        return self._application
+        return initialize_middleware(self._application)
     
     def get_new_ioloop(self) -> tornado.platform.asyncio.AsyncIOLoop:
         """

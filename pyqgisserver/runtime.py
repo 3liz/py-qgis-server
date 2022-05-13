@@ -17,16 +17,12 @@ import tornado.platform.asyncio
 
 from multiprocessing import Process
 
-from typing import Optional, Mapping, List
-
 from .logger import log_request
 from .config import confservice, qgis_api_endpoints
 
 from .handlers import (StatusHandler, 
                        OwsHandler, 
-                       OwsFilterHandler, 
                        OwsApiHandler,
-                       OwsApiFilterHandler,
                        PingHandler, 
                        NotFoundHandler,
                        ErrorHandler)
@@ -39,38 +35,8 @@ from .monitor import Monitor
 from .stats import Stats
 from .qgscache.observer import declare_cache_observers, start_cache_observer
 
-from pyqgisservercontrib.core.filters import ServerFilter
 
 LOGGER=logging.getLogger('SRVLOG')
-
-
-def load_access_policies() -> Optional[Mapping[str,List[ServerFilter]]]:
-    """ Create filter list
-    """
-    if not confservice.getboolean('server','enable_filters'):
-        return None
-
-    confservice.set('server','access_policy_version','2')
-
-    import pyqgisservercontrib.core.componentmanager as cm
-
-    collection = []
-    cm.register_entrypoints('py_qgis_server.access_policy', collection) 
-
-    if not collection:
-        return None
-
-    # Retrieve filters
-    filters = { "": [] }
-    for filt in collection:
-        uri = filt.uri or ""
-        fls = filters.get(uri,[])
-        fls.append(filt)
-        filters[uri] = fls
-    # Sort filters
-    for flist in filters.values():
-        flist.sort(key=lambda f: f.pri, reverse=True)
-    return filters
 
 
 def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
@@ -79,8 +45,6 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     cfg = confservice['server']
 
     monitor = Monitor.instance()
-
-    root = r"/ows"
 
     ows_kwargs = dict(
         client       = client,
@@ -92,21 +56,12 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
     end = r"(?:\.html|\.json|/?)"
 
-    wfs3_api_endpoints = [
-        rf"/wfs3{end}",
-        rf"/wfs3/collections(?:/[^/]+(?:/items)?)?{end}",
-        rf"/wfs3/conformance{end}",
-        rf"/wfs3/api{end}",
-        r"/wfs3/static/.*",
-    ] 
-
     handlers = [
         (r"/", ErrorHandler, dict(status_code=403)),
         (r"/ping", PingHandler),
     ]
 
     def add_handler( path, handler, kwargs ):
-        LOGGER.debug("*** Adding handler for: %s", path)        
         handlers.append( (path, handler, kwargs) )
 
     # Server status page
@@ -118,31 +73,27 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         rv.update( *args, **kwargs )
         return rv
 
-    # Load filters
-    filters = load_access_policies()
-    if filters:
-        for uri,fltrs in filters.items():
-            kw = _ows_args(filters=fltrs)
-            # Add ows endpoint
-            path = f"{root}/{uri.strip('/')}" if uri else root
-            # Add service endpoint
-            add_handler( rf"{path}(?P<endpoint>/?)", OwsFilterHandler, kw )
+    add_handler( r"/ows/?", OwsHandler, ows_kwargs)
 
-            # Add wfs3 endpoints
-            kw = _ows_args(filters=fltrs, service='WFS3')
-            for endp in wfs3_api_endpoints:
-                add_handler( rf"{path}(?P<endpoint>{endp})", OwsApiFilterHandler, kw )
-    else:
-        add_handler( rf"{root}(?P<endpoint>/?)", OwsHandler, ows_kwargs)
-        kw = _ows_args(service='WFS3')
-        for endp in wfs3_api_endpoints:
-            add_handler( rf"{root}(?P<endpoint>{endp})", OwsApiHandler, kw )
+    wfs3_api_endpoints = [
+        rf"wfs3{end}",
+        rf"wfs3/collections(?:/[^/]+(?:/items)?)?{end}",
+        rf"wfs3/conformance{end}",
+        rf"wfs3/api{end}",
+        r"wfs3/static/.*",
+    ] 
+
+    kw = _ows_args(service='WFS3')
+    for endpoint in wfs3_api_endpoints:
+        handlers.append( (rf"/ows/{endpoint}", OwsApiHandler, kw) )
+
     #
     # Add qgis api endpoints
     #
-    for name,endpoint in qgis_api_endpoints():
+    for name, endpoint in qgis_api_endpoints():
         kw = _ows_args(service=name)
-        add_handler( rf"(?P<endpoint>/{endpoint.strip('/')}/.*)", OwsApiHandler, kw )
+        LOGGER.debug("*** Adding API handler for: %s: %s", name, endpoint)        
+        handlers.append( (rf"/{endpoint.strip('/')}/.*", OwsApiHandler, kw) )
 
     return handlers
 
@@ -220,6 +171,18 @@ def create_ssl_options():
     return ssl_ctx
 
 
+def initialize_middleware( app ): 
+    """ Initialize the middleware
+    """
+    if confservice.getboolean('server','enable_filters'):
+        from .middleware import MiddleWareRouter
+        router = MiddleWareRouter(app)
+    else:
+        router = app
+
+    return router
+
+
 def run_server( port: int, address: str="", user: str=None, workers: int=0) -> None:
     """ Run the server
 
@@ -268,7 +231,7 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
         application = Application(ipcaddr)
 
         # Init HTTP server
-        server = HTTPServer(application, **kwargs)
+        server = HTTPServer(initialize_middleware(application), **kwargs)
         server.add_sockets(sockets)
 
         # Activate management

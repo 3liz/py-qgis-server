@@ -113,21 +113,24 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write_json(response)
         self.finish()
 
-    def proxy_url(self, http_proxy: bool, endpoint: Optional[str]=None) -> str:
+    def proxy_url(self, http_proxy: bool) -> str:
         """ Return the proxy_url
         """
         # Replace the status url with the proxy_url if any
         req = self.request
         if http_proxy:
-            proxy_url = self._cfg.get('proxy_url') or \
-                req.headers.get('X-Forwarded-Url') or \
-                f"{req.protocol}://{req.host}/"
-            if endpoint:
-                proxy_url = f"{proxy_url.rstrip('/')}{endpoint}"
-        else:
-            # No proxy to handle: return the full path
-            proxy_url = f"{req.protocol}://{req.host}{req.path}"
-        return proxy_url
+            # Replacement by static url, use it as base path
+            proxy_url = self._cfg.get('proxy_url')
+            if proxy_url:
+                return f"{proxy_url.rstrip('/')}{req.path}"
+        
+            # Dynamic proxy url
+            proxy_url = req.headers.get('X-Forwarded-Url')
+            if proxy_url:
+                return f"{proxy_url}"
+        
+        # No proxy to handle: return the full path
+        return f"{req.protocol}://{req.host}{req.path}"
 
 
 
@@ -139,11 +142,12 @@ class NotFoundHandler(BaseHandler):
         )
 
 class ErrorHandler(BaseHandler):
-    def initialize(self, status_code: int) -> None:
+    def initialize(self, status_code: int, reason: Optional[str]=None) -> None:
         super().initialize()
         self.set_status(status_code)
+        self.reason = reason
 
     def prepare(self) -> None:
-        raise HTTPError(self._status_code)
+        raise HTTPError(self._status_code, reason=self.reason)
 
 

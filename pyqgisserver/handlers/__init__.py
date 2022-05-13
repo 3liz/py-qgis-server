@@ -10,8 +10,6 @@ from .statushandler import ( # noqa F401
 )
 from .owshandler import ( # noqa F401
     OwsHandler, 
-    OwsFilterHandler, 
     OwsApiHandler, 
-    OwsApiFilterHandler
 )
 

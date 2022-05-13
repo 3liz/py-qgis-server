@@ -61,7 +61,7 @@ def load_configuration():
     CONFIG.set('server', 'interfaces'    , getenv('QGSRV_SERVER_INTERFACES', '0.0.0.0'))
     CONFIG.set('server', 'workers'       , getenv('QGSRV_SERVER_WORKERS', '2'))
     CONFIG.set('server', 'timeout'       , getenv('QGSRV_SERVER_TIMEOUT', '20'))
-    CONFIG.set('server', 'enable_filters', getenv('QGSRV_SERVER_ENABLE_FILTERS', 'yes'))
+    CONFIG.set('server', 'enable_filters', getenv('QGSRV_SERVER_ENABLE_FILTERS', 'no'))
     CONFIG.set('server', 'http_proxy'    , getenv('QGSRV_SERVER_HTTP_PROXY', 'no'))
     CONFIG.set('server', 'proxy_url'     , getenv('QGSRV_SERVER_PROXY_URL', ''))
     CONFIG.set('server', 'restartmon'    , getenv('QGSRV_SERVER_RESTARTMON', ''))

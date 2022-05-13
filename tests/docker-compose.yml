@@ -16,7 +16,6 @@ services:
             QGSRV_PROJECTS_SCHEMES_TEST:  /src/tests/data/
             QGSRV_PROJECTS_SCHEMES_FOO: file:foobar/
             QGSRV_PROJECTS_SCHEMES_BAR: file:foobar?data={path}
-            QGSRV_SERVER_PROFILES: /src/tests/profiles.yml
             QGSRV_SERVER_RESTARTMON: /src/.qgis-restart
             QGSRV_SERVER_HTTP_PROXY: 'no'
             QGSRV_LOGGING_LEVEL: DEBUG

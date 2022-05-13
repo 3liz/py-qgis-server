@@ -70,10 +70,9 @@ class AsyncClientHandler(BaseHandler):
         # see https://github.com/qgis/QGIS/pull/41333
         copy_headers(self._allowed_hdrs)
 
-    async def handle_request(self, method: str, endpoint: Optional[str]=None) -> Awaitable[None]:
+    async def handle_request(self, method: str) -> Awaitable[None]:
         reqtime = time()
 
-        self._endpoint = endpoint
         try:
             meta = None
             response = None
@@ -81,7 +80,7 @@ class AsyncClientHandler(BaseHandler):
             query = self.encode_arguments()
 
             headers = {}
-            proxy_url = self.proxy_url(self._proxy, endpoint)
+            proxy_url = self.proxy_url(self._proxy)
             if proxy_url: 
                 headers['X-Forwarded-Url']=proxy_url
 
@@ -170,22 +169,22 @@ class AsyncClientHandler(BaseHandler):
             )
             self._monitor.emit( params, meta=self.request.headers )
 
-    async def get(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+    async def get(self) -> Awaitable[None]:
         """ Handle Get method
         """
-        await self.handle_request('GET', endpoint)
+        await self.handle_request('GET')
 
-    async def post(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+    async def post(self) -> Awaitable[None]:
         """ Handle Post method
         """
-        await self.handle_request('POST', endpoint)
+        await self.handle_request('POST')
 
-    async def head(self, endpoint: Optional[str]=None) -> Awaitable[None]:
+    async def head(self) -> Awaitable[None]:
         """ Handle HEAD method
         """
-        await self.handle_request('HEAD', endpoint)
+        await self.handle_request('HEAD')
 
-    def options(self, endpoint: Optional[str]=None) -> None:
+    def options(self) -> None:
         """ Implement OPTIONS for validating CORS
         """
         self.set_option_headers('GET, POST, OPTIONS')
@@ -220,26 +219,6 @@ class OwsHandler(AsyncClientHandler):
         self.request.arguments = { k.upper():v for (k,v) in self.request.arguments.items() }
 
 
-class _FilterHandlerMixIn:
-    """ Handle filter handlers
-    """
-    def initfilters(self, filters: Optional[List]) -> None:
-        self._filters = filters or []
-
-    async def prepare(self) -> Awaitable[None]:
-        # Handle filters
-        super().prepare()
-        for filt in self._filters:
-            await filt.apply( self )
-
-
-class OwsFilterHandler(_FilterHandlerMixIn, OwsHandler):
-    def initialize(self, filters: Optional[List]=None, **kwargs) -> None:
-        assert 'service' not in kwargs
-        super().initialize(**kwargs)
-        self.initfilters(filters)
-
-
 class OwsApiHandler(AsyncClientHandler):
     """ Handle Qgis api
     """
@@ -264,23 +243,17 @@ class OwsApiHandler(AsyncClientHandler):
         del args[key]
         args['MAP'] = val
 
-    async def get(self, endpoint: Optional[str]=None) -> Awaitable[None]:
-        """ Fix issue with the landing page api when not 
-            specifying index.html.
-        """
-        await super().get(endpoint)
- 
-    async def delete(self, endpoint: Optional[str]=None) -> Awaitable[None]:
-        await self.handle_request('DELETE', endpoint)
+    async def delete(self) -> Awaitable[None]:
+        await self.handle_request('DELETE')
 
-    async def put(self, endpoint: Optional[str]=None) -> Awaitable[None]:
-        await self.handle_request('PUT', endpoint)
+    async def put(self) -> Awaitable[None]:
+        await self.handle_request('PUT')
 
-    async def patch(self, endpoint: Optional[str]=None) -> Awaitable[None]:
-        await self.handle_request('PATCH', endpoint)
+    async def patch(self) -> Awaitable[None]:
+        await self.handle_request('PATCH')
 
-    async def options(self, endpoint: Optional[str]=None) -> Awaitable[None]:
-        await self.handle_request('OPTIONS', endpoint)
+    async def options(self) -> Awaitable[None]:
+        await self.handle_request('OPTIONS')
 
     def get_monitor_params( self ) -> None:
         """ Override
@@ -288,14 +261,8 @@ class OwsApiHandler(AsyncClientHandler):
         params = dict(
             MAP = self.request.arguments.get('MAP','__unknown__'),
             SERVICE = self._service_name,
-            REQUEST = self._endpoint or '__unknown__',
+            REQUEST = self.request.path,
         )
         return params
-
-
-class OwsApiFilterHandler(_FilterHandlerMixIn, OwsApiHandler):
-    def initialize(self, filters: Optional[List]=None, **kwargs) -> None:
-        super().initialize(**kwargs)
-        self.initfilters(filters)
 
 
