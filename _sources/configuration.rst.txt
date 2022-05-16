@@ -230,6 +230,25 @@ header.
 
 
 
+.. _SERVER_MEMORY_HIGH_WATER_MARK:
+
+SERVER_MEMORY_HIGH_WATER_MARK
+-----------------------------
+
+Set memory high water mark as fraction of total memory. Workers are 
+restarted if total memory percent usage of workers exceed that value.
+
+
+:Type: float
+:Default: 0.9
+:Version Added: 1.7.21
+:Section: server
+:Key: memory_high_water_mark
+:Env: QGSRV_SERVER_MEMORY_HIGH_WATER_MARK
+
+
+
+
 .. _LOGGING_LEVEL:
 
 LOGGING_LEVEL
