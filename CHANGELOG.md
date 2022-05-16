@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 1.8.0 - 2022-05-16
+
+* Bump version 1.8 
 * Refactorize middleware managment
 * Root access '/' return 403 instead of 404
 * Management api `/cache/` now return the collection of cached projects.
