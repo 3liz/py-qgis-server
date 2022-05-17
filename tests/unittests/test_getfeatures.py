@@ -48,3 +48,31 @@ class Tests2(HTTPTestCase):
 
         features = rv.xml.findall(".//gml:featureMember", NAMESPACES)
         assert len(features) == 2
+
+    def test_getfeature_limit_ok(self):
+        """ Test getcapabilities hrefs
+        """
+
+        assert confservice.getint('server', 'getfeaturelimit') == 2
+
+        rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0" 
+                              "&TYPENAME=france_parts_bordure&MAXFEATURES=1")
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'].startswith('text/xml;')
+
+        features = rv.xml.findall(".//gml:featureMember", NAMESPACES)
+        assert len(features) == 1
+
+    def test_getfeature_limit_not_ok(self):
+        """ Test getcapabilities hrefs
+        """
+        assert confservice.getint('server', 'getfeaturelimit') == 2
+
+        rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0" 
+                              "&TYPENAME=france_parts_bordure&MAXFEATURES=3")
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'].startswith('text/xml;')
+
+        features = rv.xml.findall(".//gml:featureMember", NAMESPACES)
+        assert len(features) == 2
+
