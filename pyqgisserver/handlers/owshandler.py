@@ -229,14 +229,23 @@ class OwsHandler(AsyncClientHandler):
             Qgis does not set a default limit and unlimited
             request may cause issues
         """
-        if self.getfeaturelimit > 0:
-            if arguments.get('SERVICE','').upper() == 'WFS' \
-                    and arguments.get('REQUEST','').lower() == 'getfeature':
-                limit = str(self.getfeaturelimit)
-                if arguments('VERSION', default='').startswith('2.'):
-                    arguments['COUNT'] = limit
-                else:
-                    arguments['MAXFEATURES'] = limit
+        if self.getfeaturelimit > 0 \
+                and arguments.get('SERVICE', b'').upper() == b'WFS' \
+                and arguments.get('REQUEST', b'').lower() == b'getfeature':
+
+            if arguments.get('VERSION', b'').startswith(b'2.'):
+                key = 'COUNT'
+            else:
+                key = 'MAXFEATURES'
+
+            limit = self.getfeaturelimit
+            try:
+                actual_limit = int(arguments.get(key,0))
+                if actual_limit > 0:
+                    limit =  min(limit, actual_limit)
+            except ValueError:
+                pass
+            arguments[key] = str(limit).encode()
 
         return arguments
 
