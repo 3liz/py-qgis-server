@@ -73,7 +73,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         rv.update( *args, **kwargs )
         return rv
 
-    add_handler( r"/ows/?", OwsHandler, ows_kwargs)
+    add_handler( r"/ows/?", OwsHandler, _ows_args(getfeaturelimit=cfg.getint('getfeaturelimit')))
 
     wfs3_api_endpoints = [
         rf"wfs3{end}",

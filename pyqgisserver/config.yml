@@ -139,7 +139,20 @@ config_options:
       section: server
       key: memory_high_water_mark
       tags: [ workers, memory ]
-      version_added: '1.7.21'
+      version_added: '1.8.0'
+
+    - name: SERVER_GETFEATURELIMIT
+      label: Define default WFS/GetFeature limit
+      description: |
+          Define default limit for WFS/GetFeature requests.
+          A negative value set no limit; this may be a concern
+          with requests returning a high number of values.
+      default: -1
+      type: int
+      section: server
+      key: getfeaturelimit
+      tags: [ ows, memory ]
+      version_added: '1.8.1'
 
     #==========
     # Logging  

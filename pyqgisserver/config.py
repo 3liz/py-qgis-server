@@ -74,6 +74,7 @@ def load_configuration():
     CONFIG.set('server', 'allow_headers' , getenv('QGSRV_SERVER_ALLOW_HEADERS', 'X-Qgis-,X-Lizmap-'))
     CONFIG.set('server', 'memory_high_water_mark', 
                getenv('QGSRV_SERVER_MEMORY_HIGH_WATER_MARK', '0.9'))
+    CONFIG.set('server', 'getfeaturelimit', getenv('QGSRV_SERVER_GETFEATURELIMIT', '-1'))
 
     #
     # Logging

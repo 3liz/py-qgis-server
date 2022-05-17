@@ -10,6 +10,7 @@
 """
 import logging
 from time import time
+from urllib.parse import urlencode
 
 from ..logger import log_rrequest
 from ..zeromq.client import RequestTimeoutError, RequestGatewayError, AsyncClient
@@ -49,7 +50,10 @@ class AsyncClientHandler(BaseHandler):
 
         self.ogc_scheme   = None
 
-    def set_backend_headers(self, headers) -> Dict[str,str]:
+    def encode_arguments(self) -> str:
+        return '?'+urlencode({k:v[0] for k,v in self.request.arguments.items()})
+
+    def set_backend_headers(self, headers: Dict) -> None:
         """ Set headers passed to backend
         """
         project_path = self.get_argument('MAP',default=None)
@@ -196,8 +200,9 @@ class AsyncClientHandler(BaseHandler):
 
 class OwsHandler(AsyncClientHandler):
 
-    def initialize( self, *args, **kwargs ) -> None:
-        super().initialize(*args, **kwargs )
+    def initialize(self, *args, getfeaturelimit: int=-1,  **kwargs) -> None:
+        super().initialize(*args, **kwargs)
+        self.getfeaturelimit = getfeaturelimit
         self.ogc_scheme = 'OWS'
 
     MONITOR_ARGUMENTS = (
@@ -206,7 +211,7 @@ class OwsHandler(AsyncClientHandler):
         'REQUEST',
     )
 
-    def get_monitor_params( self ) -> Dict[str,Any]:
+    def get_monitor_params(self) -> Dict[str,Any]:
         """ Override
         """
         args = self.request.arguments
@@ -218,11 +223,32 @@ class OwsHandler(AsyncClientHandler):
         # Replace query arguments to upper case: (it's ok for OWS)
         self.request.arguments = { k.upper():v for (k,v) in self.request.arguments.items() }
 
+    def fix_getfeature(self, arguments: Dict) -> Dict:
+        """ Take care of WFS/GetFeature limit
+
+            Qgis does not set a default limit and unlimited
+            request may cause issues
+        """
+        if self.getfeaturelimit > 0:
+            if arguments.get('SERVICE','').upper() == 'WFS' \
+                    and arguments.get('REQUEST','').lower() == 'getfeature':
+                limit = str(self.getfeaturelimit)
+                if arguments('VERSION', default='').startswith('2.'):
+                    arguments['COUNT'] = limit
+                else:
+                    arguments['MAXFEATURES'] = limit
+
+        return arguments
+
+    def encode_arguments(self) -> str:
+        arguments = {k:v[0] for k,v in self.request.arguments.items()}
+        return '?'+urlencode(self.fix_getfeature(arguments))
+
 
 class OwsApiHandler(AsyncClientHandler):
     """ Handle Qgis api
     """
-    def initialize( self, service: str, **kwargs ) -> None:
+    def initialize(self, service: str, **kwargs) -> None:
         super().initialize(**kwargs )
         self.ogc_scheme = 'OAF'
         self._service_name = service.upper()

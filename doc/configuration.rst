@@ -241,10 +241,30 @@ restarted if total memory percent usage of workers exceed that value.
 
 :Type: float
 :Default: 0.9
-:Version Added: 1.7.21
+:Version Added: 1.8.0
 :Section: server
 :Key: memory_high_water_mark
 :Env: QGSRV_SERVER_MEMORY_HIGH_WATER_MARK
+
+
+
+
+.. _SERVER_GETFEATURELIMIT:
+
+SERVER_GETFEATURELIMIT
+----------------------
+
+Define default limit for WFS/GetFeature requests.
+A negative value set no limit; this may be a concern
+with requests returning a high number of values.
+
+
+:Type: int
+:Default: -1
+:Version Added: 1.8.1
+:Section: server
+:Key: getfeaturelimit
+:Env: QGSRV_SERVER_GETFEATURELIMIT
 
 
 

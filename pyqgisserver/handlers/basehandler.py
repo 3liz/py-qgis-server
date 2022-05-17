@@ -12,9 +12,6 @@ import tornado.web
 import logging
 import json
 from tornado.web import HTTPError # noqa F401
-
-from urllib.parse import urlencode
-
 from typing import Any, Union, Optional
 
 from ..version import __version__
@@ -36,9 +33,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def prepare(self) -> None:
         self.has_body_arguments = len(self.request.body_arguments)>0
-
-    def encode_arguments(self) -> str:
-        return '?'+urlencode({k:v[0] for k,v in self.request.arguments.items()})
 
     def compute_etag(self) -> None:
         # Disable etag computation
