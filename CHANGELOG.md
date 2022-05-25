@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.8.1 - 2022-05-25
+
 * Use qgis-plugin-manager for installing qgis server plugins
     - See https://github.com/3liz/qgis-plugin-manager
 * Support `QGIS_PLUGINPATH` environment variable
