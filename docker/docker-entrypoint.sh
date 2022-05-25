@@ -60,6 +60,12 @@ fi
 export QGIS_DISABLE_MESSAGE_HOOKS=1
 export QGIS_NO_OVERRIDE_IMPORT=1
 
+# Make sure that QGSRV_SERVER_PLUGINPATH takes precedence over
+# QGIS_PLUGINPATH
+if [[ -n ${QGSRV_SERVER_PLUGINPATH} ]]; then
+    export QGIS_PLUGINPATH=$QGSRV_SERVER_PLUGINPATH
+fi
+
 if [[ "$1" == "qgisserver-worker" ]]; then
     shift
     echo "Running Qgis server worker"

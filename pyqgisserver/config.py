@@ -65,7 +65,6 @@ def load_configuration():
     CONFIG.set('server', 'http_proxy'    , getenv('QGSRV_SERVER_HTTP_PROXY', 'no'))
     CONFIG.set('server', 'proxy_url'     , getenv('QGSRV_SERVER_PROXY_URL', ''))
     CONFIG.set('server', 'restartmon'    , getenv('QGSRV_SERVER_RESTARTMON', ''))
-    CONFIG.set('server', 'pluginpath'    , getenv('QGSRV_SERVER_PLUGINPATH', ''))
     CONFIG.set('server', 'ssl'           , getenv('QGSRV_SERVER_SSL', 'no'))
     CONFIG.set('server', 'ssl_cert'      , getenv('QGSRV_SERVER_SSL_CERT', ''))
     CONFIG.set('server', 'ssl_key'       , getenv('QGSRV_SERVER_SSL_KEY', ''))
@@ -75,7 +74,9 @@ def load_configuration():
     CONFIG.set('server', 'memory_high_water_mark', 
                getenv('QGSRV_SERVER_MEMORY_HIGH_WATER_MARK', '0.9'))
     CONFIG.set('server', 'getfeaturelimit', getenv('QGSRV_SERVER_GETFEATURELIMIT', '-1'))
-
+    CONFIG.set('server', 'pluginpath', 
+               getenv2('QGSRV_SERVER_PLUGINPATH','QGIS_PLUGINPATH', ''))
+ 
     #
     # Logging
     #

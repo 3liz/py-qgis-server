@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+* Use qgis-plugin-manager for installing qgis server plugins
+    - See https://github.com/3liz/qgis-plugin-manager
+* Support `QGIS_PLUGINPATH` environment variable
+* Add 'getfeaturelimit' config option
+    - Set maximum value for WFS/GetFeature requests
+
 ## 1.8.0 - 2022-05-16
 
 * Bump version 1.8 
