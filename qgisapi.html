@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -81,14 +82,14 @@
            <div itemprop="articleBody">
              
   <section id="expose-qgis-api">
-<span id="id1"></span><h1>Expose Qgis Api<a class="headerlink" href="#expose-qgis-api" title="Permalink to this headline"></a></h1>
+<span id="id1"></span><h1>Expose Qgis Api<a class="headerlink" href="#expose-qgis-api" title="Permalink to this heading"></a></h1>
 <p>Qgis server enable defining <a class="reference external" href="https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/server.html#custom-apis">custom api</a>.</p>
 <p>Py-qgis-server allow you to control public access to the qgis services apis while still allowing access
 throught the management api.</p>
 <p>This may be useful if you plan to have some api doing some backoffice management and do not want these api beeing accessed
 publicly.</p>
 <section id="api-endpoint">
-<span id="api-endpoints"></span><h2>Api endpoint<a class="headerlink" href="#api-endpoint" title="Permalink to this headline"></a></h2>
+<span id="api-endpoints"></span><h2>Api endpoint<a class="headerlink" href="#api-endpoint" title="Permalink to this heading"></a></h2>
 <p>Apis may be accessed by the management api by configuring the api endpoint:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">api</span><span class="o">.</span><span class="n">endpoints</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">api_name</span><span class="o">&gt;=/</span><span class="n">endpoint</span>
@@ -97,7 +98,7 @@ publicly.</p>
 <p>The endpoint should match the root path of the api as defined in the <a class="reference external" href="https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/server.html#custom-apis">qgis server api entrypoint</a></p>
 </section>
 <section id="enabling-api-public-access">
-<span id="enabling-api"></span><h2>Enabling api public access<a class="headerlink" href="#enabling-api-public-access" title="Permalink to this headline"></a></h2>
+<span id="enabling-api"></span><h2>Enabling api public access<a class="headerlink" href="#enabling-api-public-access" title="Permalink to this heading"></a></h2>
 <p>Apis are publicly enabled with the following configuration:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">api</span><span class="o">.</span><span class="n">enabled</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">api_name</span><span class="o">&gt;=</span><span class="n">yes</span>

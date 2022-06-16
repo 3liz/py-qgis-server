@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -53,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#options">Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-proxy-and-workers-separately">Running proxy and workers separately</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-with-docker">Running with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-server-plugins-with-the-docker-container">Install server plugins with the Docker container</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Settings</a></li>
@@ -90,7 +92,7 @@
            <div itemprop="articleBody">
              
   <section id="description">
-<span id="server-description"></span><h1>Description<a class="headerlink" href="#description" title="Permalink to this headline"></a></h1>
+<span id="server-description"></span><h1>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h1>
 <p>Py-qgis-server is a asynchronous HTTP Qgis server written in python on top of the <a class="reference external" href="http://www.tornadoweb.org/en/stable/">tornado</a> framework and the 0MQ messaging framework for distributing requests workers.</p>
 <p>It is based on the new Qgis 3 server API for efficiently passing requests/responses using 0MQ messaging framework to workers.</p>
 <p>The server may be run as a self-contained single service or as a proxy server with an arbitrary number of workers running
@@ -98,7 +100,7 @@ remotely or locally. Independent workers connect automatically to the front-end 
 on the proxy side. Thus, this is ideal for auto-scaling configuration for use with container orchestrator as Rancher, Swarm or Kubernetes.</p>
 <p>The server is aimed at solving some real situations encountered in production environment: zero conf scalability, handle long-running request situation, auto restart…</p>
 <section id="features">
-<span id="server-features"></span><h2>Features<a class="headerlink" href="#features" title="Permalink to this headline"></a></h2>
+<span id="server-features"></span><h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>Multiples workers</p></li>
 <li><p>Fair queuing request dispatching</p></li>
@@ -110,7 +112,7 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 </ul>
 </section>
 <section id="requirements">
-<span id="server-requirements"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h2>
+<span id="server-requirements"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>OS: Unix/Posix variants (Linux or OSX) (Windows not officially supported)</p></li>
 <li><p>Python &gt;= 3.5</p></li>
@@ -120,9 +122,9 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 </section>
 </section>
 <section id="installation">
-<span id="server-installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
+<span id="server-installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
 <section id="install-from-source">
-<span id="server-source-install"></span><h2>Install from source<a class="headerlink" href="#install-from-source" title="Permalink to this headline"></a></h2>
+<span id="server-source-install"></span><h2>Install from source<a class="headerlink" href="#install-from-source" title="Permalink to this heading"></a></h2>
 <ul>
 <li><p>Install from pypi.org:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">py</span><span class="o">-</span><span class="n">qgis</span><span class="o">-</span><span class="n">server</span>
@@ -144,7 +146,7 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 </section>
 </section>
 <section id="running-the-server">
-<span id="server-running"></span><h1>Running the server<a class="headerlink" href="#running-the-server" title="Permalink to this headline"></a></h1>
+<span id="server-running"></span><h1>Running the server<a class="headerlink" href="#running-the-server" title="Permalink to this heading"></a></h1>
 <p>The server does not run as a daemon by itself, there is several way to run a command as a daemon.</p>
 <p>For example:</p>
 <ul class="simple">
@@ -154,11 +156,11 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 <li><p>…</p></li>
 </ul>
 <section id="synopsis">
-<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline"></a></h2>
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
 <p><strong>qgisserver</strong> [<em>options</em>]</p>
 </section>
 <section id="options">
-<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline"></a></h2>
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this heading"></a></h2>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-d">
 <span id="cmdoption-debug"></span><span class="sig-name descname"><span class="pre">-d</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--debug</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-d" title="Permalink to this definition"></a></dt>
@@ -179,17 +181,26 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 
 </section>
 <section id="running-proxy-and-workers-separately">
-<h2>Running proxy and workers separately<a class="headerlink" href="#running-proxy-and-workers-separately" title="Permalink to this headline"></a></h2>
+<h2>Running proxy and workers separately<a class="headerlink" href="#running-proxy-and-workers-separately" title="Permalink to this heading"></a></h2>
 <p>If the <code class="docutils literal notranslate"><span class="pre">--proxy</span></code> option is set  the server will act as a proxy server to talk to independent qgis workers.</p>
 <p>QGIS workers can be run using the command:</p>
 <p><strong>qgisserver-worker</strong> [<em>options</em>]</p>
 <p>The options are the same as</p>
 </section>
 <section id="running-with-docker">
-<span id="server-docker-running"></span><h2>Running with Docker<a class="headerlink" href="#running-with-docker" title="Permalink to this headline"></a></h2>
+<span id="server-docker-running"></span><h2>Running with Docker<a class="headerlink" href="#running-with-docker" title="Permalink to this heading"></a></h2>
 <p>Docker image is available on <a class="reference external" href="https://hub.docker.com/r/3liz/qgis-map-server">docker-hub</a>.</p>
 <p>All options are passed with environment variables. See the <a class="reference internal" href="configuration.html#configuration-settings"><span class="std std-ref">Configuration settings</span></a>
 for a description of the options.</p>
+</section>
+<section id="install-server-plugins-with-the-docker-container">
+<span id="install-plugin"></span><h2>Install server plugins with the Docker container<a class="headerlink" href="#install-server-plugins-with-the-docker-container" title="Permalink to this heading"></a></h2>
+<p>The docker image is shipped vith the <cite>qgis-plugin-manager &lt;https://www.3liz.com/news/qgis-plugin-manager.html&gt;.</cite></p>
+<p>To install or manage your server plugins, use the docker <cite>exec</cite> command into your container, the plugins vwill install in the folder defined by the <a class="reference internal" href="configuration.html#server-pluginpath"><span class="std std-ref">SERVER_PLUGINPATH</span></a> option.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">exec</span> <span class="n">myserver</span> <span class="o">-</span><span class="n">it</span> <span class="n">qgis</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">manager</span> <span class="n">install</span> <span class="n">lizmap</span>
+</pre></div>
+</div>
 </section>
 </section>
 

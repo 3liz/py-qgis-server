@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -82,13 +83,13 @@
            <div itemprop="articleBody">
              
   <section id="management-api-experimental">
-<span id="management-api"></span><h1>Management API (experimental)<a class="headerlink" href="#management-api-experimental" title="Permalink to this headline"></a></h1>
+<span id="management-api"></span><h1>Management API (experimental)<a class="headerlink" href="#management-api-experimental" title="Permalink to this heading"></a></h1>
 <p>The management API is a REST api for inspecting the server state and controlling some of the server
 behavior.</p>
 <p>Starting from version 1.7.0, this is an <strong>experimental</strong> feature and it will be subject to change.
 The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 <section id="plugins-api">
-<span id="id1"></span><h2>Plugins API<a class="headerlink" href="#plugins-api" title="Permalink to this headline"></a></h2>
+<span id="id1"></span><h2>Plugins API<a class="headerlink" href="#plugins-api" title="Permalink to this heading"></a></h2>
 <p>The <em>plugins</em> api enable inspecting and managing Qgis server plugins.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#get--plugins-(name)" title="GET /plugins/(name)"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/plugins/(name)</span></code></a></p></li>
@@ -141,7 +142,7 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 </div></blockquote>
 </section>
 <section id="cache-api">
-<span id="id2"></span><h2>Cache API<a class="headerlink" href="#cache-api" title="Permalink to this headline"></a></h2>
+<span id="id2"></span><h2>Cache API<a class="headerlink" href="#cache-api" title="Permalink to this heading"></a></h2>
 <p>The <em>cache</em> api allow qgis project introspection</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#get--cache-(project_uri)" title="GET /cache/(project_uri)"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/cache/(project_uri)</span></code></a></p></li>
@@ -191,7 +192,7 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 </div></blockquote>
 </section>
 <section id="pool-api">
-<span id="id3"></span><h2>Pool API<a class="headerlink" href="#pool-api" title="Permalink to this headline"></a></h2>
+<span id="id3"></span><h2>Pool API<a class="headerlink" href="#pool-api" title="Permalink to this heading"></a></h2>
 <p>The <em>pool</em> api allow inspecting workers and projects cache associated to them.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#get--pool-" title="GET /pool/"><code class="xref http http-get docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/pool/</span></code></a></p></li>
@@ -266,7 +267,7 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 </div></blockquote>
 </section>
 <section id="qgis-api">
-<span id="id4"></span><h2>Qgis API<a class="headerlink" href="#qgis-api" title="Permalink to this headline"></a></h2>
+<span id="id4"></span><h2>Qgis API<a class="headerlink" href="#qgis-api" title="Permalink to this heading"></a></h2>
 <p>The <cite>/qgis/</cite> api endpoint is a passthrough for accessing directly the Qgis server api and services. Some services may install some management api that will be accessible from this endpoint.</p>
 </section>
 </section>
