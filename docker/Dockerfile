@@ -10,7 +10,7 @@ LABEL Description="QGIS3 Python Server" Vendor="3liz.org"
 ARG PIP_OPTIONS
 ARG BUILD_VERSION
 
-RUN apt-get update && apt-get install -y --no-install-recommends wget jq gosu \
+RUN apt-get update && apt-get install -y --no-install-recommends jq gosu \
     && apt-get clean  && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/share/man 
 
@@ -27,7 +27,11 @@ RUN mkdir -p /opt/local/ \
         qgis-plugin-manager \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver-worker \
-    && ln -s /opt/local/pyqgisserver/bin/qgis-plugin-manager \
+    && echo "#!/bin/bash" > qgis-plugin-manager \
+    && echo "export QGIS_PLUGINPATH=\${QGIS_PLUGINPATH:-\$QGSRV_SERVER_PLUGINPATH}" >> qgis-plugin-manager \
+    && echo "echo \"QGIS_PLUGINPATH set to \$QGIS_PLUGINPATH\"" >> qgis-plugin-manager \
+    && echo "/opt/local/pyqgisserver/bin/qgis-plugin-manager \"\$@\"" >> qgis-plugin-manager \
+    && chmod 755 qgis-plugin-manager \
     && rm -rf /root/.cache /root/.ccache
 
 COPY docker-entrypoint.sh /

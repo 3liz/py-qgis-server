@@ -1,7 +1,7 @@
 # qgis server makefile
 #
 
-VERSION:=1.8.1
+VERSION:=1.8.2
 
 ifndef CI_COMMIT_TAG
 VERSION_TAG=$(VERSION)rc0

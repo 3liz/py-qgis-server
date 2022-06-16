@@ -89,6 +89,7 @@ config_options:
       section: server
       key: pluginpath
       tags: [ qgis, plugins ]
+      alt_env: QGIS_PLUGINPATH
       type: path  
 
     - name: SERVER_SSL

@@ -123,3 +123,22 @@ Docker image is available on `docker-hub <https://hub.docker.com/r/3liz/qgis-map
 
 All options are passed with environment variables. See the :ref:`Configuration settings <configuration_settings>` 
 for a description of the options.
+
+
+.. _install_plugin:
+
+Install server plugins with the Docker container
+------------------------------------------------
+
+The docker image is shipped vith the `qgis-plugin-manager <https://www.3liz.com/news/qgis-plugin-manager.html>.`
+
+To install or manage your server plugins, use the docker `exec` command into your container, the plugins vwill install in the folder defined by the :ref:`SERVER_PLUGINPATH <SERVER_PLUGINPATH>` option.
+
+Example::
+    
+    docker exec myserver -it qgis-plugin-manager install lizmap
+
+
+
+
+

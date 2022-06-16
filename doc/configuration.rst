@@ -162,6 +162,7 @@ The path to qgis server plugins
 :Section: server
 :Key: pluginpath
 :Env: QGSRV_SERVER_PLUGINPATH
+:Alternate name: QGIS_PLUGINPATH
 
 
 
