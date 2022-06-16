@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.8.2 - 2022-06-16
+
+* Fix Installation of qgis-plugin-manager
+
 ## 1.8.1 - 2022-05-25
 
 * Use qgis-plugin-manager for installing qgis server plugins
