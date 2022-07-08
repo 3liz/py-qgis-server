@@ -26,7 +26,8 @@ from ..config import confservice
 from .types import UpdateState
 
 from qgis.PyQt.QtCore import Qt 
-from qgis.core import (QgsApplication,
+from qgis.core import (Qgis,
+                       QgsApplication,
                        QgsProjectBadLayerHandler, 
                        QgsProject, 
                        QgsMapLayer)
@@ -395,7 +396,12 @@ class QgsCacheManager:
             from uri.
         """
         LOGGER.debug("Reading Qgis project %s", uri)
-        project = self._create_project()
+
+        # see https://github.com/qgis/QGIS/pull/49266
+        if Qgis.QGIS_VERSION_INT < 32700:
+            project = self._create_project()
+        else:
+            project = self._create_project(capabilities=Qgis.ProjectCapabilities())
 
         readflags = QgsProject.ReadFlags()
         if self._trust_layer_metadata:

@@ -6,8 +6,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import asyncio
-import tornado.platform.asyncio
 from tornado.testing import AsyncHTTPTestCase
 import lxml.etree
 import logging
@@ -81,16 +79,6 @@ class HTTPTestCase(AsyncHTTPTestCase):
         self._application = Application(ipcaddr)
         return initialize_middleware(self._application)
     
-    def get_new_ioloop(self) -> tornado.platform.asyncio.AsyncIOLoop:
-        """
-        Needed to make sure that I can also run asyncio based callbacks in our tests
-        """
-        # Create a new IO loop et set it as default
-        io_loop = tornado.platform.asyncio.AsyncIOLoop()
-        asyncio.set_event_loop(io_loop.asyncio_loop)
-        return io_loop
-
-
 class HTTPTestResponse:
 
     def __init__(self, http_response) -> None:
