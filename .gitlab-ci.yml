@@ -21,7 +21,11 @@ stages:
   tags:
     - infrav3-dind
 
-tests:release:
+# XXX Temporary disable release test 
+# Because of https://github.com/qgis/QGIS/pull/49266
+#
+#
+.tests:release:
   extends: .tests
   variables:
     QGIS_FLAVOR: release  
@@ -59,7 +63,7 @@ tickets:
   only:
     - tags
   needs:
-    - "release:release" 
+#    - "release:release" 
     - "release:ltr"
   image:
     name: registry.snap.lizlan:5000/infra/ci-tools:latest

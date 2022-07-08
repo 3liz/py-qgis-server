@@ -19,10 +19,10 @@
   tags:
     - infrav3-dind
 
-build-docker:release:
-  extends: .build-docker
-  variables:
-    QGIS_FLAVOR: release
+#build-docker:release:
+#  extends: .build-docker
+#  variables:
+#    QGIS_FLAVOR: release
 
 build-docker:ltr:
   extends: .build-docker
@@ -68,7 +68,8 @@ deploy_snap:
   variables:
     FACTORY_MANIFEST: "docker/factory.manifest"
 
-release:release:
+# XXX Temporary disabled
+.release:release:
   extends: .release
   variables:
     QGIS_FLAVOR: release
