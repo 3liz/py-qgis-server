@@ -71,7 +71,7 @@ env: local
 		EOF
 
 test: export RUN_COMMAND=./tests/run_tests.sh
-test: env up 
+test: env up stop
 
 %-test: export RUN_COMMAND=./tests/run_tests.sh
 %-test: env
@@ -79,7 +79,7 @@ test: env up
 	-f docker-compose.yml \
 	-f docker-compose.$*.yml up -V --quiet-pull --remove-orphans \
 		--force-recreate --exit-code-from qgis-server
-
+	docker compose down -v --remove-orphans
 
 run: export RUN_COMMAND=./tests/run_server.sh
 run: up

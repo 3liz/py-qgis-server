@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Prune docker environment after running tests
 * Fix cache observer initialization
 
 ## 1.8.2 - 2022-06-16
