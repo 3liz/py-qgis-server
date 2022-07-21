@@ -79,9 +79,11 @@ class Server:
         names = (name.strip() for name in confservice.get('projects.cache','observers', fallback="").split(','))
         cls._declared_observers = list(name for name in names if name)
 
+        # XXX: Managment use cache observer for listing cached objects
         if cls._declared_observers or confservice.getboolean('management','enabled'):
             cls._enabled = True
-            confservice.set('projects.cache','has_observers', 'yes' if cls._declared_observers else 'no')
+
+        confservice.set('projects.cache','has_observers', 'yes' if cls._enabled else 'no')
 
     def __init__(self)-> None:
         """ Run Observer
@@ -97,6 +99,9 @@ class Server:
 
         if self._declared_observers:
             self._load_observers()
+
+        if self._enabled:
+            LOGGER.info("Starting cache observer")
             ctx = zmq.asyncio.Context.instance()
             self._sock = ctx.socket(zmq.PULL)
             self._sock.setsockopt(zmq.RCVTIMEO, 1000)

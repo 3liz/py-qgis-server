@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Fix cache observer initialization
+
 ## 1.8.2 - 2022-06-16
 
 * Fix Installation of qgis-plugin-manager
