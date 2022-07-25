@@ -21,7 +21,7 @@ stages:
   tags:
     - infrav3-dind
 
-.tests:release:
+tests:release:
   extends: .tests
   variables:
     QGIS_FLAVOR: release  

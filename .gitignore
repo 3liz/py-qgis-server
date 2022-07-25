@@ -46,6 +46,7 @@ docker-test.log
 /tests/unittests/qgis.db
 /tests/data/private
 /tests/qgis
+/tests/unittests/symbology-style.db
 
 *.bak
 *.bak~
