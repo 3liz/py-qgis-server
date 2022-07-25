@@ -398,7 +398,7 @@ class QgsCacheManager:
         LOGGER.debug("Reading Qgis project %s", uri)
 
         # see https://github.com/qgis/QGIS/pull/49266
-        if Qgis.QGIS_VERSION_INT < 32700:
+        if Qgis.QGIS_VERSION_INT < 32601:
             project = self._create_project()
         else:
             project = self._create_project(capabilities=Qgis.ProjectCapabilities())
