@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Deactivate capabilities options for Qgis >= 3.26.1
+    - See https://github.com/qgis/QGIS/pull/49266
 * Prune docker environment after running tests
 * Fix cache observer initialization
 
