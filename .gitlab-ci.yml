@@ -21,16 +21,18 @@ stages:
   tags:
     - infrav3-dind
 
-tests:release:
-  extends: .tests
-  variables:
-    QGIS_FLAVOR: release  
-
 tests:ltr:
   extends: .tests
   variables:
     QGIS_FLAVOR: ltr
 
+tests:release:
+  extends: .tests
+  needs: 
+    - "tests:ltr"
+  variables:
+    QGIS_FLAVOR: release 
+ 
 #---------------
 # Build
 #---------------
