@@ -1,7 +1,11 @@
 # Changelog
 
-## Unreleased
+## Unreleased 
 
+## 1.8.3 - 2022-08-02
+
+* Fix for python >= 3.10
+    - See https://github.com/3liz/py-qgis-server/pull/43
 * Deactivate capabilities options for Qgis >= 3.26.1
     - See https://github.com/qgis/QGIS/pull/49266
 * Prune docker environment after running tests
