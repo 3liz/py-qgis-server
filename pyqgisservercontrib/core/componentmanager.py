@@ -47,7 +47,7 @@ def _entry_points( group: str, name: Optional[str] = None):
     if ver >= (3,10):
         from importlib import metadata
         # See https://docs.python.org/3.10/library/importlib.metadata.html
-        return metadata.entry_points.select(group=group, name=name)
+        return metadata.entry_points().select(group=group, name=name)
     elif ver >= (3,8):
         from importlib import metadata
         # Return a dict
