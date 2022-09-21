@@ -12,7 +12,7 @@ services:
             QGSRV_CACHE_OBSERVERS_BAN_SERVER_ADDRESS: "http://varnish:80"
             QGSRV_CACHE_CHECK_INTERVAL: 10
     varnish:
-        image: varnish:7.1-alpine
+        image: varnish:7.2-alpine
         environment:
             VARNISH_SIZE: 500M
         volumes:

@@ -224,40 +224,57 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
     try:
         broker_pr   = create_broker_process(ipcaddr)
         worker_pool = create_poolserver(workers) if workers>0 else None
-        sockets = bind_sockets(port, address=address)
 
-        LOGGER.info("Running server on port %s:%s", address, port)
+        # Since python 3.10 and deprecation of `get_event_loop()` 
+        # This is now the preferred way to start tornado application
+        # See https://www.tornadoweb.org/en/stable/guide/running.html
+        async def _main():
+            sockets = bind_sockets(port, address=address)
 
-        application = Application(ipcaddr)
+            LOGGER.info("Running server on port %s:%s", address, port)
 
-        # Init HTTP server
-        server = HTTPServer(initialize_middleware(application), **kwargs)
-        server.add_sockets(sockets)
+            nonlocal application
+            application = Application(ipcaddr)
 
-        # Activate management
-        if confservice['management'].getboolean('enabled'):
-            from .management.server import start_management_server
-            management = start_management_server(worker_pool,ipcaddr)
-            management.stats = application.stats
+            # Init HTTP server
+            nonlocal server
+            server = HTTPServer(initialize_middleware(application), **kwargs)
+            server.add_sockets(sockets)
 
-        # Initialize pool supervisor
-        if worker_pool:
-            worker_pool.start_supervisor()
+            # Activate management
+            nonlocal management
+            if confservice['management'].getboolean('enabled'):
+                from .management.server import start_management_server
+                management = start_management_server(worker_pool,ipcaddr)
+                management.stats = application.stats
 
-        # Start cache observer
-        cache_observer = start_cache_observer()
+            # Initialize pool supervisor
+            if worker_pool:
+                worker_pool.start_supervisor()
 
-        if management:
-            management.cache_observer = cache_observer
+            # Start cache observer
+            nonlocal cache_observer
+            cache_observer = start_cache_observer()
+
+            if management:
+                management.cache_observer = cache_observer
+
+            event = asyncio.Event()
+
+            loop = asyncio.get_running_loop()
+            loop.add_signal_handler(signal.SIGTERM, event.set)
+            
+            LOGGER.info("Starting processing requests")
+            # Wait forever until signal is set 
+            # see https://www.tornadoweb.org/en/stable/guide/running.html
+            await event.wait()
 
         # XXX This trigger a deprecation warning in python 3.10
         # but there is no clear alternative with tornado atm
         # See https://github.com/tornadoweb/tornado/issues/3033
-        loop = asyncio.get_event_loop()
-        loop.add_signal_handler(signal.SIGTERM, lambda: loop.stop())
-        LOGGER.info("Starting processing requests")
-        loop.run_forever()
+        asyncio.run(_main())
     except Exception:
+        print("Server exited from exception")
         traceback.print_exc()
         exit_code = 1
     except KeyboardInterrupt:
