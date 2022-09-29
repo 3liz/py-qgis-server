@@ -2,6 +2,9 @@
 
 ## Unreleased 
 
+* Configure lizmap api from environment variables
+* Replace calls to `asyncio.get_event_loop()`
+
 ## 1.8.3 - 2022-08-02
 
 * Fix for python >= 3.10
