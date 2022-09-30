@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -195,10 +196,10 @@ for a description of the options.</p>
 </section>
 <section id="install-server-plugins-with-the-docker-container">
 <span id="install-plugin"></span><h2>Install server plugins with the Docker container<a class="headerlink" href="#install-server-plugins-with-the-docker-container" title="Permalink to this heading"></a></h2>
-<p>The docker image is shipped vith the <cite>qgis-plugin-manager &lt;https://www.3liz.com/news/qgis-plugin-manager.html&gt;.</cite></p>
-<p>To install or manage your server plugins, use the docker <cite>exec</cite> command into your container, the plugins vwill install in the folder defined by the <a class="reference internal" href="configuration.html#server-pluginpath"><span class="std std-ref">SERVER_PLUGINPATH</span></a> option.</p>
+<p>The docker image is shipped with the <cite>qgis-plugin-manager &lt;https://www.3liz.com/news/qgis-plugin-manager.html&gt;.</cite></p>
+<p>To install or manage your server plugins, use the docker <cite>exec</cite> command into your container, the plugins will install in the folder defined by the <a class="reference internal" href="configuration.html#server-pluginpath"><span class="std std-ref">SERVER_PLUGINPATH</span></a> option.</p>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">exec</span> <span class="n">myserver</span> <span class="o">-</span><span class="n">it</span> <span class="n">qgis</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">manager</span> <span class="n">install</span> <span class="n">lizmap</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">exec</span> <span class="n">myserver</span> <span class="o">-</span><span class="n">it</span> <span class="n">qgis</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">manager</span> <span class="n">install</span> <span class="s2">&quot;Lizmap server&quot;</span>
 </pre></div>
 </div>
 </section>

@@ -34,7 +34,7 @@ Requirements
 ------------
 
 - OS: Unix/Posix variants (Linux or OSX) (Windows not officially supported)
-- Python >= 3.5 
+- Python >= 3.5
 - QGIS >= 3.10 installed
 - libzmq >= 4.0.1 and pyzmq >= 17
 
@@ -80,7 +80,7 @@ For example:
 Synopsis
 --------
 
-**qgisserver** [*options*] 
+**qgisserver** [*options*]
 
 
 Options
@@ -90,15 +90,15 @@ Options
 
 .. option:: -d, --debug
 
-    Force debug mode. This is the same as setting the :ref:`LOGGING_LEVEL <LOGGING_LEVEL>` option to ``DEBUG`` 
-   
+    Force debug mode. This is the same as setting the :ref:`LOGGING_LEVEL <LOGGING_LEVEL>` option to ``DEBUG``
+
 .. option:: -c, --config path
 
-    Use the configuration file located at ``path`` 
+    Use the configuration file located at ``path``
 
 .. option:: --proxy
 
-    Run only as proxy. 
+    Run only as proxy.
 
 
 Running proxy and workers separately
@@ -111,7 +111,7 @@ QGIS workers can be run using the command:
 
 **qgisserver-worker** [*options*]
 
-The options are the same as 
+The options are the same as
 
 
 .. _server_docker_running:
@@ -119,9 +119,9 @@ The options are the same as
 Running with Docker
 -------------------
 
-Docker image is available on `docker-hub <https://hub.docker.com/r/3liz/qgis-map-server>`_. 
+Docker image is available on `docker-hub <https://hub.docker.com/r/3liz/qgis-map-server>`_.
 
-All options are passed with environment variables. See the :ref:`Configuration settings <configuration_settings>` 
+All options are passed with environment variables. See the :ref:`Configuration settings <configuration_settings>`
 for a description of the options.
 
 
@@ -130,15 +130,10 @@ for a description of the options.
 Install server plugins with the Docker container
 ------------------------------------------------
 
-The docker image is shipped vith the `qgis-plugin-manager <https://www.3liz.com/news/qgis-plugin-manager.html>.`
+The docker image is shipped with the `qgis-plugin-manager <https://www.3liz.com/news/qgis-plugin-manager.html>.`
 
-To install or manage your server plugins, use the docker `exec` command into your container, the plugins vwill install in the folder defined by the :ref:`SERVER_PLUGINPATH <SERVER_PLUGINPATH>` option.
+To install or manage your server plugins, use the docker `exec` command into your container, the plugins will install in the folder defined by the :ref:`SERVER_PLUGINPATH <SERVER_PLUGINPATH>` option.
 
 Example::
-    
-    docker exec myserver -it qgis-plugin-manager install lizmap
 
-
-
-
-
+    docker exec myserver -it qgis-plugin-manager install "Lizmap server"
