@@ -6,7 +6,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-""" Qgis server plugin managment 
+""" Qgis server plugin managment
 
 """
 import sys
@@ -19,7 +19,7 @@ from typing import Generator, Dict
 
 from .config  import confservice
 
-LOGGER = logging.getLogger('SRVLOG') 
+LOGGER = logging.getLogger('SRVLOG')
 
 server_plugins = {}
 failed_plugins = {}
@@ -47,7 +47,7 @@ def checkQgisVersion(minver: str, maxver: str) -> bool:
 
     return minver <= version <= maxver
 
-    
+
 
 def find_plugins(path: str) -> Generator[str,None,None]:
     """ return list of plugins in given path
@@ -91,33 +91,39 @@ def find_plugins(path: str) -> Generator[str,None,None]:
 
 
 
-def load_plugins(serverIface: 'QgsServerInterface') -> bool: # noqa F821
-    """ Start all plugins
-
-        Return False if some plugins can no be loaded
-    """
+def load_plugins(serverIface: 'QgsServerInterface'): # noqa F821
+    """ Start all plugins """
 
     plugin_path = confservice.get('server','pluginpath')
     if not plugin_path:
         return
 
-    LOGGER.info("Initializing plugins from %s", plugin_path)
+    LOGGER.info(f"Initializing plugins from {plugin_path}")
     sys.path.append(plugin_path)
 
+    success = 0
+    error = 0
     for plugin in find_plugins(plugin_path):
+        # noinspection PyBroadException
         try:
             __import__(plugin)
 
-            package = sys.modules[plugin] 
+            package = sys.modules[plugin]
 
             # Initialize the plugin
             server_plugins[plugin] = package.serverClassFactory(serverIface)
-            LOGGER.info("Loaded plugin %s",plugin)
+            LOGGER.info(f"Loaded plugin {plugin}")
+            success += 1
         except Exception:
             strace = traceback.format_exc()
-            LOGGER.error("Error loading plugin '%s'\n%s", plugin, strace)
+            LOGGER.error(f"Error loading plugin '{plugin}'\n{strace}")
             failed_plugins[plugin] = strace
-    
+            error += 1
+
+    LOGGER.info(f"Loaded {success} plugin(s) successfully")
+    if error:
+        LOGGER.warning(f"{error} plugin(s) having an issue")
+
 
 def plugin_metadata( plugin: str ) -> Dict:
     """ Return plugin metadata
@@ -144,4 +150,3 @@ def plugin_list():
     """ Iterate over loaded plugins
     """
     return (k for k in server_plugins.keys())
-
