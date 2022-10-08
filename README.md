@@ -135,14 +135,14 @@ Example:
 http://myserver:8080/ows/?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetCapabilities&MAP=<qgis_project_spec>
 ```
 
-### Requests to OWS/WFS3 services
+### Requests to WFS3 OAPI
 
-The OWS requests use the following format:  `/ows/wfs3/<wfs3_api_endpoint>?MAP=<qgis_project_spec>`
+The requests use the following format:  `/wfs3/<wfs3_api_endpoint>?MAP=<qgis_project_spec>`
 
 Example:
 
 ```
-http://myserver:8080/ows/wfs3/collections.html?MAP=<qgis_project_spec>
+http://myserver:8080/wfs3/collections.html?MAP=<qgis_project_spec>
 ```
 
 ### Accessing the Qgis landing page and other qgis API
