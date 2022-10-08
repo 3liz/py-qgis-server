@@ -10,6 +10,7 @@ services:
             USER: ${USER}
             QGIS_OPTIONS_PATH: /src/tests/qgis
             QGIS_SERVER_TRUST_LAYER_METADATA: 'yes'
+            QGIS_SERVER_DISABLE_GETPRINT: 'yes'
             QGSRV_SERVER_WORKERS: ${WORKERS}
             QGSRV_CACHE_ROOTDIR: /src/tests/data
             QGSRV_SERVER_PLUGINPATH: /plugins
@@ -49,11 +50,12 @@ services:
         networks:
             backend:
                 ipv4_address: 172.199.0.2 
-        deploy:
-            resources:
-                limits:
-                    cpus: ${CPU_LIMITS}
-                    memory: ${MEMORY_LIMITS}
+        #deploy:
+        #    resources:
+        #        limits:
+        #            cpus: ${CPU_LIMITS}
+        #            memory: ${MEMORY_LIMITS}
+        
 networks:
   backend:
      ipam:

@@ -5,7 +5,7 @@ SHELL:=bash
 # 
 #  Makefile for running server in docker containers
 #
-FLAVOR:=ltr
+FLAVOR:=release
 
 REGISTRY_URL ?= 3liz
 REGISTRY_PREFIX=$(REGISTRY_URL)/

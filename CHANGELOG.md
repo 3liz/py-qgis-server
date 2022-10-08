@@ -2,6 +2,8 @@
 
 ## Unreleased 
 
+* Deprecate `/ows/wfs3/` endpoint in favor of `/wfs3/`
+    - `/ows/wfs3/` will be removed in 1.9
 * Configure lizmap api from environment variables
 * Replace calls to `asyncio.get_event_loop()`
 

@@ -76,16 +76,22 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     add_handler( r"/ows/?", OwsHandler, _ows_args(getfeaturelimit=cfg.getint('getfeaturelimit')))
 
     wfs3_api_endpoints = [
-        rf"wfs3{end}",
-        rf"wfs3/collections(?:/[^/]+(?:/items)?)?{end}",
-        rf"wfs3/conformance{end}",
-        rf"wfs3/api{end}",
-        r"wfs3/static/.*",
+        rf"{end}",
+        rf"/collections(?:/[^/]+(?:/items)?)?{end}",
+        rf"/conformance{end}",
+        rf"/api{end}",
+        r"/static/.*",
     ] 
 
+    # XXX DEPRECATED (to be removed in 1.9)
     kw = _ows_args(service='WFS3')
     for endpoint in wfs3_api_endpoints:
-        handlers.append( (rf"/ows/{endpoint}", OwsApiHandler, kw) )
+        handlers.append( (rf"/ows/wfs3{endpoint}", OwsApiHandler, kw) )
+
+    # New scheme
+    kw = _ows_args(service='WFS3')
+    for endpoint in wfs3_api_endpoints:
+        handlers.append( (rf"/wfs3{endpoint}", OwsApiHandler, kw) )
 
     #
     # Add qgis api endpoints
