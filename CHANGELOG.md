@@ -2,8 +2,11 @@
 
 ## Unreleased 
 
+## 1.8.4 - 2022-10-08
+
 * Deprecate `/ows/wfs3/` endpoint in favor of `/wfs3/`
     - `/ows/wfs3/` will be removed in 1.9
+* Better logging about plugins
 * Configure lizmap api from environment variables
 * Replace calls to `asyncio.get_event_loop()`
 
