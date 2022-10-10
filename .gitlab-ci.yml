@@ -28,11 +28,11 @@ tests:ltr:
 
 tests:release:
   extends: .tests
-  needs: 
+  needs:
     - "tests:ltr"
   variables:
-    QGIS_FLAVOR: release 
- 
+    QGIS_FLAVOR: release
+
 #---------------
 # Build
 #---------------
@@ -61,12 +61,11 @@ tickets:
   only:
     - tags
   needs:
-    - "release:release" 
+    - "release:release"
     - "release:ltr"
   image:
-    name: registry.snap.lizlan:5000/infra/ci-tools:latest
+    name: $REGISTRY_URI/infra/ci-tools:latest
   script:
     - create_ticket.py
   tags:
     - factory-plain
-
