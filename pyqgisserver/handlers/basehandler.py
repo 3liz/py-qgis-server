@@ -107,14 +107,14 @@ class BaseHandler(tornado.web.RequestHandler):
         self.write_json(response)
         self.finish()
 
-    def proxy_url(self, http_proxy: bool) -> str:
+    def proxy_url(self) -> str:
         """ Return the proxy_url
         """
         # Replace the status url with the proxy_url if any
         req = self.request
-        if http_proxy:
+        if self.application.http_proxy:
             # Replacement by static url, use it as base path
-            proxy_url = self._cfg.get('proxy_url')
+            proxy_url = self._cfg.get('proxy_url') 
             if proxy_url:
                 return f"{proxy_url.rstrip('/')}{req.path}"
         

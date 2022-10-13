@@ -10,6 +10,13 @@ from .statushandler import ( # noqa F401
 )
 from .owshandler import ( # noqa F401
     OwsHandler, 
-    OwsApiHandler, 
+)
+
+from .oapihandler import ( # noqa F401
+    OAPIHandler
+)
+
+from .landingpage import ( # noqa F401
+    LandingPage
 )
 

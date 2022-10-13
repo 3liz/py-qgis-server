@@ -22,10 +22,10 @@ from .config import confservice, qgis_api_endpoints
 
 from .handlers import (StatusHandler, 
                        OwsHandler, 
-                       OwsApiHandler,
+                       OAPIHandler,
                        PingHandler, 
-                       NotFoundHandler,
-                       ErrorHandler)
+                       LandingPage,
+                       NotFoundHandler)
 
 from .zeromq import client, broker
 
@@ -50,14 +50,13 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         client       = client,
         monitor      = monitor,
         timeout      = cfg.getint('timeout'),
-        http_proxy   = cfg.getboolean('http_proxy'),
         allowed_hdrs = tuple(k.upper() for k in cfg.get('allow_headers').split(','))
     )
 
     end = r"(?:\.html|\.json|/?)"
 
     handlers = [
-        (r"/", ErrorHandler, dict(status_code=403)),
+        (r"/", LandingPage),
         (r"/ping", PingHandler),
     ]
 
@@ -66,7 +65,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
 
     # Server status page
     if cfg.getboolean('status_page'):
-        handlers.append( ("/status/?", StatusHandler) )
+        handlers.append( ("/status/?.*", StatusHandler) )
 
     def _ows_args( *args, **kwargs ):
         rv = ows_kwargs.copy()
@@ -86,12 +85,12 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     # XXX DEPRECATED (to be removed in 1.9)
     kw = _ows_args(service='WFS3')
     for endpoint in wfs3_api_endpoints:
-        handlers.append( (rf"/ows/wfs3{endpoint}", OwsApiHandler, kw) )
+        handlers.append( (rf"/ows/wfs3{endpoint}", OAPIHandler, kw) )
 
     # New scheme
     kw = _ows_args(service='WFS3')
     for endpoint in wfs3_api_endpoints:
-        handlers.append( (rf"/wfs3{endpoint}", OwsApiHandler, kw) )
+        handlers.append( (rf"/wfs3{endpoint}", OAPIHandler, kw) )
 
     #
     # Add qgis api endpoints
@@ -99,7 +98,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     for name, endpoint in qgis_api_endpoints():
         kw = _ows_args(service=name)
         LOGGER.debug("*** Adding API handler for: %s: %s", name, endpoint)        
-        handlers.append( (rf"/{endpoint.strip('/')}/.*", OwsApiHandler, kw) )
+        handlers.append( (rf"/{endpoint.strip('/')}/.*", OAPIHandler, kw) )
 
     return handlers
 
@@ -114,6 +113,8 @@ class Application(tornado.web.Application):
 
         self._broker_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
         self.stats = Stats()
+
+        self.http_proxy = confservice.getboolean('server','http_proxy')
 
         super().__init__(configure_handlers(self._broker_client),
                          default_handler_class=NotFoundHandler)

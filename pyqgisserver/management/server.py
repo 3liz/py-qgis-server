@@ -17,7 +17,12 @@ from urllib.parse import quote_plus
 
 from ..logger import log_request
 from ..config import confservice
-from ..handlers import (BaseHandler, StatusHandler, OwsApiHandler as QgisHandler, NotFoundHandler)
+from ..handlers import (
+    BaseHandler, 
+    StatusHandler, 
+    OAPIHandler as QgisHandler, 
+    NotFoundHandler
+)
 from ..zeromq import client
 
 from typing import Awaitable
@@ -150,7 +155,7 @@ def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web
 
     handlers = [
         (r"/"      , _RootHandler),
-        (r"/status", StatusHandler),
+        (r"/status/?.*", StatusHandler),
         (r"/pool/(restart)", _RestartHandler, {'poolserver': poolserver}),
         (r"/pool/?"         ,_ReportHandler,  {'poolserver': poolserver}),
         (r"/cache/content/(?P<key>.+)", _CacheHandler, kwargs),
