@@ -15,6 +15,8 @@ import signal
 import tornado.web
 import tornado.platform.asyncio
 
+from tornado.web import RedirectHandler
+
 from multiprocessing import Process
 
 from .logger import log_request
@@ -72,7 +74,7 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         rv.update( *args, **kwargs )
         return rv
 
-    add_handler( r"/ows/?", OwsHandler, _ows_args(getfeaturelimit=cfg.getint('getfeaturelimit')))
+    add_handler(r"/ows/?", OwsHandler, _ows_args(getfeaturelimit=cfg.getint('getfeaturelimit')))
 
     wfs3_api_endpoints = [
         rf"{end}",
@@ -83,14 +85,12 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     ] 
 
     # XXX DEPRECATED (to be removed in 1.9)
-    kw = _ows_args(service='WFS3')
-    for endpoint in wfs3_api_endpoints:
-        handlers.append( (rf"/ows/wfs3{endpoint}", OAPIHandler, kw) )
+    handlers.append((rf"/ows/wfs3({end}.*)", RedirectHandler, {'url': "/wfs3{0}" }))
 
     # New scheme
     kw = _ows_args(service='WFS3')
     for endpoint in wfs3_api_endpoints:
-        handlers.append( (rf"/wfs3{endpoint}", OAPIHandler, kw) )
+        handlers.append((rf"/wfs3{endpoint}", OAPIHandler, kw) )
 
     #
     # Add qgis api endpoints

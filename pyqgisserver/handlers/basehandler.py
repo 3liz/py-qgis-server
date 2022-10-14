@@ -114,17 +114,15 @@ class BaseHandler(tornado.web.RequestHandler):
         req = self.request
         if self.application.http_proxy:
             # Replacement by static url, use it as base path
-            proxy_url = self._cfg.get('proxy_url') 
+            proxy_url = self._cfg.get('proxy_url') or \
+                req.headers.get('X-Forwarded-Url')
             if proxy_url:
-                return f"{proxy_url.rstrip('/')}{req.path}"
-        
-            # Dynamic proxy url
-            proxy_url = req.headers.get('X-Forwarded-Url')
-            if proxy_url:
-                return f"{proxy_url}"
+                if proxy_url[-1] != '/':
+                    proxy_url = f"{proxy_url}/"
+                return proxy_url
         
         # No proxy to handle: return the full path
-        return f"{req.protocol}://{req.host}{req.path}"
+        return f"{req.protocol}://{req.host}/"
 
 
 

@@ -30,8 +30,8 @@ class Tests(HTTPTestCase):
         """ Test proxy location
         """
         urlref = urlparse('https://my.proxy.loc:9999/anywhere/')
-        rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities", 
-                             headers={ 'X-Forwarded-Url': urlref.geturl() })
+        rv = self.client.get("/ows/?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities", 
+                             headers={ 'X-Forwarded-Url': urlref.geturl() }, path='')
 
         assert rv.status_code == 200
         assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
@@ -42,7 +42,7 @@ class Tests(HTTPTestCase):
         href = urlparse(elem[0].get(xlink+'href'))
         assert href.scheme   == urlref.scheme
         assert href.hostname == urlref.hostname
-        assert href.path     == urlref.path
+        assert href.path     == f"{urlref.path}ows/"
 
     def test_wmsurl(self):
         """ Test proxy location is overrided by WMSUrl

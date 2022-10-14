@@ -75,8 +75,9 @@ class AsyncClientHandler(BaseHandler):
 
             headers = {}
             proxy_url = self.proxy_url()
-            if proxy_url: 
-                headers['X-Forwarded-Url']=proxy_url
+            if proxy_url:
+                # Send the full path to Qgis 
+                headers['X-Forwarded-Url']=f"{proxy_url}{self.request.path.lstrip('/')}"
 
             self.set_backend_headers(headers)
 
