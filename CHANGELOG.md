@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased 
+## Unreleased
+
+## 1.8.5 - 2022-10-19
+
+* Fix broken file watcher (regression from 1.8.4)
+* '/ows/wfs3' is now a redirection
 
 ## 1.8.4 - 2022-10-08
 
