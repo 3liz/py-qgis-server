@@ -79,7 +79,7 @@ class _RestartHandler:
         def callback( *args ):
             do_restart()
             self.update_files()
-
+       
         check_time = confservice.getint('server','restartmon_check_time', 3000)
         self._restart = watchfiles(self._watch_files, callback, check_time)
         self._restart.start()
@@ -109,7 +109,6 @@ class _Server:
         self._healthcheck = None
 
         self._restart_handler = _RestartHandler()
-        self._restart_handler.start(self.restart)
 
         # Ensure that pool is terminated is called
         # at process exit
@@ -145,6 +144,9 @@ class _Server:
         if self._healthcheck is None:
             LOGGER.info("Initializing pool healthcheck")
             self._healthcheck = asyncio.ensure_future(self.healthcheck())
+
+        self._restart_handler.start(self.restart)
+        
 
     @classmethod
     def _terminate_pool(cls, p: Process) -> None:
