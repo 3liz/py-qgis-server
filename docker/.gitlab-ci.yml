@@ -7,6 +7,7 @@
   script:
     - make version
     - make -C docker build deliver pushrc clean FLAVOR=$QGIS_FLAVOR
+    - $FACTORY_SCRIPTS/snapshot-image.sh qgis-map-server-$QGIS_FLAVOR
   environment:
     name: snap
   artifacts:
@@ -18,6 +19,9 @@
       - master
   tags:
     - infrav3-dind
+  variables:
+    FACTORY_MANIFEST: "docker/factory.manifest"
+
 
 build-docker:release:
   extends: .build-docker
@@ -37,7 +41,6 @@ deploy_snap:
   stage: deploy
   script:
     - $FACTORY_SCRIPTS/update-service map
-    - $FACTORY_SCRIPTS/snapshot-image.sh qgis-map-server-$QGIS_FLAVOR
   environment:
     name: snap
   only:
