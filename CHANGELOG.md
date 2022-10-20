@@ -5,14 +5,14 @@
 ## 1.8.5 - 2022-10-19
 
 * Fix broken file watcher (regression from 1.8.4)
-* '/ows/wfs3' is now a redirection
+* `/ows/wfs3` is now a redirection
 
 ## 1.8.4 - 2022-10-08
 
 * Deprecate `/ows/wfs3/` endpoint in favor of `/wfs3/`
     - `/ows/wfs3/` will be removed in 1.9
 * Better logging about plugins
-* Configure lizmap api from environment variables
+* Configure Lizmap API with a new environment variable `QGSRV_API_ENDPOINTS_LIZMAP=yes`
 * Replace calls to `asyncio.get_event_loop()`
 
 ## 1.8.3 - 2022-08-02
@@ -33,13 +33,13 @@
 * Use qgis-plugin-manager for installing qgis server plugins
     - See https://github.com/3liz/qgis-plugin-manager
 * Support `QGIS_PLUGINPATH` environment variable
-* Add 'getfeaturelimit' config option
+* Add `getfeaturelimit` config option
     - Set maximum value for WFS/GetFeature requests
 
 ## 1.8.0 - 2022-05-16
 
-* Bump version 1.8 
-* Refactorize middleware managment
+* Bump version 1.8
+* Refactor middleware management
 * Root access '/' return 403 instead of 404
 * Management api `/cache/` now return the collection of cached projects.
 * Add `memory_high_water_mark` configuration option
@@ -47,15 +47,15 @@
 
 ## 1.7.20 - 2022-05-02
 
-* Fix attribute dereference on undefined response 
-* Fix invalid url in managment cache api
+* Fix attribute dereference on undefined response
+* Fix invalid url in management cache api
 
 ## 1.7.19 - 2022-03-31
 
-* Fix extra argument in logging format string when handling 
+* Fix extra argument in logging format string when handling
   worker exception
 * Enhanced request metrics returned from workers
-* Fix regression in managment api
+* Fix regression in management api
 * Fix proxy/worker runtime configuration
    - The configuration was broken since supervision was implemented
 * Change entrypoint for access policy extension
@@ -80,12 +80,12 @@
 * Add 'Last-Modified' header
 * Support Etag in HEAD methods for OWS requests
 * Implement configurable monitor backend
-* Remove 'maxcycle' option.
+* Remove `maxcycle` option.
 
 ## 1.7.15 - 2022-02-02
 
 * Install server in venv in docker image
-* Ensure that exit code is non-zero on pool failure 
+* Ensure that exit code is non-zero on pool failure
 * Set option to check for cache invalidation/refresh asynchronously
 * Use QgsProjectStorage for unhandled uri schemes
     - This allows support for all QgsProjectStorage extensions
@@ -96,13 +96,13 @@
 
 ## 1.7.14 - 2022-01-18
 
-* Define explicit `CACHE_DEFAULT_HANDLER` configuration option 
-* Monitoring: define default routing key as fallback when using dynamic key 
+* Define explicit `CACHE_DEFAULT_HANDLER` configuration option
+* Monitoring: define default routing key as fallback when using dynamic key
 
 ## 1.7.13 - 2022-01-03
 
 * Do not require `api:<name>` config section when granting api access
-* Compute etag for ows getcapabilities requests
+* Compute etag for ows `getcapabilities` requests
 * Disable project's WMTSUrl
 
 ## 1.7.12 - 2021-12-10
@@ -116,7 +116,7 @@
 ## 1.7.10 - 2021-12-06
 
 * Add `install-lizmap-plugin` script
-* Preloaded files are now stored in static cache 
+* Preloaded files are now stored in static cache
 * Minimal support for HEAD requests.
 
 ## 1.7.9 - 2021-11-05
@@ -145,14 +145,14 @@
 
 ## 1.7.6 - 2021-09-28
 
-* Fix wrong type for AMQP Logger variable `connection_delay` 
-* Pass `X-Qgis-*` headers 
+* Fix wrong type for AMQP Logger variable `connection_delay`
+* Pass `X-Qgis-*` headers
     - Allow custom headers from https://github.com/qgis/QGIS/pull/41333
 
 ## 1.7.5 - 2021-09-21
 
-* Fix streamed GetFeature requests 
-    - Refactorize streamed response 
+* Fix streamed GetFeature requests
+    - Refactor streamed response
     - Allow empty chunk
 * Logging: raise from debug to error if invalid layers are found
 * Use docker-compose for running tests
@@ -165,8 +165,8 @@
 ## 1.7.3 - 2021-08-13
 
 * Fix Qgis server api call in management
-* Add specific option for logging qgis info message logs  
-* Print extended version information 
+* Add specific option for logging qgis info message logs
+* Print extended version information
 * Use setup.cfg for flake8 options
 * Handle 0 length response from qgis server
 * Expose Qgis api to public interface:
