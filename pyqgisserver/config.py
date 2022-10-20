@@ -128,6 +128,9 @@ def load_configuration():
     CONFIG.set('projects.cache', 'observers'           , getenv('QGSRV_CACHE_OBSERVERS', ''))
     CONFIG.set('projects.cache', 'advanced_report'     , getenv('QGSRV_CACHE_ADVANCED_REPORT', 'no'))
 
+    # Map read/create options
+    CONFIG.set('projects.cache', 'force_readonly_layers'    , getenv('QGIS_SERVER_FORCE_READONLY_LAYERS', 'yes'))
+
     # 
     CONFIG.add_section('projects.schemes')
 

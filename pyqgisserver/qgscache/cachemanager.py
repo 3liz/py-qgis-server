@@ -152,6 +152,11 @@ class QgsCacheManager:
         self._default_scheme = cnf.get('default_handler')
         self._observers = []   
 
+        if Qgis.QGIS_VERSION_INT < 32800:
+            self._read_only_layers = False
+        else:
+            self._read_only_layers = cnf.getboolean('force_readonly_layers')
+
         allowed_schemes = cnf.get('allow_storage_schemes')
         if allowed_schemes != '*':
             allowed_schemes = [s.strip() for s in allowed_schemes.split(',')]
@@ -160,22 +165,30 @@ class QgsCacheManager:
         # Set the base url for file protocol
         self._aliases['file'] = 'file:///%s/' % cnf.get('rootdir').strip('/')
 
-        if self._disable_getprint:
-            LOGGER.info("** Cache: Getprint disabled")
-
-        if self._trust_layer_metadata:
-            LOGGER.info("** Cache: Trust Layer Metadata on")
+        # Show options
+        self._log_cache_options()
 
         # Load protocol handlers
         componentmanager.register_entrypoints('qgssrv_contrib_protocol_handler')
 
-    def add_observer( self, observer: Callable[[str,datetime,int],None] ) -> None: 
+    def _log_cache_options(self):
+        def _yesno(value: bool):
+            return "Yes" if value else "No"
+        LOGGER.info(
+            ">>>>> Qgis Projects options:\n"
+            f"** Getprint Disabled.......{_yesno(self._disable_getprint)}\n"
+            f"** Trust Layer Metadata....{_yesno(self._trust_layer_metadata)}\n"
+            f"** Readonly Layers.........{_yesno(self._read_only_layers)}\n"
+            "<<<<<"
+        )
+
+    def add_observer(self, observer: Callable[[str,datetime,int],None] ) -> None: 
         """ Add observer for cache invalidation
         """
         self._observers.append(observer)
 
-    def notify_observers( self, key: str, modified_time: datetime,
-                          state: UpdateState) -> None:
+    def notify_observers(self, key: str, modified_time: datetime,
+                         state: UpdateState) -> None:
         """ Notify all observers
         """
         if not self._observers:
@@ -400,14 +413,21 @@ class QgsCacheManager:
         # see https://github.com/qgis/QGIS/pull/49266
         if Qgis.QGIS_VERSION_INT < 32601:
             project = self._create_project()
+            readflags = QgsProject.ReadFlags()
+            if self._trust_layer_metadata:
+                readflags |= QgsProject.FlagTrustLayerMetadata
+            if self._disable_getprint:
+                readflags |= QgsProject.FlagDontLoadLayouts 
         else:
             project = self._create_project(capabilities=Qgis.ProjectCapabilities())
+            readflags = Qgis.ProjectReadFlags()
+            if self._trust_layer_metadata:
+                readflags |= Qgis.ProjectReadFlag.TrustLayerMetadata
+            if self._disable_getprint:
+                readflags |= Qgis.ProjectReadFlag.DontLoadLayouts 
+            if self._read_only_layers:
+                readflags |= Qgis.ProjectReadFlag.ForceReadOnlyLayers
 
-        readflags = QgsProject.ReadFlags()
-        if self._trust_layer_metadata:
-            readflags |= QgsProject.FlagTrustLayerMetadata
-        if self._disable_getprint:
-            readflags |= QgsProject.FlagDontLoadLayouts 
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
         if not project.read(uri,  readflags):
