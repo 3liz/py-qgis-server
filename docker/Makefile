@@ -1,5 +1,5 @@
 SHELL:=bash
-# 
+#
 # Build docker image
 #
 #
@@ -55,7 +55,7 @@ build_local: build_package
 	docker build --rm  $(DOCKER_BUILD_ARGS) \
 		$(BUILD_ARGS) -t $(NAME):$(FLAVOR)-local -f Dockerfile.local .
 
-manifest: 
+manifest:
 	{ \
 	set -e; \
 	version=`docker run --rm $(BUILDIMAGE) version`; \
@@ -137,7 +137,7 @@ run:
    -e QGSRV_MANAGEMENT_INTERFACES=127.0.0.1 \
    -e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
    -e DEBUG_ENTRYPOINT=yes \
-   $(BUILDIMAGE) 
+   $(BUILDIMAGE)
 
 run-proxy:
 	docker run --rm -p $(TEST_HTTP_PORT):8080 --net mynet --name map-proxy-$(COMMITID) \
