@@ -2,7 +2,7 @@
 ---
 config_options:
     #=========
-    # Server    
+    # Server
     #=========
     - name: SERVER_HTTP_PORT
       label: Port
@@ -25,12 +25,12 @@ config_options:
       label: Client Timeout
       description: |
           Set the timeout for Qgis response in seconds. If a Qgis worker takes more than 
-          the corresponding value a timeout error (504) is returned to the client. 
+          the corresponding value a timeout error (504) is returned to the client.
       default: 20
       type: int
       section: server
       key: timeout
-      tags: [ http ] 
+      tags: [ http ]
 
     - name: SERVER_WORKERS
       label: Number of workers
@@ -43,15 +43,15 @@ config_options:
 
     - name: SERVER_ENABLE_FILTERS
       label: Enable filters
-      description: Enable filters as python extension 
+      description: Enable filters as python extension
       default: 'yes'
       type: boolean
       section: server
       key: enable_filters
-      tags: [ filters ] 
+      tags: [ filters ]
 
     - name: SERVER_HTTP_PROXY
-      label: http proxy 
+      label: http proxy
       description: Indicates that the server is behind a reverse proxy
       default: 'no'
       section: server
@@ -63,7 +63,7 @@ config_options:
       label: Proxy URL
       description: |
           The url that must be seen by the client when the server is behind a proxy.
-          Note that this option will be overidden by `QGIS_SERVER_<SERVICE>_URL` or 
+          Note that this option will be overridden by `QGIS_SERVER_<SERVICE>_URL` or 
           by `X-Qgis-<service>-Url` headers.
       default: ''
       section: server
@@ -90,7 +90,7 @@ config_options:
       key: pluginpath
       tags: [ qgis, plugins ]
       alt_env: QGIS_PLUGINPATH
-      type: path  
+      type: path
 
     - name: SERVER_SSL
       label: Enable SSL
@@ -107,16 +107,16 @@ config_options:
       default: ''
       tags: [ http, ssl, security ]
       section: server
-      key: ssl_cert  
+      key: ssl_cert
       type: path
 
     - name: SERVER_SSL_KEY
-      label: SSL Certificat 
+      label: SSL Certificat
       description: Path to the SSL key file
       default: ''
       tags: [ http, ssl, security ]
       section: server
-      key: ssl_key 
+      key: ssl_key
       type: path
 
     - name: SERVER_CROSS_ORIGIN
@@ -125,7 +125,7 @@ config_options:
           Allows any origin for CORS. If set to 'no', allow only CORS for the 'Origin'
           header.
       default: 'no'
-      type: boolean 
+      type: boolean
       section: server
       key: cross_origin
       tags: [ http, security ]
@@ -156,13 +156,13 @@ config_options:
       version_added: '1.8.1'
 
     #==========
-    # Logging  
+    # Logging
     #==========
     - name: LOGGING_LEVEL
       label: Logging level
       description: Set the logging level
       type: [DEBUG,INFO,WARNING,ERROR,CRITICAL]
-      default: DEBUG  
+      default: DEBUG
       section: logging
       key: level
       tags: [ logging ]
@@ -179,7 +179,7 @@ config_options:
     #===============
     # Project cache
     #===============
-    
+
     - name: CACHE_SIZE
       label: Cache size
       description: |
@@ -197,7 +197,7 @@ config_options:
       tags: [ qgis, cache ]
       type: path
       section: projects.cache
-      key: rootdir 
+      key: rootdir
 
     - name: CACHE_STRICT_CHECK
       label: Enable strict checking
@@ -221,7 +221,7 @@ config_options:
       default: 'no'
       section: projects.cache
       key: insecure
-      tags: [ cache, security ] 
+      tags: [ cache, security ]
 
     - name: TRUST_LAYER_METADATA
       label: Trust layer metadata
@@ -252,12 +252,12 @@ config_options:
       version_added: "1.4"
 
     - name: CACHE_PRELOAD_CONFIG
-      label: Preload cache configuration 
+      label: Preload cache configuration
       description: |
           Path to configuration file for preloading projects. The file must have one project uri 
           per line. Each uri is similar to the project uri passed in the 'MAP' query parameter
           of OWS requests.
-          Preloaded projects are stored in a static cache, i.e they are not subject to lru eviction. 
+          Preloaded projects are stored in a static cache, i.e they are not subject to lru eviction.
       type: path
       default: ''
       section: projects.cache
@@ -278,12 +278,12 @@ config_options:
       version_added: "1.5.4"
 
     - name: CACHE_FORCE_ETAG
-      label: Force etag header for OWS 'GetCapabilities' requests 
+      label: Force etag header for OWS 'GetCapabilities' requests
       description: |
           Force etag header even if 'TRUST_LAYER_METADATA' is not set.
           By default etags are set only when 'TRUST_LAYER_METADATA' is set because
           capabilities rely only on qgis project data and not on the underlying layer
-          data. 
+          data.
       type: boolean
       default: 'no'
       section: projects.cache
@@ -327,7 +327,7 @@ config_options:
       default: 0
       section: projects.cache
       key: refresh_interval
-              
+
 
     #===============
     # Qgis API
@@ -355,10 +355,32 @@ config_options:
       tags: [ http, qgis, api ]
       version_added: "1.7.2"
 
+    - name: API_ENABLED_LIZMAP
+      label: Enable access to the Lizmap API
+      description: |
+          Enable access to the Lizmap API
+      type: boolean
+      default: 'no'
+      section: api.enabled
+      key: lizmap_api
+      tags: [ http, qgis, api ]
+      version_added: "1.8.4"
+
+    - name: API_ENDPOINTS_LIZMAP
+      label: Define endpoint access to the Lizmap API
+      description: |
+          Define endpoint access to the Lizmap API
+      type: str
+      default: '/lizmap'
+      section: api.endpoints
+      key: lizmap_api
+      tags: [ http, qgis, api ]
+      version_added: "1.8.4"
+
     #===============
-    # Managment API
+    # Management API
     #===============
- 
+
     - name: MANAGEMENT_ENABLED
       label: Enable management API
       description: |
@@ -407,21 +429,14 @@ config_options:
       default: ''
       tags: [ http, ssl, security, management ]
       section: management
-      key: ssl_cert  
+      key: ssl_cert
       type: path
 
     - name: MANAGEMENT_SSL_KEY
-      label: SSL Certificat 
+      label: SSL Certificat
       description: Path to the SSL key file for the management API
       default: ''
       tags: [ http, ssl, security, management ]
       section: management
-      key: ssl_key 
+      key: ssl_key
       type: path
-
-
-
-
-
-
-
