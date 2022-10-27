@@ -77,6 +77,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#cache-check-interval">CACHE_CHECK_INTERVAL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#api-enabled-landing-page">API_ENABLED_LANDING_PAGE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#api-endpoints-landing-page">API_ENDPOINTS_LANDING_PAGE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-enabled-lizmap">API_ENABLED_LIZMAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-endpoints-lizmap">API_ENDPOINTS_LIZMAP</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#management-enabled">MANAGEMENT_ENABLED</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#management-interfaces">MANAGEMENT_INTERFACES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#management-port">MANAGEMENT_PORT</a></li>
@@ -816,8 +818,56 @@ to use asynchronous check with such projects in conjunction with a static cache.
 </dd>
 </dl>
 </section>
+<section id="api-enabled-lizmap">
+<span id="id33"></span><h2>API_ENABLED_LIZMAP<a class="headerlink" href="#api-enabled-lizmap" title="Permalink to this heading"></a></h2>
+<p>Enable access to the Lizmap API</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>boolean</p>
+</dd>
+<dt class="field-even">Default</dt>
+<dd class="field-even"><p>no</p>
+</dd>
+<dt class="field-odd">Version Added</dt>
+<dd class="field-odd"><p>1.8.4</p>
+</dd>
+<dt class="field-even">Section</dt>
+<dd class="field-even"><p>api.enabled</p>
+</dd>
+<dt class="field-odd">Key</dt>
+<dd class="field-odd"><p>lizmap_api</p>
+</dd>
+<dt class="field-even">Env</dt>
+<dd class="field-even"><p>QGSRV_API_ENABLED_LIZMAP</p>
+</dd>
+</dl>
+</section>
+<section id="api-endpoints-lizmap">
+<span id="id34"></span><h2>API_ENDPOINTS_LIZMAP<a class="headerlink" href="#api-endpoints-lizmap" title="Permalink to this heading"></a></h2>
+<p>Define endpoint access to the Lizmap API</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Default</dt>
+<dd class="field-even"><p>/lizmap</p>
+</dd>
+<dt class="field-odd">Version Added</dt>
+<dd class="field-odd"><p>1.8.4</p>
+</dd>
+<dt class="field-even">Section</dt>
+<dd class="field-even"><p>api.endpoints</p>
+</dd>
+<dt class="field-odd">Key</dt>
+<dd class="field-odd"><p>lizmap_api</p>
+</dd>
+<dt class="field-even">Env</dt>
+<dd class="field-even"><p>QGSRV_API_ENDPOINTS_LIZMAP</p>
+</dd>
+</dl>
+</section>
 <section id="management-enabled">
-<span id="id33"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this heading"></a></h2>
+<span id="id35"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this heading"></a></h2>
 <p>Activate management API service. The management API is REST api for controlling and inspecting
 the server behavior, plugins and cached projects.
 Starting from 1.7.0, this is a experimental feature and will be subject to change. The api will
@@ -844,7 +894,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-interfaces">
-<span id="id34"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this heading"></a></h2>
+<span id="id36"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this heading"></a></h2>
 <p>Network interfaces to listen to. The management API service will listen on this interface</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -868,7 +918,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-port">
-<span id="id35"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this heading"></a></h2>
+<span id="id37"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this heading"></a></h2>
 <p>Port to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -889,7 +939,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl">
-<span id="id36"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this heading"></a></h2>
+<span id="id38"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this heading"></a></h2>
 <p>Enable SSL endpoint for API management</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -910,7 +960,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl-cert">
-<span id="id37"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this heading"></a></h2>
+<span id="id39"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this heading"></a></h2>
 <p>Path to the SSL certificat file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -928,7 +978,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl-key">
-<span id="id38"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this heading"></a></h2>
+<span id="id40"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this heading"></a></h2>
 <p>Path to the SSL key file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
