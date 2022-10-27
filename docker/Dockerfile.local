@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1
 # vim: ft=dockerfile
+#
+# Build from local sources
+#
 ARG REGISTRY_PREFIX=''
 ARG QGIS_VERSION=latest
 
@@ -13,13 +16,14 @@ ARG BUILD_VERSION
 # Setup will use this variable for copying manifest
 ENV QGSRV_DATA_PATH=/usr/local/share/qgis-server
 
+COPY dist/py-qgis-server-${BUILD_VERSION}.tar.gz /
+
 # Create virtualenv for installing server
 RUN mkdir -p /opt/local/ \ 
     && python3 -m venv --system-site-packages /opt/local/pyqgisserver && cd /usr/local/bin \
     && /opt/local/pyqgisserver/bin/pip install -U --no-cache-dir pip setuptools wheel \
+    && /opt/local/pyqgisserver/bin/pip install /py-qgis-server-${BUILD_VERSION}.tar.gz \
     && /opt/local/pyqgisserver/bin/pip install --no-cache-dir $PIP_OPTIONS   \
-        "py-qgis-server==${BUILD_VERSION}" \
-        py-amqp-client \
         qgis-plugin-manager \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver-worker \

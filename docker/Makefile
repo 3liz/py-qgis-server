@@ -22,8 +22,6 @@ ifdef PYPISERVER
 PYPISERVER_SCHEME ?= https
 PIP_OPTIONS="--extra-index-url=$(PYPISERVER_SCHEME)://$(PYPISERVER) --trusted-host=$(PYPISERVER)"
 BUILD_ARGS=--build-arg PIP_OPTIONS=$(PIP_OPTIONS)
-else
-BUILD_PACKAGE=build_package
 endif
 
 BUILD_ARGS += --build-arg BUILD_VERSION=$(BUILD_VERSION)
@@ -50,8 +48,12 @@ _build: $(BUILD_PACKAGE)
 		$(BUILD_ARGS) -t $(BUILDIMAGE) $(DOCKERFILE) .
 
 build_package:
-	rm -r dist && mkdir -p dist
+	rm -r dist; mkdir -p dist
 	$(MAKE) -C .. dist DIST=$$PWD/dist
+
+build_local: build_package
+	docker build --rm  $(DOCKER_BUILD_ARGS) \
+		$(BUILD_ARGS) -t $(NAME):$(FLAVOR)-local -f Dockerfile.local .
 
 manifest: 
 	{ \
