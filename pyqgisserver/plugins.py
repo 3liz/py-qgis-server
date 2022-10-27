@@ -55,7 +55,16 @@ def find_plugins(path: str) -> Generator[str,None,None]:
     path = Path(path)
     for plugin in path.glob("*"):
         LOGGER.debug("Looking for plugin in %s", plugin)
+
         if not plugin.is_dir():
+            # Warn abount dangling symlink
+            # This occurs when running in docker container
+            # and symlink target path are not visible from the
+            # container - give some hint for debugging
+            if plugin.is_symlink():
+                LOGGER.warning(f"*** The symbolic link '{plugin}' is not resolved."
+                               " If you are running in docker container please consider"
+                               "mounting the target path in the container.")
             continue
 
         metadatafile = plugin / 'metadata.txt'
