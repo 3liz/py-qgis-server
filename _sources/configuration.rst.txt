@@ -53,8 +53,8 @@ Interfaces to listen to
 SERVER_TIMEOUT
 --------------
 
-Set the timeout for Qgis response in seconds. If a Qgis worker takes more than 
-the corresponding value a timeout error (504) is returned to the client. 
+Set the timeout for Qgis response in seconds. If a Qgis worker takes more than
+the corresponding value a timeout error (504) is returned to the client.
 
 
 :Type: int
@@ -120,7 +120,7 @@ SERVER_PROXY_URL
 ----------------
 
 The url that must be seen by the client when the server is behind a proxy.
-Note that this option will be overidden by `QGIS_SERVER_<SERVICE>_URL` or 
+Note that this option will be overridden by `QGIS_SERVER_<SERVICE>_URL` or
 by `X-Qgis-<service>-Url` headers.
 
 
@@ -139,7 +139,7 @@ SERVER_RESTARTMON
 -----------------
 
 The file to watch for restarting workers. When the modified date of the file is changed.
-a restart command is broadcasted to the workers. Note that workers processes are restarted 
+a restart command is broadcasted to the workers. Note that workers processes are restarted
 without dropping requests.
 
 
@@ -236,7 +236,7 @@ header.
 SERVER_MEMORY_HIGH_WATER_MARK
 -----------------------------
 
-Set memory high water mark as fraction of total memory. Workers are 
+Set memory high water mark as fraction of total memory. Workers are
 restarted if total memory percent usage of workers exceed that value.
 
 
@@ -378,8 +378,8 @@ for the limitations induced in secure mode.
 TRUST_LAYER_METADATA
 --------------------
 
-Trust layer metadata. Improves layer load time by skipping expensive checks 
-like primary key unicity, geometry type and 
+Trust layer metadata. Improves layer load time by skipping expensive checks
+like primary key unicity, geometry type and
 srid and by using estimated metadata on layer load. Since QGIS 3.16.
 
 
@@ -399,8 +399,8 @@ srid and by using estimated metadata on layer load. Since QGIS 3.16.
 DISABLE_GETPRINT
 ----------------
 
-Don't load print layouts. Improves project read time if layouts are not required, 
-and allows projects to be safely read in background threads (since print layouts are 
+Don't load print layouts. Improves project read time if layouts are not required,
+and allows projects to be safely read in background threads (since print layouts are
 not thread safe).
 
 
@@ -420,10 +420,10 @@ not thread safe).
 CACHE_PRELOAD_CONFIG
 --------------------
 
-Path to configuration file for preloading projects. The file must have one project uri 
+Path to configuration file for preloading projects. The file must have one project uri
 per line. Each uri is similar to the project uri passed in the 'MAP' query parameter
 of OWS requests.
-Preloaded projects are stored in a static cache, i.e they are not subject to lru eviction. 
+Preloaded projects are stored in a static cache, i.e they are not subject to lru eviction.
 
 
 :Type: path
@@ -462,7 +462,7 @@ CACHE_FORCE_ETAG
 Force etag header even if 'TRUST_LAYER_METADATA' is not set.
 By default etags are set only when 'TRUST_LAYER_METADATA' is set because
 capabilities rely only on qgis project data and not on the underlying layer
-data. 
+data.
 
 
 :Type: boolean
@@ -517,9 +517,9 @@ CACHE_CHECK_INTERVAL
 --------------------
 
 Set the time interval in seconds between two check for invalidation/refresh of the cache content.
-If set to a value > 0 then the cache is checked for invalidation/refresh asynchronously every 
+If set to a value > 0 then the cache is checked for invalidation/refresh asynchronously every
 seconds defined by the option.
-If set to 0 (or negative value), the cache is checked for invalidation synchronously at each request. 
+If set to 0 (or negative value), the cache is checked for invalidation synchronously at each request.
 When set to 0 with slow projects to load, user may experience latency, so it is recommended
 to use asynchronous check with such projects in conjunction with a static cache.
 
@@ -666,6 +666,3 @@ Path to the SSL key file for the management API
 :Section: management
 :Key: ssl_key
 :Env: QGSRV_MANAGEMENT_SSL_KEY
-
-
-
