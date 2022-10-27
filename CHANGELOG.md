@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* Add informative warning on dangling plugin symlink
+  - Fix https://github.com/3liz/py-qgis-server/issues/51
+* Allow building docker image from local source
+
 ## 1.8.5 - 2022-10-19
 
 * Fix broken file watcher (regression from 1.8.4)
