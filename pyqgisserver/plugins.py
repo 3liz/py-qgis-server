@@ -54,10 +54,10 @@ def find_plugins(path: str) -> Generator[str,None,None]:
     """
     path = Path(path)
     for plugin in path.glob("*"):
-        LOGGER.debug("Looking for plugin in %s", plugin)
+        LOGGER.debug(f"Looking for plugin in '{plugin}'")
 
         if not plugin.is_dir():
-            # Warn abount dangling symlink
+            # Warn about dangling symlink
             # This occurs when running in docker container
             # and symlink target path are not visible from the
             # container - give some hint for debugging
@@ -67,33 +67,34 @@ def find_plugins(path: str) -> Generator[str,None,None]:
                                "mounting the target path in the container.")
             continue
 
-        metadatafile = plugin / 'metadata.txt'
-        if not metadatafile.exists():
+        metadata_file = plugin / 'metadata.txt'
+        if not metadata_file.exists():
+            # Do not log here
             continue
 
         if not (plugin / '__init__.py').exists():
-            LOGGER.warning("Found metadata file but no entry point !")
+            LOGGER.warning(f"'{plugin}' : Found metadata file but no Python entry point !")
             continue
 
         cp = configparser.ConfigParser()
 
         try:
-            with metadatafile.open(mode='rt') as f:
+            with metadata_file.open(mode='rt') as f:
                 cp.read_file(f)
 
             if not cp['general'].getboolean('server'):
-                LOGGER.warning("%s is not a server plugin", plugin)
+                LOGGER.warning(f"'{plugin}' is not a server plugin")
                 continue
 
-            minver = cp['general'].get('qgisMinimumVersion')
-            maxver = cp['general'].get('qgisMaximumVersion')
+            min_ver = cp['general'].get('qgisMinimumVersion')
+            max_ver = cp['general'].get('qgisMaximumVersion')
 
         except Exception as exc:
-            LOGGER.error("Error reading plugin metadata '%s': %s",metadatafile,exc)
+            LOGGER.error(f"'{plugin}' : Error reading plugin metadata '{metadata_file}': {exc}")
             continue
 
-        if not checkQgisVersion(minver,maxver):
-            LOGGER.warning("Unsupported version for %s. Discarding", plugin)
+        if not checkQgisVersion(min_ver,max_ver):
+            LOGGER.warning(f"Unsupported version for {plugin}. Discarding")
             continue
 
         yield plugin.name
