@@ -1,6 +1,13 @@
 # Changelog
 
+<!--
+All notable changes to this project will be documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
+-->
+
 ## Unreleased
+
+### Added
 
 * Add informative warning on dangling plugin symlink
   - Fix https://github.com/3liz/py-qgis-server/issues/51
@@ -8,10 +15,17 @@
 
 ## 1.8.5 - 2022-10-19
 
+### Fixed
+
 * Fix broken file watcher (regression from 1.8.4)
+
+### Changed
+
 * `/ows/wfs3` is now a redirection
 
 ## 1.8.4 - 2022-10-08
+
+### Deprecated
 
 * Deprecate `/ows/wfs3/` endpoint in favor of `/wfs3/`
     - `/ows/wfs3/` will be removed in 1.9
