@@ -99,7 +99,6 @@ def load_configuration():
     CONFIG.set('api.enabled', 'lizmap_api', getenv('QGSRV_API_ENABLED_LIZMAP','no'))
 
     # Landing page config mapping
-    # see: https://github.com/qgis/QGIS/pull/38189#issuecomment-875682735
     CONFIG.add_section('api:landing_page')
     CONFIG.set('api:landing_page', 'QGIS_SERVER_LANDING_PAGE_PREFIX', 
                '${api.endpoints:landing_page}')

@@ -137,7 +137,7 @@ def set_proxy_configuration( logger: logging.Logger ) -> None:
     if proxy_type == QNetworkProxy.NoProxy:
         return
 
-    logger.info("Proxy configuration enabled: %s:%s, type: %s",
+    logger.info("QGIS Proxy configuration enabled: %s:%s, type: %s",
                 proxy.hostName(), proxy.port(), 
                 { QNetworkProxy.DefaultProxy:    'DefaultProxy',
                   QNetworkProxy.Socks5Proxy:     'Socks5Proxy' ,

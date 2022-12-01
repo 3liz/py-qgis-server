@@ -177,6 +177,7 @@ class _Management(tornado.web.Application):
         super().__init__(configure_handlers(poolserver, self._broker_client),
                          default_handler_class=NotFoundHandler)
 
+        self.http_proxy = confservice.getboolean('server','http_proxy')
 
     def log_request(self, handler: tornado.web.RequestHandler ) -> None:
         """ Write HTTP requet to the logs

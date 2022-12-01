@@ -53,7 +53,7 @@ class BaseHandler(tornado.web.RequestHandler):
         self.logger.warning("Connection closed by client: {}".format(self.request.uri))
 
     def set_option_headers(self, allow_header: Optional[str]=None) -> None:
-        """  Set correct headers for 'OPTION' method
+        """  Set correct headers for 'OPTIONS' method
         """
         if not allow_header:
             allow_header = ', '.join( me for me in self.SUPPORTED_METHODS if hasattr(self, me.lower()) )
