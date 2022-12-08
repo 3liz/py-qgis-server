@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+## 1.8.6 - 2022-12-04
+
 ### Fixed
 
 * Fix Fix missing http_proxy in managment handler
