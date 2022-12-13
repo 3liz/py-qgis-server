@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Fixed
+
+* Fix wrong url for documentation link
+
 ## 1.8.6 - 2022-12-04
 
 ### Fixed

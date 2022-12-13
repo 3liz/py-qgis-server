@@ -185,8 +185,8 @@ def load_configuration():
     CONFIG.set('metadata', 'contact_url', 'https://www.3liz.com/')
     CONFIG.set('metadata', 'licence_url', 'http://mozilla.org/MPL/2.0/')
     CONFIG.set('metadata', 'licence_name','Mozilla Public Licences, v2.0')
-    CONFIG.set('metadata', 'external_doc_description','Py-qgis-wps server documentation')
-    CONFIG.set('metadata', 'external_doc_url','https://docs.3liz.org/py-qgis-wps/')
+    CONFIG.set('metadata', 'external_doc_description','Py-qgis-server documentation')
+    CONFIG.set('metadata', 'external_doc_url','https://docs.3liz.org/py-qgis-server/')
 
 def read_config_file( cfgfile ):
     """ Read configuration from file
