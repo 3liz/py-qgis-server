@@ -166,7 +166,7 @@ class RequestHandlerDelegate(QgsServerOgcApiHandler):
     __instances = []
 
     def __init__(self, path: str, handler: Type[RequestHandler],
-                 content_types=[QgsServerOgcApi.JSON,]):
+                 content_types=[QgsServerOgcApi.JSON]):
 
         super().__init__()
         if content_types:
