@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Added
+
+* Allow 'X-Qgis-Project' header for passing project path
+
 ### Fixed
 
 * Fix wrong url for documentation link

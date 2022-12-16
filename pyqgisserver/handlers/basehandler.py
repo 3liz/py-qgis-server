@@ -114,8 +114,10 @@ class BaseHandler(tornado.web.RequestHandler):
         req = self.request
         if self.application.http_proxy:
             # Replacement by static url, use it as base path
+            # XXX Deprecate 'X-Forwarded-Url'
             proxy_url = self._cfg.get('proxy_url') or \
-                req.headers.get('X-Forwarded-Url')
+                req.headers.get('X-Forwarded-Url') or \
+                req.headers.get('X-Qgis-Forwarded-Url')
             if proxy_url:
                 if proxy_url[-1] != '/':
                     proxy_url = f"{proxy_url}/"
@@ -125,13 +127,13 @@ class BaseHandler(tornado.web.RequestHandler):
         return f"{req.protocol}://{req.host}/"
 
 
-
 class NotFoundHandler(BaseHandler):
     def prepare(self):  # for all methods
         raise HTTPError(
             status_code=404,
             reason="Invalid resource path."
         )
+
 
 class ErrorHandler(BaseHandler):
     def initialize(self, status_code: int, reason: Optional[str]=None) -> None:

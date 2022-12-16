@@ -67,7 +67,7 @@ class Request(QgsServerRequest):
         req = handler.request
         
         # Recreate URL
-        location = req.headers.get('X-Forwarded-Url',"")
+        location = req.headers.get('X-Qgis-Forwarded-Url',"")
         query    = req.query.lstrip('?')
         if query:
             location += f"?{query}"
@@ -284,9 +284,16 @@ class QgsRequestHandler(RequestHandler):
             from .management.apis import register_management_apis
             register_management_apis(serverIface)
 
+        # Try to get project from environment
+        cls._default_project_location = os.getenv("QGIS_PROJECT_FILE")
+
         preload_projects()
 
         setattr(cls, 'qgis_server' , qgsserver )
+
+    @classmethod
+    def default_project_location(cls) -> str:
+        return cls._default_project_location
 
     @classmethod
     def refresh_cache(cls) -> None:
@@ -380,18 +387,22 @@ class QgsRequestHandler(RequestHandler):
         """
         LOGGER.debug("Handling request: %s", self.msgid)
 
-        project_location = self.request.headers.pop('X-Map-Location', None)
-        ogc_scheme       = self.request.headers.pop('X-Ogc-Scheme'  , None)
-
         metadata_report = self.init_metadata_report()
 
         request  = Request(self)
         response = Response(self, metadata_report)
 
+        project_location = self.request.headers.pop('X-Map-Location', None)
+        ogc_scheme = self.request.headers.pop('X-Ogc-Scheme'  , None)
+        
+        if not project_location:
+            # Try to get project from header
+            project_location = self.request.headers.pop('X-Qgis-Project', None)
+
         if not project_location:
             # Try to get project from environment
-            project_location = os.getenv("QGIS_PROJECT_FILE")
-   
+            project_location = self.default_project_location()
+
         if ogc_scheme == 'OWS': 
             if not project_location and request.parameter('SERVICE'):
                 # Prevent qgis for returning 500 when MAP is not defined for

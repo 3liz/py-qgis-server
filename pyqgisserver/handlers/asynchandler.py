@@ -47,7 +47,7 @@ class AsyncClientHandler(BaseHandler):
         """ Set headers passed to backend
         """
         project_path = self.get_argument('MAP',default=None)
-       
+
         if project_path:
             headers['X-Map-Location']=project_path 
         if self.ogc_scheme:
@@ -77,7 +77,7 @@ class AsyncClientHandler(BaseHandler):
             proxy_url = self.proxy_url()
             if proxy_url:
                 # Send the full path to Qgis 
-                headers['X-Forwarded-Url']=f"{proxy_url}{self.request.path.lstrip('/')}"
+                headers['X-Qgis-Forwarded-Url']=f"{proxy_url}{self.request.path.lstrip('/')}"
 
             self.set_backend_headers(headers)
 
