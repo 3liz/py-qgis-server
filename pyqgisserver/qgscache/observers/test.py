@@ -22,5 +22,6 @@ def init() -> None:
 
 
 def observe(key: str, datetime: datetime, insert: bool) -> None:
-    LOGGER.debug("*** TEST CACHE OBSERVER: Received update notification for %s %s [Inserted: %s]", key, datetime, insert)
+    LOGGER.debug("*** TEST CACHE OBSERVER: Received update notification"
+                 "for %s %s [Inserted: %s]", key, datetime, insert)
     notify_data[key] = (key, datetime, insert)

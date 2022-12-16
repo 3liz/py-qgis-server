@@ -59,7 +59,7 @@ class AsyncClientHandler(BaseHandler):
         headers['If-None-Match'] = self.request.headers.get("If-None-Match", "")
 
         def copy_headers(pats):
-            headers.update((k, v) for k, v in self.request.headers.items() if \
+            headers.update((k, v) for k, v in self.request.headers.items() if
                            any(map(k.upper().startswith, pats)))
 
         # Copy custom Qgis/Forwarded headers

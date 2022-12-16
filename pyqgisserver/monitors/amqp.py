@@ -38,7 +38,9 @@ def _read_credentials(vhost: str, user: str) -> Optional:  # ['PlainCredentials'
 
 class Monitor(MonitorBase):
 
-    def __init__(self, amqp_client: 'AsyncPublisher', routing_key: str, default_routing: Optional[str] = None) -> None:  # noqa: F821
+    def __init__(self, amqp_client: 'AsyncPublisher',
+                 routing_key: str,
+                 default_routing: Optional[str] = None) -> None:  # noqa: F821
         """ Init AMQP monitor
         """
         super().__init__()

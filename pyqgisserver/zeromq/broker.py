@@ -94,7 +94,8 @@ def run_broker(inaddr: str, outaddr: str, maxqueue: int = 100, timeout: int = 30
                             LOGGER.debug("SND worker: %s -> client: %s : %s", worker_id, client_id, msgid)
                         except zmq.ZMQError as err:
                             # ZMQ Will raise error if no client_id connected
-                            LOGGER.error("SND worker: %s -> client: %s', %s ,errno %s", worker_id, client_id, err, err.errno)
+                            LOGGER.error("SND worker: %s -> client: %s', %s ,errno %s",
+                                         worker_id, client_id, err, err.errno)
                 except Exception:
                     LOGGER.error("%s", traceback.format_exc())
 
@@ -129,10 +130,12 @@ def run_broker(inaddr: str, outaddr: str, maxqueue: int = 100, timeout: int = 30
                         worker_id = workers.pop()
                         try:
                             backend.send_multipart([worker_id, client_id, msgid, data])
-                            LOGGER.debug("SND client: %s -> worker: %s : %s", client_id, worker_id, msgid)
+                            LOGGER.debug("SND client: %s -> worker: %s : %s",
+                                         client_id, worker_id, msgid)
                             break  # Handle next request
                         except zmq.ZMQError as err:
-                            LOGGER.info("SND client: %s -> worker: %s, %s, errno %s", client_id, worker_id, err, err.errno)
+                            LOGGER.info("SND client: %s -> worker: %s, %s, errno %s",
+                                        client_id, worker_id, err, err.errno)
                             if not workers:
                                 # No more workers available
                                 # push back the request on the queue
@@ -151,12 +154,18 @@ def run_broker(inaddr: str, outaddr: str, maxqueue: int = 100, timeout: int = 30
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Test broker')
-    parser.add_argument('--iface', metavar="host", default="tcp://127.0.0.1", help="Interface to bind to")
-    parser.add_argument('--in', dest='inaddr', metavar='address', default='{iface}:8880', help="frontend address")
-    parser.add_argument('--out', dest='outaddr', metavar='address', default='{iface}:8881', help="backend address")
-    parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info', help="set log level")
-    parser.add_argument('--maxqueue', metavar='NUM', type=int, default=100, help="Max waiting queue")
-    parser.add_argument('--timeout', metavar='NUM', type=int, default=3000, help="Set timeout in ms for waiting requests")
+    parser.add_argument('--iface', metavar="host", default="tcp://127.0.0.1",
+                        help="Interface to bind to")
+    parser.add_argument('--in', dest='inaddr', metavar='address', default='{iface}:8880',
+                        help="frontend address")
+    parser.add_argument('--out', dest='outaddr', metavar='address', default='{iface}:8881',
+                        help="backend address")
+    parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info',
+                        help="set log level")
+    parser.add_argument('--maxqueue', metavar='NUM', type=int, default=100,
+                        help="Max waiting queue")
+    parser.add_argument('--timeout', metavar='NUM', type=int, default=3000,
+                        help="Set timeout in ms for waiting requests")
 
     args = parser.parse_args()
 

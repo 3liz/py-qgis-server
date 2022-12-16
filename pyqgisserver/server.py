@@ -46,10 +46,13 @@ def read_configuration(argv: List[str] = None) -> argparse.Namespace:
     cli_parser.add_argument('--version', action='store_true',
                             default=False, help="Return version infos and exit")
     cli_parser.add_argument('-p', '--port', type=int, help="http port", dest='port', default=argparse.SUPPRESS)
-    cli_parser.add_argument('-b', '--bind', metavar='IP', default=argparse.SUPPRESS, help="interface to bind to", dest='interfaces')
-    cli_parser.add_argument('-w', '--workers', metavar='NUM', type=int, default=argparse.SUPPRESS, help="num workers", dest='workers')
+    cli_parser.add_argument('-b', '--bind', metavar='IP', default=argparse.SUPPRESS,
+                            help="interface to bind to", dest='interfaces')
+    cli_parser.add_argument('-w', '--workers', metavar='NUM', type=int, default=argparse.SUPPRESS,
+                            help="num workers", dest='workers')
     cli_parser.add_argument('-u', '--setuid', default='', help="uid to switch to", dest='setuid')
-    cli_parser.add_argument('--rootdir', default=argparse.SUPPRESS, metavar='PATH', help='path to qgis projects')
+    cli_parser.add_argument('--rootdir', default=argparse.SUPPRESS, metavar='PATH',
+                            help='path to qgis projects')
     cli_parser.add_argument('--proxy', action='store_true', default=False, help='run only as proxy')
 
     args = cli_parser.parse_args(argv)

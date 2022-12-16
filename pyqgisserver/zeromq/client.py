@@ -210,7 +210,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test Client')
     parser.add_argument('--host', metavar="host", default='tcp://localhost', help="router host")
     parser.add_argument('--router', metavar='address', default='{host}:8880', help="router address")
-    parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info', help="set log level")
+    parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info',
+                        help="set log level")
     parser.add_argument('--identity', default='', help="Set worker identity")
     parser.add_argument('--count', default=1, type=int, help="Number of requests")
 

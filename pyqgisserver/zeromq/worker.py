@@ -221,7 +221,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test worker')
     parser.add_argument('--host', metavar="host", default='tcp://localhost', help="router host")
     parser.add_argument('--router', metavar='address', default='{host}:8881', help="router address")
-    parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info', help="set log level")
+    parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info',
+                        help="set log level")
     parser.add_argument('--identity', default="", help="Set worker identity")
 
     args = parser.parse_args()

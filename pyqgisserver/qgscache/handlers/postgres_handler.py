@@ -20,7 +20,8 @@
 
     How does QGIS store the project?
 
-    QGIS creates a table called qgis_projects in whatever schema you had specified, each project is stored as a separate row.
+    QGIS creates a table called qgis_projects in whatever schema you had specified,
+    each project is stored as a separate row.
 
     columns are: 'name', 'metadata', 'content'
 

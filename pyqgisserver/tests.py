@@ -127,7 +127,8 @@ class OWSTestClient:
         return HTTPTestResponse(self._testcase.fetch(path, method='PUT', body=data, raise_error=False,
                                 headers=headers))
 
-    def post_xml(self, doc: lxml.etree.Element, headers: Optional[Dict] = None, path: str = '/ows/') -> HTTPTestResponse:
+    def post_xml(self, doc: lxml.etree.Element, headers: Optional[Dict] = None,
+                 path: str = '/ows/') -> HTTPTestResponse:
         return self.post(data=lxml.etree.tostring(doc, pretty_print=True),
                          headers=headers, path=path)
 
