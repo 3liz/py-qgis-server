@@ -8,11 +8,11 @@
 
 from collections import namedtuple
 
-WORKER_READY=b"ready"
+WORKER_READY = b"ready"
 
 # Message structure
 
-RequestMessage = namedtuple( "RequestMessage", (
+RequestMessage = namedtuple("RequestMessage", (
     "query",
     "headers",
     "method",
@@ -20,11 +20,9 @@ RequestMessage = namedtuple( "RequestMessage", (
 ))
 
 
-ReplyMessage = namedtuple( "ReplyMessage", (
+ReplyMessage = namedtuple("ReplyMessage", (
     "status",
     "headers",
     "data",
     "meta",
 ))
-
-

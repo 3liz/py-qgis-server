@@ -12,6 +12,7 @@
 from time import time
 from datetime import datetime, timedelta
 
+
 class Stats:
 
     def __init__(self) -> None:
@@ -19,16 +20,15 @@ class Stats:
 
     def reset(self) -> None:
         self.num_requests = 0
-        self.num_errors   = 0
-        self.start_time   = time()
-       
+        self.num_errors = 0
+        self.start_time = time()
+
     def json(self):
         """ Return a json payload
         """
         return dict(
-            num_request = self.num_requests,
-            num_errors  = self.num_errors,
-            start_date  = datetime.fromtimestamp(self.start_time).isoformat(),
-            uptime      = timedelta(seconds=time() - self.start_time).total_seconds(),
+            num_request=self.num_requests,
+            num_errors=self.num_errors,
+            start_date=datetime.fromtimestamp(self.start_time).isoformat(),
+            uptime=timedelta(seconds=time() - self.start_time).total_seconds(),
         )
-

@@ -20,8 +20,9 @@ LOGGER = logging.getLogger('SRVLOG')
 class OAPIHandler(AsyncClientHandler):
     """ Handle Qgis api
     """
+
     def initialize(self, service: str, **kwargs) -> None:
-        super().initialize(**kwargs )
+        super().initialize(**kwargs)
         self.ogc_scheme = 'OAF'
         self._service_name = service.upper()
 
@@ -30,7 +31,7 @@ class OAPIHandler(AsyncClientHandler):
         # Replace MAP key with uppercase
         args = self.request.arguments
         if 'MAP' in args:
-            return 
+            return
         for k in args:
             if k.upper() == 'MAP':
                 key = k
@@ -53,14 +54,12 @@ class OAPIHandler(AsyncClientHandler):
     async def options(self) -> Awaitable[None]:
         await self.handle_request('OPTIONS')
 
-    def get_monitor_params( self ) -> None:
+    def get_monitor_params(self) -> None:
         """ Override
         """
         params = dict(
-            MAP = self.request.arguments.get('MAP','__unknown__'),
-            SERVICE = self._service_name,
-            REQUEST = self.request.path,
+            MAP=self.request.arguments.get('MAP', '__unknown__'),
+            SERVICE=self._service_name,
+            REQUEST=self.request.path,
         )
         return params
-
-

@@ -15,9 +15,10 @@ import logging
 
 from typing import Dict
 
-from  .base import MonitorBase
+from .base import MonitorBase
 
 LOGGER = logging.getLogger('SRVLOG')
+
 
 class Monitor(MonitorBase):
 
@@ -26,16 +27,18 @@ class Monitor(MonitorBase):
 
         self.messages = []
 
-    def emit( self, params: Dict[str,str], meta: Dict ) -> None:
+    def emit(self, params: Dict[str, str], meta: Dict) -> None:
         """ Publish monitor data
         """
         data = dict(self.global_tags)
         data.update(params)
-        self.messages.append((data,meta))
+        self.messages.append((data, meta))
+
 
 _instance = Monitor()
 
 # Entrypoint
+
+
 def initialize() -> Monitor:
     return _instance
-

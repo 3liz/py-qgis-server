@@ -14,19 +14,19 @@ from .basehandler import BaseHandler
 from ..version import __version__
 from ..config import config_to_dict
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 class PingHandler(BaseHandler):
-    
+
     def set_default_headers(self) -> None:
         super().set_default_headers()
         # Disable cache because this is healtcheck requests
-        self.set_header("Cache-control","no-store")
-        self.set_header("X-Server-Status","ok")
-        
+        self.set_header("Cache-control", "no-store")
+        self.set_header("X-Server-Status", "ok")
+
     def get(self):
-        self.write_json({ 'status': 'ok' })
+        self.write_json({'status': 'ok'})
 
     def head(self):
         pass
@@ -49,33 +49,34 @@ class StatusHandler(BaseHandler):
         else:
             response = self.get_versions()
             req = self.request
+
             def _link(path: str, title: str, rel: str):
                 return {
-                    'href' : f"{req.protocol}://{req.host}{path}",
-                    'rel'  : rel,
+                    'href': f"{req.protocol}://{req.host}{path}",
+                    'rel': rel,
                     'title': title,
-                    'type' : "application/json",
+                    'type': "application/json",
                 }
             response.update(links=[
-                _link("/status/config" , "Server configuration", "status"),
+                _link("/status/config", "Server configuration", "status"),
                 _link("/status/env", "Execution environment", "status"),
-                _link("/status/versions"  , "Versions", "status"),
-                _link("/status/"   , "Server status", "self"),
+                _link("/status/versions", "Versions", "status"),
+                _link("/status/", "Server status", "self"),
             ])
-                        
+
         self.write_json(response)
 
     def get_versions(self):
         try:
             from qgis.core import Qgis
-            QGIS_VERSION=Qgis.QGIS_VERSION_INT
-            QGIS_RELEASE=Qgis.QGIS_RELEASE_NAME
+            QGIS_VERSION = Qgis.QGIS_VERSION_INT
+            QGIS_RELEASE = Qgis.QGIS_RELEASE_NAME
         except Exception as e:
             LOGGER.error("Cannot get Qgis version %s", e)
-            QGIS_VERSION="n/a"
-            QGIS_RELEASE="n/a"
+            QGIS_VERSION = "n/a"
+            QGIS_RELEASE = "n/a"
 
         return dict(tornado_ver=tornado.version,
-                    version = __version__,
+                    version=__version__,
                     qgis_version=QGIS_VERSION,
                     qgis_release=QGIS_RELEASE)

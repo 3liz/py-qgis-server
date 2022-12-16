@@ -12,7 +12,7 @@ from .basehandler import BaseHandler
 from ..version import __version__
 from ..config import confservice
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 class LandingPage(BaseHandler):
@@ -63,19 +63,18 @@ class LandingPage(BaseHandler):
         try:
             from qgis.core import Qgis
             qgis_version = Qgis.QGIS_VERSION_INT
-            qgis_release = Qgis.QGIS_RELEASE_NAME  
+            qgis_release = Qgis.QGIS_RELEASE_NAME
         except ImportError:
             LOGGER.critical("Failed to import Qgis module !")
             qgis_version = qgis_release = 'n/a'
 
         return (
             ('x-qgis-version', qgis_version),
-            ('x-qgis-release', qgis_release),   
-        )  
+            ('x-qgis-release', qgis_release),
+        )
 
     def external_doc(self):
         return {
             'description': self._metadata['external_doc_description'],
             'url': self._metadata['external_doc_url'],
         }
-

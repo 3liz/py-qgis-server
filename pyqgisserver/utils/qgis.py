@@ -13,19 +13,23 @@ import logging
 
 
 def setup_qgis_paths() -> None:
-    """ Init qgis paths 
+    """ Init qgis paths
     """
-    qgis_pluginpath = os.environ.get('QGIS3_PLUGINPATH','/usr/share/qgis/python/plugins/')
+    qgis_pluginpath = os.environ.get('QGIS3_PLUGINPATH', '/usr/share/qgis/python/plugins/')
     sys.path.append(qgis_pluginpath)
-   
 
-#XXX Apparently we need to keep a reference instance of the qgis_application object
+
+# XXX Apparently we need to keep a reference instance of the qgis_application object
 # And not make this object garbage collected
 qgis_application = None
 
 
-def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False, verbose: bool=False, 
-                           cleanup: bool=True, logger : logging.Logger=None, logprefix :str='Qgis:') -> 'QgsApplication':  # noqa: F821
+def start_qgis_application(
+        enable_gui: bool = False,
+        enable_processing: bool = False, verbose: bool = False,
+        cleanup: bool = True,
+        logger: logging.Logger = None,
+        logprefix: str = 'Qgis:') -> 'QgsApplication':  # noqa: F821
     """ Start qgis application
 
         :param boolean enable_gui: Enable graphical interface, default to False
@@ -34,7 +38,7 @@ def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False
         :param boolean cleanup: Register atexit hook to close qgisapplication on exit().
             Note that prevents qgis to segfault when exiting. Default to True.
     """
-    os.environ['QGIS_NO_OVERRIDE_IMPORT']    = '1'
+    os.environ['QGIS_NO_OVERRIDE_IMPORT'] = '1'
     os.environ['QGIS_DISABLE_MESSAGE_HOOKS'] = '1'
 
     logger = logger or logging.getLogger()
@@ -42,7 +46,7 @@ def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False
 
     from qgis.core import Qgis, QgsApplication
 
-    logger.info("Starting Qgis application: %s",Qgis.QGIS_VERSION)
+    logger.info("Starting Qgis application: %s", Qgis.QGIS_VERSION)
 
     if QgsApplication.QGIS_APPLICATION_NAME != "QGIS3":
         raise RuntimeError("You need QGIS3 (found %s)" % QgsApplication.QGIS_APPLICATION_NAME)
@@ -54,7 +58,7 @@ def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False
             logger.info("Setting offscreen mode")
             os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-    qgis_prefix = os.environ.get('QGIS3_HOME','/usr')
+    qgis_prefix = os.environ.get('QGIS3_HOME', '/usr')
 
     # XXX Set QGIS_PREFIX_PATH, it seems that setPrefixPath
     # does not do the job correctly
@@ -62,9 +66,8 @@ def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False
 
     global qgis_application
 
-    qgis_application = QgsApplication([], enable_gui )
+    qgis_application = QgsApplication([], enable_gui)
     qgis_application.setPrefixPath(qgis_prefix, True)
-    #qgis_application.initQgis()
 
     if cleanup:
         # Closing QgsApplication on exit will
@@ -72,7 +75,7 @@ def start_qgis_application(enable_gui: bool=False, enable_processing: bool=False
         import atexit
 
         logger.info("%s Installing cleanup hook" % logprefix)
-    
+
         @atexit.register
         def exitQgis():
             global qgis_application
@@ -103,13 +106,14 @@ def init_processing() -> None:
     Processing.initialize()
 
 
-def install_logger_hook( logger: logging.Logger, logprefix: str, verbose: bool=False ) -> None:
+def install_logger_hook(logger: logging.Logger, logprefix: str, verbose: bool = False) -> None:
     """ Install message log hook
     """
     from qgis.core import Qgis, QgsApplication
-    # Add a hook to qgis  message log 
+    # Add a hook to qgis  message log
+
     def writelogmessage(message, tag, level):
-        arg = '{} {}: {}'.format( logprefix, tag, message )
+        arg = '{} {}: {}'.format(logprefix, tag, message)
         if level == Qgis.Warning:
             logger.warning(arg)
         elif level == Qgis.Critical:
@@ -120,10 +124,10 @@ def install_logger_hook( logger: logging.Logger, logprefix: str, verbose: bool=F
             logger.debug(arg)
 
     messageLog = QgsApplication.messageLog()
-    messageLog.messageReceived.connect( writelogmessage )
+    messageLog.messageReceived.connect(writelogmessage)
 
 
-def set_proxy_configuration( logger: logging.Logger ) -> None:
+def set_proxy_configuration(logger: logging.Logger) -> None:
     """ Display proxy configuration
     """
     from qgis.PyQt.QtNetwork import QNetworkProxy
@@ -138,16 +142,16 @@ def set_proxy_configuration( logger: logging.Logger ) -> None:
         return
 
     logger.info("QGIS Proxy configuration enabled: %s:%s, type: %s",
-                proxy.hostName(), proxy.port(), 
-                { QNetworkProxy.DefaultProxy:    'DefaultProxy',
-                  QNetworkProxy.Socks5Proxy:     'Socks5Proxy' ,
-                  QNetworkProxy.HttpProxy:       'HttpProxy'   ,
-                  QNetworkProxy.HttpCachingProxy:'HttpCachingProxy' ,
-                  QNetworkProxy.HttpCachingProxy:'FtpCachingProxy' ,
-                }.get(proxy_type,'Undetermined')) # noqa E124
- 
+                proxy.hostName(), proxy.port(),
+                {QNetworkProxy.DefaultProxy: 'DefaultProxy',
+                 QNetworkProxy.Socks5Proxy: 'Socks5Proxy',
+                 QNetworkProxy.HttpProxy: 'HttpProxy',
+                 QNetworkProxy.HttpCachingProxy: 'HttpCachingProxy',
+                 QNetworkProxy.HttpCachingProxy: 'FtpCachingProxy',
+                }.get(proxy_type, 'Undetermined'))  # noqa E124
 
-def init_qgis_server(**kwargs) -> 'QgsServer': # noqa: F821
+
+def init_qgis_server(**kwargs) -> 'QgsServer':  # noqa: F821
     """ Init Qgis server
     """
     start_qgis_application(**kwargs)
@@ -165,7 +169,7 @@ def init_qgis_server(**kwargs) -> 'QgsServer': # noqa: F821
     return server
 
 
-def print_qgis_version(verbose: bool=False) -> None:
+def print_qgis_version(verbose: bool = False) -> None:
     """ Output the qgis version
     """
     from qgis.core import Qgis
@@ -178,6 +182,3 @@ def print_qgis_version(verbose: bool=False) -> None:
 
     if verbose:
         start_qgis_application(verbose=True)
-    
-
-

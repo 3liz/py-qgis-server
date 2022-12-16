@@ -16,4 +16,3 @@ class UpdateState(IntEnum):
     UNCHANGED = 0
     INSERTED = 1
     UPDATED = 2
-

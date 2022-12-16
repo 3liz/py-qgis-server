@@ -7,7 +7,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 """
-The fork serve will ensure that forking processes 
+The fork serve will ensure that forking processes
 occurs from [almost] the same state.
 """
 import os
@@ -41,7 +41,8 @@ except ImportError:
     psutil = None
 
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
+
 
 class _RestartHandler:
 
@@ -62,7 +63,7 @@ class _RestartHandler:
         # Check for plugins
         pluginpath = conf.get('pluginpath')
         if pluginpath:
-            plugins = glob(os.path.join(pluginpath,'*/.update-manifest'))
+            plugins = glob(os.path.join(pluginpath, '*/.update-manifest'))
             self._watch_files.extend(plugins)
 
         LOGGER.debug("Updated watch files %s", self._watch_files)
@@ -71,23 +72,23 @@ class _RestartHandler:
         if self._restart:
             self._restart.stop()
 
-    def start(self, do_restart: Callable[[None],None]) -> None:
+    def start(self, do_restart: Callable[[None], None]) -> None:
         """ Create a restart handler
         """
         self.update_files()
-        
-        def callback( *args ):
+
+        def callback(*args):
             do_restart()
             self.update_files()
-       
-        check_time = confservice.getint('server','restartmon_check_time', 3000)
+
+        check_time = confservice.getint('server', 'restartmon_check_time', 3000)
         self._restart = watchfiles(self._watch_files, callback, check_time)
         self._restart.start()
 
 
 class _Server:
 
-    def __init__(self, broadcastaddr: str, pool: Process,  timeout: int,
+    def __init__(self, broadcastaddr: str, pool: Process, timeout: int,
                  num_workers: int,
                  high_water_mark: float = 1.0) -> None:
 
@@ -97,7 +98,7 @@ class _Server:
         pub.setsockopt(zmq.SNDHWM, 1)      # Max 1 item on send queue
         pub.bind(broadcastaddr)
 
-        self._timeout = timeout 
+        self._timeout = timeout
         self._sock = pub
         self._num_workers = num_workers
 
@@ -113,7 +114,7 @@ class _Server:
         # Ensure that pool is terminated is called
         # at process exit
         self._terminate = Finalize(
-            self, self._terminate_pool, 
+            self, self._terminate_pool,
             args=(self._pool,),
             exitpriority=16
         )
@@ -129,7 +130,7 @@ class _Server:
                 LOGGER.critical("High memory water mark reached: restarting workers %s", self._high_water_mark)
                 self.restart()
             await asyncio.sleep(5)
-    
+
     def start_supervisor(self):
         """ Start supervisor independently
 
@@ -146,7 +147,6 @@ class _Server:
             self._healthcheck = asyncio.ensure_future(self.healthcheck())
 
         self._restart_handler.start(self.restart)
-        
 
     @classmethod
     def _terminate_pool(cls, p: Process) -> None:
@@ -167,8 +167,8 @@ class _Server:
             self._supervisor.stop()
         self._terminate()
 
-    def broadcast(self, command: bytes ) -> None:
-        """ Broadcast notification to workers 
+    def broadcast(self, command: bytes) -> None:
+        """ Broadcast notification to workers
         """
         try:
             self._sock.send(command, zmq.NOBLOCK)
@@ -188,8 +188,8 @@ class _Server:
     async def get_reports(self) -> Awaitable[List[Dict]]:
         """ Collect reports
         """
-        maxwait=10
-        so_far=0
+        maxwait = 10
+        so_far = 0
         self._supervisor.clear_reports()
         self.broadcast(b'REPORT')
         while self._supervisor.num_reports() < self._num_workers:
@@ -216,17 +216,17 @@ def create_poolserver(numworkers: int) -> _Server:
         This ensure that sub-processes all always forked from
         the same parent context
     """
-    router        = confservice['zmq']['bindaddr']
+    router = confservice['zmq']['bindaddr']
     broadcastaddr = confservice['zmq']['broadcastaddr']
-    timeout       = confservice['server'].getint('timeout')
+    timeout = confservice['server'].getint('timeout')
 
     high_water_mark = float(confservice['server']['memory_high_water_mark'])
 
     p = Process(target=run_worker_pool, args=(numworkers, broadcastaddr, router))
     p.start()
 
-    poolserver = _Server(broadcastaddr, p, timeout, numworkers, 
-                         high_water_mark = high_water_mark)
+    poolserver = _Server(broadcastaddr, p, timeout, numworkers,
+                         high_water_mark=high_water_mark)
     return poolserver
 
 
@@ -237,15 +237,15 @@ def run_worker_pool(numworkers: int, broadcastaddr: str, router: str) -> None:
     """
 
     # Try to exit gracefully
-    def term_signal(signum,frames):
-        #print("Caught signal: %s" % signum, file=sys.stderr)
+    def term_signal(signum, frames):
+        # print("Caught signal: %s" % signum, file=sys.stderr)
         raise SystemExit()
 
     LOGGER.info("Starting worker pool")
-    pool = Pool( numworkers, target=QgsRequestHandler.run, args=(router,),
-                 kwargs={ 'broadcastaddr': broadcastaddr } )
+    pool = Pool(numworkers, target=QgsRequestHandler.run, args=(router,),
+                kwargs={'broadcastaddr': broadcastaddr})
 
-    signal.signal(signal.SIGTERM,term_signal)
+    signal.signal(signal.SIGTERM, term_signal)
 
     try:
         while True:
@@ -253,10 +253,8 @@ def run_worker_pool(numworkers: int, broadcastaddr: str, router: str) -> None:
                 raise RuntimeError("Server aborting prematurely !")
             pool.maintain_pool()
             time.sleep(0.1)
-    except (KeyboardInterrupt,SystemExit):
+    except (KeyboardInterrupt, SystemExit):
         LOGGER.warning("Pool Interrupted")
     finally:
         LOGGER.info("Terminating worker pool")
         pool.terminate()
-
-

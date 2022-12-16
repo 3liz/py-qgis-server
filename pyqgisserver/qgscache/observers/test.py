@@ -6,20 +6,21 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-""" Cache Observer used for testing 
+""" Cache Observer used for testing
 """
 import logging
 
 from datetime import datetime
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
 
 notify_data = {}
+
 
 def init() -> None:
     pass
 
+
 def observe(key: str, datetime: datetime, insert: bool) -> None:
     LOGGER.debug("*** TEST CACHE OBSERVER: Received update notification for %s %s [Inserted: %s]", key, datetime, insert)
-    notify_data[key] = (key,datetime,insert)
-
+    notify_data[key] = (key, datetime, insert)

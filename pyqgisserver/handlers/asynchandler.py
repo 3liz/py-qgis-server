@@ -22,34 +22,36 @@ from typing import Any, Optional, Awaitable, List, Dict
 
 LOGGER = logging.getLogger('SRVLOG')
 
+
 class AsyncClientHandler(BaseHandler):
 
     """ Proxy to Qgis 0MQ worker
     """
-    def initialize(self, client: AsyncClient, timeout: int, 
-                   monitor: Optional[Monitor]=None, 
-                   allowed_hdrs: List[str]=[] ) -> None:
+
+    def initialize(self, client: AsyncClient, timeout: int,
+                   monitor: Optional[Monitor] = None,
+                   allowed_hdrs: List[str] = []) -> None:
 
         super().initialize()
 
-        self._client       = client
-        self._timeout      = timeout
-        self._monitor      = monitor
-        self._stats        = self.application.stats
+        self._client = client
+        self._timeout = timeout
+        self._monitor = monitor
+        self._stats = self.application.stats
         self._allowed_hdrs = allowed_hdrs
 
-        self.ogc_scheme   = None
+        self.ogc_scheme = None
 
     def encode_arguments(self) -> str:
-        return '?'+urlencode({k:v[0] for k,v in self.request.arguments.items()})
+        return '?' + urlencode({k: v[0] for k, v in self.request.arguments.items()})
 
     def set_backend_headers(self, headers: Dict) -> None:
         """ Set headers passed to backend
         """
-        project_path = self.get_argument('MAP',default=None)
+        project_path = self.get_argument('MAP', default=None)
 
         if project_path:
-            headers['X-Map-Location']=project_path 
+            headers['X-Map-Location'] = project_path
         if self.ogc_scheme:
             headers['X-Ogc-Scheme'] = self.ogc_scheme
 
@@ -57,8 +59,8 @@ class AsyncClientHandler(BaseHandler):
         headers['If-None-Match'] = self.request.headers.get("If-None-Match", "")
 
         def copy_headers(pats):
-            headers.update((k,v) for k,v in self.request.headers.items() if \
-                           any(map(k.upper().startswith,pats)))
+            headers.update((k, v) for k, v in self.request.headers.items() if \
+                           any(map(k.upper().startswith, pats)))
 
         # Copy custom Qgis/Forwarded headers
         # see https://github.com/qgis/QGIS/pull/41333
@@ -76,33 +78,33 @@ class AsyncClientHandler(BaseHandler):
             headers = {}
             proxy_url = self.proxy_url()
             if proxy_url:
-                # Send the full path to Qgis 
-                headers['X-Qgis-Forwarded-Url']=f"{proxy_url}{self.request.path.lstrip('/')}"
+                # Send the full path to Qgis
+                headers['X-Qgis-Forwarded-Url'] = f"{proxy_url}{self.request.path.lstrip('/')}"
 
             self.set_backend_headers(headers)
 
             data = self.request.body
 
-            if self.get_argument('SERVICE', default=None) and  self.has_body_arguments:
+            if self.get_argument('SERVICE', default=None) and self.has_body_arguments:
                 # Do not let qgis server handle url encoded parameters
                 data = None
                 if method == 'POST':
                     method = 'GET'
 
-            self._stats.num_requests +=1
+            self._stats.num_requests += 1
 
-            response = await self._client.fetch(query=query, method=method, 
+            response = await self._client.fetch(query=query, method=method,
                                                 headers=headers, data=data,
                                                 timeout=self._timeout)
             status = response.status
-            hdrs   = response.headers
-            delta  = time() - reqtime
+            hdrs = response.headers
+            delta = time() - reqtime
 
             log_rrequest(proxy_url, status, method, query, delta, hdrs)
-          
+
             # Send response
-            for k,v in hdrs.items():
-                self.set_header(k,v)
+            for k, v in hdrs.items():
+                self.set_header(k, v)
 
             # Send CORS Header
             self.set_access_control_headers()
@@ -121,7 +123,7 @@ class AsyncClientHandler(BaseHandler):
             else:
                 self.set_status(status)
                 if response.data:
-                    # XXX Tornado do no like 304 
+                    # XXX Tornado do no like 304
                     # with (potentially empty) chunk
                     self.write(response.data)
 
@@ -137,15 +139,15 @@ class AsyncClientHandler(BaseHandler):
         except RequestGatewayError:
             status = 502
             delta = time() - reqtime
-            # Log the request 
+            # Log the request
             log_rrequest(proxy_url, 499, method, query, delta, {})
             self.send_error(status, reason="Backend request error")
 
         if status >= 500:
-            self._stats.num_errors +=1
+            self._stats.num_errors += 1
 
         # Send monitoring info
-        self.emit( status, delta, meta or {})
+        self.emit(status, delta, meta or {})
 
     def emit(self, status: int, response_time: float, meta: Dict) -> None:
         if not self._monitor:
@@ -158,11 +160,11 @@ class AsyncClientHandler(BaseHandler):
         if params:
             params.update(
                 # RESPONSE TIME MUST BE IN MILLISECONDS
-                RESPONSE_TIME = int(response_time*1000.0),
-                RESPONSE_STATUS  = status,
-                RESPONSE_MEMUSED = meta.get('mem_used',0)
+                RESPONSE_TIME=int(response_time * 1000.0),
+                RESPONSE_STATUS=status,
+                RESPONSE_MEMUSED=meta.get('mem_used', 0)
             )
-            self._monitor.emit( params, meta=self.request.headers )
+            self._monitor.emit(params, meta=self.request.headers)
 
     async def get(self) -> Awaitable[None]:
         """ Handle Get method
@@ -184,7 +186,7 @@ class AsyncClientHandler(BaseHandler):
         """
         self.set_option_headers('GET, POST, OPTIONS')
 
-    def get_monitor_params( self ) -> Optional[Dict[str,Any]]:
+    def get_monitor_params(self) -> Optional[Dict[str, Any]]:
         """ Emit monitoring info
         """
         return None

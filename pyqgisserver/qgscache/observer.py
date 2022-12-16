@@ -8,7 +8,7 @@
 
 """ Cache observer for triggers
 
-    The observer aggregate update notifications from 
+    The observer aggregate update notifications from
     all workers, it prevents triggering the same update
     multiple times.
 """
@@ -23,11 +23,11 @@ from datetime import datetime
 from typing import Optional, Awaitable, Any, NamedTuple, Iterable, Tuple
 
 from ..zeromq.utils import _get_ipc
-from ..config  import confservice
+from ..config import confservice
 from .types import UpdateState
 
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 class _CacheUpdate(NamedTuple):
@@ -44,11 +44,11 @@ class Client:
 
         ctx = zmq.Context.instance()
         self._sock = ctx.socket(zmq.PUSH)
-        self._sock.setsockopt(zmq.IMMEDIATE, 1) # Do no queue if no connection
+        self._sock.setsockopt(zmq.IMMEDIATE, 1)  # Do no queue if no connection
         self._sock.connect(address)
         self._pid = os.getpid()
 
-    def _send(self, data: Any ) -> None: 
+    def _send(self, data: Any) -> None:
         try:
             self._sock.send_pyobj((self._pid, data), flags=zmq.DONTWAIT)
         except zmq.ZMQError as err:
@@ -61,8 +61,8 @@ class Client:
     def observe(self, key: str, modified_time: datetime, state: UpdateState):
         """
         """
-        self._send((key,modified_time,state))
-        
+        self._send((key, modified_time, state))
+
 
 class Server:
 
@@ -76,16 +76,16 @@ class Server:
             must be done before forking workers since
             we want to make aware of the observers situation
         """
-        names = (name.strip() for name in confservice.get('projects.cache','observers', fallback="").split(','))
+        names = (name.strip() for name in confservice.get('projects.cache', 'observers', fallback="").split(','))
         cls._declared_observers = list(name for name in names if name)
 
         # XXX: Managment use cache observer for listing cached objects
-        if cls._declared_observers or confservice.getboolean('management','enabled'):
+        if cls._declared_observers or confservice.getboolean('management', 'enabled'):
             cls._enabled = True
 
-        confservice.set('projects.cache','has_observers', 'yes' if cls._enabled else 'no')
+        confservice.set('projects.cache', 'has_observers', 'yes' if cls._enabled else 'no')
 
-    def __init__(self)-> None:
+    def __init__(self) -> None:
         """ Run Observer
 
             :param timeout: timeout delay in seconds
@@ -105,7 +105,7 @@ class Server:
             ctx = zmq.asyncio.Context.instance()
             self._sock = ctx.socket(zmq.PULL)
             self._sock.setsockopt(zmq.RCVTIMEO, 1000)
-            self._sock.bind( address )
+            self._sock.bind(address)
         else:
             self._sock = None
 
@@ -113,11 +113,12 @@ class Server:
         """ Load registered triggers
         """
         from pyqgisservercontrib.core import componentmanager as cm
+
         def _load_observers():
             for name in self._declared_observers:
                 try:
                     LOGGER.debug("*** Loading cache observer '%s'", name)
-                    observer = cm.load_entrypoint('py_qgis_server.cache.observers',name)
+                    observer = cm.load_entrypoint('py_qgis_server.cache.observers', name)
                     observer.init()
                     yield observer
                 except cm.EntryPointNotFoundError:
@@ -138,8 +139,8 @@ class Server:
             try:
                 pid, (key, modified_time, state) = await self._sock.recv_pyobj()
                 LOGGER.debug("*** CACHE OBSERVER: Received update %s for key %s from pid %s", state, key, pid)
-               
-                # Check if an entry exists already 
+
+                # Check if an entry exists already
                 entry = self._last_updates.get(key)
                 if entry:
                     do_notify = entry.modified_time < modified_time
@@ -149,7 +150,7 @@ class Server:
 
                 # Update entry
                 self._last_updates[key] = _CacheUpdate(modified_time, state)
-                   
+
                 if do_notify:
                     self.notify_observers(key, modified_time, state)
 
@@ -173,7 +174,7 @@ class Server:
         if self._task and not self._task.cancelled():
             self._task.cancel()
 
-    def notify_observers(self, key: str, modified_time: datetime, state = UpdateState ) -> None:
+    def notify_observers(self, key: str, modified_time: datetime, state=UpdateState) -> None:
         """ Run registered observers
         """
         for obs in self._observers:
@@ -182,12 +183,12 @@ class Server:
             except Exception:
                 LOGGER.critical("Uncaugh error in observer: %s\n%s", obs, traceback.format_exc())
 
-    def find(self, key:str) -> Optional[_CacheUpdate]:
+    def find(self, key: str) -> Optional[_CacheUpdate]:
         """ return entry
         """
         return self._last_updates.get(key)
 
-    def items(self) -> Iterable[Tuple[str,_CacheUpdate]]:
+    def items(self) -> Iterable[Tuple[str, _CacheUpdate]]:
         return self._last_updates.items()
 
 
@@ -199,6 +200,3 @@ def start_cache_observer() -> Server:
     server = Server()
     server.run()
     return server
-
-
-

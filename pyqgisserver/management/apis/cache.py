@@ -12,10 +12,10 @@
 """
 import logging
 
-from tornado.web import HTTPError # noqa F401
+from tornado.web import HTTPError  # noqa F401
 
 from pyqgisserver.qgscache.cachemanager import (get_cacheservice, get_project_summary)
- 
+
 from .handler import RequestHandler, register_handlers
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -23,7 +23,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class CacheCollection(RequestHandler):
 
-    def get(self, key: str=None) -> None: 
+    def get(self, key: str = None) -> None:
         """ Return project cache info
         """
         if not key:
@@ -31,20 +31,19 @@ class CacheCollection(RequestHandler):
             key = self.request.parameter('MAP')
 
         if not key:
-            raise HTTPError(400,reason="Missing project specification")
+            raise HTTPError(400, reason="Missing project specification")
 
         cache = get_cacheservice()
         project, _ = cache.lookup(key, refresh=False)
- 
-        self.write(get_project_summary(key, project))  
-    
- 
-def register( serverIface ):
+
+        self.write(get_project_summary(key, project))
+
+
+def register(serverIface):
     """ Register plugins api handlers
     """
-    register_handlers(serverIface, "/cache","CacheManagment",
+    register_handlers(serverIface, "/cache", "CacheManagment",
                       [
                           (r'/content/(?P<key>.+)$', CacheCollection),
                           (r'/', CacheCollection),
                       ])
-

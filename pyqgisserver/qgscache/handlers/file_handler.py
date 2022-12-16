@@ -20,9 +20,10 @@ from pyqgisservercontrib.core import componentmanager
 
 LOGGER = logging.getLogger('SRVLOG')
 
-ALLOWED_SFX=('.qgs','.qgz')
+ALLOWED_SFX = ('.qgs', '.qgz')
 
-__all__= []
+__all__ = []
+
 
 @componentmanager.register_factory('@3liz.org/cache/protocol-handler;1?scheme=file')
 class FileProtocolHandler:
@@ -37,7 +38,7 @@ class FileProtocolHandler:
         """
         if not path.is_absolute():
             raise ValueError(f"file path must be absolute not {path}")
-    
+
         exists = False
         if path.suffix not in ALLOWED_SFX:
             for sfx in ALLOWED_SFX:
@@ -50,15 +51,15 @@ class FileProtocolHandler:
 
         return path if exists else None
 
-    def get_modified_time( self, url: urllib.parse.ParseResult) -> datetime:
+    def get_modified_time(self, url: urllib.parse.ParseResult) -> datetime:
         """ Return the modified date time of the project referenced by its url
         """
         path = self._check_file(Path(url.path))
         return datetime.fromtimestamp(path.stat().st_mtime)
 
-    def get_project( self, url: Optional[urllib.parse.ParseResult],
-                     project: Optional[QgsProject]=None,
-                     timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
+    def get_project(self, url: Optional[urllib.parse.ParseResult],
+                    project: Optional[QgsProject] = None,
+                    timestamp: Optional[datetime] = None) -> Tuple[QgsProject, datetime]:
         """ Create or return a proect
         """
         if url:
@@ -69,14 +70,13 @@ class FileProtocolHandler:
             raise ValueError('Cannot get path from arguments')
 
         if not path:
-            LOGGER.error("File protocol handler: File not found: %s", str(path)) 
+            LOGGER.error("File protocol handler: File not found: %s", str(path))
             raise FileNotFoundError(str(path))
 
         modified_time = datetime.fromtimestamp(path.stat().st_mtime)
         if timestamp is None or timestamp < modified_time:
-            cachmngr  = componentmanager.get_service('@3liz.org/cache-manager;1')
-            project   = cachmngr.read_project(str(path))
+            cachmngr = componentmanager.get_service('@3liz.org/cache-manager;1')
+            project = cachmngr.read_project(str(path))
             timestamp = modified_time
 
         return project, timestamp
-

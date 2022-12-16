@@ -24,13 +24,16 @@ from .messages import RequestMessage
 
 from ..logger import setup_log_handler
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
+
 
 class RequestTimeoutError(Exception):
     pass
 
+
 class RequestGatewayError(Exception):
     pass
+
 
 class RequestProxyError(Exception):
     pass
@@ -62,9 +65,9 @@ class AsyncResponseHandler:
         """
         if self.headers is None:
             status, hdrs, body, meta = pickle.loads(data)
-            self.headers  = hdrs
-            self.data     = body
-            self.status   = status
+            self.headers = hdrs
+            self.data = body
+            self.status = status
             self.metadata = meta
             # We are waiting for more data
             # Create a queue to collect the remaining chunks
@@ -76,7 +79,7 @@ class AsyncResponseHandler:
         elif self._has_more:
             body, has_more, extra = pickle.loads(data)
             self._has_more = has_more
-            self._chunks.put_nowait((body,has_more))
+            self._chunks.put_nowait((body, has_more))
             self.extra = extra
 
     def _done(self) -> bool:
@@ -85,7 +88,7 @@ class AsyncResponseHandler:
         return not self._has_more and self._future.done()
 
     async def _get(self, timeout: int) -> 'AsyncResponseHandler':
-        """ wait for result and return the parsed 
+        """ wait for result and return the parsed
             result
         """
         try:
@@ -94,7 +97,7 @@ class AsyncResponseHandler:
             self._has_more = False
             raise RequestTimeoutError()
 
-    async def _next_chunk(self, timeout: int) -> Tuple[bytes,bool]:
+    async def _next_chunk(self, timeout: int) -> Tuple[bytes, bool]:
         """ Get next chunk
         """
         try:
@@ -107,8 +110,9 @@ class AsyncResponseHandler:
 class AsyncClient:
     """ Async DEALER ZMQ client
     """
-    def __init__(self, address: str , identity: bytes=None) -> None:
-        
+
+    def __init__(self, address: str, identity: bytes = None) -> None:
+
         context = zmq.asyncio.Context.instance()
 
         self.identity = identity or uuid.uuid1().bytes
@@ -121,8 +125,8 @@ class AsyncClient:
 
         self._running = False
         self._handlers = {}
-        self._socket   = sock
-        self._polling  = False
+        self._socket = sock
+        self._polling = False
         LOGGER.info("Starting client %s", self.identity)
 
     async def _poll(self) -> None:
@@ -141,21 +145,21 @@ class AsyncClient:
                         handler._set_result(data)
                     # Remove handlers from the heap if we are done
                     if handler._done():
-                        self._handlers.pop(correlation_id,None)
+                        self._handlers.pop(correlation_id, None)
                 except KeyError:
-                    LOGGER.warning("%s: No pending future found for message %s",self.identity, correlation_id)
+                    LOGGER.warning("%s: No pending future found for message %s", self.identity, correlation_id)
             except zmq.ZMQError as err:
-                LOGGER.error("%s error:  zmq error: %s (%s)", self.identity, zmq.strerror(err.errno),err.errno)
+                LOGGER.error("%s error:  zmq error: %s (%s)", self.identity, zmq.strerror(err.errno), err.errno)
             except Exception as err:
                 LOGGER.error("%s exception %s\n%s", self.identity, err, traceback.format_exc())
         self._polling = False
 
-    async def fetch( self, query: str, method: str='GET', headers: Mapping[str,str]={}, 
-                     data: Any=None, timeout: int=5) -> AsyncResponseHandler:
+    async def fetch(self, query: str, method: str = 'GET', headers: Mapping[str, str] = {},
+                    data: Any = None, timeout: int = 5) -> AsyncResponseHandler:
         """ Send a request message to the worker
         """
         # Send request
-        request = pickle.dumps(RequestMessage(query,headers=headers,method=method,data=data),-1)
+        request = pickle.dumps(RequestMessage(query, headers=headers, method=method, data=data), -1)
         correlation_id = uuid.uuid1().bytes
         assert correlation_id not in self._handlers
         try:
@@ -163,7 +167,7 @@ class AsyncClient:
         except zmq.ZMQError as err:
             LOGGER.error("%s (%s)", zmq.strerror(err.errno), err.errno)
             raise RequestGatewayError()
-        
+
         # Create response handler and register it
         handler = AsyncResponseHandler(correlation_id)
         self._handlers[correlation_id] = handler
@@ -175,20 +179,20 @@ class AsyncClient:
         try:
             return await handler._get(timeout)
         except Exception:
-            self._handlers.pop(correlation_id,None)
+            self._handlers.pop(correlation_id, None)
             raise
 
-    async def fetch_more( self, response, timeout=5 ):
+    async def fetch_more(self, response, timeout=5):
         """ Request next chunk
         """
         try:
             while True:
-                data, has_more = await response._next_chunk(timeout) 
+                data, has_more = await response._next_chunk(timeout)
                 if not has_more:
                     break
-                yield  data
+                yield data
         except Exception:
-            self._handlers.pop(response.correlation_id,None)
+            self._handlers.pop(response.correlation_id, None)
             raise
 
     def terminate(self) -> None:
@@ -196,7 +200,7 @@ class AsyncClient:
         self._running = False
         self._futures = {}
         self._socket.close()
-    
+
 
 if __name__ == '__main__':
     import signal
@@ -204,11 +208,11 @@ if __name__ == '__main__':
     from time import sleep
 
     parser = argparse.ArgumentParser(description='Test Client')
-    parser.add_argument('--host'      , metavar="host"   , default='tcp://localhost', help="router host")
-    parser.add_argument('--router'    , metavar='address', default='{host}:8880', help="router address")
-    parser.add_argument('--logging'   , choices=['debug', 'info', 'warning', 'error'], default='info', help="set log level")
-    parser.add_argument('--identity'  , default='', help="Set worker identity")
-    parser.add_argument('--count'     , default=1, type=int, help="Number of requests")
+    parser.add_argument('--host', metavar="host", default='tcp://localhost', help="router host")
+    parser.add_argument('--router', metavar='address', default='{host}:8880', help="router address")
+    parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info', help="set log level")
+    parser.add_argument('--identity', default='', help="Set worker identity")
+    parser.add_argument('--count', default=1, type=int, help="Number of requests")
 
     args = parser.parse_args()
 
@@ -217,15 +221,15 @@ if __name__ == '__main__':
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 
-    client = AsyncClient(args.router.format(host=args.host),bytes(args.identity.encode('ascii')))
-    sleep(1) # Give some time to connection to establish
+    client = AsyncClient(args.router.format(host=args.host), bytes(args.identity.encode('ascii')))
+    sleep(1)  # Give some time to connection to establish
 
     async def fetch(index):
         try:
             response = await client.fetch(query="?service=WMS", data=b"Hello world from %d" % index)
-            print("%d -> response = %s" % (index,response.data))
+            print("%d -> response = %s" % (index, response.data))
             async for chunk in client.fetch_more(response):
-                print("%d -> chunk = %s" % (index,chunk))
+                print("%d -> chunk = %s" % (index, chunk))
         except RequestTimeoutError:
             LOGGER.error("%d -> TIMEOUT", index)
         except RequestGatewayError:
@@ -233,9 +237,8 @@ if __name__ == '__main__':
 
     loop = asyncio.new_event_loop()
     loop.add_signal_handler(signal.SIGINT, loop.stop)
-    loop.run_until_complete(asyncio.wait([fetch(i+1) for i in range(args.count)]))
-    
+    loop.run_until_complete(asyncio.wait([fetch(i + 1) for i in range(args.count)]))
+
     client.terminate()
 
     print("DONE", file=sys.stderr)
-

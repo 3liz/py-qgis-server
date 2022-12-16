@@ -21,6 +21,7 @@ __all__ = ['singleton', 'once', 'lazy_property']
 
 class singleton:
     """ Decorator for defining a singleton-like object instanciated at the first call """
+
     def __init__(self, decorated):
         self._decorated = decorated
 
@@ -34,6 +35,7 @@ class singleton:
 
 class once:
     """ Evaluate the function only once """
+
     def __init__(self, f):
         self.f = f
 

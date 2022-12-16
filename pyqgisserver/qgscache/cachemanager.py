@@ -25,11 +25,11 @@ from ..config import confservice
 
 from .types import UpdateState
 
-from qgis.PyQt.QtCore import Qt 
+from qgis.PyQt.QtCore import Qt
 from qgis.core import (Qgis,
                        QgsApplication,
-                       QgsProjectBadLayerHandler, 
-                       QgsProject, 
+                       QgsProjectBadLayerHandler,
+                       QgsProject,
                        QgsMapLayer)
 
 from qgis.server import QgsServerProjectUtils
@@ -37,7 +37,7 @@ from qgis.server import QgsServerProjectUtils
 from pyqgisservercontrib.core import componentmanager
 
 # Import default handlers for auto-registration
-from .handlers import * # noqa: F403,F401
+from .handlers import *  # noqa: F403,F401
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -57,25 +57,24 @@ class UnreadableResourceError(Exception):
 
 
 class CacheDetails(NamedTuple):
-    project: QgsProject 
+    project: QgsProject
     timestamp: datetime
 
 
 CACHE_MANAGER_CONTRACTID = '@3liz.org/cache-manager;1'
 
 
-
-def _merge_qs( query1: str, query2: str ) -> str:
+def _merge_qs(query1: str, query2: str) -> str:
     """ Merge query1 with query2 but coerce values
-        from query1 
+        from query1
     """
     params_1 = parse_qs(query1)
     params_2 = parse_qs(query2)
     params_2.update(params_1)
-    return '&'.join('%s=%s' % (k,v[0]) for k,v in params_2.items())
+    return '&'.join('%s=%s' % (k, v[0]) for k, v in params_2.items())
 
 
-class CacheType(Enum): 
+class CacheType(Enum):
     LRU = 'lru'
     STATIC = 'static'
 
@@ -84,30 +83,31 @@ class QgisStorageHandler:
     """ Handler for handling Qgis supported storage
         throught the `QgsProjectStorage` api.
     """
+
     def __init__(self):
         pass
 
-    def get_storage_metadata( self, uri: str ):
+    def get_storage_metadata(self, uri: str):
         # Check out for storage
         storage = QgsApplication.projectStorageRegistry().projectStorageFromUri(uri)
         if not storage:
             LOGGER.error("No project storage found for %s", uri)
             raise FileNotFoundError(uri)
-        res, metadata = storage.readProjectStorageMetadata( uri )
+        res, metadata = storage.readProjectStorageMetadata(uri)
         if not res:
             LOGGER.error("Failed to read storage metadata for %s", uri)
             raise FileNotFoundError(uri)
         return metadata
 
-    def get_modified_time( self, url: urllib.parse.ParseResult) -> datetime:
+    def get_modified_time(self, url: urllib.parse.ParseResult) -> datetime:
         """ Return the modified date time of the project referenced by its url
         """
         metadata = self.get_storage_metadata(urlunparse(url))
         return metadata.lastModified.toPyDateTime()
 
-    def get_project( self, url: urllib.parse.ParseResult,
-                     project: Optional[QgsProject]=None,
-                     timestamp: Optional[datetime]=None) -> Tuple[QgsProject, datetime]:
+    def get_project(self, url: urllib.parse.ParseResult,
+                    project: Optional[QgsProject] = None,
+                    timestamp: Optional[datetime] = None) -> Tuple[QgsProject, datetime]:
         """ Create or return a project
         """
         uri = urlunparse(url)
@@ -116,8 +116,8 @@ class QgisStorageHandler:
         modified_time = metadata.lastModified.toPyDateTime()
 
         if timestamp is None or timestamp < modified_time:
-            cachmngr  = componentmanager.get_service('@3liz.org/cache-manager;1')
-            project   = cachmngr.read_project(uri)
+            cachmngr = componentmanager.get_service('@3liz.org/cache-manager;1')
+            project = cachmngr.read_project(uri)
             timestamp = modified_time
 
         return project, timestamp
@@ -125,12 +125,12 @@ class QgisStorageHandler:
 
 @componentmanager.register_factory(CACHE_MANAGER_CONTRACTID)
 class QgsCacheManager:
-    """ Handle Qgis project cache 
+    """ Handle Qgis project cache
     """
 
-    StrictCheckingError=StrictCheckingError
-    PathNotAllowedError=PathNotAllowedError
-    UnreadableResourceError=UnreadableResourceError
+    StrictCheckingError = StrictCheckingError
+    PathNotAllowedError = PathNotAllowedError
+    UnreadableResourceError = UnreadableResourceError
 
     def __init__(self) -> None:
         """ Initialize cache
@@ -142,15 +142,15 @@ class QgsCacheManager:
         size = cnf.getint('size')
 
         self._create_project = QgsProject
-        self._lru_cache            = lrucache(size)
-        self._static_cache         = OrderedDict()
-        self._strict_check         = cnf.getboolean('strict_check')
+        self._lru_cache = lrucache(size)
+        self._static_cache = OrderedDict()
+        self._strict_check = cnf.getboolean('strict_check')
         self._trust_layer_metadata = cnf.getboolean('trust_layer_metadata')
-        self._disable_getprint     = cnf.getboolean('disable_getprint')
-        self._disable_owsurls      = cnf.getboolean('disable_owsurls', fallback=False)
+        self._disable_getprint = cnf.getboolean('disable_getprint')
+        self._disable_owsurls = cnf.getboolean('disable_owsurls', fallback=False)
         self._aliases = {}
         self._default_scheme = cnf.get('default_handler')
-        self._observers = []   
+        self._observers = []
 
         if Qgis.QGIS_VERSION_INT < 32800:
             self._read_only_layers = False
@@ -161,7 +161,7 @@ class QgsCacheManager:
         if allowed_schemes != '*':
             allowed_schemes = [s.strip() for s in allowed_schemes.split(',')]
         self._allowed_schemes = allowed_schemes
-    
+
         # Set the base url for file protocol
         self._aliases['file'] = 'file:///%s/' % cnf.get('rootdir').strip('/')
 
@@ -182,7 +182,7 @@ class QgsCacheManager:
             "<<<<<"
         )
 
-    def add_observer(self, observer: Callable[[str,datetime,int],None] ) -> None: 
+    def add_observer(self, observer: Callable[[str, datetime, int], None]) -> None:
         """ Add observer for cache invalidation
         """
         self._observers.append(observer)
@@ -209,23 +209,23 @@ class QgsCacheManager:
     def strict_mode_on(self) -> bool:
         return self._strict_check
 
-    def items(self, cachetype: CacheType = CacheType.LRU) -> Sequence[Tuple[str,CacheDetails]]:
+    def items(self, cachetype: CacheType = CacheType.LRU) -> Sequence[Tuple[str, CacheDetails]]:
         if cachetype == CacheType.LRU:
             return self._lru_cache.items()
         elif cachetype == CacheType.STATIC:
             return self._static_cache.items()
 
-    def resolve_alias(self, key: str ) -> urllib.parse.ParseResult:
+    def resolve_alias(self, key: str) -> urllib.parse.ParseResult:
         """ Resolve scheme from configuration variables
         """
-        url    = urlparse(key)
+        url = urlparse(key)
         scheme = url.scheme or self._default_scheme
         LOGGER.debug("Resolving '%s' protocol for '%s'", scheme, key)
         baseurl = self._aliases.get(scheme)
         if not baseurl:
             try:
                 # Check for user-defined scheme
-                baseurl = confservice.get('projects.schemes',scheme.replace('-','_').lower())
+                baseurl = confservice.get('projects.schemes', scheme.replace('-', '_').lower())
             except KeyError:
                 pass
             else:
@@ -236,11 +236,11 @@ class QgsCacheManager:
                 url = urlparse(baseurl.format(path=url.path))
             else:
                 baseurl = urlparse(baseurl)
-                # Build a new query from coercing with base url params 
+                # Build a new query from coercing with base url params
                 query = _merge_qs(baseurl.query, url.query)
                 # XXX Note that the path of the base url must be terminated by '/'
                 # otherwise urljoin() will replace the base name - may be not what we want
-                url = urlparse(urljoin(baseurl.geturl(),url.path+'?'+query))
+                url = urlparse(urljoin(baseurl.geturl(), url.path + '?' + query))
                 # Make sure that the result url path is relative to base url
                 try:
                     # Ensure that if an absolute path is given, we may extract
@@ -249,11 +249,11 @@ class QgsCacheManager:
                     Path(url.path).relative_to(Path('/') / baseurl.path)
                 except ValueError:
                     LOGGER.error("The path '%s' is outside base path '%s'", url.path, baseurl.path)
-                    raise PathNotAllowedError()                    
+                    raise PathNotAllowedError()
 
         return url
 
-    def get_protocol_handler(self, key: str, scheme: Optional[str] ) -> Any:
+    def get_protocol_handler(self, key: str, scheme: Optional[str]) -> Any:
         """ Find protocol handler for the given scheme
         """
         scheme = scheme or self._default_scheme
@@ -268,24 +268,24 @@ class QgsCacheManager:
             # Fallback to Qgis storage handler
             store = QgisStorageHandler()
 
-        return store 
+        return store
 
-    def refresh(self) -> Generator[Tuple[str,UpdateState], None, None]:
+    def refresh(self) -> Generator[Tuple[str, UpdateState], None, None]:
         """ Refresh all entries
 
             keys are returned from most recently user to the last recently,
-            then we have to update in reverse for preserving order 
+            then we have to update in reverse for preserving order
         """
         # Update static cache;
-        for key,_ in self.items(CacheType.STATIC):
+        for key, _ in self.items(CacheType.STATIC):
             self.update_static_entry(key)
 
         # Update both caches
-        keys = reversed([k for k,_ in self.items(CacheType.LRU)])
+        keys = reversed([k for k, _ in self.items(CacheType.LRU)])
         return ((key, self.update_entry(key)) for key in keys)
 
-    def peek(self, key:str, cachetype: Optional[CacheType] = None) -> CacheDetails:
-        """ Return cache details 
+    def peek(self, key: str, cachetype: Optional[CacheType] = None) -> CacheDetails:
+        """ Return cache details
         """
         if cachetype == CacheType.LRU:
             return self._lru_cache.peek(key)
@@ -294,7 +294,7 @@ class QgsCacheManager:
         else:
             return self._lru_cache.peek(key) or self._static_cache.get(key)
 
-    def get_modified_time(self, key: str, from_cache: bool=True) -> datetime:
+    def get_modified_time(self, key: str, from_cache: bool = True) -> datetime:
         """ Get the modified time for the given project uri
         """
         details = self.peek(key)
@@ -306,28 +306,28 @@ class QgsCacheManager:
             # Trust Qgis to return modified time
             last_modified = details.project.lastModified()
             if not last_modified.isValid():
-                # Occurs if resource is not valid 
-                LOGGER.error("QgsProject::lastModified() returned invalid date time for %s", 
+                # Occurs if resource is not valid
+                LOGGER.error("QgsProject::lastModified() returned invalid date time for %s",
                              details.project.fileName())
                 raise FileNotFoundError(key)
             last_modified = last_modified.toPyDateTime()
         else:
-            # Get modified 
+            # Get modified
             url = self.resolve_alias(key)
             store = self.get_protocol_handler(key, url.scheme)
             last_modified = store.get_modified_time(url)
 
         return last_modified.replace(microsecond=0)
 
-    def _get_project_details(self, key: str, 
-                             details: Optional[CacheDetails]) -> Tuple[CacheDetails, bool]: 
+    def _get_project_details(self, key: str,
+                             details: Optional[CacheDetails]) -> Tuple[CacheDetails, bool]:
         """ Return updated project details
         """
-        url   = self.resolve_alias(key)
+        url = self.resolve_alias(key)
         store = self.get_protocol_handler(key, url.scheme)
 
         if details is not None:
-            project, timestamp  = store.get_project(url, **details._asdict())
+            project, timestamp = store.get_project(url, **details._asdict())
             update = UpdateState.UPDATED if timestamp != details.timestamp else UpdateState.UNCHANGED
         else:
             project, timestamp = store.get_project(url)
@@ -335,7 +335,7 @@ class QgsCacheManager:
 
         return CacheDetails(project, timestamp), update
 
-    def update_static_entry( self, key: str ) -> UpdateState:
+    def update_static_entry(self, key: str) -> UpdateState:
         """ Update static cache
         """
         details, update = self._get_project_details(key, self._static_cache.get(key))
@@ -372,7 +372,7 @@ class QgsCacheManager:
     def lookup(self, key: str, refresh: bool = True) -> Tuple[QgsProject, UpdateState]:
         """ Lookup entry from key
 
-            If refresh is False, return actual cache 
+            If refresh is False, return actual cache
             content without refreshing/updating the entry.
         """
         if not refresh:
@@ -385,22 +385,22 @@ class QgsCacheManager:
             if details:
                 self._lru_cache[key] = details
                 return details.project, UpdateState.UPDATED
-        
+
         # Not found in cache, update the actual entry
         update = self.update_entry(key)
         return self._lru_cache[key].project, update
 
-    def prepare_project(self, project: QgsProject ) -> None:
+    def prepare_project(self, project: QgsProject) -> None:
         """ Set project configuration
         """
         if self._disable_owsurls:
             # Disable ows urls defined in project
-            # May be needed because it overrides 
+            # May be needed because it overrides
             # any proxy settings
-            project.writeEntry("WMSUrl","/", "")
-            project.writeEntry("WFSUrl","/", "")
-            project.writeEntry("WCSUrl","/", "")
-            project.writeEntry("WMTSUrl","/", "")
+            project.writeEntry("WMSUrl", "/", "")
+            project.writeEntry("WFSUrl", "/", "")
+            project.writeEntry("WCSUrl", "/", "")
+            project.writeEntry("WMTSUrl", "/", "")
 
     def read_project(self, uri: str) -> QgsProject:
         """ Read project from path
@@ -417,20 +417,20 @@ class QgsCacheManager:
             if self._trust_layer_metadata:
                 readflags |= QgsProject.FlagTrustLayerMetadata
             if self._disable_getprint:
-                readflags |= QgsProject.FlagDontLoadLayouts 
+                readflags |= QgsProject.FlagDontLoadLayouts
         else:
             project = self._create_project(capabilities=Qgis.ProjectCapabilities())
             readflags = Qgis.ProjectReadFlags()
             if self._trust_layer_metadata:
                 readflags |= Qgis.ProjectReadFlag.TrustLayerMetadata
             if self._disable_getprint:
-                readflags |= Qgis.ProjectReadFlag.DontLoadLayouts 
+                readflags |= Qgis.ProjectReadFlag.DontLoadLayouts
             if self._read_only_layers:
                 readflags |= Qgis.ProjectReadFlag.ForceReadOnlyLayers
 
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)
-        if not project.read(uri,  readflags):
+        if not project.read(uri, readflags):
             raise RuntimeError(f"Failed to read Qgis project {uri}")
 
         if self._strict_check and not badlayerh.validateLayers(project):
@@ -446,17 +446,17 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
         super().__init__()
         self.badLayerNames = set()
 
-    def handleBadLayers( self, layers ) -> None:
+    def handleBadLayers(self, layers) -> None:
         """ See https://qgis.org/pyqgis/3.0/core/Project/QgsProjectBadLayerHandler.html
         """
-        super().handleBadLayers( layers )
+        super().handleBadLayers(layers)
 
         nameElements = (lyr.firstChildElement("layername") for lyr in layers if lyr)
         self.badLayerNames = set(elem.text() for elem in nameElements if elem)
 
-    def validateLayers( self, project: QgsProject ) -> bool:
+    def validateLayers(self, project: QgsProject) -> bool:
         """ Check layers
-            
+
             If layers are excluded do not count them as bad layers
             see https://github.com/qgis/QGIS/pull/33668
         """
@@ -471,24 +471,24 @@ def get_cacheservice() -> QgsCacheManager:
     return componentmanager.get_service(CACHE_MANAGER_CONTRACTID)
 
 
-def preload_projects_file( path: Path, cacheservice: QgsCacheManager ) ->  int:
+def preload_projects_file(path: Path, cacheservice: QgsCacheManager) -> int:
     """ Preload projects from configuration file in static cache
     """
     conf_file = Path(path)
     if not conf_file.exists():
         LOGGER.error("%s file do not exists, ignoring preload config", path)
         return 0
-    
+
     loaded_so_far = 0
 
-    # Read the projects, strip comments 
+    # Read the projects, strip comments
     with conf_file.open() as fp:
-        for p in filter(None,(line.strip('\n ').partition('#')[0] for line in fp.readlines())):
+        for p in filter(None, (line.strip('\n ').partition('#')[0] for line in fp.readlines())):
             p = p.strip(' ')
             try:
                 cacheservice.update_static_entry(p)
             except StrictCheckingError:
-                LOGGER.error("Preload: '%s' as invalid layers - strict mode on" , p)
+                LOGGER.error("Preload: '%s' as invalid layers - strict mode on", p)
             except PathNotAllowedError:
                 LOGGER.error("Preload: '%s' path not allowed", p)
             except FileNotFoundError:
@@ -507,13 +507,13 @@ def preload_projects() -> None:
     if not confpath:
         return
 
-    preload_projects_file( confpath, get_cacheservice() )
+    preload_projects_file(confpath, get_cacheservice())
 
 
-def get_project_summary( key: str, project: QgsProject ):
+def get_project_summary(key: str, project: QgsProject):
     """ Return json summary for cached project
     """
-    def layer_summary( layer_id: str, layer: QgsMapLayer ):
+    def layer_summary(layer_id: str, layer: QgsMapLayer):
         return dict(
             id=layer_id,
             name=layer.name(),
@@ -523,7 +523,7 @@ def get_project_summary( key: str, project: QgsProject ):
             spatial=layer.isSpatial(),
         )
 
-    layers = [layer_summary(idstr,l) for (idstr,l) in project.mapLayers().items()]
+    layers = [layer_summary(idstr, l) for (idstr, l) in project.mapLayers().items()]
 
     return dict(
         cache_key=key,

@@ -16,7 +16,7 @@ except Exception:
     HAVE_PSUTIL = False
 
 
-def stats(pid: Optional[int]=None) -> Dict:
+def stats(pid: Optional[int] = None) -> Dict:
     """ Collect stats about process
         see https://psutil.readthedocs.io/en/latest/#processes
     """
@@ -28,5 +28,3 @@ def stats(pid: Optional[int]=None) -> Dict:
         mem_usage=proc.memory_info().rss,
         mem_percent=proc.memory_percent(),
     )
-
-

@@ -8,9 +8,9 @@
 
 """ Qgis server request adapters
 
-    Embedded qgis server in a 0MQ worker 
+    Embedded qgis server in a 0MQ worker
 
-    see: 
+    see:
         - https://qgis.org/pyqgis/master/server/QgsBufferServerResponse.html
         - https://qgis.org/pyqgis/master/server/QgsBufferServerRequest.html
 """
@@ -51,31 +51,32 @@ from .config import confservice, configure_qgis_api, qgis_api_endpoints
 LOGGER = logging.getLogger('SRVLOG')
 
 HTTP_METHODS = {
-    'GET' : QgsServerRequest.GetMethod,
-    'PUT' : QgsServerRequest.PutMethod,
+    'GET': QgsServerRequest.GetMethod,
+    'PUT': QgsServerRequest.PutMethod,
     'POST': QgsServerRequest.PostMethod,
     'HEAD': QgsServerRequest.HeadMethod,
     'DELETE': QgsServerRequest.DeleteMethod,
     'PATCH': QgsServerRequest.PatchMethod,
 }
 
+
 class Request(QgsServerRequest):
 
-    def __init__(self, handler: RequestHandler ) -> None:
+    def __init__(self, handler: RequestHandler) -> None:
         """ Create a new QgsServerRequest from zmq handler request
         """
         req = handler.request
-        
+
         # Recreate URL
-        location = req.headers.get('X-Qgis-Forwarded-Url',"")
-        query    = req.query.lstrip('?')
+        location = req.headers.get('X-Qgis-Forwarded-Url', "")
+        query = req.query.lstrip('?')
         if query:
             location += f"?{query}"
 
         self._data = req.data
         super().__init__(location, HTTP_METHODS[req.method], headers=req.headers)
-         
-    def data(self) -> QByteArray: 
+
+    def data(self) -> QByteArray:
         """ Return post/put data a QByteArray
         """
         # Make sure that data is valid
@@ -88,23 +89,23 @@ class Response(QgsServerResponse):
         The data is written at 'flush()' call.
     """
 
-    def __init__(self, handler: RequestHandler, metadata_fn: Callable ) -> None:
+    def __init__(self, handler: RequestHandler, metadata_fn: Callable) -> None:
         super().__init__()
         self._handler = handler
         self._buffer = QBuffer()
         self._buffer.open(QIODevice.ReadWrite)
         self._numbytes = 0
-        self._finish   = False
-        self._metadata_fn  = metadata_fn
+        self._finish = False
+        self._metadata_fn = metadata_fn
 
         self._extra_headers = {}
 
     def get_metadata(self):
         if self._metadata_fn:
             return self._metadata_fn()
-        
-    def setExtraHeader( self, key: str, value: str ) -> None:
-        # Keep extra headers so we may 
+
+    def setExtraHeader(self, key: str, value: str) -> None:
+        # Keep extra headers so we may
         # set them again on clear()
         self._extra_headers[key] = value
         self.setHeader(key, value)
@@ -125,7 +126,7 @@ class Response(QgsServerResponse):
         self.flush()
 
     def flush(self) -> None:
-        """ Write the data to the handler buffer 
+        """ Write the data to the handler buffer
             and flush the socket
 
             Headers will be written at the first call to flush()
@@ -135,25 +136,25 @@ class Response(QgsServerResponse):
 
             self._buffer.seek(0)
             bytesAvail = self._buffer.bytesAvailable()
-            LOGGER.debug("%s: Flushing response data: (%d bytes)",self._handler.identity, bytesAvail)
+            LOGGER.debug("%s: Flushing response data: (%d bytes)", self._handler.identity, bytesAvail)
             if self._finish and bytesAvail:
                 # Make sure that we have Content-length set
-                self._handler.headers['Content-Length']=bytesAvail
+                self._handler.headers['Content-Length'] = bytesAvail
             # Take care of the logic: if finish and not handler.header_written then there is no
             # chunk following
             send_more = not self._finish or self._handler.header_written
             if bytesAvail:
                 LOGGER.debug("Sending bytes %s (send_more: %s)", bytesAvail, send_more)
-                self._handler.send( bytes(self._buffer.data()), send_more, meta )
+                self._handler.send(bytes(self._buffer.data()), send_more, meta)
                 self._buffer.buffer().clear()
             else:
                 # Return empty response
                 LOGGER.debug("Sending empty response (send_more: %s)", send_more)
-                self._handler.send( b'', send_more, meta )
+                self._handler.send(b'', send_more, meta)
             # push the sentinel
             if send_more and self._finish:
                 LOGGER.debug("Sending EOF")
-                self._handler.send( b'', False, meta )
+                self._handler.send(b'', False, meta)
         except Exception:
             trace = traceback.format_exc()
             LOGGER.error("Caught Exception (worker: %s, msg: %s):\n%s",
@@ -165,11 +166,11 @@ class Response(QgsServerResponse):
     def header(self, key: str) -> str:
         return self._handler.headers.get(key)
 
-    def headers(self) -> Dict[str,str]:
+    def headers(self) -> Dict[str, str]:
         """ Return headers as dict
         """
         return self._handler.headers
-        
+
     def io(self) -> QIODevice:
         return self._buffer
 
@@ -185,9 +186,9 @@ class Response(QgsServerResponse):
             LOGGER.error("Cannot set header after header written")
 
     def removeHeader(self, key: str) -> None:
-        self._handler.headers.pop(key,None)
+        self._handler.headers.pop(key, None)
 
-    def sendError(self, code: int, message: Optional[str]=None) -> None:
+    def sendError(self, code: int, message: Optional[str] = None) -> None:
         try:
             if not self._handler.header_written:
                 LOGGER.error("%s (%s)", message, code)
@@ -199,13 +200,12 @@ class Response(QgsServerResponse):
         except Exception:
             LOGGER.critical("Unrecoverable exception:\n%s", traceback.format_exc())
 
-
     def _clearHeaders(self) -> None:
         """ Clear headers set so far
         """
         self._handler.headers = {}
         self._handler.headers.update(self._extra_headers)
- 
+
     def clear(self) -> None:
         self._clearHeaders()
         self.truncate()
@@ -226,9 +226,9 @@ class QgsRequestHandler(RequestHandler):
     def init_server(cls) -> None:
         """ Initialize qgis server
         """
-        if hasattr(cls, 'qgis_server' ):
+        if hasattr(cls, 'qgis_server'):
             return
-        
+
         from .utils.qgis import init_qgis_server
 
         # Enable qgis server verbosity
@@ -245,10 +245,10 @@ class QgsRequestHandler(RequestHandler):
             os.environ['QGIS_SERVER_DISABLE_GETPRINT'] = 'yes'
 
         # Get refresh interval
-        cls._cache_service        = get_cacheservice()
+        cls._cache_service = get_cacheservice()
         cls._cache_check_interval = cache_config.getint('check_interval')
-        cls._cache_last_check     = time()  
-      
+        cls._cache_last_check = time()
+
         cls._pid = os.getpid()
         cls._advanced_report = cache_config.getboolean('advanced_report')
 
@@ -267,15 +267,15 @@ class QgsRequestHandler(RequestHandler):
             cls._cache_service.add_observer(cls._cache_observer.observe)
 
         # Configure qgis api
-        for name,_ in qgis_api_endpoints(enabled_only=False):
-            configure_qgis_api(name)                         
-        
-        verbose = LOGGER.level<=logging.DEBUG or confservice.getboolean('logging','qgis_info')
+        for name, _ in qgis_api_endpoints(enabled_only=False):
+            configure_qgis_api(name)
+
+        verbose = LOGGER.level <= logging.DEBUG or confservice.getboolean('logging', 'qgis_info')
 
         LOGGER.debug("Initializing qgis server")
-        qgsserver = init_qgis_server( enable_processing=False, 
-                                      logger=LOGGER, 
-                                      verbose=verbose)
+        qgsserver = init_qgis_server(enable_processing=False,
+                                     logger=LOGGER,
+                                     verbose=verbose)
 
         serverIface = qgsserver.serverInterface()
         load_plugins(serverIface)
@@ -289,7 +289,7 @@ class QgsRequestHandler(RequestHandler):
 
         preload_projects()
 
-        setattr(cls, 'qgis_server' , qgsserver )
+        setattr(cls, 'qgis_server', qgsserver)
 
     @classmethod
     def default_project_location(cls) -> str:
@@ -306,12 +306,12 @@ class QgsRequestHandler(RequestHandler):
             if state == UpdateState.UPDATED:
                 details = cls._cache_service.peek(key)
                 iface.removeConfigCacheEntry(details.project.fileName())
-        
+
         cls._cache_last_check = time()
 
     @classmethod
     def cache_lookup(cls, key) -> Tuple[QgsProject, UpdateState]:
-        return cls._cache_service.lookup(key, refresh = cls._cache_check_interval <= 0)
+        return cls._cache_service.lookup(key, refresh=cls._cache_check_interval <= 0)
 
     @classmethod
     def post_process(cls, idle: bool) -> None:
@@ -322,7 +322,7 @@ class QgsRequestHandler(RequestHandler):
         cls.refresh_cache()
 
     @classmethod
-    def get_modified_time(cls, key: str, from_cache: bool=True) -> datetime:
+    def get_modified_time(cls, key: str, from_cache: bool = True) -> datetime:
         return cls._cache_service.get_modified_time(key, from_cache=from_cache)
 
     def compute_etag(self, uri: str, last_modified: datetime, request: QgsServerRequest) -> Optional[str]:
@@ -340,10 +340,10 @@ class QgsRequestHandler(RequestHandler):
                 return '"%s"' % hasher.hexdigest()
 
     def set_etag_header(self, uri: str, last_modified: datetime, request: QgsServerRequest,
-                        response: Response ) -> Optional[str]:
+                        response: Response) -> Optional[str]:
         """ Compute and set etag
         """
-        computed_etag = self.compute_etag(uri, last_modified, request )
+        computed_etag = self.compute_etag(uri, last_modified, request)
         if computed_etag:
             response.setExtraHeader("Etag", computed_etag)
 
@@ -358,26 +358,27 @@ class QgsRequestHandler(RequestHandler):
             return False
 
         # Check etag header
-        etag = self.request.headers.get("If-None-Match","")
+        etag = self.request.headers.get("If-None-Match", "")
         return etag == "*" or etag == computed_etag
 
     @staticmethod
-    def run( router: str, identity: str="", **kwargs: Any) -> None:
+    def run(router: str, identity: str = "", **kwargs: Any) -> None:
         """ Run qgis server worker loop
         """
         QgsRequestHandler.init_server()
 
-        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')), 
+        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')),
                    postprocess=QgsRequestHandler.post_process, **kwargs)
 
-    QGIS_NO_MAP_ERROR_MSG = "No project defined. For OWS services: please provide a SERVICE and a MAP parameter" 
+    QGIS_NO_MAP_ERROR_MSG = "No project defined. For OWS services: please provide a SERVICE and a MAP parameter"
 
     def init_metadata_report(self) -> Dict:
         if self._advanced_report:
             start_mem = self._process.memory_info().rss
+
             def _metadata_report():
                 return {
-                    'pid'     : self._pid,
+                    'pid': self._pid,
                     'mem_used': self._process.memory_info().rss - start_mem,
                 }
             return _metadata_report
@@ -389,12 +390,12 @@ class QgsRequestHandler(RequestHandler):
 
         metadata_report = self.init_metadata_report()
 
-        request  = Request(self)
+        request = Request(self)
         response = Response(self, metadata_report)
 
         project_location = self.request.headers.pop('X-Map-Location', None)
-        ogc_scheme = self.request.headers.pop('X-Ogc-Scheme'  , None)
-        
+        ogc_scheme = self.request.headers.pop('X-Ogc-Scheme', None)
+
         if not project_location:
             # Try to get project from header
             project_location = self.request.headers.pop('X-Qgis-Project', None)
@@ -403,7 +404,7 @@ class QgsRequestHandler(RequestHandler):
             # Try to get project from environment
             project_location = self.default_project_location()
 
-        if ogc_scheme == 'OWS': 
+        if ogc_scheme == 'OWS':
             if not project_location and request.parameter('SERVICE'):
                 # Prevent qgis for returning 500 when MAP is not defined for
                 # OWS services
@@ -426,7 +427,7 @@ class QgsRequestHandler(RequestHandler):
 
         self.handle_qgis_request(ogc_scheme, project_location, request, response)
 
-    def handle_qgis_request(self, ogc_scheme: str, project_location: str, request: Request, response: Response ) -> None:
+    def handle_qgis_request(self, ogc_scheme: str, project_location: str, request: Request, response: Response) -> None:
         """ Handle request passed to Qgis
         """
         if not project_location:
@@ -439,7 +440,7 @@ class QgsRequestHandler(RequestHandler):
         try:
             project, updated = self.cache_lookup(project_location)
             config_path = project.fileName()
-            if updated: 
+            if updated:
                 # Needed to cleanup cached capabilities
                 LOGGER.debug("Cleaning config cache entry %s", config_path)
                 iface.removeConfigCacheEntry(config_path)
@@ -448,8 +449,8 @@ class QgsRequestHandler(RequestHandler):
 
             # Set the project uri in separate header, this
             # is useful for invalidating front-end cache
-            response.setExtraHeader('X-Map-Id'      , project_location)
-            response.setExtraHeader('Last-Modified' , last_modified.astimezone().isoformat())
+            response.setExtraHeader('X-Map-Id', project_location)
+            response.setExtraHeader('Last-Modified', last_modified.astimezone().isoformat())
 
             # Check etag for OWS requests
             if ogc_scheme == 'OWS':
@@ -459,13 +460,13 @@ class QgsRequestHandler(RequestHandler):
                     return
 
         except StrictCheckingError:
-            response.sendError(422,f"Invalid layers for project '{project_location}' - strict mode on")
+            response.sendError(422, f"Invalid layers for project '{project_location}' - strict mode on")
         except UnreadableResourceError:
-            response.sendError(422,f"Cannot read project resource '{project_location}'")
+            response.sendError(422, f"Cannot read project resource '{project_location}'")
         except PathNotAllowedError:
-            response.sendError(403,"Project path not allowed")
+            response.sendError(403, "Project path not allowed")
         except FileNotFoundError:
-            response.sendError(404,f"Project '{project_location}' not found")
+            response.sendError(404, f"Project '{project_location}' not found")
         else:
             # See https://github.com/qgis/QGIS/pull/9773
             iface.setConfigFilePath(config_path)
@@ -473,7 +474,7 @@ class QgsRequestHandler(RequestHandler):
 
     @classmethod
     def get_report(cls):
-        report = super(QgsRequestHandler,cls).get_report()
+        report = super(QgsRequestHandler, cls).get_report()
 
         def _to_json(key: str, project: QgsProject, static: bool):
             return dict(
@@ -484,14 +485,13 @@ class QgsRequestHandler(RequestHandler):
                 static=static,
             )
 
-        items = { k:(d,False) for k,d in get_cacheservice().items(CacheType.LRU) }
-        items.update( (k,(d,True)) for (k,d) in get_cacheservice().items(CacheType.STATIC) )
-        
+        items = {k: (d, False) for k, d in get_cacheservice().items(CacheType.LRU)}
+        items.update((k, (d, True)) for (k, d) in get_cacheservice().items(CacheType.STATIC))
+
         report.update(
-            cache=[_to_json(k,d.project,static) for (k,(d,static)) in items.items()]
+            cache=[_to_json(k, d.project, static) for (k, (d, static)) in items.items()]
         )
         return report
-
 
 
 def main():
@@ -501,17 +501,17 @@ def main():
     import sys
     import argparse
     from .version import __manifest__
-    from .config  import (confservice, load_configuration, read_config_file, validate_config_path)
+    from .config import (confservice, load_configuration, read_config_file, validate_config_path)
     from .logger import setup_log_handler
 
     parser = argparse.ArgumentParser(description='Qgis Server Worker')
-    parser.add_argument('-d','--debug', action='store_true', default=False, help="debug mode") 
-    parser.add_argument('-c','--config', metavar='PATH', nargs='?', dest='config',
+    parser.add_argument('-d', '--debug', action='store_true', default=False, help="debug mode")
+    parser.add_argument('-c', '--config', metavar='PATH', nargs='?', dest='config',
                         default=None, help="Configuration file")
-    parser.add_argument('--proxy-host' , dest="hostaddr", metavar="host"   , default='localhost' , help="router host")   
-    parser.add_argument('--identity'   , default="", help="Set worker identity")
-    parser.add_argument('--rootdir'    , default=argparse.SUPPRESS, metavar='PATH', help='Path to qgis projects')
-    parser.add_argument('--version'    , action='store_true', default=False, help="Return version number and exit")
+    parser.add_argument('--proxy-host', dest="hostaddr", metavar="host", default='localhost', help="router host")
+    parser.add_argument('--identity', default="", help="Set worker identity")
+    parser.add_argument('--rootdir', default=argparse.SUPPRESS, metavar='PATH', help='Path to qgis projects')
+    parser.add_argument('--version', action='store_true', default=False, help="Return version number and exit")
 
     args = parser.parse_args()
 
@@ -520,7 +520,7 @@ def main():
         """
         from .utils.qgis import print_qgis_version
         program = os.path.basename(sys.argv[0])
-        print("{program} {version} (build {buildid},commit {commitid})".format(program=program,**__manifest__))
+        print("{program} {version} (build {buildid},commit {commitid})".format(program=program, **__manifest__))
         print_qgis_version(verbose=verbose)
 
     if args.version:
@@ -536,9 +536,9 @@ def main():
             read_config_file(config_file)
 
     # Override config
-    def set_arg( section:str, name:str ) -> None:
+    def set_arg(section: str, name: str) -> None:
         if name in args:
-            confservice.set( section, name, str(getattr(args,name)))
+            confservice.set(section, name, str(getattr(args, name)))
 
     set_arg('projects.cache', 'rootdir')
     set_arg('zmq', 'hostaddr')
@@ -549,18 +549,15 @@ def main():
 
     print_version()
 
-    validate_config_path('projects.cache','rootdir')
+    validate_config_path('projects.cache', 'rootdir')
 
-    setup_log_handler(confservice.get('logging','level'))
+    setup_log_handler(confservice.get('logging', 'level'))
     print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
 
-    broadcastaddr = confservice.get('zmq','broadcastaddr')
+    broadcastaddr = confservice.get('zmq', 'broadcastaddr')
     router = confservice.get('zmq', 'bindaddr')
 
     QgsRequestHandler.run(router, identity=args.identity,
                           broadcastaddr=broadcastaddr)
 
     print("Qgis worker terminated", file=sys.stderr)
-
-
-

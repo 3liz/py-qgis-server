@@ -1,3 +1,2 @@
 
-from .types import UpdateState # noqa
-
+from .types import UpdateState  # noqa

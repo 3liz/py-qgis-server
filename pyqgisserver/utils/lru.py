@@ -10,10 +10,11 @@
 from collections import OrderedDict
 from typing import Any, Sequence, Tuple
 
+
 class lrucache():
 
     def __init__(self, size: int) -> None:
-        self._table    = OrderedDict()
+        self._table = OrderedDict()
         self._capacity = size
 
         # Adjust the size
@@ -64,39 +65,39 @@ class lrucache():
 
     def __iter__(self) -> Sequence[Any]:
         """ Return an iterator that returns the keys in the cache.
-        
-            Values are returned in order from the most recently to least recently used. 
+
+            Values are returned in order from the most recently to least recently used.
             Does not modify the cache order.
 
             Make the cache behaves like a dictionary
         """
         return reversed(self._table.keys())
 
-    def items(self) -> Sequence[Tuple[Any,Any]]:
+    def items(self) -> Sequence[Tuple[Any, Any]]:
         """ Return an iterator that returns the (key, value) pairs in the cache.
 
-            Items are returned  in order from the most recently to least recently used. 
+            Items are returned  in order from the most recently to least recently used.
             Does not modify the cache order.
         """
         return reversed(self._table.items())
 
     def keys(self) -> Sequence[Any]:
         """ Return an iterator that returns the keys in the cache.
-        
-            Keys are returned in order from the most recently to least recently used. 
+
+            Keys are returned in order from the most recently to least recently used.
             Does not modify the cache order.
         """
         return reversed(self._table.keys())
 
     def values(self) -> Sequence[Any]:
         """ Return an iterator that returns the values in the cache.
-            
-            Values are returned  in order from the most recently to least recently used. 
+
+            Values are returned  in order from the most recently to least recently used.
             Does not modify the cache order.
         """
         return reversed(self._table.values())
 
-    def size(self, size :int=None) -> int:
+    def size(self, size: int = None) -> int:
         """ Set the size of the cache
 
             :param int size: maximum number of elements in the cache
@@ -111,4 +112,3 @@ class lrucache():
             self._capacity = size
 
         return self._capacity
-

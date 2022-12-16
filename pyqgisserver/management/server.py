@@ -18,9 +18,9 @@ from urllib.parse import quote_plus
 from ..logger import log_request
 from ..config import confservice
 from ..handlers import (
-    BaseHandler, 
-    StatusHandler, 
-    OAPIHandler as QgisHandler, 
+    BaseHandler,
+    StatusHandler,
+    OAPIHandler as QgisHandler,
     NotFoundHandler
 )
 from ..zeromq import client
@@ -28,12 +28,12 @@ from ..zeromq import client
 from typing import Awaitable
 
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
 
 
 class _PoolHandler(BaseHandler):
 
-    def initialize(self, poolserver ) -> None:
+    def initialize(self, poolserver) -> None:
         super().initialize()
         self._poolserver = poolserver
 
@@ -53,7 +53,7 @@ class _RestartHandler(_PoolHandler):
             # Restart workers
             self._poolserver.restart()
 
-        self.write_json({ 'status': 'ok' }) 
+        self.write_json({'status': 'ok'})
 
 
 def _get_cache_link(key: str, req) -> str:
@@ -79,7 +79,7 @@ class _ReportHandler(_PoolHandler):
         for w in reports:
             for entry in w['cache']:
                 entry.update(link=_get_cache_link(entry['key'], req))
-        self.write_json({'workers': reports, 'num_workers': self._poolserver.num_workers }) 
+        self.write_json({'workers': reports, 'num_workers': self._poolserver.num_workers})
 
 
 class _RootHandler(BaseHandler):
@@ -88,23 +88,23 @@ class _RootHandler(BaseHandler):
         """ Return links to default api entries
         """
         req = self.request
-        def _link( path: str, title: str ):
+
+        def _link(path: str, title: str):
             return {
-                'href' : f"{req.protocol}://{req.host}{path}",
+                'href': f"{req.protocol}://{req.host}{path}",
                 'title': title,
-                'type' : "application/json",
+                'type': "application/json",
             }
 
         data = dict(
             links=[
-                _link("/status" , "Server status and configuration"),
+                _link("/status", "Server status and configuration"),
                 _link("/plugins", "Plugins managment"),
-                _link("/cache"  , "Projects cache managment"),
-                _link("/pool"   , "Workers pool status"),
+                _link("/cache", "Projects cache managment"),
+                _link("/pool", "Workers pool status"),
             ]
         )
-        self.write(data) 
-
+        self.write(data)
 
     def options(self) -> None:
         """ Implement OPTION for validating CORS
@@ -114,19 +114,20 @@ class _RootHandler(BaseHandler):
 
 class _CacheHandler(QgisHandler):
 
-    async def get(self, key: str=None) -> None: 
+    async def get(self, key: str = None) -> None:
         """ Return project cache info
         """
         if not key:
             # Try to get key from param
-            key = self.get_argument('MAP',default=None) 
+            key = self.get_argument('MAP', default=None)
 
         cache_observer = self.application.cache_observer
         if not key:
             """ Send the collection of cached objects
             """
             req = self.request
-            def _link( key, item ):
+
+            def _link(key, item):
                 return dict(
                     name=key,
                     last_modified=item.modified_time.astimezone().isoformat(),
@@ -137,37 +138,36 @@ class _CacheHandler(QgisHandler):
             return
         else:
             if not cache_observer.find(key):
-                self.send_error(404, reason=f"Project '{key}' not in cache")  
+                self.send_error(404, reason=f"Project '{key}' not in cache")
                 return
 
         # Delegate to server api
         await super().handle_request('GET')
 
 
-def configure_handlers( poolserver, client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
+def configure_handlers(poolserver, client: client.AsyncClient) -> [tornado.web.RequestHandler]:
     """
     """
-    kwargs =  {
-        'client': client, 
+    kwargs = {
+        'client': client,
         'timeout': confservice['server'].getint('timeout'),
         'service': 'Managment',
     }
 
     handlers = [
-        (r"/"      , _RootHandler),
+        (r"/", _RootHandler),
         (r"/status/?.*", StatusHandler),
         (r"/pool/(restart)", _RestartHandler, {'poolserver': poolserver}),
-        (r"/pool/?"         ,_ReportHandler,  {'poolserver': poolserver}),
+        (r"/pool/?", _ReportHandler, {'poolserver': poolserver}),
         (r"/cache/content/(?P<key>.+)", _CacheHandler, kwargs),
-        (r"/cache/?"                  , _CacheHandler, kwargs),
+        (r"/cache/?", _CacheHandler, kwargs),
         # Forward to Qgis api handlers
-        (r"/.+"             , QgisHandler, kwargs),
+        (r"/.+", QgisHandler, kwargs),
     ]
     return handlers
 
 
 class _Management(tornado.web.Application):
-
 
     def __init__(self, poolserver, router: str) -> None:
         """
@@ -177,9 +177,9 @@ class _Management(tornado.web.Application):
         super().__init__(configure_handlers(poolserver, self._broker_client),
                          default_handler_class=NotFoundHandler)
 
-        self.http_proxy = confservice.getboolean('server','http_proxy')
+        self.http_proxy = confservice.getboolean('server', 'http_proxy')
 
-    def log_request(self, handler: tornado.web.RequestHandler ) -> None:
+    def log_request(self, handler: tornado.web.RequestHandler) -> None:
         """ Write HTTP requet to the logs
         """
         log_request(handler)
@@ -188,22 +188,22 @@ class _Management(tornado.web.Application):
         self._broker_client.terminate()
 
 
-def create_ssl_context( conf ):
+def create_ssl_context(conf):
     import ssl
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    ssl_ctx.load_cert_chain(conf['ssl_cert'],conf['ssl_key'])
+    ssl_ctx.load_cert_chain(conf['ssl_cert'], conf['ssl_key'])
     return ssl_ctx
 
 
-def start_management_server( poolserver, router: str ) -> _Management:
+def start_management_server(poolserver, router: str) -> _Management:
     """ Start management server,
     """
     conf = confservice['management']
 
-    port    = conf.getint('port')
+    port = conf.getint('port')
     address = conf['interfaces']
 
-    LOGGER.info("MANAGEMENT: running server on %s:%s",address,port)
+    LOGGER.info("MANAGEMENT: running server on %s:%s", address, port)
 
     kwargs = {}
     if conf.getboolean('ssl'):
@@ -214,4 +214,3 @@ def start_management_server( poolserver, router: str ) -> _Management:
     app.listen(port, address=address, xheaders=True, **kwargs)
 
     return app
-

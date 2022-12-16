@@ -20,12 +20,12 @@
         ...
 
 
-    Filters are applied before sending the request, a filter can return response or 
+    Filters are applied before sending the request, a filter can return response or
     raise exception based on authorization rules.
 
     Registering filters:
 
-    Modules implementing filters must register their filters using setup.py entry_points with the 
+    Modules implementing filters must register their filters using setup.py entry_points with the
     key 'pyqgisserver_filters'
 
     policy_service.add_policy([myfilter1, myfilter2], pri=1000)
@@ -39,8 +39,8 @@ from tornado.httputil import HTTPServerRequest
 from typing import (
     Union,
     Tuple,
-    Callable, 
-    Awaitable, 
+    Callable,
+    Awaitable,
     Optional,
 )
 
@@ -49,7 +49,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class _FilterBase:
 
-    def __init__(self, match: Optional[Union[str,re.Pattern]]=None, repl: Optional[str]=None):
+    def __init__(self, match: Optional[Union[str, re.Pattern]] = None, repl: Optional[str] = None):
         if isinstance(match, str):
             match = re.compile(match, re.IGNORECASE)
         self.pattern = match
@@ -59,7 +59,8 @@ class _FilterBase:
 
     def __str__(self) -> str:
         return f"_FilterBase<{hex(id(self))}>(match={self.pattern}, repl={self.repl})"
-    def match(self, path: str) -> Tuple[bool,str]:
+
+    def match(self, path: str) -> Tuple[bool, str]:
         """ Check uri against pattern
         """
         if self.pattern:
@@ -67,11 +68,11 @@ class _FilterBase:
             if match:
                 # match.groups() includes both named and
                 # unnamed groups, we want to use either groups
-                # or groupdict but not both. 
+                # or groupdict but not both.
                 if self.pattern.groupindex:
                     self.match_kwargs = match.groupdict()
                 else:
-                    self.match_args = match.groups() 
+                    self.match_args = match.groups()
                 if self.repl:
                     path = self.pattern.sub(self.repl, path, count=1)
                 return True, path
@@ -94,4 +95,3 @@ class policy_filter(_FilterBase):
     """ Decorator for synchronous request filter
     """
     pass
-

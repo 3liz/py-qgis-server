@@ -9,9 +9,8 @@
 from pyqgisserver.management.apis import plugins, cache
 
 
-def register_management_apis( serverIface ):
+def register_management_apis(serverIface):
     """ Return management Qgis server apis
     """
-    plugins.register( serverIface )
-    cache.register( serverIface )    
-
+    plugins.register(serverIface)
+    cache.register(serverIface)

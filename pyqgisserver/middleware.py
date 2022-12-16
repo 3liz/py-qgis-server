@@ -24,6 +24,7 @@ HandlerDelegate = TypeVar('HandlerDelegate')
 
 LOGGER = logging.getLogger('SRVLOG')
 
+
 class _Policy(NamedTuple):
     pri: int
     filters: List[_FilterBase]
@@ -38,11 +39,11 @@ def load_access_policies() -> List[_FilterBase]:
         @staticmethod
         def add_filters(filters, pri=0):
             if LOGGER.isEnabledFor(logging.DEBUG):
-                LOGGER.debug("Adding policy filter(s):\n%s", '\n'.join(str(f) for f in filters)) 
-            collection.append(_Policy(pri, [p for p in filters if isinstance(p,_FilterBase)]))
+                LOGGER.debug("Adding policy filter(s):\n%s", '\n'.join(str(f) for f in filters))
+            collection.append(_Policy(pri, [p for p in filters if isinstance(p, _FilterBase)]))
 
     import pyqgisservercontrib.core.componentmanager as cm
-    cm.register_entrypoints('py_qgis_server.access_policy', policy_service) 
+    cm.register_entrypoints('py_qgis_server.access_policy', policy_service)
 
     # Sort filters
     collection.sort(key=lambda p: p.pri, reverse=True)
@@ -59,7 +60,7 @@ class MiddleWareRouter(Router):
         self.policies = load_access_policies()
 
     def find_handler(self, request, **kwargs) -> HandlerDelegate:
-        """ Define middleware prerocessing 
+        """ Define middleware prerocessing
         """
         # Find matching paths
         for policy in self.policies:
@@ -80,4 +81,3 @@ class MiddleWareRouter(Router):
                         return self.app.get_handler_delegate(request, ErrorHandler, {'status_code': 500})
 
         return self.app.find_handler(request, **kwargs)
-

@@ -10,10 +10,10 @@ from tornado import ioloop
 
 LOGGER = logging.getLogger('SRVLOG')
 
-UpdateFunc = Callable[[List[str]],None]
+UpdateFunc = Callable[[List[str]], None]
 
 
-def watchfiles(watched_files: List[str], updatefunc: UpdateFunc,  check_time: int=500) -> ioloop.PeriodicCallback:
+def watchfiles(watched_files: List[str], updatefunc: UpdateFunc, check_time: int = 500) -> ioloop.PeriodicCallback:
     """Begins watching source files for changes.
     """
     modify_times = {}
@@ -22,16 +22,16 @@ def watchfiles(watched_files: List[str], updatefunc: UpdateFunc,  check_time: in
     return scheduler
 
 
-def _update_callback( updatefunc: UpdateFunc, watched_files: List[str], modify_times: Mapping[str,float]) -> None:
+def _update_callback(updatefunc: UpdateFunc, watched_files: List[str], modify_times: Mapping[str, float]) -> None:
     """ Call update funcs when modified files
     """
     modified_files = [path for path in watched_files if _check_file(modify_times, path) is not None]
     if len(modified_files) > 0:
         LOGGER.debug("running update hook for %s", modified_files)
-        updatefunc( modified_files )
+        updatefunc(modified_files)
 
 
-def _check_file(modify_times: Mapping[str,float], path: str) -> Optional[str]:
+def _check_file(modify_times: Mapping[str, float], path: str) -> Optional[str]:
     try:
         modified = os.stat(path).st_mtime
     except FileNotFoundError:
@@ -47,4 +47,3 @@ def _check_file(modify_times: Mapping[str,float], path: str) -> Optional[str]:
     if modify_times[path] != modified:
         modify_times[path] = modified
         return path
-

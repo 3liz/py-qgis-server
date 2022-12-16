@@ -9,17 +9,18 @@
 import logging
 
 REQ_LOG_TEMPLATE = "{ip}\t{code}\t{method}\t{url}\t{time}\t{length}\t"
-REQ_FORMAT = REQ_LOG_TEMPLATE+'{agent}\t{referer}'
+REQ_FORMAT = REQ_LOG_TEMPLATE + '{agent}\t{referer}'
 RREQ_FORMAT = REQ_LOG_TEMPLATE
 
 # Lies between warning and error
 REQ = 21
 RREQ = 22
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
+
 
 def setup_log_handler(log_level, formatstr='%(asctime)s\t%(levelname)s\t[%(process)d]\t%(message)s',
-                      stream = None ):
+                      stream=None):
     """ Initialize log handler with the given log level
     """
     logging.addLevelName(REQ, "REQ")
@@ -36,6 +37,7 @@ def setup_log_handler(log_level, formatstr='%(asctime)s\t%(levelname)s\t[%(proce
         return True
     return False
 
+
 def format_log_request(handler):
     """ Format current request from the given tornado request handler
 
@@ -46,12 +48,12 @@ def format_log_request(handler):
             length: the size of the payload
     """
     request = handler.request
-    code    = handler.get_status()
+    code = handler.get_status()
     reqtime = request.request_time()
 
-    length  = handler._headers.get('Content-Length') or -1
-    agent   = request.headers.get('User-Agent') or ""
-    referer = request.headers.get('Referer')  or ""
+    length = handler._headers.get('Content-Length') or -1
+    agent = request.headers.get('User-Agent') or ""
+    referer = request.headers.get('Referer') or ""
 
     fmt = REQ_FORMAT.format(
         ip=request.remote_ip,
@@ -119,4 +121,3 @@ def log_rrequest(*args, **kwargs):
     """
     fmt = format_log_rrequest(*args, **kwargs)
     LOGGER.log(RREQ, fmt)
-

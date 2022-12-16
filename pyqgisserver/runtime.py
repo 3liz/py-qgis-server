@@ -22,10 +22,10 @@ from multiprocessing import Process
 from .logger import log_request
 from .config import confservice, qgis_api_endpoints
 
-from .handlers import (StatusHandler, 
-                       OwsHandler, 
+from .handlers import (StatusHandler,
+                       OwsHandler,
                        OAPIHandler,
-                       PingHandler, 
+                       PingHandler,
                        LandingPage,
                        NotFoundHandler)
 
@@ -38,10 +38,10 @@ from .stats import Stats
 from .qgscache.observer import declare_cache_observers, start_cache_observer
 
 
-LOGGER=logging.getLogger('SRVLOG')
+LOGGER = logging.getLogger('SRVLOG')
 
 
-def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHandler]:
+def configure_handlers(client: client.AsyncClient) -> [tornado.web.RequestHandler]:
     """ Configure request handlers
     """
     cfg = confservice['server']
@@ -49,10 +49,10 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
     monitor = Monitor.instance()
 
     ows_kwargs = dict(
-        client       = client,
-        monitor      = monitor,
-        timeout      = cfg.getint('timeout'),
-        allowed_hdrs = tuple(k.upper() for k in cfg.get('allow_headers').split(','))
+        client=client,
+        monitor=monitor,
+        timeout=cfg.getint('timeout'),
+        allowed_hdrs=tuple(k.upper() for k in cfg.get('allow_headers').split(','))
     )
 
     end = r"(?:\.html|\.json|/?)"
@@ -62,16 +62,16 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         (r"/ping", PingHandler),
     ]
 
-    def add_handler( path, handler, kwargs ):
-        handlers.append( (path, handler, kwargs) )
+    def add_handler(path, handler, kwargs):
+        handlers.append((path, handler, kwargs))
 
     # Server status page
     if cfg.getboolean('status_page'):
-        handlers.append( ("/status/?.*", StatusHandler) )
+        handlers.append(("/status/?.*", StatusHandler))
 
-    def _ows_args( *args, **kwargs ):
+    def _ows_args(*args, **kwargs):
         rv = ows_kwargs.copy()
-        rv.update( *args, **kwargs )
+        rv.update(*args, **kwargs)
         return rv
 
     add_handler(r"/ows/?", OwsHandler, _ows_args(getfeaturelimit=cfg.getint('getfeaturelimit')))
@@ -82,23 +82,23 @@ def configure_handlers( client: client.AsyncClient ) -> [tornado.web.RequestHand
         rf"/conformance{end}",
         rf"/api{end}",
         r"/static/.*",
-    ] 
+    ]
 
     # XXX DEPRECATED (to be removed in 1.9)
-    handlers.append((rf"/ows/wfs3({end}.*)", RedirectHandler, {'url': "/wfs3{0}" }))
+    handlers.append((rf"/ows/wfs3({end}.*)", RedirectHandler, {'url': "/wfs3{0}"}))
 
     # New scheme
     kw = _ows_args(service='WFS3')
     for endpoint in wfs3_api_endpoints:
-        handlers.append((rf"/wfs3{endpoint}", OAPIHandler, kw) )
+        handlers.append((rf"/wfs3{endpoint}", OAPIHandler, kw))
 
     #
     # Add qgis api endpoints
     #
     for name, endpoint in qgis_api_endpoints():
         kw = _ows_args(service=name)
-        LOGGER.debug("*** Adding API handler for: %s: %s", name, endpoint)        
-        handlers.append( (rf"/{endpoint.strip('/')}/.*", OAPIHandler, kw) )
+        LOGGER.debug("*** Adding API handler for: %s: %s", name, endpoint)
+        handlers.append((rf"/{endpoint.strip('/')}/.*", OAPIHandler, kw))
 
     return handlers
 
@@ -109,26 +109,26 @@ class Application(tornado.web.Application):
         """
         """
         identity = confservice['zmq']['identity']
-        identity = "{}-{}".format(identity,os.getpid())
+        identity = "{}-{}".format(identity, os.getpid())
 
         self._broker_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
         self.stats = Stats()
 
-        self.http_proxy = confservice.getboolean('server','http_proxy')
+        self.http_proxy = confservice.getboolean('server', 'http_proxy')
 
         super().__init__(configure_handlers(self._broker_client),
                          default_handler_class=NotFoundHandler)
 
-    def log_request(self, handler: tornado.web.RequestHandler ) -> None:
+    def log_request(self, handler: tornado.web.RequestHandler) -> None:
         """ Write HTTP requet to the logs
         """
-        log_request(handler)        
+        log_request(handler)
 
     def terminate(self) -> None:
         self._broker_client.terminate()
 
 
-def setuid( username: str) -> None:
+def setuid(username: str) -> None:
     """ setuid to username uid """
     from pwd import getpwnam, getpwuid
     pw = getpwnam(username)
@@ -137,17 +137,17 @@ def setuid( username: str) -> None:
     LOGGER.info("Setuid to user {} ({}:{})".format(getpwuid(os.getuid()).pw_name, os.getuid(), os.getgid()))
 
 
-def create_broker_process( ipcaddr: str ) -> Process:
+def create_broker_process(ipcaddr: str) -> Process:
     """ Create a brker process
     """
     cfg = confservice['zmq']
 
     LOGGER.info("Starting broker process")
     p = Process(target=broker.run_broker, kwargs=dict(
-                inaddr   = ipcaddr,
-                outaddr  = cfg['bindaddr'],
-                maxqueue = cfg.getint('maxqueue'),
-                timeout  = cfg.getint('timeout')))
+                inaddr=ipcaddr,
+                outaddr=cfg['bindaddr'],
+                maxqueue=cfg.getint('maxqueue'),
+                timeout=cfg.getint('timeout')))
     p.start()
     return p
 
@@ -160,10 +160,10 @@ def configure_ipc_addresses(workers: int) -> str:
     os.makedirs(os.path.dirname(ipc_path), exist_ok=True)
     ipcaddr = f"ipc://{ipc_path}0"
     # Use ipc sockets for managed workers
-    confservice.set('zmq','ipcpath', ipc_path)
+    confservice.set('zmq', 'ipcpath', ipc_path)
     if workers > 0:
-        confservice.set('zmq','bindaddr'     , f"ipc://{ipc_path}pool0")
-        confservice.set('zmq','broadcastaddr', f"ipc://{ipc_path}broadcast0")
+        confservice.set('zmq', 'bindaddr', f"ipc://{ipc_path}pool0")
+        confservice.set('zmq', 'broadcastaddr', f"ipc://{ipc_path}broadcast0")
 
     return ipcaddr
 
@@ -174,14 +174,14 @@ def create_ssl_options():
     import ssl
     cfg = confservice['server']
     ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    ssl_ctx.load_cert_chain(cfg['ssl_cert'],cfg['ssl_key'])
+    ssl_ctx.load_cert_chain(cfg['ssl_cert'], cfg['ssl_key'])
     return ssl_ctx
 
 
-def initialize_middleware( app ): 
+def initialize_middleware(app):
     """ Initialize the middleware
     """
-    if confservice.getboolean('server','enable_filters'):
+    if confservice.getboolean('server', 'enable_filters'):
         from .middleware import MiddleWareRouter
         router = MiddleWareRouter(app)
     else:
@@ -190,7 +190,7 @@ def initialize_middleware( app ):
     return router
 
 
-def run_server( port: int, address: str="", user: str=None, workers: int=0) -> None:
+def run_server(port: int, address: str = "", user: str = None, workers: int = 0) -> None:
     """ Run the server
 
         :param port: port number
@@ -217,11 +217,11 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
     management = None
 
     # Setup ssl config
-    if confservice.getboolean('server','ssl'):
+    if confservice.getboolean('server', 'ssl'):
         LOGGER.info("SSL enabled")
         kwargs['ssl_options'] = create_ssl_options()
 
-    if confservice.getboolean('server','http_proxy'):
+    if confservice.getboolean('server', 'http_proxy'):
         LOGGER.info("Proxy configuration enabled")
         kwargs['xheaders'] = True
 
@@ -229,10 +229,10 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
     declare_cache_observers()
 
     try:
-        broker_pr   = create_broker_process(ipcaddr)
-        worker_pool = create_poolserver(workers) if workers>0 else None
+        broker_pr = create_broker_process(ipcaddr)
+        worker_pool = create_poolserver(workers) if workers > 0 else None
 
-        # Since python 3.10 and deprecation of `get_event_loop()` 
+        # Since python 3.10 and deprecation of `get_event_loop()`
         # This is now the preferred way to start tornado application
         # See https://www.tornadoweb.org/en/stable/guide/running.html
         async def _main():
@@ -252,7 +252,7 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
             nonlocal management
             if confservice['management'].getboolean('enabled'):
                 from .management.server import start_management_server
-                management = start_management_server(worker_pool,ipcaddr)
+                management = start_management_server(worker_pool, ipcaddr)
                 management.stats = application.stats
 
             # Initialize pool supervisor
@@ -270,9 +270,9 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
 
             loop = asyncio.get_running_loop()
             loop.add_signal_handler(signal.SIGTERM, event.set)
-            
+
             LOGGER.info("Starting processing requests")
-            # Wait forever until signal is set 
+            # Wait forever until signal is set
             # see https://www.tornadoweb.org/en/stable/guide/running.html
             await event.wait()
 
@@ -315,4 +315,3 @@ def run_server( port: int, address: str="", user: str=None, workers: int=0) -> N
 
     print("Server shutdown", flush=True)
     sys.exit(exit_code)
-

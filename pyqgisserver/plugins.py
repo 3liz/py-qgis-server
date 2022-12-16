@@ -17,7 +17,7 @@ import traceback
 from pathlib import Path
 from typing import Generator, Dict
 
-from .config  import confservice
+from .config import confservice
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -32,24 +32,22 @@ def checkQgisVersion(minver: str, maxver: str) -> bool:
         major, *ver = ver.split('.')
         major = int(major)
         minor = int(ver[0]) if len(ver) > 0 else 0
-        rev   = int(ver[1]) if len(ver) > 1 else 0
+        rev = int(ver[1]) if len(ver) > 1 else 0
         if minor >= 99:
             minor = rev = 0
             major += 1
         if rev > 99:
             rev = 99
-        return int("{:d}{:02d}{:02d}".format(major,minor,rev))
-
+        return int("{:d}{:02d}{:02d}".format(major, minor, rev))
 
     version = to_int(Qgis.QGIS_VERSION.split('-')[0])
-    minver  = to_int(minver) if minver else version
-    maxver  = to_int(maxver) if maxver else version
+    minver = to_int(minver) if minver else version
+    maxver = to_int(maxver) if maxver else version
 
     return minver <= version <= maxver
 
 
-
-def find_plugins(path: str) -> Generator[str,None,None]:
+def find_plugins(path: str) -> Generator[str, None, None]:
     """ return list of plugins in given path
     """
     path = Path(path)
@@ -93,18 +91,17 @@ def find_plugins(path: str) -> Generator[str,None,None]:
             LOGGER.error(f"'{plugin}' : Error reading plugin metadata '{metadata_file}': {exc}")
             continue
 
-        if not checkQgisVersion(min_ver,max_ver):
+        if not checkQgisVersion(min_ver, max_ver):
             LOGGER.warning(f"Unsupported version for {plugin}. Discarding")
             continue
 
         yield plugin.name
 
 
-
-def load_plugins(serverIface: 'QgsServerInterface'): # noqa F821
+def load_plugins(serverIface: 'QgsServerInterface'):  # noqa F821
     """ Start all plugins """
 
-    plugin_path = confservice.get('server','pluginpath')
+    plugin_path = confservice.get('server', 'pluginpath')
     if not plugin_path:
         return
 
@@ -135,7 +132,7 @@ def load_plugins(serverIface: 'QgsServerInterface'): # noqa F821
         LOGGER.warning(f"{error} plugin(s) having an issue")
 
 
-def plugin_metadata( plugin: str ) -> Dict:
+def plugin_metadata(plugin: str) -> Dict:
     """ Return plugin metadata
     """
     if plugin not in server_plugins:
@@ -150,8 +147,8 @@ def plugin_metadata( plugin: str ) -> Dict:
     with metadatafile.open(mode='rt') as f:
         cp = configparser.ConfigParser()
         cp.read_file(f)
-        metadata = { s: dict(p.items()) for s,p in cp.items() }
-        metadata.pop('DEFAULT',None)
+        metadata = {s: dict(p.items()) for s, p in cp.items()}
+        metadata.pop('DEFAULT', None)
         metadata.update(path=str(path))
         return metadata
 

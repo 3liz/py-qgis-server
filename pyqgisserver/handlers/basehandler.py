@@ -6,12 +6,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-""" Base Request handler 
+""" Base Request handler
 """
 import tornado.web
 import logging
 import json
-from tornado.web import HTTPError # noqa F401
+from tornado.web import HTTPError  # noqa F401
 from typing import Any, Union, Optional
 
 from ..version import __version__
@@ -23,28 +23,29 @@ LOGGER = logging.getLogger('SRVLOG')
 class BaseHandler(tornado.web.RequestHandler):
     """ Base class for HTTP request hanlers
     """
+
     def initialize(self) -> None:
         super().initialize()
-        self._links    = []
+        self._links = []
         self.connection_closed = False
         self.logger = LOGGER
-        self._cfg   = confservice['server']
+        self._cfg = confservice['server']
         self._cross_origin = self._cfg.getboolean('cross_origin')
 
     def prepare(self) -> None:
-        self.has_body_arguments = len(self.request.body_arguments)>0
+        self.has_body_arguments = len(self.request.body_arguments) > 0
 
     def compute_etag(self) -> None:
         # Disable etag computation
         pass
 
     def set_default_headers(self) -> None:
-        """ Override defaults HTTP headers 
+        """ Override defaults HTTP headers
         """
         # XXX By default tornado set Content-Type to xml/text
         # this may have unwanted side effects
         self.clear_header("Content-Type")
-        self.set_header("Server",f"Py-Qgis-Server {__version__}")
+        self.set_header("Server", f"Py-Qgis-Server {__version__}")
 
     def on_connection_close(self) -> None:
         """ Override, log and set 'connection_closed' to True
@@ -52,12 +53,12 @@ class BaseHandler(tornado.web.RequestHandler):
         self.connection_closed = True
         self.logger.warning("Connection closed by client: {}".format(self.request.uri))
 
-    def set_option_headers(self, allow_header: Optional[str]=None) -> None:
+    def set_option_headers(self, allow_header: Optional[str] = None) -> None:
         """  Set correct headers for 'OPTIONS' method
         """
         if not allow_header:
-            allow_header = ', '.join( me for me in self.SUPPORTED_METHODS if hasattr(self, me.lower()) )
-        
+            allow_header = ', '.join(me for me in self.SUPPORTED_METHODS if hasattr(self, me.lower()))
+
         self.set_header("Allow", allow_header)
         if self.set_access_control_headers():
             # Required in CORS context
@@ -78,12 +79,12 @@ class BaseHandler(tornado.web.RequestHandler):
         else:
             return False
 
-    def write_json(self, chunk: Union[str,dict]) -> None:
+    def write_json(self, chunk: Union[str, dict]) -> None:
         """ Write body as json
 
             The method will also set CORS implicitely for any origin
             If this a security issue, we should allow it
-            explicitely. 
+            explicitely.
         """
         if isinstance(chunk, dict):
             chunk = json.dumps(chunk, sort_keys=True)
@@ -96,13 +97,13 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         message = self._reason
 
-        #if "exc_info" in kwargs:
+        # if "exc_info" in kwargs:
         #    exception = kwargs['exc_info'][1]
-               
+
         self.logger.error("%s", message)
         response = dict(status="error" if status_code != 200 else "ok",
-                        httpcode = status_code,
-                        error    = { "message": message })
+                        httpcode=status_code,
+                        error={"message": message})
 
         self.write_json(response)
         self.finish()
@@ -122,7 +123,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 if proxy_url[-1] != '/':
                     proxy_url = f"{proxy_url}/"
                 return proxy_url
-        
+
         # No proxy to handle: return the full path
         return f"{req.protocol}://{req.host}/"
 
@@ -136,12 +137,10 @@ class NotFoundHandler(BaseHandler):
 
 
 class ErrorHandler(BaseHandler):
-    def initialize(self, status_code: int, reason: Optional[str]=None) -> None:
+    def initialize(self, status_code: int, reason: Optional[str] = None) -> None:
         super().initialize()
         self.set_status(status_code)
         self.reason = reason
 
     def prepare(self) -> None:
         raise HTTPError(self._status_code, reason=self.reason)
-
-

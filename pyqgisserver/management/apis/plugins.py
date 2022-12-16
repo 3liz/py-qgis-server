@@ -12,8 +12,8 @@
 """
 import logging
 
-from tornado.web import HTTPError # noqa F401
-from typing import Optional 
+from tornado.web import HTTPError  # noqa F401
+from typing import Optional
 
 from pyqgisserver.plugins import plugin_list, plugin_metadata, failed_plugins
 from .handler import RequestHandler, register_handlers
@@ -23,21 +23,21 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class PluginCollection(RequestHandler):
 
-    def get(self, name: Optional[str]=None) -> None: 
+    def get(self, name: Optional[str] = None) -> None:
         """ Return plugin info
         """
         if name:
             if name in failed_plugins:
-                self.write({ 'name': name, 'error_log' : failed_plugins[name], 'status': 'failed' })
+                self.write({'name': name, 'error_log': failed_plugins[name], 'status': 'failed'})
                 return
             # Return plugin informations
             metadata = plugin_metadata(name)
             if not metadata:
                 raise HTTPError(404)
-            self.write({'name': name, 'status': 'loaded', 'metadata': metadata })
+            self.write({'name': name, 'status': 'loaded', 'metadata': metadata})
         else:
             def _link(name, status):
-                return { 
+                return {
                     'href': self.public_url(f"/{name}"),
                     'status': status,
                     'name': name,
@@ -45,18 +45,16 @@ class PluginCollection(RequestHandler):
                     'title': f'Details for plugin {name}',
                 }
             # List all loaded plugins
-            plugins = [_link(n,'loaded') for n in plugin_list()]
-            plugins.extend([_link(n,'failed') for n in failed_plugins])
-            self.write({'links': plugins })
+            plugins = [_link(n, 'loaded') for n in plugin_list()]
+            plugins.extend([_link(n, 'failed') for n in failed_plugins])
+            self.write({'links': plugins})
 
-        
-def register( serverIface ):
+
+def register(serverIface):
     """ Register plugins api handlers
     """
-    register_handlers(serverIface, "/plugins","PluginsManagment",
+    register_handlers(serverIface, "/plugins", "PluginsManagment",
                       [
                           (r'/(?P<name>[^\/]+)/?$', PluginCollection),
                           (r'/', PluginCollection),
                       ])
-
-

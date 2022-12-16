@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Fixed
 
+* Fix pep8 E2,E3,W2,W3 code style
 * Fix wrong url for documentation link
 
 ## 1.8.6 - 2022-12-04
