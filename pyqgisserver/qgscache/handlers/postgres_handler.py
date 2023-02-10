@@ -95,7 +95,7 @@ def _check_unsafe_url(insecure: bool, url: urllib.parse.ParseResult) -> Tuple[st
     if database:
         params.update(dbname=database)
 
-    params = '&'.join('%s=%s' % (k, v) for k, v in params.items())
+    params = '&'.join(f'{k}={v}' for k, v in params.items())
     urlstr = f"postgresql://{netloc}/?{params}"
 
     try:

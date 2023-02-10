@@ -71,7 +71,7 @@ def _merge_qs(query1: str, query2: str) -> str:
     params_1 = parse_qs(query1)
     params_2 = parse_qs(query2)
     params_2.update(params_1)
-    return '&'.join('%s=%s' % (k, v[0]) for k, v in params_2.items())
+    return '&'.join(f'{k}={v[0]}' for k, v in params_2.items())
 
 
 class CacheType(Enum):
@@ -452,7 +452,7 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
         super().handleBadLayers(layers)
 
         nameElements = (lyr.firstChildElement("layername") for lyr in layers if lyr)
-        self.badLayerNames = set(elem.text() for elem in nameElements if elem)
+        self.badLayerNames = {elem.text() for elem in nameElements if elem}
 
     def validateLayers(self, project: QgsProject) -> bool:
         """ Check layers

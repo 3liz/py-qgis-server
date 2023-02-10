@@ -66,7 +66,7 @@ def read_configuration(argv: List[str] = None) -> argparse.Namespace:
     load_configuration()
 
     if args.config:
-        with open(args.config, mode='rt') as config_file:
+        with open(args.config) as config_file:
             read_config_file(config_file)
 
     # Override config
@@ -85,7 +85,7 @@ def read_configuration(argv: List[str] = None) -> argparse.Namespace:
 
     # set log level
     setup_log_handler(confservice.get('logging', 'level'))
-    print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
+    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
 
     conf = confservice['server']
     args.port = conf.getint('port')

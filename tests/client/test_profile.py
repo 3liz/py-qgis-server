@@ -13,7 +13,7 @@ def test_profile_request( host ):
            '&layers=france_parts&request=GetMap'
            '&service=WMS&styles=default&transparent=TRUE&version=1.3.0&width=1353')
 
-    rv = requests.get("http://{}{}".format( host, url ))
+    rv = requests.get(f"http://{host}{url}")
     assert rv.status_code == 200
 
 
@@ -24,7 +24,7 @@ def test_profile_return_403( host ):
     url = ('/ows/p/wmsonly/?exceptions=application/vnd.ogc.se_inimage'
            '&service=WFS&request=GetCapabilities')
 
-    rv = requests.get("http://{}{}".format( host, url ))
+    rv = requests.get(f"http://{host}{url}")
     assert rv.status_code == 403
 
 
@@ -34,7 +34,7 @@ def test_ip_ok( host ):
     """
     url = ('/ows/p/rejectips/?service=WMS&request=GetCapabilities')
 
-    rv = requests.get("http://{}{}".format( host, url ),  headers={ 'X-Forwarded-For': '192.168.2.1' })
+    rv = requests.get(f"http://{host}{url}",  headers={ 'X-Forwarded-For': '192.168.2.1' })
     assert rv.status_code == 200
 
 
@@ -44,7 +44,7 @@ def test_ip_rejected_return_403( host ):
     """
     url = ('/ows/p/rejectips/?service=WMS&request=GetCapabilities')
 
-    rv = requests.get("http://{}{}".format( host, url ), headers={ 'X-Forwarded-For': '192.168.3.1' })
+    rv = requests.get(f"http://{host}{url}", headers={ 'X-Forwarded-For': '192.168.3.1' })
     assert rv.status_code == 403
 
 
@@ -57,7 +57,7 @@ def test_profile_with_path( host ):
            '&layers=france_parts&request=GetMap'
            '&service=WMS&styles=default&transparent=TRUE&version=1.3.0&width=1353')
 
-    rv = requests.get("http://{}{}".format( host, url ))
+    rv = requests.get(f"http://{host}{url}")
     assert rv.status_code == 200
 
 

@@ -474,7 +474,7 @@ class QgsRequestHandler(RequestHandler):
 
     @classmethod
     def get_report(cls):
-        report = super(QgsRequestHandler, cls).get_report()
+        report = super().get_report()
 
         def _to_json(key: str, project: QgsProject, static: bool):
             return dict(
@@ -532,7 +532,7 @@ def main():
     load_configuration()
 
     if args.config:
-        with open(args.config, mode='rt') as config_file:
+        with open(args.config) as config_file:
             read_config_file(config_file)
 
     # Override config
@@ -552,7 +552,7 @@ def main():
     validate_config_path('projects.cache', 'rootdir')
 
     setup_log_handler(confservice.get('logging', 'level'))
-    print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
+    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
 
     broadcastaddr = confservice.get('zmq', 'broadcastaddr')
     router = confservice.get('zmq', 'bindaddr')

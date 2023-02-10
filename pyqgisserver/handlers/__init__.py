@@ -1,4 +1,3 @@
-
 from .basehandler import (  # noqa F401
     BaseHandler,
     NotFoundHandler,

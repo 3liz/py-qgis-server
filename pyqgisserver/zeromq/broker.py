@@ -170,7 +170,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     setup_log_handler(args.logging)
-    print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
+    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 

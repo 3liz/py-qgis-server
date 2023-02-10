@@ -1,4 +1,3 @@
-
 from qgis.core import Qgis, QgsMessageLog
 from qgis.server import QgsServerFilter
 
