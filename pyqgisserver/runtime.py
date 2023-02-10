@@ -109,7 +109,7 @@ class Application(tornado.web.Application):
         """
         """
         identity = confservice['zmq']['identity']
-        identity = "{}-{}".format(identity, os.getpid())
+        identity = f"{identity}-{os.getpid()}"
 
         self._broker_client = client.AsyncClient(router, bytes(identity.encode('ascii')))
         self.stats = Stats()
@@ -134,7 +134,7 @@ def setuid(username: str) -> None:
     pw = getpwnam(username)
     os.setgid(pw.pw_gid)
     os.setuid(pw.pw_uid)
-    LOGGER.info("Setuid to user {} ({}:{})".format(getpwuid(os.getuid()).pw_name, os.getuid(), os.getgid()))
+    LOGGER.info(f"Setuid to user {getpwuid(os.getuid()).pw_name} ({os.getuid()}:{os.getgid()})")
 
 
 def create_broker_process(ipcaddr: str) -> Process:
@@ -302,7 +302,7 @@ def run_server(port: int, address: str = "", user: str = None, workers: int = 0)
     if application is not None:
         application.terminate()
         application = None
-        print("PID {}: Server instance stopped".format(os.getpid()), flush=True)
+        print(f"PID {os.getpid()}: Server instance stopped", flush=True)
     if cache_observer:
         cache_observer.stop()
     if worker_pool:

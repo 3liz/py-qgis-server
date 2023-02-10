@@ -12,7 +12,7 @@ def test_getmap_request( host ):
            '&layers=france_parts&map=france_parts.qgs&request=GetMap'
            '&service=WMS&styles=default&transparent=TRUE&version=1.3.0&width=1353')
 
-    rv = requests.get("http://{}{}".format( host, url ))
+    rv = requests.get(f"http://{host}{url}")
     assert rv.status_code == 200
 
 def test_getmap_post_request( host ):
@@ -34,7 +34,7 @@ def test_getmap_post_request( host ):
       'version':'1.3.0',
       'width':'1353' }
 
-    rv = requests.post("http://{}/ows/".format( host ), data=arguments)
+    rv = requests.post(f"http://{host}/ows/", data=arguments)
     assert rv.status_code == 200
 
 

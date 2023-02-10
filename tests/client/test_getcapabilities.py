@@ -13,12 +13,12 @@ xlink = "{http://www.w3.org/1999/xlink}"
 def test_wms_getcapabilities_hrefs( host ):
     """ Test getcapabilities hrefs
     """
-    urlref = urlparse( "http://{}/ows/?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities".format( host ) )
+    urlref = urlparse( f"http://{host}/ows/?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities" )
     rv = requests.get( urlref.geturl() )
     assert rv.status_code == 200
     assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
-    urlref = urlparse("http://{}/ows/".format( host ))
+    urlref = urlparse(f"http://{host}/ows/")
 
     xml  = etree.fromstring(rv.content)
 
@@ -35,7 +35,7 @@ def test_forwarded_url( host ):
     """ Test proxy location
     """
     urlref = urlparse('https://my.proxy.loc:9999/anywhere')
-    rv = requests.get("http://{}/ows/?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities".format( host ) , 
+    rv = requests.get(f"http://{host}/ows/?MAP=france_parts.qgs&SERVICE=WMS&request=GetCapabilities" , 
                       headers={ 'X-Forwarded-Url': urlref.geturl() } )
 
     assert rv.status_code == 200
@@ -54,6 +54,6 @@ def test_forwarded_url( host ):
 def test_lower_case_query_params( host ):
     """ Test that we support lower case query param
     """
-    urlref = "http://{}/ows/?map=france_parts.qgs&SERVICE=WMS&request=GetCapabilities".format( host )
+    urlref = f"http://{host}/ows/?map=france_parts.qgs&SERVICE=WMS&request=GetCapabilities"
     rv = requests.get( urlref )
     assert rv.status_code == 200    

@@ -179,7 +179,7 @@ def run_worker(address: str, handler_factory: Type[RequestHandler],
                 traceback.print_exc()
                 if handler and not handler.header_written:
                     handler.status_code = 500
-                    handler.send("Worker internal error".encode())
+                    handler.send(b"Worker internal error")
                     # Got error 500, do not presume worker state
                     break
             finally:
@@ -228,7 +228,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     setup_log_handler(args.logging)
-    print("Log level set to {}\n".format(logging.getLevelName(LOGGER.level)), file=sys.stderr)
+    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 

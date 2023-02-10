@@ -38,7 +38,7 @@ def checkQgisVersion(minver: str, maxver: str) -> bool:
             major += 1
         if rev > 99:
             rev = 99
-        return int("{:d}{:02d}{:02d}".format(major, minor, rev))
+        return int(f"{major:d}{minor:02d}{rev:02d}")
 
     version = to_int(Qgis.QGIS_VERSION.split('-')[0])
     minver = to_int(minver) if minver else version

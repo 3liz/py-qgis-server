@@ -113,7 +113,7 @@ def install_logger_hook(logger: logging.Logger, logprefix: str, verbose: bool = 
     # Add a hook to qgis  message log
 
     def writelogmessage(message, tag, level):
-        arg = '{} {}: {}'.format(logprefix, tag, message)
+        arg = f'{logprefix} {tag}: {message}'
         if level == Qgis.Warning:
             logger.warning(arg)
         elif level == Qgis.Critical:

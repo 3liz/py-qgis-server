@@ -18,8 +18,8 @@ class Tests(HTTPTestCase):
     def test_wfs_describe_feature_type(self):
         """ Test DescribeFeatureType
         """
-        rv = self.client.get( ("?MAP=france_parts.qgs&SERVICE=WFS&request=DescribeFeatureType&VERSION=1.0.0"
-                               "&TypeName=france_parts_bordure"))
+        rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WFS&request=DescribeFeatureType&VERSION=1.0.0"
+                               "&TypeName=france_parts_bordure")
 
         assert rv.status_code == 200
         assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
@@ -31,8 +31,8 @@ class Tests(HTTPTestCase):
     def test_wfs_getfeature(self):
         """ Test DescribeFeatureType
         """
-        rv = self.client.get( ("?MAP=france_parts.qgs&SERVICE=WFS&request=GetFeature&VERSION=1.0.0"
-                               "&TypeName=france_parts_bordure"))
+        rv = self.client.get( "?MAP=france_parts.qgs&SERVICE=WFS&request=GetFeature&VERSION=1.0.0"
+                               "&TypeName=france_parts_bordure")
 
         assert rv.status_code == 200
 
