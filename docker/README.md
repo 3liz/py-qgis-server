@@ -12,7 +12,13 @@ docker run -it 3liz/qgis-map-server:3.10 version
 ```
 will return the full QGIS version used.
 
-## Run example
+## Quick start 
+
+```
+docker run -p 8080:8080 [--user <uid>[:<gid>]] -v /path/to/qgis/projects:/qgis-data 3liz/qgis-map-server
+```
+
+## Run example with config
 
 ```bash
 docker run -p 8080:8080 \
