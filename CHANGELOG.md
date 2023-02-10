@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+## 1.8.7 - 2023-02-10
+
 ### Added
 
 * Set default logging mode to INFO instead of DEBUG
