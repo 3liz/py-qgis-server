@@ -9,6 +9,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
+* Set default logging mode to INFO instead of DEBUG
+* Allow quickstart docker run (https://github.com/3liz/py-qgis-server/issues/55)
+    - Support for '--user' option
+    - Comprehensive error messages
 * Supports for 'X-Forwarded-Host/Forwarded' headers when behind a proxy
 * Allow 'X-Qgis-Project' header for passing project path
 

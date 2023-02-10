@@ -31,7 +31,11 @@ RUN mkdir -p /opt/local/ \
     && rm -rf /root/.cache /root/.ccache
 
 COPY docker-entrypoint.sh /
-RUN chmod 0755 /docker-entrypoint.sh
+RUN chmod 0755 /docker-entrypoint.sh && mkdir -p /home/qgis && chmod 777 /home/qgis
+
+# Set uid root on Xvfb
+# Allow us to run Xvfb when the container runs with '-u' option
+RUN chmod u+s /usr/bin/Xvfb
 
 EXPOSE 8080
 
