@@ -9,6 +9,7 @@ services:
             PIP_CACHE_DIR: /.cache
             USER: ${USER}
             QGIS_OPTIONS_PATH: /src/tests/qgis
+            QGIS_CUSTOM_CONFIG_PATH: /src/tests/qgis
             QGIS_SERVER_TRUST_LAYER_METADATA: 'yes'
             QGIS_SERVER_DISABLE_GETPRINT: 'yes'
             QGSRV_SERVER_WORKERS: ${WORKERS}

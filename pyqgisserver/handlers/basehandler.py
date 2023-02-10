@@ -124,6 +124,25 @@ class BaseHandler(tornado.web.RequestHandler):
                     proxy_url = f"{proxy_url}/"
                 return proxy_url
 
+            # Check for X-Forwarded-Host header
+            forwarded_host = req.headers.get('X-Forwarded-Host')
+            if forwarded_host:
+                req.host = forwarded_host
+
+            # Check for 'Forwarded headers
+            forwarded = req.headers.get('Forwarded')
+            if forwarded:
+                parts = forwarded.split(';')
+                for p in parts:
+                    try:
+                        k, v = p.split('=')
+                        if k == 'host':
+                            req.host = v
+                        elif k == 'proto':
+                            req.protocol = v
+                    except Exception as e:
+                        LOGGER.error("Forwaded header error: %s", e)
+
         # No proxy to handle: return the full path
         return f"{req.protocol}://{req.host}/"
 
