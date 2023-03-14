@@ -79,7 +79,10 @@ class AsyncClientHandler(BaseHandler):
             proxy_url = self.proxy_url()
             if proxy_url:
                 # Send the full path to Qgis
-                headers['X-Qgis-Forwarded-Url'] = f"{proxy_url}{self.request.path.lstrip('/')}"
+                req_url = f"{proxy_url}{self.request.path.lstrip('/')}"
+                headers['X-Qgis-Forwarded-Url'] = req_url
+            else:
+                req_url = self.request.uri
 
             self.set_backend_headers(headers)
 
@@ -100,7 +103,7 @@ class AsyncClientHandler(BaseHandler):
             hdrs = response.headers
             delta = time() - reqtime
 
-            log_rrequest(proxy_url, status, method, query, delta, hdrs)
+            log_rrequest(req_url, status, method, query, delta, hdrs)
 
             # Send response
             for k, v in hdrs.items():
@@ -134,13 +137,13 @@ class AsyncClientHandler(BaseHandler):
             delta = time() - reqtime
             # Log the request with status code 499 indicating
             # that the request has not returned
-            log_rrequest(proxy_url, 499, method, query, delta, {})
+            log_rrequest(req_url, 499, method, query, delta, {})
             self.send_error(status, reason="Request timeout error")
         except RequestGatewayError:
             status = 502
             delta = time() - reqtime
             # Log the request
-            log_rrequest(proxy_url, 499, method, query, delta, {})
+            log_rrequest(req_url, 499, method, query, delta, {})
             self.send_error(status, reason="Backend request error")
 
         if status >= 500:
