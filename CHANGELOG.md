@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 -->
 
 ## Unreleased
+### Added
+* Supports for header 'Access-Control-Allow-Headers'='Authorization' in OPTIONS method, is required if the request has an Authorization header (04/04/2023)
 
 ## 1.8.7 - 2023-02-10
 
