@@ -60,8 +60,10 @@ class BaseHandler(tornado.web.RequestHandler):
             allow_header = ', '.join(me for me in self.SUPPORTED_METHODS if hasattr(self, me.lower()))
 
         self.set_header("Allow", allow_header)
-         # Required if the request has an "Authorization" header. This is useful to implement authentification on top QGIS SERVER
-         # see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers & https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
+        # Required if the request has an "Authorization" header.
+        # This is useful to implement authentification on top QGIS SERVER
+        # see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers &
+        # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
         self.set_header('Access-Control-Allow-Headers', 'Authorization')
         if self.set_access_control_headers():
             # Required in CORS context
