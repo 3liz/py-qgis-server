@@ -33,7 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Fixed
 
-* Fix Fix missing http_proxy in managment handler
+* Fix missing http_proxy in management handler
 
 ### Added
 
