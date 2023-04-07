@@ -9,9 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
-* Use request path when logging qgis request.
 * Supports for header 'Access-Control-Allow-Headers'='Authorization' in OPTIONS method, 
   is required if the request has an Authorization header (04/04/2023, contribution from @TANK2003)
+
+### Fixed
+
+* Changed '/ows/catalog' default entry point to '/catalog'
+* Use request path when logging qgis request.
 
 ## 1.8.7 - 2023-02-10
 

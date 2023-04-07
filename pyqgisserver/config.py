@@ -90,7 +90,7 @@ def load_configuration():
 
     # Qgis api endpoints
     CONFIG.add_section('api.endpoints')
-    CONFIG.set('api.endpoints', 'landing_page', getenv('QGSRV_API_ENDPOINTS_LANDING_PAGE', '/ows/catalog'))
+    CONFIG.set('api.endpoints', 'landing_page', getenv('QGSRV_API_ENDPOINTS_LANDING_PAGE', '/catalog'))
     CONFIG.set('api.endpoints', 'lizmap_api', getenv('QGSRV_API_ENDPOINTS_LIZMAP', '/lizmap'))
 
     # Services enabled

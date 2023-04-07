@@ -123,7 +123,7 @@ TEST_HTTP_PORT:=8888
 QGSRV_USER:=$(shell id -u):$(shell id -g)
 
 run:
-	docker run -it --rm -p $(TEST_HTTP_PORT):8080 --name py-qgis-server  \
+	docker run -it --rm  -p $(TEST_HTTP_PORT):8080 --name py-qgis-server  \
    -v $(SRCDIR):/src  \
    -v $(SRCDIR)/tests/data:/projects \
    -e QGSRV_PROJECTS_SCHEMES_TEST=/src/tests/data/ \
@@ -136,6 +136,7 @@ run:
    -e QGSRV_MANAGEMENT_ENABLED=yes \
    -e QGSRV_MANAGEMENT_INTERFACES=127.0.0.1 \
    -e QGSRV_SERVER_PLUGINPATH=/src/tests/plugins \
+   -e QGSRV_API_ENABLED_LANDING_PAGE=yes \
    -e DEBUG_ENTRYPOINT=yes \
    $(BUILDIMAGE)
 
