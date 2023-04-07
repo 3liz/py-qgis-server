@@ -155,6 +155,18 @@ config_options:
       tags: [ ows, memory ]
       version_added: '1.8.1'
 
+    - name: SERVER_ALLOW_HEADERS
+      label: Define headers that will be forwarded to Qgis server worker
+      description: |
+         Set the headers - as comma separated header prefix - that will be
+         forwarded to the Qgis server worker. This may be useful if you
+         have plugins that may deal with request headers.
+      default: 'X-Qgis-,X-Lizmap-'
+      section: server
+      key: allow_headers
+      tags: [ http, header, plugin ]
+      version_added: '1.8.8'
+
     #==========
     # Logging
     #==========

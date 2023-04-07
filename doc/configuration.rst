@@ -270,6 +270,27 @@ with requests returning a high number of values.
 
 
 
+.. _SERVER_ALLOW_HEADERS:
+
+SERVER_ALLOW_HEADERS
+--------------------
+
+Set the headers - as comma separated header prefix - that will be
+forwarded to the Qgis server worker. This may be useful if you
+have plugins that may deal with request headers.
+
+
+
+:Type: string
+:Default: X-Qgis-,X-Lizmap-
+:Version Added: 1.8.8
+:Section: server
+:Key: allow_headers
+:Env: QGSRV_SERVER_ALLOW_HEADERS
+
+
+
+
 .. _LOGGING_LEVEL:
 
 LOGGING_LEVEL
