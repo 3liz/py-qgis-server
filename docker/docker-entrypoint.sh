@@ -42,6 +42,10 @@ if [[ -z $QGSRV_CACHE_ROOTDIR ]]; then
 fi
 
 if [ "$(id -u)" = '0' ]; then
+    # Delete any actual Xvfb lock file
+    # Because it can only be removed as root
+    rm -rf /tmp/.X99-lock
+
     if [[ "$(stat -c '%u' $HOME)" == "0" ]] ; then
         chown $QGSRV_USER $HOME
         chmod 755 $HOME
@@ -93,10 +97,14 @@ QGSRV_DISPLAY_XVFB=${QGSRV_DISPLAY_XVFB:-ON}
 XVFB_DEFAULT_ARGS="-screen 0 1024x768x24 -ac +extension GLX +render -noreset"
 XVFB_ARGS=${QGSRV_XVFB_ARGS:-":99 $XVFB_DEFAULT_ARGS"}
 
-# Delete any actual Xvfb lock file
-rm -rf /tmp/.X99-lock
-
 if [[ "$QGSRV_DISPLAY_XVFB" == "ON" ]]; then
+ if [ -f /tmp/.X99-lock ]; then
+     echo "ERROR: An existing lock file will prevent Xvfb to start"
+     echo "If you expect restarting the container with '--user' option"
+     echo "consider mounting /tmp with option '--tmpfs /tmp'"
+     exit 1
+ fi
+    
  # RUN Xvfb in the background
  echo "Running Xvfb"
  nohup /usr/bin/Xvfb $XVFB_ARGS &

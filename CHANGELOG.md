@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Fixed
 
+* Docker: Fix removing Xvfb lock file when running with `QGSRV_USER`
+    - Display comprehensive message when attempting to restart container
+      started with `--user` option.
 * Changed '/ows/catalog' default entry point to '/catalog'
 * Use request path when logging qgis request.
 

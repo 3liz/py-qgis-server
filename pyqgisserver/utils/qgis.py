@@ -54,9 +54,12 @@ def start_qgis_application(
     if not enable_gui:
         #  We MUST set the QT_QPA_PLATFORM to prevent
         #  Qt trying to connect to display in containers
-        if os.environ.get('DISPLAY') is None:
+        display = os.environ.get('DISPLAY')
+        if display is None:
             logger.info("Setting offscreen mode")
             os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+        else:
+            logger.info(f"Using DISPLAY: {display}")
 
     qgis_prefix = os.environ.get('QGIS3_HOME', '/usr')
 
