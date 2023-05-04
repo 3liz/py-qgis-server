@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+## 1.8.8 - 2023-04-04
+
 ### Added
 
 * Add documentation for `SERVER_ALLOW_HEADERS` config option.
