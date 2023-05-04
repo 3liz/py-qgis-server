@@ -1,6 +1,8 @@
-# QGIS 3 map  server
+# QGIS map server
 
-Setup a OGC WWS/WFS/WCS service.
+[![Docker Pulls](https://img.shields.io/docker/pulls/3liz/qgis-map-server)](https://hub.docker.com/r/3liz/qgis-map-server/tags)
+
+Set up a OGC WWS/WFS/WCS service.
 
 Run the python QGIS server from https://github.com/3liz/py-qgis-server in a docker container.
 

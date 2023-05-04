@@ -3,7 +3,7 @@
 [![PyPi version badge](https://badgen.net/pypi/v/py-qgis-server)](https://pypi.org/project/py-qgis-server/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/py-qgis-server)](https://pypi.org/project/py-qgis-server/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/py-qgis-server)](https://pypi.org/project/py-qgis-server/)
-
+[![Docker Pulls](https://img.shields.io/docker/pulls/3liz/qgis-map-server)](https://hub.docker.com/r/3liz/qgis-map-server/tags)
 
 ## Description
 
