@@ -84,6 +84,9 @@ class AsyncClientHandler(BaseHandler):
             else:
                 req_url = self.request.uri
 
+            if self.request.headers.get('X-Map-Location', None):
+                headers['X-Map-Location'] = self.request.headers['X-Map-Location']
+
             self.set_backend_headers(headers)
 
             data = self.request.body
