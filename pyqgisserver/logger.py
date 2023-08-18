@@ -12,7 +12,7 @@ REQ_LOG_TEMPLATE = "{ip}\t{code}\t{method}\t{url}\t{time}\t{length}\t"
 REQ_FORMAT = REQ_LOG_TEMPLATE + '{agent}\t{referer}'
 RREQ_FORMAT = REQ_LOG_TEMPLATE
 
-# Lies between warning and error
+# Lies between info and warning
 REQ = 21
 RREQ = 22
 

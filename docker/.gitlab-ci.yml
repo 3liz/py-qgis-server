@@ -32,6 +32,10 @@ build-docker:ltr:
   variables:
     QGIS_FLAVOR: ltr
 
+#
+# Compatibility with previous ltr
+#
+
 build-docker:3.22:
   extends: .build-docker
   variables:
@@ -89,6 +93,10 @@ release:ltr:
     QGIS_FLAVOR: ltr
   dependencies:
     - build-docker:ltr
+
+#
+# Compatibility with previous ltr
+#
 
 release:3.22:
   extends: .release
