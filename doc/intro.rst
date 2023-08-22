@@ -1,4 +1,5 @@
 .. highlight:: python
+.. highlight:: sh
 
 .. _server_description:
 
@@ -15,6 +16,7 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 
 The server is aimed at solving some real situations encountered in production environment: zero conf scalability, handle long-running request situation, auto restart...
 
+
 .. _server_features:
 
 Features
@@ -27,6 +29,7 @@ Features
 - Auto-restart trigger for workers
 - Support streamed/chunked responses
 - SSL support
+
 
 .. _server_requirements:
 
@@ -43,6 +46,7 @@ Requirements
 
 Installation
 ============
+
 
 .. _server_source_install:
 
@@ -62,8 +66,8 @@ Install from source
     make dist
     pip install py-qgis-server-X.Y.Z.tar.gz
 
-.. _server_running:
 
+.. _server_running:
 
 Running the server
 ==================
@@ -72,7 +76,7 @@ The server does not run as a daemon by itself, there is several way to run a com
 
 For example:
 
-* Use `Supervisor <http://supervisord.org/>`_. Will gives you full control over logs and server status notifications.
+* Use `Supervisor <http://supervisord.org/>`_. Will gives you full control over logs and server status notifications. See :ref:`Running with Supervisor <server_supervisor_running>`.
 * Use the ``daemon`` command.
 * Use systemd
 * ...
@@ -104,7 +108,6 @@ Options
 Running proxy and workers separately
 ------------------------------------
 
-
 If the ``--proxy`` option is set  the server will act as a proxy server to talk to independent qgis workers.
 
 QGIS workers can be run using the command:
@@ -130,10 +133,40 @@ for a description of the options.
 Install server plugins with the Docker container
 ------------------------------------------------
 
-The docker image is shipped with the `qgis-plugin-manager <https://www.3liz.com/news/qgis-plugin-manager.html>.`
+The docker image is shipped with the `qgis-plugin-manager <https://www.3liz.com/news/qgis-plugin-manager.html>`_.
 
 To install or manage your server plugins, use the docker `exec` command into your container, the plugins will install in the folder defined by the :ref:`SERVER_PLUGINPATH <SERVER_PLUGINPATH>` option.
 
 Example::
 
     docker exec myserver -it qgis-plugin-manager install "Lizmap server"
+
+
+.. _server_supervisor_running:
+
+Running with Supervisor
+-----------------------
+
+Example of Supervisor configuration file for py-qgis-server :file:`/etc/supervisor/conf.d/py-qgis-server.conf`:
+
+.. code-block:: ini
+
+    [program:py-qgis-server]
+    command=/path/to/qgisserver -c /path/to/py-qgis-server-config-file.conf
+    process_name=%(program_name)s
+    user=www-data
+    redirect_stderr=true
+    stdout_logfile=/var/log/supervisor/%(program_name)s-stdout.log
+    stdout_logfile_maxbytes=10MB
+    environment=
+        QGIS_OPTIONS_PATH=/path/to/qgis-server-profile-folder,
+        QGIS_SERVER_PARALLEL_RENDERING=1,
+        QGIS_SERVER_MAX_THREADS=8,
+        QGIS_SERVER_LIZMAP_REVEAL_SETTINGS=True
+
+Feel free to adapt environment variables depending on your setup and needs.
+
+Once supervisor configuration file for py-qgis-server is created, py-qgis-server can be started using following commands::
+
+    sudo supervisorctl reread && sudo supervisorctl start py-qgis-server
+
