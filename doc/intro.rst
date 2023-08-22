@@ -1,4 +1,5 @@
 .. highlight:: python
+.. highlight:: sh
 
 .. _server_description:
 
@@ -15,6 +16,7 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 
 The server is aimed at solving some real situations encountered in production environment: zero conf scalability, handle long-running request situation, auto restart...
 
+
 .. _server_features:
 
 Features
@@ -27,6 +29,7 @@ Features
 - Auto-restart trigger for workers
 - Support streamed/chunked responses
 - SSL support
+
 
 .. _server_requirements:
 
@@ -43,6 +46,7 @@ Requirements
 
 Installation
 ============
+
 
 .. _server_source_install:
 
@@ -62,8 +66,8 @@ Install from source
     make dist
     pip install py-qgis-server-X.Y.Z.tar.gz
 
-.. _server_running:
 
+.. _server_running:
 
 Running the server
 ==================
@@ -104,7 +108,6 @@ Options
 Running proxy and workers separately
 ------------------------------------
 
-
 If the ``--proxy`` option is set  the server will act as a proxy server to talk to independent qgis workers.
 
 QGIS workers can be run using the command:
@@ -130,7 +133,7 @@ for a description of the options.
 Install server plugins with the Docker container
 ------------------------------------------------
 
-The docker image is shipped with the `qgis-plugin-manager <https://www.3liz.com/news/qgis-plugin-manager.html>.`
+The docker image is shipped with the `qgis-plugin-manager <https://www.3liz.com/news/qgis-plugin-manager.html>`_.
 
 To install or manage your server plugins, use the docker `exec` command into your container, the plugins will install in the folder defined by the :ref:`SERVER_PLUGINPATH <SERVER_PLUGINPATH>` option.
 
