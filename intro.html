@@ -11,11 +11,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=392da36c"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -59,6 +59,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#running-proxy-and-workers-separately">Running proxy and workers separately</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-with-docker">Running with Docker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#install-server-plugins-with-the-docker-container">Install server plugins with the Docker container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-with-supervisor">Running with Supervisor</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Settings</a></li>
@@ -96,7 +97,7 @@
            <div itemprop="articleBody">
              
   <section id="description">
-<span id="server-description"></span><h1>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h1>
+<span id="server-description"></span><h1>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h1>
 <p>Py-qgis-server is a asynchronous HTTP Qgis server written in python on top of the <a class="reference external" href="http://www.tornadoweb.org/en/stable/">tornado</a> framework and the 0MQ messaging framework for distributing requests workers.</p>
 <p>It is based on the new Qgis 3 server API for efficiently passing requests/responses using 0MQ messaging framework to workers.</p>
 <p>The server may be run as a self-contained single service or as a proxy server with an arbitrary number of workers running
@@ -104,7 +105,7 @@ remotely or locally. Independent workers connect automatically to the front-end 
 on the proxy side. Thus, this is ideal for auto-scaling configuration for use with container orchestrator as Rancher, Swarm or Kubernetes.</p>
 <p>The server is aimed at solving some real situations encountered in production environment: zero conf scalability, handle long-running request situation, auto restart…</p>
 <section id="features">
-<span id="server-features"></span><h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
+<span id="server-features"></span><h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Multiples workers</p></li>
 <li><p>Fair queuing request dispatching</p></li>
@@ -116,7 +117,7 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 </ul>
 </section>
 <section id="requirements">
-<span id="server-requirements"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
+<span id="server-requirements"></span><h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>OS: Unix/Posix variants (Linux or OSX) (Windows not officially supported)</p></li>
 <li><p>Python &gt;= 3.5</p></li>
@@ -126,23 +127,23 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 </section>
 </section>
 <section id="installation">
-<span id="server-installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
+<span id="server-installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <section id="install-from-source">
-<span id="server-source-install"></span><h2>Install from source<a class="headerlink" href="#install-from-source" title="Permalink to this heading"></a></h2>
+<span id="server-source-install"></span><h2>Install from source<a class="headerlink" href="#install-from-source" title="Link to this heading"></a></h2>
 <ul>
 <li><p>Install from pypi.org:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">py</span><span class="o">-</span><span class="n">qgis</span><span class="o">-</span><span class="n">server</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>py-qgis-server
 </pre></div>
 </div>
 </li>
 <li><p>Install from sources:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
 </li>
 <li><p>Install from build version X.Y.Z:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">dist</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">py</span><span class="o">-</span><span class="n">qgis</span><span class="o">-</span><span class="n">server</span><span class="o">-</span><span class="n">X</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">Z</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dist
+pip<span class="w"> </span>install<span class="w"> </span>py-qgis-server-X.Y.Z.tar.gz
 </pre></div>
 </div>
 </li>
@@ -150,59 +151,82 @@ on the proxy side. Thus, this is ideal for auto-scaling configuration for use wi
 </section>
 </section>
 <section id="running-the-server">
-<span id="server-running"></span><h1>Running the server<a class="headerlink" href="#running-the-server" title="Permalink to this heading"></a></h1>
+<span id="server-running"></span><h1>Running the server<a class="headerlink" href="#running-the-server" title="Link to this heading"></a></h1>
 <p>The server does not run as a daemon by itself, there is several way to run a command as a daemon.</p>
 <p>For example:</p>
 <ul class="simple">
-<li><p>Use <a class="reference external" href="http://supervisord.org/">Supervisor</a>. Will gives you full control over logs and server status notifications.</p></li>
+<li><p>Use <a class="reference external" href="http://supervisord.org/">Supervisor</a>. Will gives you full control over logs and server status notifications. See <a class="reference internal" href="#server-supervisor-running"><span class="std std-ref">Running with Supervisor</span></a>.</p></li>
 <li><p>Use the <code class="docutils literal notranslate"><span class="pre">daemon</span></code> command.</p></li>
 <li><p>Use systemd</p></li>
 <li><p>…</p></li>
 </ul>
 <section id="synopsis">
-<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this heading"></a></h2>
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading"></a></h2>
 <p><strong>qgisserver</strong> [<em>options</em>]</p>
 </section>
 <section id="options">
-<h2>Options<a class="headerlink" href="#options" title="Permalink to this heading"></a></h2>
+<h2>Options<a class="headerlink" href="#options" title="Link to this heading"></a></h2>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-d">
-<span id="cmdoption-debug"></span><span class="sig-name descname"><span class="pre">-d</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--debug</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-d" title="Permalink to this definition"></a></dt>
+<span id="cmdoption-debug"></span><span class="sig-name descname"><span class="pre">-d</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--debug</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-d" title="Link to this definition"></a></dt>
 <dd><p>Force debug mode. This is the same as setting the <a class="reference internal" href="configuration.html#logging-level"><span class="std std-ref">LOGGING_LEVEL</span></a> option to <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code></p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-c">
-<span id="cmdoption-config"></span><span class="sig-name descname"><span class="pre">-c</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--config</span></span><span class="sig-prename descclassname"> <span class="pre">path</span></span><a class="headerlink" href="#cmdoption-c" title="Permalink to this definition"></a></dt>
+<span id="cmdoption-config"></span><span class="sig-name descname"><span class="pre">-c</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--config</span></span><span class="sig-prename descclassname"> <span class="pre">path</span></span><a class="headerlink" href="#cmdoption-c" title="Link to this definition"></a></dt>
 <dd><p>Use the configuration file located at <code class="docutils literal notranslate"><span class="pre">path</span></code></p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-proxy">
-<span class="sig-name descname"><span class="pre">--proxy</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-proxy" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">--proxy</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-proxy" title="Link to this definition"></a></dt>
 <dd><p>Run only as proxy.</p>
 </dd></dl>
 
 </section>
 <section id="running-proxy-and-workers-separately">
-<h2>Running proxy and workers separately<a class="headerlink" href="#running-proxy-and-workers-separately" title="Permalink to this heading"></a></h2>
+<h2>Running proxy and workers separately<a class="headerlink" href="#running-proxy-and-workers-separately" title="Link to this heading"></a></h2>
 <p>If the <code class="docutils literal notranslate"><span class="pre">--proxy</span></code> option is set  the server will act as a proxy server to talk to independent qgis workers.</p>
 <p>QGIS workers can be run using the command:</p>
 <p><strong>qgisserver-worker</strong> [<em>options</em>]</p>
 <p>The options are the same as</p>
 </section>
 <section id="running-with-docker">
-<span id="server-docker-running"></span><h2>Running with Docker<a class="headerlink" href="#running-with-docker" title="Permalink to this heading"></a></h2>
+<span id="server-docker-running"></span><h2>Running with Docker<a class="headerlink" href="#running-with-docker" title="Link to this heading"></a></h2>
 <p>Docker image is available on <a class="reference external" href="https://hub.docker.com/r/3liz/qgis-map-server">docker-hub</a>.</p>
 <p>All options are passed with environment variables. See the <a class="reference internal" href="configuration.html#configuration-settings"><span class="std std-ref">Configuration settings</span></a>
 for a description of the options.</p>
 </section>
 <section id="install-server-plugins-with-the-docker-container">
-<span id="install-plugin"></span><h2>Install server plugins with the Docker container<a class="headerlink" href="#install-server-plugins-with-the-docker-container" title="Permalink to this heading"></a></h2>
-<p>The docker image is shipped with the <cite>qgis-plugin-manager &lt;https://www.3liz.com/news/qgis-plugin-manager.html&gt;.</cite></p>
+<span id="install-plugin"></span><h2>Install server plugins with the Docker container<a class="headerlink" href="#install-server-plugins-with-the-docker-container" title="Link to this heading"></a></h2>
+<p>The docker image is shipped with the <a class="reference external" href="https://www.3liz.com/news/qgis-plugin-manager.html">qgis-plugin-manager</a>.</p>
 <p>To install or manage your server plugins, use the docker <cite>exec</cite> command into your container, the plugins will install in the folder defined by the <a class="reference internal" href="configuration.html#server-pluginpath"><span class="std std-ref">SERVER_PLUGINPATH</span></a> option.</p>
 <p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">exec</span> <span class="n">myserver</span> <span class="o">-</span><span class="n">it</span> <span class="n">qgis</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">manager</span> <span class="n">install</span> <span class="s2">&quot;Lizmap server&quot;</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>myserver<span class="w"> </span>-it<span class="w"> </span>qgis-plugin-manager<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;Lizmap server&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="running-with-supervisor">
+<span id="server-supervisor-running"></span><h2>Running with Supervisor<a class="headerlink" href="#running-with-supervisor" title="Link to this heading"></a></h2>
+<p>Example of Supervisor configuration file for py-qgis-server <code class="file docutils literal notranslate"><span class="pre">/etc/supervisor/conf.d/py-qgis-server.conf</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[program:py-qgis-server]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/path/to/qgisserver -c /path/to/py-qgis-server-config-file.conf</span>
+<span class="na">process_name</span><span class="o">=</span><span class="s">%(program_name)s</span>
+<span class="na">user</span><span class="o">=</span><span class="s">www-data</span>
+<span class="na">redirect_stderr</span><span class="o">=</span><span class="s">true</span>
+<span class="na">stdout_logfile</span><span class="o">=</span><span class="s">/var/log/supervisor/%(program_name)s-stdout.log</span>
+<span class="na">stdout_logfile_maxbytes</span><span class="o">=</span><span class="s">10MB</span>
+<span class="na">environment</span><span class="o">=</span>
+<span class="w">    </span><span class="na">QGIS_OPTIONS_PATH</span><span class="o">=</span><span class="s">/path/to/qgis-server-profile-folder,</span>
+<span class="w">    </span><span class="na">QGIS_SERVER_PARALLEL_RENDERING</span><span class="o">=</span><span class="s">1,</span>
+<span class="w">    </span><span class="na">QGIS_SERVER_MAX_THREADS</span><span class="o">=</span><span class="s">8,</span>
+<span class="w">    </span><span class="na">QGIS_SERVER_LIZMAP_REVEAL_SETTINGS</span><span class="o">=</span><span class="s">True</span>
+</pre></div>
+</div>
+<p>Feel free to adapt environment variables depending on your setup and needs.</p>
+<p>Once supervisor configuration file for py-qgis-server is created, py-qgis-server can be started using following commands:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>supervisorctl<span class="w"> </span>reread<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>supervisorctl<span class="w"> </span>start<span class="w"> </span>py-qgis-server
 </pre></div>
 </div>
 </section>

@@ -11,11 +11,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=392da36c"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -86,7 +86,7 @@
            <div itemprop="articleBody">
              
   <section id="loader-schemes">
-<span id="id1"></span><h1>Loader schemes<a class="headerlink" href="#loader-schemes" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Loader schemes<a class="headerlink" href="#loader-schemes" title="Link to this heading"></a></h1>
 <p>Py-qgis-server support custom loaders schemes definitions</p>
 <p>Qgis projects path are passed in the <code class="docutils literal notranslate"><span class="pre">MAP</span></code> query parameter of the request. By default this parameter
 is interpreted as an url.</p>
@@ -94,10 +94,10 @@ is interpreted as an url.</p>
 handled with the <code class="docutils literal notranslate"><span class="pre">file</span></code> protocol handler.</p>
 </section>
 <section id="default-handlers">
-<span id="id2"></span><h1>Default handlers<a class="headerlink" href="#default-handlers" title="Permalink to this heading"></a></h1>
+<span id="id2"></span><h1>Default handlers<a class="headerlink" href="#default-handlers" title="Link to this heading"></a></h1>
 <p>Py-qgis-server supports natively the following default schemes:</p>
 <section id="file-protocol">
-<span id="id3"></span><h2>File protocol<a class="headerlink" href="#file-protocol" title="Permalink to this heading"></a></h2>
+<span id="id3"></span><h2>File protocol<a class="headerlink" href="#file-protocol" title="Link to this heading"></a></h2>
 <p>Handle projects file stored on local media. The <code class="docutils literal notranslate"><span class="pre">file:</span></code> protocol is aliased by default for using
 the <a class="reference internal" href="configuration.html#cache-rootdir"><span class="std std-ref">CACHE_ROOTDIR</span></a> as base path for when looking for projects.</p>
 <dl class="field-list simple">
@@ -107,7 +107,7 @@ the <a class="reference internal" href="configuration.html#cache-rootdir"><span 
 </dl>
 </section>
 <section id="postgres-protocol">
-<span id="id4"></span><h2>Postgres protocol<a class="headerlink" href="#postgres-protocol" title="Permalink to this heading"></a></h2>
+<span id="id4"></span><h2>Postgres protocol<a class="headerlink" href="#postgres-protocol" title="Link to this heading"></a></h2>
 <p>The <cite>postgres</cite> protocol handle file stored in postgres database as supported by Qgis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Secure mode<span class="colon">:</span></dt>
@@ -118,7 +118,7 @@ Only the <code class="docutils literal notranslate"><span class="pre">user&#64;<
 </section>
 </section>
 <section id="scheme-aliases">
-<span id="id5"></span><h1>Scheme aliases<a class="headerlink" href="#scheme-aliases" title="Permalink to this heading"></a></h1>
+<span id="id5"></span><h1>Scheme aliases<a class="headerlink" href="#scheme-aliases" title="Link to this heading"></a></h1>
 <p>Py-qgis-server allow defining custom scheme as scheme aliases. Scheme aliases defines base urls
 for existing schemes with overrides rules on path and query params:</p>
 <p>Schemes aliases are defined by adding the scheme definition in the <code class="docutils literal notranslate"><span class="pre">projects.schemes</span></code> section:</p>

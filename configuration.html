@@ -11,11 +11,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=392da36c"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -124,14 +124,14 @@
            <div itemprop="articleBody">
              
   <section id="configuration-settings">
-<span id="id1"></span><h1>Configuration Settings<a class="headerlink" href="#configuration-settings" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Configuration Settings<a class="headerlink" href="#configuration-settings" title="Link to this heading"></a></h1>
 <p>Configuration can be done either by using a configuration file or with environnement variable.</p>
 <p>Except stated otherwise, the rule for environnement variable names is <code class="docutils literal notranslate"><span class="pre">QGSRV_&lt;SECTION&gt;_&lt;KEY&gt;</span></code> all in uppercase.</p>
 </section>
 <section id="common-configuration-options">
-<h1>Common Configuration Options<a class="headerlink" href="#common-configuration-options" title="Permalink to this heading"></a></h1>
+<h1>Common Configuration Options<a class="headerlink" href="#common-configuration-options" title="Link to this heading"></a></h1>
 <section id="server-http-port">
-<span id="id2"></span><h2>SERVER_HTTP_PORT<a class="headerlink" href="#server-http-port" title="Permalink to this heading"></a></h2>
+<span id="id2"></span><h2>SERVER_HTTP_PORT<a class="headerlink" href="#server-http-port" title="Link to this heading"></a></h2>
 <p>Port to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -152,7 +152,7 @@
 </dl>
 </section>
 <section id="server-interfaces">
-<span id="id3"></span><h2>SERVER_INTERFACES<a class="headerlink" href="#server-interfaces" title="Permalink to this heading"></a></h2>
+<span id="id3"></span><h2>SERVER_INTERFACES<a class="headerlink" href="#server-interfaces" title="Link to this heading"></a></h2>
 <p>Interfaces to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -173,7 +173,7 @@
 </dl>
 </section>
 <section id="server-timeout">
-<span id="id4"></span><h2>SERVER_TIMEOUT<a class="headerlink" href="#server-timeout" title="Permalink to this heading"></a></h2>
+<span id="id4"></span><h2>SERVER_TIMEOUT<a class="headerlink" href="#server-timeout" title="Link to this heading"></a></h2>
 <p>Set the timeout for Qgis response in seconds. If a Qgis worker takes more than
 the corresponding value a timeout error (504) is returned to the client.</p>
 <dl class="field-list simple">
@@ -195,7 +195,7 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 </dl>
 </section>
 <section id="server-workers">
-<span id="id5"></span><h2>SERVER_WORKERS<a class="headerlink" href="#server-workers" title="Permalink to this heading"></a></h2>
+<span id="id5"></span><h2>SERVER_WORKERS<a class="headerlink" href="#server-workers" title="Link to this heading"></a></h2>
 <p>The number of workers for processing requests</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -216,7 +216,7 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 </dl>
 </section>
 <section id="server-enable-filters">
-<span id="id6"></span><h2>SERVER_ENABLE_FILTERS<a class="headerlink" href="#server-enable-filters" title="Permalink to this heading"></a></h2>
+<span id="id6"></span><h2>SERVER_ENABLE_FILTERS<a class="headerlink" href="#server-enable-filters" title="Link to this heading"></a></h2>
 <p>Enable filters as python extension</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -237,7 +237,7 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 </dl>
 </section>
 <section id="server-http-proxy">
-<span id="id7"></span><h2>SERVER_HTTP_PROXY<a class="headerlink" href="#server-http-proxy" title="Permalink to this heading"></a></h2>
+<span id="id7"></span><h2>SERVER_HTTP_PROXY<a class="headerlink" href="#server-http-proxy" title="Link to this heading"></a></h2>
 <p>Indicates that the server is behind a reverse proxy</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -258,7 +258,7 @@ the corresponding value a timeout error (504) is returned to the client.</p>
 </dl>
 </section>
 <section id="server-proxy-url">
-<span id="id8"></span><h2>SERVER_PROXY_URL<a class="headerlink" href="#server-proxy-url" title="Permalink to this heading"></a></h2>
+<span id="id8"></span><h2>SERVER_PROXY_URL<a class="headerlink" href="#server-proxy-url" title="Link to this heading"></a></h2>
 <p>The url that must be seen by the client when the server is behind a proxy.
 Note that this option will be overridden by <cite>QGIS_SERVER_&lt;SERVICE&gt;_URL</cite> or
 by <cite>X-Qgis-&lt;service&gt;-Url</cite> headers.</p>
@@ -278,7 +278,7 @@ by <cite>X-Qgis-&lt;service&gt;-Url</cite> headers.</p>
 </dl>
 </section>
 <section id="server-restartmon">
-<span id="id9"></span><h2>SERVER_RESTARTMON<a class="headerlink" href="#server-restartmon" title="Permalink to this heading"></a></h2>
+<span id="id9"></span><h2>SERVER_RESTARTMON<a class="headerlink" href="#server-restartmon" title="Link to this heading"></a></h2>
 <p>The file to watch for restarting workers. When the modified date of the file is changed.
 a restart command is broadcasted to the workers. Note that workers processes are restarted
 without dropping requests.</p>
@@ -298,7 +298,7 @@ without dropping requests.</p>
 </dl>
 </section>
 <section id="server-pluginpath">
-<span id="id10"></span><h2>SERVER_PLUGINPATH<a class="headerlink" href="#server-pluginpath" title="Permalink to this heading"></a></h2>
+<span id="id10"></span><h2>SERVER_PLUGINPATH<a class="headerlink" href="#server-pluginpath" title="Link to this heading"></a></h2>
 <p>The path to qgis server plugins</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -319,7 +319,7 @@ without dropping requests.</p>
 </dl>
 </section>
 <section id="server-ssl">
-<span id="id11"></span><h2>SERVER_SSL<a class="headerlink" href="#server-ssl" title="Permalink to this heading"></a></h2>
+<span id="id11"></span><h2>SERVER_SSL<a class="headerlink" href="#server-ssl" title="Link to this heading"></a></h2>
 <p>Enable SSL endpoint</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -340,7 +340,7 @@ without dropping requests.</p>
 </dl>
 </section>
 <section id="server-ssl-cert">
-<span id="id12"></span><h2>SERVER_SSL_CERT<a class="headerlink" href="#server-ssl-cert" title="Permalink to this heading"></a></h2>
+<span id="id12"></span><h2>SERVER_SSL_CERT<a class="headerlink" href="#server-ssl-cert" title="Link to this heading"></a></h2>
 <p>Path to the SSL certificat file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -358,7 +358,7 @@ without dropping requests.</p>
 </dl>
 </section>
 <section id="server-ssl-key">
-<span id="id13"></span><h2>SERVER_SSL_KEY<a class="headerlink" href="#server-ssl-key" title="Permalink to this heading"></a></h2>
+<span id="id13"></span><h2>SERVER_SSL_KEY<a class="headerlink" href="#server-ssl-key" title="Link to this heading"></a></h2>
 <p>Path to the SSL key file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -376,7 +376,7 @@ without dropping requests.</p>
 </dl>
 </section>
 <section id="server-cross-origin">
-<span id="id14"></span><h2>SERVER_CROSS_ORIGIN<a class="headerlink" href="#server-cross-origin" title="Permalink to this heading"></a></h2>
+<span id="id14"></span><h2>SERVER_CROSS_ORIGIN<a class="headerlink" href="#server-cross-origin" title="Link to this heading"></a></h2>
 <p>Allows any origin for CORS. If set to ‘no’, allow only CORS for the ‘Origin’
 header.</p>
 <dl class="field-list simple">
@@ -398,7 +398,7 @@ header.</p>
 </dl>
 </section>
 <section id="server-memory-high-water-mark">
-<span id="id15"></span><h2>SERVER_MEMORY_HIGH_WATER_MARK<a class="headerlink" href="#server-memory-high-water-mark" title="Permalink to this heading"></a></h2>
+<span id="id15"></span><h2>SERVER_MEMORY_HIGH_WATER_MARK<a class="headerlink" href="#server-memory-high-water-mark" title="Link to this heading"></a></h2>
 <p>Set memory high water mark as fraction of total memory. Workers are
 restarted if total memory percent usage of workers exceed that value.</p>
 <dl class="field-list simple">
@@ -423,7 +423,7 @@ restarted if total memory percent usage of workers exceed that value.</p>
 </dl>
 </section>
 <section id="server-getfeaturelimit">
-<span id="id16"></span><h2>SERVER_GETFEATURELIMIT<a class="headerlink" href="#server-getfeaturelimit" title="Permalink to this heading"></a></h2>
+<span id="id16"></span><h2>SERVER_GETFEATURELIMIT<a class="headerlink" href="#server-getfeaturelimit" title="Link to this heading"></a></h2>
 <p>Define default limit for WFS/GetFeature requests.
 A negative value set no limit; this may be a concern
 with requests returning a high number of values.</p>
@@ -449,7 +449,7 @@ with requests returning a high number of values.</p>
 </dl>
 </section>
 <section id="server-allow-headers">
-<span id="id17"></span><h2>SERVER_ALLOW_HEADERS<a class="headerlink" href="#server-allow-headers" title="Permalink to this heading"></a></h2>
+<span id="id17"></span><h2>SERVER_ALLOW_HEADERS<a class="headerlink" href="#server-allow-headers" title="Link to this heading"></a></h2>
 <p>Set the headers - as comma separated header prefix - that will be
 forwarded to the Qgis server worker. This may be useful if you
 have plugins that may deal with request headers.</p>
@@ -475,7 +475,7 @@ have plugins that may deal with request headers.</p>
 </dl>
 </section>
 <section id="logging-level">
-<span id="id18"></span><h2>LOGGING_LEVEL<a class="headerlink" href="#logging-level" title="Permalink to this heading"></a></h2>
+<span id="id18"></span><h2>LOGGING_LEVEL<a class="headerlink" href="#logging-level" title="Link to this heading"></a></h2>
 <p>Set the logging level</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -496,7 +496,7 @@ have plugins that may deal with request headers.</p>
 </dl>
 </section>
 <section id="qgis-info">
-<span id="id19"></span><h2>QGIS_INFO<a class="headerlink" href="#qgis-info" title="Permalink to this heading"></a></h2>
+<span id="id19"></span><h2>QGIS_INFO<a class="headerlink" href="#qgis-info" title="Link to this heading"></a></h2>
 <p>Log out qgis ‘Info’ message logs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -517,7 +517,7 @@ have plugins that may deal with request headers.</p>
 </dl>
 </section>
 <section id="cache-size">
-<span id="id20"></span><h2>CACHE_SIZE<a class="headerlink" href="#cache-size" title="Permalink to this heading"></a></h2>
+<span id="id20"></span><h2>CACHE_SIZE<a class="headerlink" href="#cache-size" title="Link to this heading"></a></h2>
 <p>The maximal number of Qgis projects held in cache. The cache strategy is LRU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -538,7 +538,7 @@ have plugins that may deal with request headers.</p>
 </dl>
 </section>
 <section id="cache-rootdir">
-<span id="id21"></span><h2>CACHE_ROOTDIR<a class="headerlink" href="#cache-rootdir" title="Permalink to this heading"></a></h2>
+<span id="id21"></span><h2>CACHE_ROOTDIR<a class="headerlink" href="#cache-rootdir" title="Link to this heading"></a></h2>
 <p>The directory location for Qgis project files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -556,7 +556,7 @@ have plugins that may deal with request headers.</p>
 </dl>
 </section>
 <section id="cache-strict-check">
-<span id="id22"></span><h2>CACHE_STRICT_CHECK<a class="headerlink" href="#cache-strict-check" title="Permalink to this heading"></a></h2>
+<span id="id22"></span><h2>CACHE_STRICT_CHECK<a class="headerlink" href="#cache-strict-check" title="Link to this heading"></a></h2>
 <p>Activate strict checking of project layers. When enabled, Qgis projects
 with invalid layers will be dismissed and an ‘Unprocessable Entity’ (422) HTTP error
 will be issued.</p>
@@ -579,7 +579,7 @@ will be issued.</p>
 </dl>
 </section>
 <section id="cache-insecure">
-<span id="id23"></span><h2>CACHE_INSECURE<a class="headerlink" href="#cache-insecure" title="Permalink to this heading"></a></h2>
+<span id="id23"></span><h2>CACHE_INSECURE<a class="headerlink" href="#cache-insecure" title="Link to this heading"></a></h2>
 <p>Enable or disable the insecure cache mode. The insecure cache mode allow scheme handlers
 to enable or disable some features considered harmful. See the handler’s description
 for the limitations induced in secure mode.</p>
@@ -602,7 +602,7 @@ for the limitations induced in secure mode.</p>
 </dl>
 </section>
 <section id="trust-layer-metadata">
-<span id="id24"></span><h2>TRUST_LAYER_METADATA<a class="headerlink" href="#trust-layer-metadata" title="Permalink to this heading"></a></h2>
+<span id="id24"></span><h2>TRUST_LAYER_METADATA<a class="headerlink" href="#trust-layer-metadata" title="Link to this heading"></a></h2>
 <p>Trust layer metadata. Improves layer load time by skipping expensive checks
 like primary key unicity, geometry type and
 srid and by using estimated metadata on layer load. Since QGIS 3.16.</p>
@@ -631,7 +631,7 @@ srid and by using estimated metadata on layer load. Since QGIS 3.16.</p>
 </dl>
 </section>
 <section id="disable-getprint">
-<span id="id25"></span><h2>DISABLE_GETPRINT<a class="headerlink" href="#disable-getprint" title="Permalink to this heading"></a></h2>
+<span id="id25"></span><h2>DISABLE_GETPRINT<a class="headerlink" href="#disable-getprint" title="Link to this heading"></a></h2>
 <p>Don’t load print layouts. Improves project read time if layouts are not required,
 and allows projects to be safely read in background threads (since print layouts are
 not thread safe).</p>
@@ -660,7 +660,7 @@ not thread safe).</p>
 </dl>
 </section>
 <section id="cache-preload-config">
-<span id="id26"></span><h2>CACHE_PRELOAD_CONFIG<a class="headerlink" href="#cache-preload-config" title="Permalink to this heading"></a></h2>
+<span id="id26"></span><h2>CACHE_PRELOAD_CONFIG<a class="headerlink" href="#cache-preload-config" title="Link to this heading"></a></h2>
 <p>Path to configuration file for preloading projects. The file must have one project uri
 per line. Each uri is similar to the project uri passed in the ‘MAP’ query parameter
 of OWS requests.
@@ -684,7 +684,7 @@ Preloaded projects are stored in a static cache, i.e they are not subject to lru
 </dl>
 </section>
 <section id="cache-disable-owsurls">
-<span id="id27"></span><h2>CACHE_DISABLE_OWSURLS<a class="headerlink" href="#cache-disable-owsurls" title="Permalink to this heading"></a></h2>
+<span id="id27"></span><h2>CACHE_DISABLE_OWSURLS<a class="headerlink" href="#cache-disable-owsurls" title="Link to this heading"></a></h2>
 <p>Disable ows urls defined in projects. This may be necessary because Qgis projects
 urls override proxy urls.</p>
 <dl class="field-list simple">
@@ -709,7 +709,7 @@ urls override proxy urls.</p>
 </dl>
 </section>
 <section id="cache-force-etag">
-<span id="id28"></span><h2>CACHE_FORCE_ETAG<a class="headerlink" href="#cache-force-etag" title="Permalink to this heading"></a></h2>
+<span id="id28"></span><h2>CACHE_FORCE_ETAG<a class="headerlink" href="#cache-force-etag" title="Link to this heading"></a></h2>
 <p>Force etag header even if ‘TRUST_LAYER_METADATA’ is not set.
 By default etags are set only when ‘TRUST_LAYER_METADATA’ is set because
 capabilities rely only on qgis project data and not on the underlying layer
@@ -736,7 +736,7 @@ data.</p>
 </dl>
 </section>
 <section id="cache-default-handler">
-<span id="id29"></span><h2>CACHE_DEFAULT_HANDLER<a class="headerlink" href="#cache-default-handler" title="Permalink to this heading"></a></h2>
+<span id="id29"></span><h2>CACHE_DEFAULT_HANDLER<a class="headerlink" href="#cache-default-handler" title="Link to this heading"></a></h2>
 <p>Set the default handler for MAP parameters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -754,7 +754,7 @@ data.</p>
 </dl>
 </section>
 <section id="cache-allow-storage-schemes">
-<span id="id30"></span><h2>CACHE_ALLOW_STORAGE_SCHEMES<a class="headerlink" href="#cache-allow-storage-schemes" title="Permalink to this heading"></a></h2>
+<span id="id30"></span><h2>CACHE_ALLOW_STORAGE_SCHEMES<a class="headerlink" href="#cache-allow-storage-schemes" title="Link to this heading"></a></h2>
 <p>Restrict authorized project storage scheme for projects uri to
 those listed - The value must be a comma separated list of allowed
 schemes. The value ‘*’ allow any scheme.
@@ -778,7 +778,7 @@ Note that aliases are resolved before applying restrictions.</p>
 </dl>
 </section>
 <section id="cache-check-interval">
-<span id="id31"></span><h2>CACHE_CHECK_INTERVAL<a class="headerlink" href="#cache-check-interval" title="Permalink to this heading"></a></h2>
+<span id="id31"></span><h2>CACHE_CHECK_INTERVAL<a class="headerlink" href="#cache-check-interval" title="Link to this heading"></a></h2>
 <p>Set the time interval in seconds between two check for invalidation/refresh of the cache content.
 If set to a value &gt; 0 then the cache is checked for invalidation/refresh asynchronously every
 seconds defined by the option.
@@ -801,7 +801,7 @@ to use asynchronous check with such projects in conjunction with a static cache.
 </dl>
 </section>
 <section id="api-enabled-landing-page">
-<span id="id32"></span><h2>API_ENABLED_LANDING_PAGE<a class="headerlink" href="#api-enabled-landing-page" title="Permalink to this heading"></a></h2>
+<span id="id32"></span><h2>API_ENABLED_LANDING_PAGE<a class="headerlink" href="#api-enabled-landing-page" title="Link to this heading"></a></h2>
 <p>Enable access to qgis ‘landing page’ api</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -825,7 +825,7 @@ to use asynchronous check with such projects in conjunction with a static cache.
 </dl>
 </section>
 <section id="api-endpoints-landing-page">
-<span id="id33"></span><h2>API_ENDPOINTS_LANDING_PAGE<a class="headerlink" href="#api-endpoints-landing-page" title="Permalink to this heading"></a></h2>
+<span id="id33"></span><h2>API_ENDPOINTS_LANDING_PAGE<a class="headerlink" href="#api-endpoints-landing-page" title="Link to this heading"></a></h2>
 <p>Define endpoint access to the ‘landing page’ service</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -849,7 +849,7 @@ to use asynchronous check with such projects in conjunction with a static cache.
 </dl>
 </section>
 <section id="api-enabled-lizmap">
-<span id="id34"></span><h2>API_ENABLED_LIZMAP<a class="headerlink" href="#api-enabled-lizmap" title="Permalink to this heading"></a></h2>
+<span id="id34"></span><h2>API_ENABLED_LIZMAP<a class="headerlink" href="#api-enabled-lizmap" title="Link to this heading"></a></h2>
 <p>Enable access to the Lizmap API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -873,7 +873,7 @@ to use asynchronous check with such projects in conjunction with a static cache.
 </dl>
 </section>
 <section id="api-endpoints-lizmap">
-<span id="id35"></span><h2>API_ENDPOINTS_LIZMAP<a class="headerlink" href="#api-endpoints-lizmap" title="Permalink to this heading"></a></h2>
+<span id="id35"></span><h2>API_ENDPOINTS_LIZMAP<a class="headerlink" href="#api-endpoints-lizmap" title="Link to this heading"></a></h2>
 <p>Define endpoint access to the Lizmap API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -897,7 +897,7 @@ to use asynchronous check with such projects in conjunction with a static cache.
 </dl>
 </section>
 <section id="management-enabled">
-<span id="id36"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Permalink to this heading"></a></h2>
+<span id="id36"></span><h2>MANAGEMENT_ENABLED<a class="headerlink" href="#management-enabled" title="Link to this heading"></a></h2>
 <p>Activate management API service. The management API is REST api for controlling and inspecting
 the server behavior, plugins and cached projects.
 Starting from 1.7.0, this is a experimental feature and will be subject to change. The api will
@@ -924,7 +924,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-interfaces">
-<span id="id37"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Permalink to this heading"></a></h2>
+<span id="id37"></span><h2>MANAGEMENT_INTERFACES<a class="headerlink" href="#management-interfaces" title="Link to this heading"></a></h2>
 <p>Network interfaces to listen to. The management API service will listen on this interface</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -948,7 +948,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-port">
-<span id="id38"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Permalink to this heading"></a></h2>
+<span id="id38"></span><h2>MANAGEMENT_PORT<a class="headerlink" href="#management-port" title="Link to this heading"></a></h2>
 <p>Port to listen to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -969,7 +969,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl">
-<span id="id39"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Permalink to this heading"></a></h2>
+<span id="id39"></span><h2>MANAGEMENT_SSL<a class="headerlink" href="#management-ssl" title="Link to this heading"></a></h2>
 <p>Enable SSL endpoint for API management</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -990,7 +990,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl-cert">
-<span id="id40"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Permalink to this heading"></a></h2>
+<span id="id40"></span><h2>MANAGEMENT_SSL_CERT<a class="headerlink" href="#management-ssl-cert" title="Link to this heading"></a></h2>
 <p>Path to the SSL certificat file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1008,7 +1008,7 @@ be considered as ‘stable’ from the 1.8.0 version.</p>
 </dl>
 </section>
 <section id="management-ssl-key">
-<span id="id41"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Permalink to this heading"></a></h2>
+<span id="id41"></span><h2>MANAGEMENT_SSL_KEY<a class="headerlink" href="#management-ssl-key" title="Link to this heading"></a></h2>
 <p>Path to the SSL key file for the management API</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
