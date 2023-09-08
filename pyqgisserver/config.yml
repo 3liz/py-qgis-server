@@ -214,7 +214,7 @@ config_options:
     - name: CACHE_STRICT_CHECK
       label: Enable strict checking
       description: |
-          Activate strict checking of project layers. When enabled, Qgis projects
+          Activate  with invalid layers will be dismissedstrict checking of project layers. When enabled, Qgis projects
           with invalid layers will be dismissed and an 'Unprocessable Entity' (422) HTTP error
           will be issued.
       default: 'yes'

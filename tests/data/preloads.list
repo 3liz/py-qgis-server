@@ -3,5 +3,5 @@
 #
 file:france_parts.qgs
 project_simple.qgs  # Comments may goes here
-raster_layer.qgs    # Invalid layer
+#raster_layer.qgs    # Invalid layer
 
