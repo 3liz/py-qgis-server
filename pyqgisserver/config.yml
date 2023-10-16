@@ -426,6 +426,17 @@ config_options:
       section: management
       tags: [ http, management ]
 
+    - name: MANAGEMENT_PROXY_URL
+      label: Management proxy URL
+      description: |
+          The URL that must be seen by the client when the management service is
+          behind a proxy.
+      default: ''
+      type: string
+      key: proxy_url
+      section: management
+      tags: [ http, management, proxy ]
+
     - name: MANAGEMENT_SSL
       label: Enable SSL
       description: Enable SSL endpoint for API management
