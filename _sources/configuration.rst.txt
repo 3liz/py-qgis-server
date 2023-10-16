@@ -223,7 +223,7 @@ header.
 
 
 :Type: boolean
-:Default: no
+:Default: yes
 :Section: server
 :Key: cross_origin
 :Env: QGSRV_SERVER_CROSS_ORIGIN
