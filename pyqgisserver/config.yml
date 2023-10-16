@@ -124,7 +124,7 @@ config_options:
       description: |
           Allows any origin for CORS. If set to 'no', allow only CORS for the 'Origin'
           header.
-      default: 'no'
+      default: 'yes'
       type: boolean
       section: server
       key: cross_origin

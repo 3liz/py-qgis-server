@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Fixed 
+
+* Fix `cross_origin` documentation according to the actual 
+  default value
+
 ## 1.8.8 - 2023-04-04
 
 ### Added
