@@ -15,6 +15,7 @@ import logging
 from tornado.web import HTTPError  # noqa F401
 from typing import Optional
 
+from pyqgisserver.config import confservice
 from pyqgisserver.plugins import plugin_list, plugin_metadata, failed_plugins
 from .handler import RequestHandler, register_handlers
 
@@ -22,6 +23,11 @@ LOGGER = logging.getLogger('SRVLOG')
 
 
 class PluginCollection(RequestHandler):
+
+    def __init__(self, context):
+        super().__init__(context)
+        config = confservice['management']
+        self.management_proxy_url = config['proxy_url'].strip('/')
 
     def get(self, name: Optional[str] = None) -> None:
         """ Return plugin info
@@ -36,9 +42,14 @@ class PluginCollection(RequestHandler):
                 raise HTTPError(404)
             self.write({'name': name, 'status': 'loaded', 'metadata': metadata})
         else:
+            management_proxy_url = self.management_proxy_url
             def _link(name, status):
+                if management_proxy_url:
+                    href = f"{management_proxy_url}/plugins/{name}"
+                else:
+                    href = self.public_url(f"/{name}")
                 return {
-                    'href': self.public_url(f"/{name}"),
+                    'href': href,
                     'status': status,
                     'name': name,
                     'type': 'application/json',
