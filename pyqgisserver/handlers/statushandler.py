@@ -11,6 +11,7 @@ import tornado
 import logging
 
 from .basehandler import BaseHandler
+from ..config import confservice
 from ..version import __version__
 from ..config import config_to_dict
 
@@ -34,9 +35,15 @@ class PingHandler(BaseHandler):
 
 class StatusHandler(BaseHandler):
 
+    def initialize(self) -> None:
+        super().initialize()
+        config = confservice['management']
+        self.management_proxy_url = config['proxy_url'].strip('/')
+
     def get(self):
 
         path = self.request.path.rstrip('/')
+        management_proxy_url = self.management_proxy_url
 
         if path == '/status/config':
             response = config_to_dict()
@@ -51,8 +58,13 @@ class StatusHandler(BaseHandler):
             req = self.request
 
             def _link(path: str, title: str, rel: str):
+                if management_proxy_url:
+                    href = f"{management_proxy_url}{path}"
+                else:
+                    href = f"{req.protocol}://{req.host}{path}"
+
                 return {
-                    'href': f"{req.protocol}://{req.host}{path}",
+                    'href': href,
                     'rel': rel,
                     'title': title,
                     'type': "application/json",
