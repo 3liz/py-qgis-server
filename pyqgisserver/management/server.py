@@ -80,25 +80,14 @@ class _ReportHandler(_PoolHandler):
 
 class _RootHandler(BaseHandler):
 
-    def initialize(self) -> None:
-        super().initialize()
-        config = confservice['management']
-        self.management_proxy_url = config['proxy_url'].strip('/')
-
     def get(self) -> None:
         """ Return links to default api entries
         """
         req = self.request
-        management_proxy_url = self.management_proxy_url
 
         def _link(path: str, title: str):
-            if management_proxy_url:
-                href = f"{management_proxy_url}{path}"
-            else:
-                href = f"{req.protocol}://{req.host}{path}"
-
             return {
-                'href': href,
+                'href': f"{req.protocol}://{req.host}{path}",
                 'title': title,
                 'type': "application/json",
             }

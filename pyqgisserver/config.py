@@ -174,7 +174,6 @@ def load_configuration():
     CONFIG.set('management', 'ss_key', getenv('QGSRV_MANAGEMENT_SSL_KEY', ''))
     CONFIG.set('management', 'ssl_cert', getenv('QGSRV_MANAGEMENT_SSL_CERT', ''))
     CONFIG.set('management', 'port', getenv('QGSRV_MANAGEMENT_PORT', '19876'))
-    CONFIG.set('management', 'proxy_url', getenv('QGSRV_MANAGEMENT_PROXY_URL', ''))
 
     #
     # Metadata
