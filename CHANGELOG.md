@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### 1.8.9 - 2023-11-07
+
 ### Fixed 
 
 * Fix `cross_origin` documentation according to the actual 
