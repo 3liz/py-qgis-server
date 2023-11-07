@@ -23,7 +23,7 @@ copyright = '2021, David Marteau - 3liz'
 author = 'David Marteau'
 
 # The full version, including alpha/beta/rc tags
-release = '1.7'
+release = '1.8'
 
 
 # -- General configuration ---------------------------------------------------
