@@ -14,9 +14,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
-* Management: Add support for a `proxy_url` from 
-  https://github.com/3liz/py-qgis-server/pull/69
-
 ## 1.8.8 - 2023-04-04
 
 ### Added
