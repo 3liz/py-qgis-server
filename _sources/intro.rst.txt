@@ -37,8 +37,8 @@ Requirements
 ------------
 
 - OS: Unix/Posix variants (Linux or OSX) (Windows not officially supported)
-- Python >= 3.5
-- QGIS >= 3.10 installed
+- Python >= 3.8
+- QGIS >= 3.22 installed
 - libzmq >= 4.0.1 and pyzmq >= 17
 
 
