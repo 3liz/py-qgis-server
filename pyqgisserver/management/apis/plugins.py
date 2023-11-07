@@ -12,10 +12,12 @@
 """
 import logging
 
-from tornado.web import HTTPError  # noqa F401
 from typing import Optional
 
-from pyqgisserver.plugins import plugin_list, plugin_metadata, failed_plugins
+from tornado.web import HTTPError  # noqa F401
+
+from pyqgisserver.plugins import failed_plugins, plugin_list, plugin_metadata
+
 from .handler import RequestHandler, register_handlers
 
 LOGGER = logging.getLogger('SRVLOG')

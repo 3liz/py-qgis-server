@@ -16,19 +16,19 @@
 # Client
 #
 
+import asyncio
+import logging
 import os
 import signal
-import asyncio
-import zmq.asyncio
-import zmq
 import traceback
-import logging
-
-
-from .utils import _get_ipc
 
 from collections import namedtuple
-from typing import Awaitable, Any
+from typing import Any, Awaitable
+
+import zmq
+import zmq.asyncio
+
+from .utils import _get_ipc
 
 LOGGER = logging.getLogger('SRVLOG')
 

@@ -7,9 +7,9 @@
 
 """ Start qgis application
 """
+import logging
 import os
 import sys
-import logging
 
 
 def setup_qgis_paths() -> None:
@@ -113,6 +113,7 @@ def install_logger_hook(logger: logging.Logger, logprefix: str, verbose: bool = 
     """ Install message log hook
     """
     from qgis.core import Qgis, QgsApplication
+
     # Add a hook to qgis  message log
 
     def writelogmessage(message, tag, level):
@@ -133,8 +134,8 @@ def install_logger_hook(logger: logging.Logger, logprefix: str, verbose: bool = 
 def set_proxy_configuration(logger: logging.Logger) -> None:
     """ Display proxy configuration
     """
-    from qgis.PyQt.QtNetwork import QNetworkProxy
     from qgis.core import QgsNetworkAccessManager
+    from qgis.PyQt.QtNetwork import QNetworkProxy
 
     nam = QgsNetworkAccessManager.instance()
     nam.setupDefaultProxyAndCache()

@@ -8,15 +8,14 @@
 
 """ Pool server
 """
-import os
 import logging
-import time
+import os
 import signal
+import time
 
 from multiprocessing import Process
 from multiprocessing.util import Finalize
-
-from typing import Callable, List, Dict
+from typing import Callable, Dict, List
 
 # Early failure min delay
 # If any process fail before that starting delay

@@ -12,20 +12,20 @@
     all workers, it prevents triggering the same update
     multiple times.
 """
-import os
 import asyncio
-import zmq.asyncio
-import zmq
-import traceback
 import logging
+import os
+import traceback
 
 from datetime import datetime
-from typing import Optional, Awaitable, Any, NamedTuple, Iterable, Tuple
+from typing import Any, Awaitable, Iterable, NamedTuple, Optional, Tuple
 
-from ..zeromq.utils import _get_ipc
+import zmq
+import zmq.asyncio
+
 from ..config import confservice
+from ..zeromq.utils import _get_ipc
 from .types import UpdateState
-
 
 LOGGER = logging.getLogger('SRVLOG')
 

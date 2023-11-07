@@ -6,13 +6,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import os
-import tornado
 import logging
+import os
 
-from .basehandler import BaseHandler
-from ..version import __version__
+import tornado
+
 from ..config import config_to_dict
+from ..version import __version__
+from .basehandler import BaseHandler
 
 LOGGER = logging.getLogger('SRVLOG')
 

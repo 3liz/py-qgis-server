@@ -12,18 +12,18 @@
     to workers DEALER
 """
 
-import sys
-import zmq
 import logging
-import traceback
 import signal
+import sys
+import traceback
 
-from time import time
 from collections import deque
+from time import time
 
-from .messages import WORKER_READY
+import zmq
 
 from ..logger import setup_log_handler
+from .messages import WORKER_READY
 
 LOGGER = logging.getLogger('SRVLOG')
 

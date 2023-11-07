@@ -2,7 +2,7 @@
 """
 import os
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 TAG_PREFIX_LEGACY = 'AMQP_GLOBAL_TAG_'
 TAG_PREFIX = 'QGSRV_MONITOR_TAG_'

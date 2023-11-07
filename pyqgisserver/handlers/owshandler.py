@@ -9,11 +9,11 @@
 """ Qgis server handler
 """
 import logging
+
+from typing import Any, Dict, Union
 from urllib.parse import urlencode
 
 from .asynchandler import AsyncClientHandler
-
-from typing import Any, Union, Dict
 
 LOGGER = logging.getLogger('SRVLOG')
 

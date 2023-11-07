@@ -10,34 +10,42 @@
 """
 
 import logging
-import urllib.parse
 import traceback
+import urllib.parse
 
-from urllib.parse import urlparse, urlunparse, urljoin, parse_qs
-from typing import Any, Tuple, Optional, Sequence, NamedTuple, Callable, Generator
 from collections import OrderedDict
-from pathlib import Path
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Tuple,
+)
+from urllib.parse import parse_qs, urljoin, urlparse, urlunparse
 
-from ..utils.lru import lrucache
-from ..config import confservice
-
-from .types import UpdateState
-
+from qgis.core import (
+    Qgis,
+    QgsApplication,
+    QgsMapLayer,
+    QgsProject,
+    QgsProjectBadLayerHandler,
+)
 from qgis.PyQt.QtCore import Qt
-from qgis.core import (Qgis,
-                       QgsApplication,
-                       QgsProjectBadLayerHandler,
-                       QgsProject,
-                       QgsMapLayer)
-
 from qgis.server import QgsServerProjectUtils
 
 from pyqgisservercontrib.core import componentmanager
 
+from ..config import confservice
+from ..utils.lru import lrucache
+
 # Import default handlers for auto-registration
 from .handlers import *  # noqa: F403,F401
+from .types import UpdateState
 
 LOGGER = logging.getLogger('SRVLOG')
 

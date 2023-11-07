@@ -32,14 +32,14 @@
 import logging
 import urllib.parse
 
-import psycopg2
-
+from datetime import datetime
+from typing import Optional, Tuple
 from urllib.parse import parse_qs
 
-from typing import Tuple, Optional
-from datetime import datetime
+import psycopg2
 
 from qgis.core import QgsProject
+
 from pyqgisservercontrib.core import componentmanager
 
 LOGGER = logging.getLogger('SRVLOG')

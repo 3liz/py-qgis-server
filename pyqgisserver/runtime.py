@@ -6,37 +6,34 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import os
-import sys
 import asyncio
 import logging
+import os
 import signal
-
-import tornado.web
-import tornado.platform.asyncio
-
-from tornado.web import RedirectHandler
+import sys
 
 from multiprocessing import Process
 
-from .logger import log_request
+import tornado.platform.asyncio
+import tornado.web
+
+from tornado.web import RedirectHandler
+
 from .config import confservice, qgis_api_endpoints
-
-from .handlers import (StatusHandler,
-                       OwsHandler,
-                       OAPIHandler,
-                       PingHandler,
-                       LandingPage,
-                       NotFoundHandler)
-
-from .zeromq import client, broker
-
-from .qgspool import create_poolserver
-
+from .handlers import (
+    LandingPage,
+    NotFoundHandler,
+    OAPIHandler,
+    OwsHandler,
+    PingHandler,
+    StatusHandler,
+)
+from .logger import log_request
 from .monitor import Monitor
-from .stats import Stats
 from .qgscache.observer import declare_cache_observers, start_cache_observer
-
+from .qgspool import create_poolserver
+from .stats import Stats
+from .zeromq import broker, client
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -198,8 +195,9 @@ def run_server(port: int, address: str = "", user: str = None, workers: int = 0)
         :user: User to setuid after opening ports (default no setuid)
     """
     import traceback
-    from tornado.netutil import bind_sockets
+
     from tornado.httpserver import HTTPServer
+    from tornado.netutil import bind_sockets
 
     kwargs = {}
 

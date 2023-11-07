@@ -11,11 +11,12 @@
 import logging
 import urllib.parse
 
-from typing import Tuple, Optional
 from datetime import datetime
 from pathlib import Path
+from typing import Optional, Tuple
 
 from qgis.core import QgsProject
+
 from pyqgisservercontrib.core import componentmanager
 
 LOGGER = logging.getLogger('SRVLOG')

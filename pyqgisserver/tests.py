@@ -6,19 +6,23 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from tornado.testing import AsyncHTTPTestCase
-import lxml.etree
-import logging
 import json
+import logging
 
 from typing import Any, Dict, Optional
 
+import lxml.etree
+
+from tornado.testing import AsyncHTTPTestCase
+
 from .config import load_configuration
-from .runtime import (Application,
-                      create_poolserver,
-                      create_broker_process,
-                      configure_ipc_addresses,
-                      initialize_middleware)
+from .runtime import (
+    Application,
+    configure_ipc_addresses,
+    create_broker_process,
+    create_poolserver,
+    initialize_middleware,
+)
 
 LOGGER = logging.getLogger('SRVLOG')
 

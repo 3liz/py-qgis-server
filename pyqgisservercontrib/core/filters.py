@@ -34,15 +34,9 @@
 import logging
 import re
 
-from tornado.httputil import HTTPServerRequest
+from typing import Awaitable, Callable, Optional, Tuple, Union
 
-from typing import (
-    Union,
-    Tuple,
-    Callable,
-    Awaitable,
-    Optional,
-)
+from tornado.httputil import HTTPServerRequest
 
 LOGGER = logging.getLogger('SRVLOG')
 

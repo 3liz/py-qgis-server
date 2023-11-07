@@ -17,10 +17,10 @@ Options
 
 """
 
-import os
 import configparser
-import logging
 import functools
+import logging
+import os
 
 from typing import Any, Iterable, Tuple
 

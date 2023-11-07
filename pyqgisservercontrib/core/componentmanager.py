@@ -15,8 +15,8 @@
     module behaviors without the need for these to do explicit imports
 """
 
-import sys
 import logging
+import sys
 
 from collections import namedtuple
 from typing import Any, Callable, Optional
@@ -49,10 +49,12 @@ def _entry_points(group: str, name: Optional[str] = None):
     ver = sys.version_info[:2]
     if ver >= (3, 10):
         from importlib import metadata
+
         # See https://docs.python.org/3.10/library/importlib.metadata.html
         return metadata.entry_points().select(group=group, name=name)
     elif ver >= (3, 8):
         from importlib import metadata
+
         # Return a dict
         # see https://docs.python.org/3.8/library/importlib.metadata.html
         eps = metadata.entry_points().get(group, [])

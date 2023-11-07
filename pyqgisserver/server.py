@@ -6,20 +6,23 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import argparse
+import logging
 import os
 import sys
-import logging
-import argparse
 
 from typing import List
 
-from .version import __description__, __manifest__
+from .config import (
+    confservice,
+    load_configuration,
+    read_config_file,
+    validate_config_path,
+)
 from .logger import setup_log_handler
-from .config import (confservice, read_config_file,
-                     validate_config_path, load_configuration)
-
-from .utils.qgis import print_qgis_version
 from .runtime import run_server
+from .utils.qgis import print_qgis_version
+from .version import __description__, __manifest__
 
 LOGGER = logging.getLogger('SRVLOG')
 

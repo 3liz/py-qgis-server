@@ -10,30 +10,26 @@
 The fork serve will ensure that forking processes
 occurs from [almost] the same state.
 """
-import os
-import zmq
+import asyncio
 import logging
+import os
 import signal
 import time
 import traceback
-import asyncio
 
 from glob import glob
-
 from multiprocessing import Process
 from multiprocessing.util import Finalize
+from typing import Awaitable, Callable, Dict, List
 
-from typing import Callable, Awaitable, Dict, List
-
-from .zeromq.supervisor import Supervisor
-from .zeromq.pool import Pool
-
-from .config import confservice
-
-from .qgsworker import QgsRequestHandler
+import zmq
 
 from pyqgisservercontrib.core.watchfiles import watchfiles
 
+from .config import confservice
+from .qgsworker import QgsRequestHandler
+from .zeromq.pool import Pool
+from .zeromq.supervisor import Supervisor
 
 try:
     import psutil

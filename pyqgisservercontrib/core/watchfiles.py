@@ -1,11 +1,12 @@
 """ Watch file change
 """
-import os
 import functools
 import logging
+import os
 import traceback
 
-from typing import Callable, Mapping, List, Optional
+from typing import Callable, List, Mapping, Optional
+
 from tornado import ioloop
 
 LOGGER = logging.getLogger('SRVLOG')

@@ -14,7 +14,10 @@ import logging
 
 from tornado.web import HTTPError  # noqa F401
 
-from pyqgisserver.qgscache.cachemanager import (get_cacheservice, get_project_summary)
+from pyqgisserver.qgscache.cachemanager import (
+    get_cacheservice,
+    get_project_summary,
+)
 
 from .handler import RequestHandler, register_handlers
 

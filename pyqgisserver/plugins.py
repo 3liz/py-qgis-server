@@ -9,13 +9,13 @@
 """ Qgis server plugin managment
 
 """
-import sys
-import logging
 import configparser
+import logging
+import sys
 import traceback
 
 from pathlib import Path
-from typing import Generator, Dict
+from typing import Dict, Generator
 
 from .config import confservice
 

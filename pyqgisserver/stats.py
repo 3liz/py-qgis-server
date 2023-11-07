@@ -9,8 +9,8 @@
 """
     Collect global stats
 """
-from time import time
 from datetime import datetime, timedelta
+from time import time
 
 
 class Stats:

@@ -9,20 +9,20 @@
 """ Zmq asynchrone client
 """
 
-import sys
 import asyncio
+import logging
+import pickle
+import sys
+import traceback
+import uuid
+
+from typing import Any, Mapping, Tuple
+
 import zmq
 import zmq.asyncio
-import pickle
-import logging
-import uuid
-import traceback
-
-from typing import Mapping, Any, Tuple
-
-from .messages import RequestMessage
 
 from ..logger import setup_log_handler
+from .messages import RequestMessage
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -203,8 +203,9 @@ class AsyncClient:
 
 
 if __name__ == '__main__':
-    import signal
     import argparse
+    import signal
+
     from time import sleep
 
     parser = argparse.ArgumentParser(description='Test Client')

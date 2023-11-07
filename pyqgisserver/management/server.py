@@ -9,24 +9,20 @@
 """
     Server management
 """
-import os
-import tornado.web
 import logging
-
-from urllib.parse import quote_plus
-
-from ..logger import log_request
-from ..config import confservice
-from ..handlers import (
-    BaseHandler,
-    StatusHandler,
-    OAPIHandler as QgisHandler,
-    NotFoundHandler
-)
-from ..zeromq import client
+import os
 
 from typing import Awaitable
+from urllib.parse import quote_plus
 
+import tornado.web
+
+from ..config import confservice
+from ..handlers import BaseHandler, NotFoundHandler
+from ..handlers import OAPIHandler as QgisHandler
+from ..handlers import StatusHandler
+from ..logger import log_request
+from ..zeromq import client
 
 LOGGER = logging.getLogger('SRVLOG')
 

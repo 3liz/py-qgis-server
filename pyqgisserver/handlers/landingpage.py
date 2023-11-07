@@ -8,9 +8,9 @@
 
 import logging
 
-from .basehandler import BaseHandler
-from ..version import __version__
 from ..config import confservice
+from ..version import __version__
+from .basehandler import BaseHandler
 
 LOGGER = logging.getLogger('SRVLOG')
 

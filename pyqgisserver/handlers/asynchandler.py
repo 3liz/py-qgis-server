@@ -9,16 +9,19 @@
 """ Qgis server handler
 """
 import logging
+
 from time import time
+from typing import Any, Awaitable, Dict, List, Optional
 from urllib.parse import urlencode
 
 from ..logger import log_rrequest
-from ..zeromq.client import RequestTimeoutError, RequestGatewayError, AsyncClient
 from ..monitor import Monitor
-
+from ..zeromq.client import (
+    AsyncClient,
+    RequestGatewayError,
+    RequestTimeoutError,
+)
 from .basehandler import BaseHandler
-
-from typing import Any, Optional, Awaitable, List, Dict
 
 LOGGER = logging.getLogger('SRVLOG')
 

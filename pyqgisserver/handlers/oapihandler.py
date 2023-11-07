@@ -10,9 +10,9 @@
 """
 import logging
 
-from .asynchandler import AsyncClientHandler
-
 from typing import Awaitable
+
+from .asynchandler import AsyncClientHandler
 
 LOGGER = logging.getLogger('SRVLOG')
 

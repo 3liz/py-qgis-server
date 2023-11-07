@@ -8,14 +8,17 @@
 
 """ Base Request handler
 """
-import tornado.web
-import logging
 import json
-from tornado.web import HTTPError  # noqa F401
-from typing import Any, Union, Optional
+import logging
 
-from ..version import __version__
+from typing import Any, Optional, Union
+
+import tornado.web
+
+from tornado.web import HTTPError  # noqa F401
+
 from ..config import confservice
+from ..version import __version__
 
 LOGGER = logging.getLogger('SRVLOG')
 

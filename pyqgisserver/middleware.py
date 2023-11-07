@@ -9,16 +9,16 @@
 import logging
 import traceback
 
+from typing import List, NamedTuple, TypeVar
+
 import tornado.web
 
-from tornado.web import HTTPError
 from tornado.routing import Router
-
-from typing import TypeVar, List, NamedTuple
-
-from .handlers import ErrorHandler
+from tornado.web import HTTPError
 
 from pyqgisservercontrib.core.filters import _FilterBase
+
+from .handlers import ErrorHandler
 
 HandlerDelegate = TypeVar('HandlerDelegate')
 

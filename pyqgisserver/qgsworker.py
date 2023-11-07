@@ -14,10 +14,10 @@
         - https://qgis.org/pyqgis/master/server/QgsBufferServerResponse.html
         - https://qgis.org/pyqgis/master/server/QgsBufferServerRequest.html
 """
-import os
-import logging
-import traceback
 import hashlib
+import logging
+import os
+import traceback
 
 try:
     import psutil
@@ -26,27 +26,25 @@ except ImportError:
 
 from datetime import datetime
 from time import time
-from typing import Dict, Optional, Any, Tuple, Callable
+from typing import Any, Callable, Dict, Optional, Tuple
 
-from qgis.PyQt.QtCore import Qt, QBuffer, QIODevice, QByteArray
 from qgis.core import QgsProject
-from qgis.server import (QgsServerRequest,
-                         QgsServerResponse,
-                         QgsServerException)
+from qgis.PyQt.QtCore import QBuffer, QByteArray, QIODevice, Qt
+from qgis.server import QgsServerException, QgsServerRequest, QgsServerResponse
 
-from .zeromq.worker import RequestHandler, run_worker
-from .qgscache.cachemanager import (get_cacheservice,
-                                    preload_projects,
-                                    StrictCheckingError,
-                                    UnreadableResourceError,
-                                    PathNotAllowedError,
-                                    UpdateState,
-                                    CacheType)
-
-from .qgscache.observer import Client as CacheObserver
-
+from .config import configure_qgis_api, confservice, qgis_api_endpoints
 from .plugins import load_plugins
-from .config import confservice, configure_qgis_api, qgis_api_endpoints
+from .qgscache.cachemanager import (
+    CacheType,
+    PathNotAllowedError,
+    StrictCheckingError,
+    UnreadableResourceError,
+    UpdateState,
+    get_cacheservice,
+    preload_projects,
+)
+from .qgscache.observer import Client as CacheObserver
+from .zeromq.worker import RequestHandler, run_worker
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -497,12 +495,18 @@ class QgsRequestHandler(RequestHandler):
 def main():
     """ Run as command line interface
     """
+    import argparse
     import os
     import sys
-    import argparse
-    from .version import __manifest__
-    from .config import (confservice, load_configuration, read_config_file, validate_config_path)
+
+    from .config import (
+        confservice,
+        load_configuration,
+        read_config_file,
+        validate_config_path,
+    )
     from .logger import setup_log_handler
+    from .version import __manifest__
 
     parser = argparse.ArgumentParser(description='Qgis Server Worker')
     parser.add_argument('-d', '--debug', action='store_true', default=False, help="debug mode")

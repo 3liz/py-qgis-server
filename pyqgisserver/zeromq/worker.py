@@ -15,20 +15,20 @@
     2. Connect a REQ zmq socket to endpoint
     3. Return qgis server responses
 """
-import os
-import sys
 import logging
-import traceback
-import zmq
+import os
 import pickle
+import sys
+import traceback
 import uuid
 
-from typing import TypeVar, Optional, Type, Callable, Any
+from typing import Any, Callable, Optional, Type, TypeVar
+
+import zmq
 
 from ..logger import setup_log_handler
 from ..utils import stats
-
-from .messages import (WORKER_READY, ReplyMessage)
+from .messages import WORKER_READY, ReplyMessage
 from .supervisor import Client as SupervisorClient
 
 LOGGER = logging.getLogger('SRVLOG')

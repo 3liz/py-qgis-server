@@ -1,12 +1,12 @@
 """ AMQP monitor for qgis requests
 """
 import asyncio
-import logging
-import traceback
 import json
+import logging
 import os
+import traceback
 
-from typing import Dict, Optional, Any
+from typing import Any, Dict, Optional
 
 from amqpclient.concurrent import AsyncPublisher
 

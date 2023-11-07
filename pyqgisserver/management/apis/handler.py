@@ -10,23 +10,21 @@
     Wrapper around more tornado-like request handler for
     implementing Qgis server API
 """
+import json
 import logging
 import sys
-import json
 import traceback
 
-from qgis.PyQt.QtCore import QRegularExpression, QUrl
+from typing import Any, List, Optional, Tuple, Type, Union
 
+from qgis.PyQt.QtCore import QRegularExpression, QUrl
 from qgis.server import (
     QgsServerOgcApi,
     QgsServerOgcApiHandler,
     QgsServerRequest,
 )
-
-from tornado.web import HTTPError  # noqa F401
 from tornado import httputil
-
-from typing import Any, Optional, Union, Tuple, Type, List
+from tornado.web import HTTPError  # noqa F401
 
 LOGGER = logging.getLogger('SRVLOG')
 
