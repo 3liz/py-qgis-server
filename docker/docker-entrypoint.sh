@@ -2,6 +2,16 @@
 
 set -e
 
+copy_qgis_configuration() {
+    QGIS_CUSTOM_CONFIG_PATH=${QGIS_CUSTOM_CONFIG_PATH:-$QGIS_OPTION_PATH}
+    if [[ -n $QGIS_CUSTOM_CONFIG_PATH ]]; then
+        echo "Copying Qgis configuration: $QGIS_CUSTOM_CONFIG_PATH"
+        cp -aRL $QGIS_CUSTOM_CONFIG_PATH/* $HOME/
+    fi
+    export QGIS_CUSTOM_CONFIG_PATH=$HOME
+    export QGIS_OPTIONS_PATH=$HOME
+}
+
 [[ "$DEBUG_ENTRYPOINT" == "yes" ]]  && set -x
 
 if [[ "$1" == "version" ]]; then
@@ -111,6 +121,7 @@ if [[ "$QGSRV_DISPLAY_XVFB" == "ON" ]]; then
  export DISPLAY=":99"
 fi
 
+copy_qgis_configuration
 
 # See https://github.com/qgis/QGIS/pull/5337
 export QGIS_DISABLE_MESSAGE_HOOKS=1

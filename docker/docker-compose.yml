@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  qgis-server:
+    user: 1001:1001
+    image: 3liz/qgis-map-server:ltr-dev
+    environment:
+        QGIS_CUSTOM_CONFIG_PATH: /test/qgis
+        QGSRV_CACHE_ROOTDIR: /test/data
+        QGSRV_SERVER_WORKERS: "1"
+        QGSRV_LOGGING_LEVEL: DEBUG
+    volumes:
+    - type: bind
+      source: "../tests/"
+      target: /test
+      read_only: true
+

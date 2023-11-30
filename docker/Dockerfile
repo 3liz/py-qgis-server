@@ -19,7 +19,7 @@ RUN mkdir -p /opt/local/ \
     && /opt/local/pyqgisserver/bin/pip install -U --no-cache-dir pip setuptools wheel \
     && /opt/local/pyqgisserver/bin/pip install --no-cache-dir $PIP_OPTIONS   \
         "py-qgis-server==${BUILD_VERSION}" \
-        py-amqp-client \
+        "py-amqp-client<=2.0.0" \
         qgis-plugin-manager \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver-worker \
