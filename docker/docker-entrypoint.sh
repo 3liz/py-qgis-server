@@ -3,7 +3,7 @@
 set -e
 
 copy_qgis_configuration() {
-    QGIS_CUSTOM_CONFIG_PATH=${QGIS_CUSTOM_CONFIG_PATH:-$QGIS_OPTION_PATH}
+    QGIS_CUSTOM_CONFIG_PATH=${QGIS_CUSTOM_CONFIG_PATH:-$QGIS_OPTIONS_PATH}
     if [[ -n $QGIS_CUSTOM_CONFIG_PATH ]]; then
         echo "Copying Qgis configuration: $QGIS_CUSTOM_CONFIG_PATH"
         cp -aRL $QGIS_CUSTOM_CONFIG_PATH/* $HOME/
