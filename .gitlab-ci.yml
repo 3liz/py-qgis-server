@@ -77,3 +77,27 @@ tickets:
     - create_ticket.py
   tags:
     - factory-plain
+
+monthly-release:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+      allow_failure: false
+    - when: manual
+      allow_failure: true
+  script:
+    - >
+      curl -v -i
+      --header 'Content-Type:application/json'
+      --header "PRIVATE-TOKEN: ${BOT_TOKEN}"
+      --data '{
+      "id":"'"${CI_PROJECT_ID}"'",
+      "title":"New monthly release",
+      "description":"New monthly bugfix release of QGIS",
+      "labels":"qgis",
+      "assignee_ids":[5]
+      }'
+      https://projects.3liz.org/api/v4/projects/${CI_PROJECT_ID}/issues
+  tags:
+    - factory-plain
