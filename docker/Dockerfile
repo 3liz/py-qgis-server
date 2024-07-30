@@ -16,7 +16,7 @@ ENV QGSRV_DATA_PATH=/usr/local/share/qgis-server
 # Create virtualenv for installing server
 RUN mkdir -p /opt/local/ \ 
     && python3 -m venv --system-site-packages /opt/local/pyqgisserver && cd /usr/local/bin \
-    && /opt/local/pyqgisserver/bin/pip install -U --no-cache-dir pip setuptools wheel \
+    && /opt/local/pyqgisserver/bin/pip install -U --no-cache-dir pip setuptools wheel packaging>=22.0 \
     && /opt/local/pyqgisserver/bin/pip install --no-cache-dir $PIP_OPTIONS   \
         "py-qgis-server==${BUILD_VERSION}" \
         "py-amqp-client<=2.0.0" \
