@@ -11,15 +11,13 @@
     name: snap
   artifacts:
     paths:
-      - "docker/factory.manifest"
+      - "docker/factory-${QGIS_FLAVOR}.manifest"
   only:
     refs:
       - tags
       - master
   tags:
     - infrav3-dind
-  variables:
-    FACTORY_MANIFEST: "docker/factory.manifest"
 
 
 build-docker:release:
@@ -46,9 +44,10 @@ build-docker:3.28:
 #-------------
 
 deploy_snap:
+  image: ${REGISTRY_URL}/factory-ci-runner:package-management
   stage: deploy
   script:
-    - $FACTORY_SCRIPTS/update-service map
+    - update-service map
   environment:
     name: snap
   only:
@@ -63,10 +62,11 @@ deploy_snap:
 #-------------
 
 .release:
+  image: ${REGISTRY_URL}/factory-ci-runner:package-management
   stage: release
   script:
-    - $FACTORY_SCRIPTS/release-image.sh qgis-map-server-$QGIS_FLAVOR
-    - $FACTORY_SCRIPTS/push-to-docker-hub.sh --clean
+    - release-image.sh qgis-map-server-$QGIS_FLAVOR
+    - push-to-docker-hub.sh --clean
   environment:
     name: production
   when: manual
@@ -78,7 +78,7 @@ deploy_snap:
   tags:
     - infrav3-dind
   variables:
-    FACTORY_MANIFEST: "docker/factory.manifest"
+    FACTORY_MANIFEST: "docker/factory-${QGIS_FLAVOR}.manifest"
 
 release:release:
   extends: .release
@@ -104,10 +104,3 @@ release:3.28:
     QGIS_FLAVOR: "3.28"
   dependencies:
     - build-docker:3.28
-
-#release:3.22:
-#  extends: .release
-#  variables:
-#    QGIS_FLAVOR: "3.22"
-#  dependencies:
-#    - build-docker:3.22
