@@ -40,14 +40,6 @@ tests:3.28:
   variables:
     QGIS_FLAVOR: "3.28"
 
-#tests:3.22:
-#  extends: .tests
-#  needs:
-#    - "tests:release"
-#  variables:
-#    QGIS_FLAVOR: "3.22"
-
-
 #---------------
 # Build
 #---------------

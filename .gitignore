@@ -9,6 +9,7 @@ docs/_build
 
 build.manifest
 factory.manifest
+factory-*.manifest
 
 venv/
 .venv/
@@ -55,4 +56,5 @@ qgis.db
 
 VERSION
 .env
+.activate
 

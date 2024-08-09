@@ -33,7 +33,7 @@ BUILD_ARGS += --build-arg REGISTRY_PREFIX=$(REGISTRY_PREFIX)
 
 BUILDIMAGE:=$(NAME):$(FLAVOR)-$(COMMITID)
 
-MANIFEST=factory.manifest
+MANIFEST:=factory-$(FLAVOR).manifest
 
 # Use buildkit
 export DOCKER_BUILDKIT:=1

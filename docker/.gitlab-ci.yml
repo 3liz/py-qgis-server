@@ -41,11 +41,6 @@ build-docker:3.28:
   variables:
     QGIS_FLAVOR: "3.28"
 
-#build-docker:3.22:
-#  extends: .build-docker
-#  variables:
-#    QGIS_FLAVOR: "3.22"
-
 #-------------
 # deploy
 #-------------
