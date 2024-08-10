@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "py-qgis-server"
+description = """
+Py-Qgis-Server is an implementation of the OWS standards 
+standard from the Open Geospatial Consortium.
+Py-Qgis-Server written in Python and built on top of Qgis server
+implementation.
+"""
+readme = "README.md"
+requires-python = ">= 3.10"
+classifiers=[
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+dependencies = [
+    "tornado >= 5",
+    "pyzmq >= 17",
+    "PyYAML",
+]
+dynamic = ["version"]
+
+[[project.authors]]
+name = "3Liz"
+email = "david.marteau@3liz.com"
+
+[[project.maintainers]]
+name = "David Marteau"
+email = "david.marteau@3liz.com"
+
+[project.urls]
+Homepage = "https://gitthub.com/3liz/py-qgis-server"
+Repository = "https://github.com/3liz/py-qgis-server.git"
+Documentation = "https://docs.3liz.org/py-qgis-server"
+
+[project.scripts]
+qgisserver = "pyqgisserver.server:main"
+qgisserver-worker = "pyqgisserver.qgsworker:main"
+
+[project.entry-points."py_qgis_server.monitors"]
+amqp = "pyqgisserver.monitors.amqp:Monitor"
+test = "pyqgisserver.monitors.test"
+
+[project.entry-points."py_qgis_server.cache.observers"]
+test = "pyqgisserver.qgscache.observers.test"
+ban = "pyqgisserver.qgscache.observers.ban"
+
+[tool.setuptools.dynamic]
+version = { file = ["VERSION"] }
+
+[tool.setuptools.packages.find]
+include = [
+    "pyqgisserver",
+    "pyqgisserver.*",
+    "pyqgisservercontrib.*",
+]

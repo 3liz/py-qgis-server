@@ -1,0 +1,9 @@
+*
+
+!/pyqgisserver
+!/pyqgisservercontrib
+!/pyproject.toml
+!/setup.py
+!/docker/docker-entrypoint.sh
+!/VERSION
+

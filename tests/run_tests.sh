@@ -15,7 +15,6 @@ python3 -m venv --system-site-packages $VENV_PATH
 echo "-- Installing required packages..."
 $PIP_INSTALL -q pip setuptools wheel
 $PIP_INSTALL -q --prefer-binary -r requirements.pip
-$PIP_INSTALL -q --prefer-binary -r requirements.txt
 
 $PIP install -e ./
 

@@ -1,4 +1,8 @@
 
+DEPTH=..
+
+include $(DEPTH)/config.mk
+
 PROJECT_NAME=py-qgis-server
 
 BUILDDIR=${shell pwd}/build

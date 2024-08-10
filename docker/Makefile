@@ -4,10 +4,11 @@ SHELL:=bash
 #
 #
 
-NAME=qgis-map-server
+DEPTH=..
 
-BUILDID=$(shell date +"%Y%m%d%H%M")
-COMMITID=$(shell git rev-parse --short HEAD)
+include $(DEPTH)/config.mk
+
+NAME=qgis-map-server
 
 # QGIS platform version
 FLAVOR:=release
@@ -41,28 +42,22 @@ export DOCKER_BUILDKIT:=1
 all:
 	@echo "Usage: make [build|test|deliver|clean]"
 
-build: _build manifest
+BUILD_TARGET:=base
 
-_build: $(BUILD_PACKAGE)
-	docker build --rm --force-rm --no-cache $(DOCKER_BUILD_ARGS) \
-		$(BUILD_ARGS) -t $(BUILDIMAGE) $(DOCKERFILE) .
+build: manifest
+	docker build --rm --force-rm --no-cache $(DOCKER_BUILD_ARGS) --target $(BUILD_TARGET) \
+		$(BUILD_ARGS) -t $(BUILDIMAGE) -f Dockerfile ..
 
-build_package:
-	rm -r dist; mkdir -p dist
-	$(MAKE) -C .. dist DIST=$$PWD/dist
 
-build_local: build_package
-	docker build --rm  $(DOCKER_BUILD_ARGS) \
-		$(BUILD_ARGS) -t $(NAME):$(FLAVOR)-local -f Dockerfile.local .
+QGIS_IMAGE=$(REGISTRY_PREFIX)qgis-platform:$(FLAVOR)
 
 manifest:
 	{ \
 	set -e; \
-	version=`docker run --rm $(BUILDIMAGE) version`; \
-	version_short=`echo $$version | cut -d- -f1 |cut -d. -f1-2`-`echo $$version | cut -d- -f2 |cut -d. -f1-2`; \
+	version=`docker run --rm -v $$(pwd)/scripts:/scripts $(QGIS_IMAGE)  /scripts/qgis-version.sh`; \
 	echo name=$(NAME) > $(MANIFEST) && \
-    echo version=$$version >> $(MANIFEST) && \
-    echo version_short=$$version_short >> $(MANIFEST) && \
+    echo version=$$version-$(VERSION) >> $(MANIFEST) && \
+    echo version_short=$$version >> $(MANIFEST) && \
     echo release_tag=`echo $$version | cut -d- -f1 |cut -d. -f1-2` >> $(MANIFEST) && \
     echo buildid=$(BUILDID)   >> $(MANIFEST) && \
     echo commitid=$(COMMITID) >> $(MANIFEST); }

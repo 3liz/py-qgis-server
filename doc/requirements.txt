@@ -1,3 +1,4 @@
 sphinx-rtd-theme
 sphinxcontrib-httpdomain
 PyYAML
+jinja2

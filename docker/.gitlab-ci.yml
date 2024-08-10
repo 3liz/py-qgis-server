@@ -6,7 +6,7 @@
   stage: docker
   script:
     - make version
-    - make -C docker build deliver pushrc clean FLAVOR=$QGIS_FLAVOR
+    - make -C docker build deliver pushrc clean FLAVOR=$QGIS_FLAVOR BUILD_TARGET=amqp
   environment:
     name: snap
   artifacts:

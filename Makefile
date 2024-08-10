@@ -1,23 +1,13 @@
 # qgis server makefile
 #
+DEPTH=.
 
-VERSION:=1.8.8
-
-ifndef CI_COMMIT_TAG
-VERSION_TAG=$(VERSION)rc0
-else
-VERSION_TAG=$(VERSION)
-endif
-
-BUILDID=$(shell date +"%Y%m%d%H%M")
-COMMITID=$(shell git rev-parse --short HEAD)
+include $(DEPTH)/config.mk
 
 BUILDDIR:=build
 DIST:=${BUILDDIR}/dist
 
 MANIFEST=pyqgisserver/build.manifest
-
-PYTHON:=python3
 
 FLAVOR:=release
 
@@ -32,24 +22,18 @@ dirs:
 version:
 	echo $(VERSION_TAG) > VERSION
 
+configure: manifest version
+
 manifest: version
 	echo name=$(shell $(PYTHON) setup.py --name) > $(MANIFEST) && \
 		echo version=$(shell $(PYTHON) setup.py --version) >> $(MANIFEST) && \
 		echo buildid=$(BUILDID)   >> $(MANIFEST) && \
 		echo commitid=$(COMMITID) >> $(MANIFEST)
 
-# Build dependencies
-wheel-deps: dirs
-	pip wheel -w $(DIST) -r requirements.txt
-
-wheel:
-	mkdir -p $(DIST)
-	$(PYTHON) setup.py bdist_wheel --dist-dir=$(DIST)
-
 deliver:
 	twine upload -r storage $(DIST)/*
 
-dist: dirs manifest
+dist: dirs configure
 	rm -rf *.egg-info
 	$(PYTHON) setup.py sdist --dist-dir=$(DIST)
 
