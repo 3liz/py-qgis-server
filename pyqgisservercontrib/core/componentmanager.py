@@ -47,7 +47,11 @@ def _entry_points(group: str, name: Optional[str] = None) -> Sequence[metadata.E
     """ Return entry points
     """
     # See https://docs.python.org/3.10/library/importlib.metadata.html
-    return metadata.entry_points().select(group=group, name=name)
+    entry_points = metadata.entry_points()
+    if name:
+        return entry_points.select(group=group, name=name)
+    else:
+        return entry_points.select(group=group)
 
 
 class ComponentManager:

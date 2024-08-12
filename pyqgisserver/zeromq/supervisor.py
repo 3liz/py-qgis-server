@@ -23,9 +23,10 @@ import signal
 import traceback
 
 from typing import (
-    Awaitable,
+    Any,
+    Dict,
     NamedTuple,
-    TypeVar,
+    Optional,
 )
 
 import zmq
@@ -36,12 +37,8 @@ from .utils import _get_ipc
 LOGGER = logging.getLogger('SRVLOG')
 
 
-T = TypeVar('T')
-
-
-# Generic NamedTuple only supported in 3.11+
-class _Report(NamedTuple):  # , Generic[T]):
-    data: T
+class _Report(NamedTuple):
+    data: Any
 
 
 class Client:
@@ -86,11 +83,11 @@ class Client:
             self._busy = True
             self._send(b'BUSY')
 
-    def close(self) -> None:
+    def close(self):
         if self._sock:
             self._sock.close()
 
-    def send_report(self, data: T):
+    def send_report(self, data: Any):  # noqa: ANN401
         self._send(_Report(data=data))
 
 
@@ -109,20 +106,20 @@ class Supervisor:
         self._sock.bind(address)
 
         self._timeout = timeout
-        self._busy = {}
+        self._busy: Dict[int, asyncio.Task] = {}
         self._stopped = True
-        self._task = None
-        self._reports = {}
+        self._task: Optional[asyncio.Task] = None
+        self._reports: Dict[int, Any] = {}
 
-    def run(self) -> None:
-        self._task = asyncio.ensure_future(self._run_async())
+    def run(self):
+        self._task = asyncio.create_task(self._run_async())
 
-    async def _run_async(self) -> Awaitable[None]:
+    async def _run_async(self):
         """ Run supervisor
         """
         loop = asyncio.get_running_loop()
 
-        def kill(pid: int) -> None:
+        def kill(pid: int):
             del self._busy[pid]
             try:
                 os.kill(pid, signal.SIGKILL)

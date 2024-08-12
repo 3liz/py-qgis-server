@@ -13,6 +13,8 @@ import sys
 
 from typing import Optional
 
+import qgis
+
 
 def setup_qgis_paths() -> None:
     """ Init qgis paths
@@ -31,7 +33,7 @@ def start_qgis_application(
         enable_processing: bool = False, verbose: bool = False,
         cleanup: bool = True,
         logger: Optional[logging.Logger] = None,
-        logprefix: str = 'Qgis:') -> 'QgsApplication':  # noqa: F821
+        logprefix: str = 'Qgis:') -> qgis.core.QgsApplication:
     """ Start qgis application
 
         :param boolean enable_gui: Enable graphical interface, default to False
@@ -161,15 +163,14 @@ def set_proxy_configuration(logger: logging.Logger) -> None:
     )
 
 
-def init_qgis_server(**kwargs) -> 'QgsServer':  # noqa: F821
+def init_qgis_server(**kwargs) -> qgis.server.QgsServer:
     """ Init Qgis server
     """
     start_qgis_application(**kwargs)
 
     logger = kwargs.get('logger') or logging.getLogger()
 
-    from qgis.server import QgsServer
-    server = QgsServer()
+    server = qgis.server.QgsServer()
 
     # Update the network configuration
     # XXX: At the time the settings are read, the neworkmanager is already

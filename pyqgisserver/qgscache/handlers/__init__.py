@@ -10,4 +10,4 @@ from .proto import ProtocolHandler  # noqa F401
 from .file_handler import *  # noqa: F403
 from .postgres_handler import *  # noqa: F403
 
-__all__ = []
+__all__ = []  # type: ignore [var-annotated]

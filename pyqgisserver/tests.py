@@ -9,12 +9,17 @@
 import json
 import logging
 
-from typing import Dict, Optional
-
 import lxml.etree
 
 from tornado.httpclient import HTTPResponse
 from tornado.testing import AsyncHTTPTestCase
+from typing_extensions import (
+    ClassVar,
+    Dict,
+    Optional,
+    Self,
+    cast,
+)
 
 from .config import load_configuration
 from .runtime import (
@@ -41,6 +46,8 @@ NAMESPACES = {
 
 class TestRuntime:
 
+    _instance: ClassVar[Optional[Self]] = None
+
     def __init__(self) -> None:
         self.started = False
 
@@ -63,10 +70,10 @@ class TestRuntime:
         self._broker.join()
 
     @classmethod
-    def instance(cls) -> 'TestRuntime':
-        if not hasattr(cls, '_instance'):
-            cls._instance = TestRuntime()
-        return cls._instance
+    def instance(cls) -> Self:
+        if cls._instance is None:
+            cls._instance = cls()
+        return cast(Self, cls._instance)
 
 
 class HTTPTestCase(AsyncHTTPTestCase):
@@ -104,12 +111,6 @@ class HTTPTestResponse:
     @property
     def headers(self):
         return self.http_response.headers
-
-    def xpath(self, path: str) -> 'xpath':
-        return self.xml.xpath(path, namespaces=NAMESPACES)
-
-    def xpath_text(self, path: str) -> str:
-        return ' '.join(e.text for e in self.xpath(path))
 
     def json(self) -> object:
         return json.loads(self.content)
@@ -166,7 +167,7 @@ class OWSTestClient:
 
     def post_xml(
         self,
-        doc: lxml.etree.Element,
+        doc: lxml.etree._Element,
         headers: Optional[Dict] = None,
         path: str = '/ows/',
     ) -> HTTPTestResponse:

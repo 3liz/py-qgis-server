@@ -37,6 +37,7 @@ import re
 from tornado.httputil import HTTPServerRequest
 from typing_extensions import (
     Callable,
+    Dict,
     Optional,
     Self,
     Tuple,
@@ -53,13 +54,13 @@ class _FilterBase:
             match = re.compile(match, re.IGNORECASE)
         self.pattern = match
         self.repl = repl
-        self.match_args = []
-        self.match_kwargs = {}
+        self.match_args: Tuple = ()
+        self.match_kwargs: Dict = {}
 
     def __str__(self) -> str:
         return f"_FilterBase<{hex(id(self))}>(match={self.pattern}, repl={self.repl})"
 
-    def match(self, path: str) -> Tuple[bool, str]:
+    def match(self, path: str) -> Tuple[bool, Optional[str]]:
         """ Check uri against pattern
         """
         if self.pattern:

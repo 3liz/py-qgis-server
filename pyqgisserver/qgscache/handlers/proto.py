@@ -16,9 +16,12 @@ class ProtocolHandler(Protocol):
         """
         ...
 
-    def get_project(self, url: Optional[urllib.parse.ParseResult],
-                    project: Optional[QgsProject] = None,
-                    timestamp: Optional[datetime] = None) -> Tuple[QgsProject, datetime]:
+    def get_project(
+        self,
+        url: Optional[urllib.parse.ParseResult],
+        project: Optional[QgsProject] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> Tuple[QgsProject, datetime]:
         """ Create or return a proect
         """
         ...

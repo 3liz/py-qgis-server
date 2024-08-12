@@ -10,8 +10,6 @@
 """
 import logging
 
-from typing import Awaitable
-
 from .asynchandler import AsyncClientHandler
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -20,13 +18,12 @@ LOGGER = logging.getLogger('SRVLOG')
 class OAPIHandler(AsyncClientHandler):
     """ Handle Qgis api
     """
-
-    def initialize(self, service: str, **kwargs) -> None:
+    def initialize(self, service: str, **kwargs):  # type: ignore [override]
         super().initialize(**kwargs)
         self.ogc_scheme = 'OAF'
         self._service_name = service.upper()
 
-    def prepare(self) -> None:
+    def prepare(self):
         super().prepare()
         # Replace MAP key with uppercase
         args = self.request.arguments
@@ -42,19 +39,19 @@ class OAPIHandler(AsyncClientHandler):
         del args[key]
         args['MAP'] = val
 
-    async def delete(self) -> Awaitable[None]:
+    async def delete(self):
         await self.handle_request('DELETE')
 
-    async def put(self) -> Awaitable[None]:
+    async def put(self):
         await self.handle_request('PUT')
 
-    async def patch(self) -> Awaitable[None]:
+    async def patch(self):
         await self.handle_request('PATCH')
 
-    async def options(self) -> Awaitable[None]:
+    async def options(self):
         await self.handle_request('OPTIONS')
 
-    def get_monitor_params(self) -> None:
+    def get_monitor_params(self):
         """ Override
         """
         params = dict(

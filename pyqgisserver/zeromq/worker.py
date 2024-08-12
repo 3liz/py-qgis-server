@@ -22,24 +22,42 @@ import sys
 import traceback
 import uuid
 
-from typing import Callable, Optional, Type, TypeVar
+from typing import (
+    Callable,
+    Dict,
+    Mapping,
+    Optional,
+    Protocol,
+    Type,
+)
 
 import zmq
 
 from ..logger import setup_log_handler
 from ..utils import stats
-from .messages import WORKER_READY, Meta, ReplyMessage
+from .messages import WORKER_READY, ReplyMessage
 from .supervisor import Client as SupervisorClient
 
 LOGGER = logging.getLogger('SRVLOG')
 
+
 # Define an abstract type for HTTPRequest
-HTTPRequest = TypeVar('HTTPRequest')
+class HTTPRequest(Protocol):
+    headers: Mapping[str, str]
+    query: str
+    data: bytes
+    method: str
 
 
 class RequestHandler:
 
-    def __init__(self, socket: zmq.Socket, client_id: bytes, correlation_id: bytes, request: HTTPRequest) -> None:
+    def __init__(
+        self,
+        socket: zmq.Socket,
+        client_id: bytes,
+        correlation_id: bytes,
+        request: HTTPRequest,
+    ):
         """ Handle requests and
 
             Handle reply message contruction and pass message correlation_id to
@@ -48,7 +66,7 @@ class RequestHandler:
             :param request: An HTTP request handler
             :param socket: the zmq socket
         """
-        self.headers = {}
+        self.headers: Dict = {}
         self.status_code = 200
         self.request = request
         self.header_written = False
@@ -57,7 +75,7 @@ class RequestHandler:
         self._socket = socket
         self._client_id = client_id
 
-    def _write(self, data: bytes) -> None:
+    def _write(self, data: bytes):
         """ Send data back to client
         """
         self._socket.send_multipart([
@@ -65,7 +83,7 @@ class RequestHandler:
             self._correlation_id,
             data])
 
-    def send(self, data: bytes, send_more: bool = False, meta: Optional[Meta] = None) -> None:
+    def send(self, data: bytes, send_more: bool = False, meta: Optional[Dict[str, str]] = None):
         """ Send data
         """
         if not self.header_written:
@@ -97,10 +115,10 @@ class RequestHandler:
         return self._correlation_id
 
     @property
-    def identity(self) -> bytes:
+    def identity(self) -> bytes | str | int:
         return self._socket.identity
 
-    def handle_message(self) -> None:
+    def handle_message(self):
         """ Override this method to handle_messages
         """
         print("Received", self.request.data, "from", self._client_id)  # noqa T201
@@ -149,8 +167,8 @@ def run_worker(
     handler_factory: Type[RequestHandler],
     identity: Optional[bytes] = None,
     broadcastaddr: Optional[str] = None,
-    postprocess: Optional[Callable[[], None]] = None,
-) -> None:
+    postprocess: Optional[Callable[[bool], None]] = None,
+):
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()
@@ -244,6 +262,10 @@ if __name__ == '__main__':
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 
-    run_worker(args.router.format(host=args.host), RequestHandler,
-               identity=bytes(args.identity.encode('ascii')))
+    run_worker(
+        args.router.format(host=args.host),
+        RequestHandler,
+        identity=bytes(args.identity.encode('ascii')),
+    )
+
     print("DONE", file=sys.stderr)  # noqa: T201

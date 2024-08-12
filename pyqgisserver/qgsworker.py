@@ -19,24 +19,27 @@ import logging
 import os
 import traceback
 
-try:
-    import psutil
-except ImportError:
-    psutil = None
-
 from datetime import datetime
 from time import time
 from typing import Callable, Dict, Optional, Tuple
 
+import psutil
+
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QBuffer, QByteArray, QIODevice, Qt
-from qgis.server import QgsServerException, QgsServerRequest, QgsServerResponse
+from qgis.server import (
+    QgsServer,
+    QgsServerException,
+    QgsServerRequest,
+    QgsServerResponse,
+)
 
 from .config import configure_qgis_api, confservice, qgis_api_endpoints
 from .plugins import load_plugins
 from .qgscache.cachemanager import (
     CacheType,
     PathNotAllowedError,
+    QgsCacheManager,
     StrictCheckingError,
     UnreadableResourceError,
     UpdateState,
@@ -96,7 +99,7 @@ class Response(QgsServerResponse):
         self._finish = False
         self._metadata_fn = metadata_fn
 
-        self._extra_headers = {}
+        self._extra_headers: Dict[str, str] = {}
 
     def get_metadata(self):
         if self._metadata_fn:
@@ -162,7 +165,7 @@ class Response(QgsServerResponse):
             self.sendError(500, "Internal server error")
 
     def header(self, key: str) -> str:
-        return self._handler.headers.get(key)
+        return self._handler.headers.get(key) or ""
 
     def headers(self) -> Dict[str, str]:
         """ Return headers as dict
@@ -220,6 +223,13 @@ class Response(QgsServerResponse):
 
 class QgsRequestHandler(RequestHandler):
 
+    qgis_server: QgsServer
+
+    _advanced_report: Optional[psutil.Process] = None
+    _cache_service: QgsCacheManager
+    _cache_check_interval: int
+    _default_project_location: Optional[str] = None
+
     @classmethod
     def init_server(cls):
         """ Initialize qgis server
@@ -248,15 +258,8 @@ class QgsRequestHandler(RequestHandler):
         cls._cache_last_check = time()
 
         cls._pid = os.getpid()
-        cls._advanced_report = cache_config.getboolean('advanced_report')
-
-        if cls._advanced_report:
-            if psutil is not None:
-                cls._process = psutil.Process(cls._pid)
-            else:
-                LOGGER.warning("No 'PSUtil' module, advanced report will be disabled")
-                cls._advanced_report = False
-                cls._process = None
+        if cache_config.getboolean('advanced_report'):
+            cls._advanced_report = psutil.Process(cls._pid)
 
         # Attach cache observer
         if cache_config.getboolean('has_observers'):
@@ -290,7 +293,7 @@ class QgsRequestHandler(RequestHandler):
         setattr(cls, 'qgis_server', qgsserver)
 
     @classmethod
-    def default_project_location(cls) -> str:
+    def default_project_location(cls) -> Optional[str]:
         return cls._default_project_location
 
     @classmethod
@@ -323,7 +326,12 @@ class QgsRequestHandler(RequestHandler):
     def get_modified_time(cls, key: str, from_cache: bool = True) -> datetime:
         return cls._cache_service.get_modified_time(key, from_cache=from_cache)
 
-    def compute_etag(self, uri: str, last_modified: datetime, request: QgsServerRequest) -> Optional[str]:
+    def compute_etag(
+        self,
+        uri: str,
+        last_modified: datetime,
+        request: QgsServerRequest,
+    ) -> Optional[str]:
         """ Compute ETAG for GetCapabilities requests
         """
         conf = confservice['projects.cache']
@@ -337,6 +345,8 @@ class QgsRequestHandler(RequestHandler):
                 hasher.update(last_modified.isoformat().encode())
                 return '"%s"' % hasher.hexdigest()
 
+        return None
+
     def set_etag_header(self, uri: str, last_modified: datetime, request: QgsServerRequest,
                         response: Response) -> Optional[str]:
         """ Compute and set etag
@@ -347,8 +357,13 @@ class QgsRequestHandler(RequestHandler):
 
         return computed_etag
 
-    def check_etag_header(self, uri: str, last_modified: datetime, request: QgsServerRequest,
-                          response: Response) -> bool:
+    def check_etag_header(
+        self,
+        uri: str,
+        last_modified: datetime,
+        request: QgsServerRequest,
+        response: Response,
+    ) -> bool:
         """ Compute etag and check header
         """
         computed_etag = self.set_etag_header(uri, last_modified, request, response)
@@ -365,21 +380,28 @@ class QgsRequestHandler(RequestHandler):
         """
         QgsRequestHandler.init_server()
 
-        run_worker(router, QgsRequestHandler, identity=bytes(identity.encode('ascii')),
-                   postprocess=QgsRequestHandler.post_process, **kwargs)
+        run_worker(
+            router,
+            QgsRequestHandler,
+            identity=bytes(identity.encode('ascii')),
+            postprocess=QgsRequestHandler.post_process,
+            **kwargs,
+        )
 
     QGIS_NO_MAP_ERROR_MSG = "No project defined. For OWS services: please provide a SERVICE and a MAP parameter"
 
-    def init_metadata_report(self) -> Dict:
+    def init_metadata_report(self) -> Optional[Callable[[], Dict]]:
         if self._advanced_report:
-            start_mem = self._process.memory_info().rss
+            start_mem = self._advanced_report.memory_info().rss
 
             def _metadata_report():
                 return {
                     'pid': self._pid,
-                    'mem_used': self._process.memory_info().rss - start_mem,
+                    'mem_used': self._advanced_report.memory_info().rss - start_mem,
                 }
             return _metadata_report
+        else:
+            return None
 
     def handle_message(self):
         """ Override this method to handle_messages

@@ -9,7 +9,7 @@
 import logging
 import traceback
 
-from typing import List, NamedTuple, TypeVar
+from typing import List, NamedTuple, cast
 
 import tornado.web
 
@@ -21,7 +21,7 @@ from pyqgisservercontrib.core.filters import _FilterBase
 
 from .handlers import ErrorHandler
 
-HandlerDelegate = TypeVar('HandlerDelegate')
+HandlerDelegate = tornado.web._HandlerDelegate
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -31,7 +31,7 @@ class _Policy(NamedTuple):
     filters: List[_FilterBase]
 
 
-def load_access_policies() -> List[_FilterBase]:
+def load_access_policies() -> List[_Policy]:
     """ Create filter list
     """
     collection = []
@@ -70,7 +70,7 @@ class MiddleWareRouter(Router):
                 match, path = filt.match(request.path)
                 if match:
                     LOGGER.debug("Found matching filter for %s -> %s:\n%s", request.path, path, filt)
-                    request.path = path
+                    request.path = cast(str, path)
                     try:
                         filt.apply(request)
                         break

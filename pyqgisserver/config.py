@@ -22,9 +22,10 @@ import functools
 import logging
 import os
 
-from typing import (
+from typing_extensions import (
+    TYPE_CHECKING,
     Callable,
-    Iterable,
+    Iterator,
     Literal,
     Tuple,
     TypeAlias,
@@ -41,7 +42,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 CONFIG = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 # Preserve case
-CONFIG.optionxform = lambda opt: opt
+CONFIG.optionxform = lambda opt: opt  # type: ignore [assignment]
 
 
 def getenv2(env1, env2, default):
@@ -231,7 +232,7 @@ def validate_config_path(confname, confid, optional=False):
     CONFIG.set(confname, confid, confvalue)
 
 
-def configure_qgis_api(name: str) -> None:
+def configure_qgis_api(name: str):
     """ Configure qgis service environnement variables
     """
     section = f"api:{name}"
@@ -244,12 +245,12 @@ def configure_qgis_api(name: str) -> None:
         os.environ[k] = v
 
 
-def qgis_api_endpoints(enabled_only: bool = True) -> Iterable[Tuple[str, str]]:
+def qgis_api_endpoints(enabled_only: bool = True) -> Iterator[Tuple[str, str]]:
     """ Return the list of enabled services
     """
     endpoints = CONFIG["api.endpoints"]
     enabled = CONFIG["api.enabled"]
-    items = ((name, endpoint) for name, endpoint in endpoints.items())
+    items: Iterator = ((name, endpoint) for name, endpoint in endpoints.items())
     if enabled_only:
         items = filter(lambda item: enabled.getboolean(item[0]), items)
     return items
@@ -261,8 +262,19 @@ def qgis_api_endpoints(enabled_only: bool = True) -> Iterable[Tuple[str, str]]:
 
 NO_DEFAULT = object()
 
+NO_DEFAULT_TYPE = Literal[NO_DEFAULT]  # type: ignore [valid-type]
+
 # Chars that are to be replaced in env variable name
 ENV_REPLACE_CHARS = ':.-@#$%&*'
+
+if TYPE_CHECKING:
+    from mypy_extensions import DefaultNamedArg
+    ConfigValueGetter = Callable[
+        [str, str, DefaultNamedArg(str | NO_DEFAULT_TYPE, 'fallback')],
+        ConfigValue,
+    ]
+else:
+    ConfigValueGetter = Callable[[str, str, str | NO_DEFAULT_TYPE], ConfigValue]
 
 
 @componentmanager.register_factory('@3liz.org/config-service;1')
@@ -275,10 +287,10 @@ class ConfigService:
 
     def __get_impl(
         self,
-        _get_fun: Callable[[str, str, str], ConfigValue],
+        _get_fun: ConfigValueGetter,
         section: str,
         option: str,
-        fallback: ConfigValue | Literal[NO_DEFAULT] = NO_DEFAULT,
+        fallback: ConfigValue | NO_DEFAULT_TYPE = NO_DEFAULT,
     ) -> ConfigValue:
         """
         """
@@ -313,10 +325,10 @@ class ConfigService:
     def __contains__(self, section):
         return section in CONFIG
 
-    def set(self, section: str, option: str, value: ConfigValue) -> None:
+    def set(self, section: str, option: str, value: str):
         CONFIG.set(section, option, value)
 
-    def add_section(self, sectionname: str) -> None:
+    def add_section(self, sectionname: str):
         # We do not care if the section already exists
         try:
             CONFIG.add_section(sectionname)

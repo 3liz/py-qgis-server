@@ -13,11 +13,14 @@ import signal
 import sys
 
 from multiprocessing import Process
-from typing import Optional
+from typing import (
+    Optional,
+)
 
 import tornado.platform.asyncio
 import tornado.web
 
+from tornado.routing import _RuleList
 from tornado.web import RedirectHandler
 
 from .config import confservice, qgis_api_endpoints
@@ -39,7 +42,7 @@ from .zeromq import broker, client
 LOGGER = logging.getLogger('SRVLOG')
 
 
-def configure_handlers(client: client.AsyncClient) -> [tornado.web.RequestHandler]:
+def configure_handlers(client: client.AsyncClient) -> _RuleList:
     """ Configure request handlers
     """
     cfg = confservice['server']
@@ -55,7 +58,7 @@ def configure_handlers(client: client.AsyncClient) -> [tornado.web.RequestHandle
 
     end = r"(?:\.html|\.json|/?)"
 
-    handlers = [
+    handlers: _RuleList = [
         (r"/", LandingPage),
         (r"/ping", PingHandler),
     ]
@@ -114,8 +117,10 @@ class Application(tornado.web.Application):
 
         self.http_proxy = confservice.getboolean('server', 'http_proxy')
 
-        super().__init__(configure_handlers(self._broker_client),
-                         default_handler_class=NotFoundHandler)
+        super().__init__(
+            configure_handlers(self._broker_client),
+            default_handler_class=NotFoundHandler,
+        )
 
     def log_request(self, handler: tornado.web.RequestHandler) -> None:
         """ Write HTTP requet to the logs
@@ -288,7 +293,13 @@ def run_server(port: int, address: str = "", user: Optional[str] = None, workers
         exit_code = 15
     except SystemExit as exc:
         print("Exiting with code:", exc.code, flush=True)  # noqa: T201
-        exit_code = exc.code
+        match exc.code:
+            case int(code):
+                exit_code = code
+            case None:
+                exit_code = 0
+            case _:
+                exit_code = 1
     else:
         exit_code = 0
 

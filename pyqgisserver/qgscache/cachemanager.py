@@ -114,9 +114,12 @@ class QgisStorageHandler:
         metadata = self.get_storage_metadata(urlunparse(url))
         return metadata.lastModified.toPyDateTime()
 
-    def get_project(self, url: urllib.parse.ParseResult,
-                    project: Optional[QgsProject] = None,
-                    timestamp: Optional[datetime] = None) -> Tuple[QgsProject, datetime]:
+    def get_project(
+        self,
+        url: urllib.parse.ParseResult,
+        project: Optional[QgsProject] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> Tuple[QgsProject, datetime]:
         """ Create or return a project
         """
         uri = urlunparse(url)
@@ -124,12 +127,11 @@ class QgisStorageHandler:
         metadata = self.get_storage_metadata(uri)
         modified_time = metadata.lastModified.toPyDateTime()
 
-        if timestamp is None or timestamp < modified_time:
+        if not project or timestamp is None or timestamp < modified_time:
             cachmngr = componentmanager.get_service('@3liz.org/cache-manager;1')
             project = cachmngr.read_project(uri)
-            timestamp = modified_time
 
-        return project, timestamp
+        return project, modified_time
 
 
 @componentmanager.register_factory(CACHE_MANAGER_CONTRACTID)
@@ -141,7 +143,7 @@ class QgsCacheManager:
     PathNotAllowedError = PathNotAllowedError
     UnreadableResourceError = UnreadableResourceError
 
-    def __init__(self) -> None:
+    def __init__(self):
         """ Initialize cache
 
             :param size: size of the lru cache
@@ -191,13 +193,17 @@ class QgsCacheManager:
             "<<<<<",
         )
 
-    def add_observer(self, observer: Callable[[str, datetime, int], None]) -> None:
+    def add_observer(self, observer: Callable[[str, datetime, int], None]):
         """ Add observer for cache invalidation
         """
         self._observers.append(observer)
 
-    def notify_observers(self, key: str, modified_time: datetime,
-                         state: UpdateState) -> None:
+    def notify_observers(
+        self,
+        key: str,
+        modified_time: datetime,
+        state: UpdateState,
+    ):
         """ Notify all observers
         """
         if not self._observers:
@@ -328,8 +334,11 @@ class QgsCacheManager:
 
         return last_modified.replace(microsecond=0)
 
-    def _get_project_details(self, key: str,
-                             details: Optional[CacheDetails]) -> Tuple[CacheDetails, bool]:
+    def _get_project_details(
+        self,
+        key: str,
+        details: Optional[CacheDetails],
+    ) -> Tuple[CacheDetails, UpdateState]:
         """ Return updated project details
         """
         url = self.resolve_alias(key)
@@ -399,7 +408,7 @@ class QgsCacheManager:
         update = self.update_entry(key)
         return self._lru_cache[key].project, update
 
-    def prepare_project(self, project: QgsProject) -> None:
+    def prepare_project(self, project: QgsProject):
         """ Set project configuration
         """
         if self._disable_owsurls:
@@ -455,7 +464,7 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
         super().__init__()
         self.badLayerNames = set()
 
-    def handleBadLayers(self, layers: Sequence[QgsMapLayer]) -> None:
+    def handleBadLayers(self, layers: Sequence[QgsMapLayer]):
         """ See https://qgis.org/pyqgis/3.0/core/Project/QgsProjectBadLayerHandler.html
         """
         super().handleBadLayers(layers)
@@ -509,7 +518,7 @@ def preload_projects_file(path: Path, cacheservice: QgsCacheManager) -> int:
     return loaded_so_far
 
 
-def preload_projects() -> None:
+def preload_projects():
     """ Preload projects in cache
     """
     confpath = confservice['projects.cache'].get('preload_config', fallback=None)

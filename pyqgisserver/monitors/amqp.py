@@ -9,21 +9,20 @@ import traceback
 from typing import Any, Dict, Optional
 
 from amqpclient.concurrent import AsyncPublisher
+from pika import PlainCredentials
 
 from ..config import confservice
-from .base import MonitorBase
+from .base import MonitorABC
 
 LOGGER = logging.getLogger('SRVLOG')
 
 
-def _read_credentials(vhost: str, user: str) -> Optional:  # ['PlainCredentials']
+def _read_credentials(vhost: str, user: str) -> Optional[PlainCredentials]:
     """ Read credentials from passfile
     """
     credential_file = os.getenv("AMQPPASSFILE")
     if not (credential_file and os.path.exists(credential_file)):
-        return
-
-    from pika import PlainCredentials
+        return None
 
     LOGGER.debug("Using passfile %s", credential_file)
     with open(credential_file) as fp:
@@ -34,9 +33,10 @@ def _read_credentials(vhost: str, user: str) -> Optional:  # ['PlainCredentials'
                 if cr_vhost in ('*', vhost) and cr_user in ('*', user):
                     LOGGER.info("Using credentials for user '%s' on vhost '%s'", user, vhost)
                     return PlainCredentials(user, passwd)
+    return None
 
 
-class Monitor(MonitorBase):
+class Monitor(MonitorABC):
 
     def __init__(self, amqp_client: 'AsyncPublisher',
                  routing_key: str,
@@ -56,7 +56,7 @@ class Monitor(MonitorBase):
         else:
             self._routing_key = routing_key
 
-    def emit(self, params: Dict[str, Any], meta: Dict) -> None:
+    def emit(self, params: Dict[str, Any], meta: Dict[str, str]) -> None:
         """ Publish monitor data
         """
         if self._dynamic_routing:
@@ -73,14 +73,16 @@ class Monitor(MonitorBase):
         data = dict(self.global_tags, ROUTING_KEY=routing_key)
         data.update(params)
         log_msg = json.dumps(data)
-        self._client.publish(log_msg,
-                             routing_key=routing_key,
-                             expiration=3000,
-                             content_type='application/json',
-                             content_encoding='utf-8')
+        self._client.publish(
+            log_msg,
+            routing_key=routing_key,
+            expiration=3000,
+            content_type='application/json',
+            content_encoding='utf-8',
+        )
 
     @classmethod
-    def initialize(cls) -> 'Monitor':
+    def initialize(cls) -> Optional[MonitorABC]:
         """ Register an instance of Monitor client
         """
         if hasattr(cls, '_instance'):
@@ -89,7 +91,7 @@ class Monitor(MonitorBase):
         conf = confservice['monitor:amqp']
         routing_key = conf.get('routing_key')
         if not routing_key:
-            return
+            return None
 
         hosts = conf['host']
         user = conf['user']

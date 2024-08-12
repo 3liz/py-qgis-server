@@ -12,6 +12,7 @@ import asyncio
 import logging
 
 from datetime import datetime
+from typing import cast
 
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
@@ -19,8 +20,8 @@ from pyqgisserver.config import confservice
 
 LOGGER = logging.getLogger('SRVLOG')
 
-server_address = None
-http_client = None
+server_address: str
+http_client: AsyncHTTPClient | None = None
 
 
 def init() -> None:
@@ -41,12 +42,15 @@ async def ban(key: str) -> None:
     """
     LOGGER.info("Sending BAN request to %s", server_address)
 
-    request = HTTPRequest(server_address, method='BAN',
-                          headers={'X-Map-Id': key},
-                          user_agent="py-qgis-server; ban observer",
-                          allow_nonstandard_methods=True)
+    request = HTTPRequest(
+        cast(str, server_address),
+        method='BAN',
+        headers={'X-Map-Id': key},
+        user_agent="py-qgis-server; ban observer",
+        allow_nonstandard_methods=True,
+    )
 
-    response = await http_client.fetch(request, raise_error=False)
+    response = await cast(AsyncHTTPClient, http_client).fetch(request, raise_error=False)
     if response.code != 200:
         LOGGER.error("Ban server returned status code %s", response.code)
 

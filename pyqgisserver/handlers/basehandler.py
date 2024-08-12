@@ -27,7 +27,7 @@ class BaseHandler(tornado.web.RequestHandler):
     """ Base class for HTTP request hanlers
     """
 
-    def initialize(self) -> None:
+    def initialize(self):
         super().initialize()
         self._links = []
         self.connection_closed = False
@@ -121,7 +121,7 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         # Replace the status url with the proxy_url if any
         req = self.request
-        if self.application.http_proxy:
+        if self.application.http_proxy:  # type: ignore [attr-defined]
             # Replacement by static url, use it as base path
             # XXX Deprecate 'X-Forwarded-Url'
             proxy_url = self._cfg.get('proxy_url') or \
@@ -164,7 +164,7 @@ class NotFoundHandler(BaseHandler):
 
 
 class ErrorHandler(BaseHandler):
-    def initialize(self, status_code: int, reason: Optional[str] = None) -> None:
+    def initialize(self, status_code: int, reason: Optional[str] = None):  # type: ignore [override]
         super().initialize()
         self.set_status(status_code)
         self.reason = reason

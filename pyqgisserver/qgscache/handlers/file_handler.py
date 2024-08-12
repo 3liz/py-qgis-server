@@ -23,7 +23,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 ALLOWED_SFX = ('.qgs', '.qgz')
 
-__all__ = []
+__all__ = []  # type: ignore [var-annotated]
 
 
 @componentmanager.register_factory('@3liz.org/cache/protocol-handler;1?scheme=file')
@@ -34,7 +34,7 @@ class FileProtocolHandler:
     def __init__(self):
         pass
 
-    def _check_file(self, path: Path) -> bool:
+    def _check_file(self, path: Path) -> Optional[Path]:
         """
         """
         if not path.is_absolute():
@@ -56,11 +56,16 @@ class FileProtocolHandler:
         """ Return the modified date time of the project referenced by its url
         """
         path = self._check_file(Path(url.path))
+        if not path:
+            raise FileNotFoundError(url.path)
         return datetime.fromtimestamp(path.stat().st_mtime)
 
-    def get_project(self, url: Optional[urllib.parse.ParseResult],
-                    project: Optional[QgsProject] = None,
-                    timestamp: Optional[datetime] = None) -> Tuple[QgsProject, datetime]:
+    def get_project(
+        self,
+        url: Optional[urllib.parse.ParseResult],
+        project: Optional[QgsProject] = None,
+            timestamp: Optional[datetime] = None,
+    ) -> Tuple[QgsProject, datetime]:
         """ Create or return a proect
         """
         if url:

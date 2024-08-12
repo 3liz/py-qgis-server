@@ -20,22 +20,17 @@ import traceback
 from glob import glob
 from multiprocessing import Process
 from multiprocessing.util import Finalize
-from typing import Awaitable, Callable, Dict, List
+from typing import Awaitable, Callable, Dict, List, cast
 
+import psutil
 import zmq
 
-from pyqgisservercontrib.core.watchfiles import watchfiles
+from pyqgisservercontrib.core.watchfiles import Scheduler, watchfiles
 
 from .config import confservice
 from .qgsworker import QgsRequestHandler
 from .zeromq.pool import Pool
 from .zeromq.supervisor import Supervisor
-
-try:
-    import psutil
-except ImportError:
-    psutil = None
-
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -43,8 +38,8 @@ LOGGER = logging.getLogger('SRVLOG')
 class _RestartHandler:
 
     def __init__(self) -> None:
-        self._restart = None
-        self._watch_files = []
+        self._restart: None | Scheduler = None
+        self._watch_files: List[str] = []
 
     def update_files(self) -> None:
         """ update files to watch
@@ -79,7 +74,7 @@ class _RestartHandler:
 
         check_time = confservice.getint('server', 'restartmon_check_time', 3000)
         self._restart = watchfiles(self._watch_files, callback, check_time)
-        self._restart.start()
+        self._restart.start()  # type: ignore [attr-defined]
 
 
 class WorkerPoolServer:
@@ -107,7 +102,7 @@ class WorkerPoolServer:
 
         LOGGER.debug("Started pool server")
         self._pool = pool
-        self._supervisor = None
+        self._supervisor: Supervisor | None = None
         self._healthcheck = None
 
         self._restart_handler = _RestartHandler()
@@ -186,19 +181,24 @@ class WorkerPoolServer:
     def num_workers(self) -> int:
         return self._num_workers
 
-    async def get_reports(self) -> Awaitable[List[Dict]]:
+    async def get_reports(self) -> List[Dict]:
         """ Collect reports
         """
+        if self._supervisor is None:
+            return []
+
+        supervisor = cast(Supervisor, self._supervisor)
+
         maxwait = 10
         so_far = 0
-        self._supervisor.clear_reports()
+        supervisor.clear_reports()
         self.broadcast(b'REPORT')
-        while self._supervisor.num_reports() < self._num_workers:
+        while supervisor.num_reports() < self._num_workers:
             await asyncio.sleep(1)
             so_far += 1
             if so_far >= maxwait:
                 break
-        return self._supervisor.reports
+        return supervisor.reports
 
     def memory_fraction(self) -> float:
         """ Return total memory fraction used by pool
@@ -243,8 +243,12 @@ def run_worker_pool(numworkers: int, broadcastaddr: str, router: str) -> None:
         raise SystemExit()
 
     LOGGER.info("Starting worker pool")
-    pool = Pool(numworkers, target=QgsRequestHandler.run, args=(router,),
-                kwargs={'broadcastaddr': broadcastaddr})
+    pool = Pool(
+        numworkers,
+        target=QgsRequestHandler.run,
+        args=(router,),
+        kwargs={'broadcastaddr': broadcastaddr},
+    )
 
     signal.signal(signal.SIGTERM, term_signal)
 

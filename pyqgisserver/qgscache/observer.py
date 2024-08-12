@@ -20,7 +20,6 @@ import traceback
 from datetime import datetime
 from typing import (
     Any,
-    Awaitable,
     ClassVar,
     Iterable,
     List,
@@ -46,7 +45,7 @@ class _CacheUpdate(NamedTuple):
 
 class Client:
 
-    def __init__(self) -> None:
+    def __init__(self):
         """ Cache observer client
         """
         address = _get_ipc('cache_observer')
@@ -57,14 +56,14 @@ class Client:
         self._sock.connect(address)
         self._pid = os.getpid()
 
-    def _send(self, data: Any) -> None:   # noqa ANN401
+    def _send(self, data: Any):   # noqa ANN401
         try:
             self._sock.send_pyobj((self._pid, data), flags=zmq.DONTWAIT)
         except zmq.ZMQError as err:
             if err.errno != zmq.EAGAIN:
                 LOGGER.error("%s (%s)", zmq.strerror(err.errno), err.errno)
 
-    def close(self) -> None:
+    def close(self):
         self._sock.close()
 
     def observe(self, key: str, modified_time: datetime, state: UpdateState):
@@ -94,7 +93,7 @@ class Server:
 
         confservice.set('projects.cache', 'has_observers', 'yes' if cls._enabled else 'no')
 
-    def __init__(self) -> None:
+    def __init__(self):
         """ Run Observer
 
             :param timeout: timeout delay in seconds
@@ -135,11 +134,11 @@ class Server:
 
         self._observers = list(_load_observers())
 
-    def run(self) -> None:
+    def run(self):
         if self._enabled:
             self._task = asyncio.ensure_future(self._run_async())
 
-    async def _run_async(self) -> Awaitable[None]:
+    async def _run_async(self):
         """ Run supervisor
         """
         self._stopped = False
@@ -172,7 +171,7 @@ class Server:
                 LOGGER.critical("%s", traceback.format_exc())
                 raise
 
-    def stop(self) -> None:
+    def stop(self):
         """ Stop the Observer
         """
         if self._stopped:
@@ -183,7 +182,7 @@ class Server:
         if self._task and not self._task.cancelled():
             self._task.cancel()
 
-    def notify_observers(self, key: str, modified_time: datetime, state: UpdateState) -> None:
+    def notify_observers(self, key: str, modified_time: datetime, state: UpdateState):
         """ Run registered observers
         """
         for obs in self._observers:
@@ -201,7 +200,7 @@ class Server:
         return self._last_updates.items()
 
 
-def declare_cache_observers() -> None:
+def declare_cache_observers():
     Server.declare_observers()
 
 

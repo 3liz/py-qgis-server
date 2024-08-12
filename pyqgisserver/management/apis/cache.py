@@ -28,7 +28,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class CacheCollection(RequestHandler):
 
-    def get(self, key: Optional[str] = None) -> None:
+    def get(self, key: Optional[str] = None):  # type: ignore [override]
         """ Return project cache info
         """
         if not key:

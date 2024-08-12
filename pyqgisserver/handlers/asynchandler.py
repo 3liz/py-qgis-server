@@ -11,11 +11,11 @@
 import logging
 
 from time import time
-from typing import Any, Awaitable, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 from urllib.parse import urlencode
 
 from ..logger import log_rrequest
-from ..monitor import Monitor
+from ..monitor import MonitorABC
 from ..zeromq.client import (
     AsyncClient,
     RequestGatewayError,
@@ -31,24 +31,27 @@ class AsyncClientHandler(BaseHandler):
     """ Proxy to Qgis 0MQ worker
     """
 
-    def initialize(self, client: AsyncClient, timeout: int,
-                   monitor: Optional[Monitor] = None,
-                   allowed_hdrs: List[str] = []) -> None:
-
+    def initialize(   # type: ignore [override]
+        self,
+        client: AsyncClient,
+        timeout: int,
+        monitor: Optional[MonitorABC] = None,
+        allowed_hdrs: List[str] = [],
+    ):
         super().initialize()
 
         self._client = client
         self._timeout = timeout
         self._monitor = monitor
-        self._stats = self.application.stats
+        self._stats = self.application.stats  # type: ignore [attr-defined]
         self._allowed_hdrs = allowed_hdrs
 
-        self.ogc_scheme = None
+        self.ogc_scheme: str | None = None
 
     def encode_arguments(self) -> str:
         return '?' + urlencode({k: v[0] for k, v in self.request.arguments.items()})
 
-    def set_backend_headers(self, headers: Dict) -> None:
+    def set_backend_headers(self, headers: Dict):
         """ Set headers passed to backend
         """
         project_path = self.get_argument('MAP', default=None)
@@ -69,7 +72,7 @@ class AsyncClientHandler(BaseHandler):
         # see https://github.com/qgis/QGIS/pull/41333
         copy_headers(self._allowed_hdrs)
 
-    async def handle_request(self, method: str) -> Awaitable[None]:
+    async def handle_request(self, method: str):
         reqtime = time()
 
         try:
@@ -80,6 +83,7 @@ class AsyncClientHandler(BaseHandler):
 
             headers = {}
             proxy_url = self.proxy_url()
+            req_url: str | None
             if proxy_url:
                 # Send the full path to Qgis
                 req_url = f"{proxy_url}{self.request.path.lstrip('/')}"
@@ -89,7 +93,7 @@ class AsyncClientHandler(BaseHandler):
 
             self.set_backend_headers(headers)
 
-            data = self.request.body
+            data: Optional[bytes] = self.request.body
 
             if self.get_argument('SERVICE', default=None) and self.has_body_arguments:
                 # Do not let qgis server handle url encoded parameters
@@ -99,11 +103,16 @@ class AsyncClientHandler(BaseHandler):
 
             self._stats.num_requests += 1
 
-            response = await self._client.fetch(query=query, method=method,
-                                                headers=headers, data=data,
-                                                timeout=self._timeout)
+            response = await self._client.fetch(
+                query=query,
+                method=method,
+                headers=headers,
+                data=data,
+                timeout=self._timeout,
+            )
+
             status = response.status
-            hdrs = response.headers
+            hdrs = cast(Dict, response.headers)
             delta = time() - reqtime
 
             log_rrequest(req_url, status, method, query, delta, hdrs)
@@ -118,7 +127,8 @@ class AsyncClientHandler(BaseHandler):
             if status == 206:
                 # Partial response
                 self.set_status(200)
-                self.write(response.data)
+                if response.data:
+                    self.write(response.data)
                 await self.flush()
                 async for chunk in self._client.fetch_more(response, timeout=self._timeout):
                     self.write(chunk)
@@ -155,7 +165,7 @@ class AsyncClientHandler(BaseHandler):
         # Send monitoring info
         self.emit(status, delta, meta or {})
 
-    def emit(self, status: int, response_time: float, meta: Dict) -> None:
+    def emit(self, status: int, response_time: float, meta: Dict[str, str]):
         if not self._monitor:
             return
 
@@ -170,24 +180,24 @@ class AsyncClientHandler(BaseHandler):
                 RESPONSE_STATUS=status,
                 RESPONSE_MEMUSED=meta.get('mem_used', 0),
             )
-            self._monitor.emit(params, meta=self.request.headers)
+            self._monitor.emit(params, meta={k: v for k, v in self.request.headers.get_all()})
 
-    async def get(self) -> Awaitable[None]:
+    async def get(self):
         """ Handle Get method
         """
         await self.handle_request('GET')
 
-    async def post(self) -> Awaitable[None]:
+    async def post(self):
         """ Handle Post method
         """
         await self.handle_request('POST')
 
-    async def head(self) -> Awaitable[None]:
+    async def head(self):
         """ Handle HEAD method
         """
         await self.handle_request('HEAD')
 
-    def options(self) -> None:
+    def options(self):
         """ Implement OPTIONS for validating CORS
         """
         self.set_option_headers('GET, POST, OPTIONS')

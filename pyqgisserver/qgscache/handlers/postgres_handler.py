@@ -33,7 +33,7 @@ import logging
 import urllib.parse
 
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, cast
 from urllib.parse import parse_qs
 
 import psycopg2
@@ -44,7 +44,7 @@ from pyqgisservercontrib.core import componentmanager
 
 LOGGER = logging.getLogger('SRVLOG')
 
-__all__ = []
+__all__ = []  # type: ignore [var-annotated]
 
 # List of allowed params in secure mode
 ALLOWED_SECURE_PARAMS = ('service', 'project', 'dbname', 'schema')
@@ -95,17 +95,17 @@ def _check_unsafe_url(insecure: bool, url: urllib.parse.ParseResult) -> Tuple[st
     if database:
         params.update(dbname=database)
 
-    params = '&'.join(f'{k}={v}' for k, v in params.items())
-    urlstr = f"postgresql://{netloc}/?{params}"
+    qparams = '&'.join(f'{k}={v}' for k, v in params.items())
+    urlstr = f"postgresql://{netloc}/?{qparams}"
 
     try:
         LOGGER.debug("**** Postgresql connection params %s", connexion_params)
-        conn = psycopg2.connect(**connexion_params)
+        conn = psycopg2.connect(**connexion_params)  # type: ignore [arg-type]
         cursor = conn.cursor()
         cursor.execute(f"select metadata from {schema}.qgis_projects where name='{prjname}'")
         if cursor.rowcount <= 0:
             raise FileNotFoundError(url.geturl())
-        metadata = cursor.fetchone()[0]
+        metadata = cast(Tuple, cursor.fetchone())[0]
         LOGGER.debug("**** Postgres metadata for '%s': %s", prjname, metadata)
         conn.close()
     except psycopg2.OperationalError as e:

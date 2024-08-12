@@ -60,7 +60,7 @@ def run_broker(inaddr: str, outaddr: str, maxqueue: int = 100, timeout: int = 30
     poller.register(frontend, zmq.POLLIN)
 
     workers = set()    # Workers available
-    waiting = deque()  # Client waiting
+    waiting: deque = deque()  # Client waiting
 
     LOGGER.info("Starting ZMQ broker loop")
 

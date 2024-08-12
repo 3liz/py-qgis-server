@@ -12,9 +12,7 @@ from typing import (
     Generic,
     Hashable,
     Iterator,
-    Mapping,
     Optional,
-    Sequence,
     Tuple,
     TypeVar,
 )
@@ -26,7 +24,7 @@ K = TypeVar('K', bound=Hashable)
 class lrucache(Generic[K, V]):
 
     def __init__(self, size: int) -> None:
-        self._table: Mapping[K, V] = OrderedDict()
+        self._table = OrderedDict[K, V]()
         self._capacity = size
 
         # Adjust the size
@@ -41,7 +39,7 @@ class lrucache(Generic[K, V]):
     def __contains__(self, key: K) -> bool:
         return key in self._table
 
-    def peek(self, key: K) -> V:
+    def peek(self, key: K) -> Optional[V]:
         """ Looks up a value in the cache without affecting cache order
 
             Return None if the key doesn't exists
@@ -68,7 +66,7 @@ class lrucache(Generic[K, V]):
         while len(self._table) >= self._capacity:
             self._table.popitem(last=False)
 
-        OrderedDict.__setitem__(self._table, key, value)
+        self._table.__setitem__(key, value)
 
     def __delitem__(self, key: K) -> None:
         """ Remove from _
@@ -85,7 +83,7 @@ class lrucache(Generic[K, V]):
         """
         return reversed(self._table.keys())
 
-    def items(self) -> Sequence[Tuple[K, V]]:
+    def items(self) -> Iterator[Tuple[K, V]]:
         """ Return an iterator that returns the (key, value) pairs in the cache.
 
             Items are returned  in order from the most recently to least recently used.
@@ -93,7 +91,7 @@ class lrucache(Generic[K, V]):
         """
         return reversed(self._table.items())
 
-    def keys(self) -> Sequence[K]:
+    def keys(self) -> Iterator[K]:
         """ Return an iterator that returns the keys in the cache.
 
             Keys are returned in order from the most recently to least recently used.
@@ -101,7 +99,7 @@ class lrucache(Generic[K, V]):
         """
         return reversed(self._table.keys())
 
-    def values(self) -> Sequence[V]:
+    def values(self) -> Iterator[V]:
         """ Return an iterator that returns the values in the cache.
 
             Values are returned  in order from the most recently to least recently used.

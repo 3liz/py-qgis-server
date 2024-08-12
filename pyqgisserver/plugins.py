@@ -15,7 +15,7 @@ import sys
 import traceback
 
 from pathlib import Path
-from typing import Dict, Generator
+from typing import Dict, Generator, TypeVar
 
 from .config import confservice
 
@@ -98,7 +98,10 @@ def find_plugins(path: str) -> Generator[str, None, None]:
         yield plugin.name
 
 
-def load_plugins(serverIface: 'QgsServerInterface'):  # noqa F821
+QgsServerInterface = TypeVar('QgsServerInterface')
+
+
+def load_plugins(serverIface: QgsServerInterface):
     """ Start all plugins """
 
     plugin_path = confservice.get('server', 'pluginpath')
@@ -136,18 +139,19 @@ def plugin_metadata(plugin: str) -> Dict:
     """ Return plugin metadata
     """
     if plugin not in server_plugins:
-        return
+        return {}
 
     # Read metadata
-    path = Path(sys.modules[plugin].__file__)
+    path = Path(sys.modules[plugin].__file__ or '/i_dot_not_exists')
     metadatafile = path.parent / 'metadata.txt'
     if not metadatafile.exists():
-        return
+        return {}
 
     with metadatafile.open(mode='rt') as f:
         cp = configparser.ConfigParser()
         cp.read_file(f)
-        metadata = {s: dict(p.items()) for s, p in cp.items()}
+
+        metadata: Dict[str, str | Dict[str, str]] = {s: dict(p.items()) for s, p in cp.items()}
         metadata.pop('DEFAULT', None)
         metadata.update(path=str(path))
         return metadata

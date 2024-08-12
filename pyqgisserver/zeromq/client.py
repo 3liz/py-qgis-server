@@ -16,7 +16,13 @@ import sys
 import traceback
 import uuid
 
-from typing import Mapping, Optional, Tuple
+from typing import (
+    Dict,
+    Mapping,
+    Optional,
+    Tuple,
+    cast,
+)
 
 import zmq
 import zmq.asyncio
@@ -40,30 +46,31 @@ class RequestProxyError(Exception):
 
 
 class AsyncResponseHandler:
-    def __init__(self, correlation_id: bytes) -> None:
+    def __init__(self, correlation_id: bytes):
 
         loop = asyncio.get_running_loop()
 
         self.correlation_id = correlation_id
-        self.headers = None
+        self.headers: Dict[str, str] = {}
         # Create a future for sending the result
         self._future = loop.create_future()
-        self._chunks = None
-        self._has_more = False
-        self.data = None
-        self.metadata = None
+        self._chunks: Optional[asyncio.Queue] = None
+        self._has_more: bool = False
+        self.data: Optional[bytes] = None
+        self.metadata: Optional[Dict[str, str]] = None
+        self.status: int = -1
 
-    def _set_exception(self, exc: Exception) -> None:
+    def _set_exception(self, exc: Exception):
         self._has_more = False
         self._future.set_exception(exc)
 
-    def _set_result(self, data: bytes) -> None:
+    def _set_result(self, data: bytes):
         """ Set raw results from request
 
             This method send the result to the stored
             future.
         """
-        if self.headers is None:
+        if self.status == -1:
             status, hdrs, body, meta = pickle.loads(data)
             self.headers = hdrs
             self.data = body
@@ -79,7 +86,8 @@ class AsyncResponseHandler:
         elif self._has_more:
             body, has_more, extra = pickle.loads(data)
             self._has_more = has_more
-            self._chunks.put_nowait((body, has_more))
+            chunks = cast(asyncio.Queue, self._chunks)
+            chunks.put_nowait((body, has_more))
             self.extra = extra
 
     def _done(self) -> bool:
@@ -101,7 +109,8 @@ class AsyncResponseHandler:
         """ Get next chunk
         """
         try:
-            return await asyncio.wait_for(self._chunks.get(), timeout)
+            chunks = cast(asyncio.Queue, self._chunks)
+            return await asyncio.wait_for(chunks.get(), timeout)
         except asyncio.TimeoutError:
             self._has_more = False
             raise RequestTimeoutError()
@@ -124,13 +133,13 @@ class AsyncClient:
         sock.connect(address)
 
         self._running = False
-        self._handlers = {}
+        self._handlers: Dict[bytes, AsyncResponseHandler] = {}
         self._socket = sock
         self._polling = False
         self._poll_task: Optional[asyncio.Task] = None
         LOGGER.info("Starting client %s", self.identity)
 
-    async def _poll(self) -> None:
+    async def _poll(self):
         """ Handle incoming messages
         """
         self._polling = True
@@ -202,10 +211,10 @@ class AsyncClient:
             self._handlers.pop(response.correlation_id, None)
             raise
 
-    def terminate(self) -> None:
+    def terminate(self):
         LOGGER.info("Terminating client %s", self.identity)
         self._running = False
-        self._futures = {}
+        self._handlers = {}
         self._socket.close()
 
 

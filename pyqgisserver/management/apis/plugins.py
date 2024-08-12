@@ -25,7 +25,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class PluginCollection(RequestHandler):
 
-    def get(self, name: Optional[str] = None) -> None:
+    def get(self, name: Optional[str] = None):  # type: ignore [override]
         """ Return plugin info
         """
         if name:

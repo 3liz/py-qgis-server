@@ -66,5 +66,8 @@ lint-preview:
 lint-fix:
 	@ruff check --preview --fix $(PYTHON_PKG) $(TESTDIR)
 
+typing:
+	mypy --config-file=$(topsrcdir)/mypy.ini -p pyqgisserver
+
 test-%:
 	$(MAKE) -C tests env $* FLAVOR=$(FLAVOR)

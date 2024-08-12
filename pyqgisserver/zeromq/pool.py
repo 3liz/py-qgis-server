@@ -15,7 +15,8 @@ import time
 
 from multiprocessing import Process
 from multiprocessing.util import Finalize
-from typing import Callable, Dict, List
+
+from typing_extensions import Callable, Dict, List, Sequence
 
 # Early failure min delay
 # If any process fail before that starting delay
@@ -27,13 +28,18 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class Pool:
 
-    def __init__(self, num_workers: int, target: Callable, args: List = (),
-                 kwargs: Dict = {}) -> None:
+    def __init__(
+        self,
+        num_workers: int,
+        target: Callable,
+        args: Sequence = (),
+        kwargs: Dict = {},
+    ):
 
         self.critical_failure = False
 
         self._num_workers = num_workers
-        self._pool = []
+        self._pool: List[Process] = []
         self._args = args
         self._kwargs = kwargs
         self._target = target
@@ -75,7 +81,7 @@ class Pool:
                 del self._pool[i]
         return cleaned
 
-    def _repopulate_pool(self) -> None:
+    def _repopulate_pool(self):
         """Bring the number of pool processes up to the specified number,
         for use after reaping workers which have exited.
         """
@@ -85,14 +91,14 @@ class Pool:
             w.name = w.name.replace('Process', 'PoolWorker')
             w.start()
 
-    def maintain_pool(self) -> None:
+    def maintain_pool(self):
         """Clean up any exited workers and start replacements for them.
         """
         if self._join_exited_workers():
             self._repopulate_pool()
 
     @classmethod
-    def _terminate_pool(cls, pool: 'Pool') -> None:
+    def _terminate_pool(cls, pool: List[Process]):
 
         # Send terminate to workers
         if pool and hasattr(pool[0], 'terminate'):
@@ -107,12 +113,12 @@ class Pool:
                     # worker has not yet exited
                     p.join()
 
-    def __reduce__(self) -> None:
+    def __reduce__(self):
         raise NotImplementedError(
             'Pool objects cannot be passed between processes or pickled',
         )
 
-    def terminate(self) -> None:
+    def terminate(self):
         self._terminate()
 
     def kill(self, pid: int) -> bool:

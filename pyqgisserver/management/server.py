@@ -12,18 +12,21 @@
 import logging
 import os
 
-from typing import Dict, Optional
+from typing import Dict, Optional, cast
 from urllib.parse import quote_plus
 
 import tornado.web
 
 from tornado.httpserver import HTTPRequest
+from tornado.routing import _RuleList
 
 from ..config import confservice
 from ..handlers import BaseHandler, NotFoundHandler, StatusHandler
 from ..handlers import OAPIHandler as QgisHandler
 from ..logger import log_request
+from ..qgscache.observer import Server as ObserverServer
 from ..qgspool import WorkerPoolServer
+from ..stats import Stats
 from ..zeromq import client
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -31,11 +34,11 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class _PoolHandler(BaseHandler):
 
-    def initialize(self, poolserver: WorkerPoolServer) -> None:
+    def initialize(self, poolserver: WorkerPoolServer):  # type: ignore [override]
         super().initialize()
         self._poolserver = poolserver
 
-    def options(self) -> None:
+    def options(self):
         """ Implement OPTION for validating CORS
         """
         self.set_option_headers()
@@ -43,7 +46,7 @@ class _PoolHandler(BaseHandler):
 
 class _RestartHandler(_PoolHandler):
 
-    def post(self, action: str) -> None:
+    def post(self, action: str):
         """ Handle POST method
         """
         # Broadcast 'restart' to workers
@@ -69,7 +72,7 @@ def _get_cache_link(key: str, req: HTTPRequest) -> str:
 
 class _ReportHandler(_PoolHandler):
 
-    async def get(self) -> None:
+    async def get(self):
         """ Return worker reports
         """
         req = self.request
@@ -82,7 +85,7 @@ class _ReportHandler(_PoolHandler):
 
 class _RootHandler(BaseHandler):
 
-    def get(self) -> None:
+    def get(self):
         """ Return links to default api entries
         """
         req = self.request
@@ -104,7 +107,7 @@ class _RootHandler(BaseHandler):
         )
         self.write(data)
 
-    def options(self) -> None:
+    def options(self):
         """ Implement OPTION for validating CORS
         """
         self.set_option_headers()
@@ -112,14 +115,14 @@ class _RootHandler(BaseHandler):
 
 class _CacheHandler(QgisHandler):
 
-    async def get(self, key: Optional[str] = None) -> None:
+    async def get(self, key: Optional[str] = None):
         """ Return project cache info
         """
         if not key:
             # Try to get key from param
             key = self.get_argument('MAP', default=None)
 
-        cache_observer = self.application.cache_observer
+        cache_observer = cast(_Management, self.application).cache_observer
         if not key:
             """ Send the collection of cached objects
             """
@@ -146,7 +149,7 @@ class _CacheHandler(QgisHandler):
 def configure_handlers(
     poolserver: WorkerPoolServer,
     client: client.AsyncClient,
-) -> [tornado.web.RequestHandler]:
+) -> _RuleList:
     """
     """
     kwargs = {
@@ -155,7 +158,7 @@ def configure_handlers(
         'service': 'Managment',
     }
 
-    handlers = [
+    handlers: _RuleList = [
         (r"/", _RootHandler),
         (r"/status/?.*", StatusHandler),
         (r"/pool/(restart)", _RestartHandler, {'poolserver': poolserver}),
@@ -170,7 +173,10 @@ def configure_handlers(
 
 class _Management(tornado.web.Application):
 
-    def __init__(self, poolserver: WorkerPoolServer, router: str) -> None:
+    stats: Stats
+    cache_observer: ObserverServer
+
+    def __init__(self, poolserver: WorkerPoolServer, router: str):
         """
         """
         identity = bytes(f"MANAGEMENT-{os.getpid()}".encode('ascii'))
@@ -180,12 +186,12 @@ class _Management(tornado.web.Application):
 
         self.http_proxy = confservice.getboolean('server', 'http_proxy')
 
-    def log_request(self, handler: tornado.web.RequestHandler) -> None:
+    def log_request(self, handler: tornado.web.RequestHandler):
         """ Write HTTP requet to the logs
         """
         log_request(handler)
 
-    def terminate(self) -> None:
+    def terminate(self):
         self._broker_client.terminate()
 
 
