@@ -9,6 +9,8 @@
 import logging
 import os
 
+from typing import Dict
+
 import tornado
 
 from ..config import config_to_dict
@@ -51,13 +53,14 @@ class StatusHandler(BaseHandler):
             response = self.get_versions()
             req = self.request
 
-            def _link(path: str, title: str, rel: str):
+            def _link(path: str, title: str, rel: str) -> Dict[str, str]:
                 return {
                     'href': f"{req.protocol}://{req.host}{path}",
                     'rel': rel,
                     'title': title,
                     'type': "application/json",
                 }
+
             response.update(links=[
                 _link("/status/config", "Server configuration", "status"),
                 _link("/status/env", "Execution environment", "status"),
@@ -67,17 +70,19 @@ class StatusHandler(BaseHandler):
 
         self.write_json(response)
 
-    def get_versions(self):
+    def get_versions(self) -> Dict[str, str]:
         try:
             from qgis.core import Qgis
-            QGIS_VERSION = Qgis.QGIS_VERSION_INT
+            QGIS_VERSION = str(Qgis.QGIS_VERSION_INT)
             QGIS_RELEASE = Qgis.QGIS_RELEASE_NAME
         except Exception as e:
             LOGGER.error("Cannot get Qgis version %s", e)
             QGIS_VERSION = "n/a"
             QGIS_RELEASE = "n/a"
 
-        return dict(tornado_ver=tornado.version,
-                    version=__version__,
-                    qgis_version=QGIS_VERSION,
-                    qgis_release=QGIS_RELEASE)
+        return dict(
+            tornado_ver=tornado.version,
+            version=__version__,
+            qgis_version=QGIS_VERSION,
+            qgis_release=QGIS_RELEASE,
+        )

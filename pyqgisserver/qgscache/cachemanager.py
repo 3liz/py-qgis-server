@@ -18,8 +18,8 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import (
-    Any,
     Callable,
+    Dict,
     Generator,
     NamedTuple,
     Optional,
@@ -34,6 +34,7 @@ from qgis.core import (
     QgsMapLayer,
     QgsProject,
     QgsProjectBadLayerHandler,
+    QgsProjectStorage,
 )
 from qgis.PyQt.QtCore import Qt
 from qgis.server import QgsServerProjectUtils
@@ -44,7 +45,7 @@ from ..config import confservice
 from ..utils.lru import lrucache
 
 # Import default handlers for auto-registration
-from .handlers import *  # noqa: F403,F401
+from .handlers import ProtocolHandler
 from .types import UpdateState
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -95,7 +96,7 @@ class QgisStorageHandler:
     def __init__(self):
         pass
 
-    def get_storage_metadata(self, uri: str):
+    def get_storage_metadata(self, uri: str) -> QgsProjectStorage.Metadata:
         # Check out for storage
         storage = QgsApplication.projectStorageRegistry().projectStorageFromUri(uri)
         if not storage:
@@ -180,14 +181,14 @@ class QgsCacheManager:
         componentmanager.register_entrypoints('qgssrv_contrib_protocol_handler')
 
     def _log_cache_options(self):
-        def _yesno(value: bool):
+        def _yesno(value: bool) -> str:
             return "Yes" if value else "No"
         LOGGER.info(
             ">>>>> Qgis Projects options:\n"
             f"** Getprint Disabled.......{_yesno(self._disable_getprint)}\n"
             f"** Trust Layer Metadata....{_yesno(self._trust_layer_metadata)}\n"
             f"** Readonly Layers.........{_yesno(self._read_only_layers)}\n"
-            "<<<<<"
+            "<<<<<",
         )
 
     def add_observer(self, observer: Callable[[str, datetime, int], None]) -> None:
@@ -261,7 +262,7 @@ class QgsCacheManager:
 
         return url
 
-    def get_protocol_handler(self, key: str, scheme: Optional[str]) -> Any:
+    def get_protocol_handler(self, key: str, scheme: Optional[str]) -> ProtocolHandler:
         """ Find protocol handler for the given scheme
         """
         scheme = scheme or self._default_scheme
@@ -372,7 +373,7 @@ class QgsCacheManager:
 
         # Notify
         if update:
-            LOGGER.info("Updated project '%s' in cache", key),
+            LOGGER.info("Updated project '%s' in cache", key)
             self.notify_observers(key, details.timestamp, update)
 
         return update
@@ -454,7 +455,7 @@ class BadLayerHandler(QgsProjectBadLayerHandler):
         super().__init__()
         self.badLayerNames = set()
 
-    def handleBadLayers(self, layers) -> None:
+    def handleBadLayers(self, layers: Sequence[QgsMapLayer]) -> None:
         """ See https://qgis.org/pyqgis/3.0/core/Project/QgsProjectBadLayerHandler.html
         """
         super().handleBadLayers(layers)
@@ -518,10 +519,10 @@ def preload_projects() -> None:
     preload_projects_file(confpath, get_cacheservice())
 
 
-def get_project_summary(key: str, project: QgsProject):
+def get_project_summary(key: str, project: QgsProject) -> Dict:
     """ Return json summary for cached project
     """
-    def layer_summary(layer_id: str, layer: QgsMapLayer):
+    def layer_summary(layer_id: str, layer: QgsMapLayer) -> Dict:
         return dict(
             id=layer_id,
             name=layer.name(),
@@ -531,7 +532,7 @@ def get_project_summary(key: str, project: QgsProject):
             spatial=layer.isSpatial(),
         )
 
-    layers = [layer_summary(idstr, l) for (idstr, l) in project.mapLayers().items()]
+    layers = [layer_summary(idstr, lyr) for (idstr, lyr) in project.mapLayers().items()]
 
     return dict(
         cache_key=key,
@@ -539,5 +540,5 @@ def get_project_summary(key: str, project: QgsProject):
         bad_layers_count=sum(1 for ls in layers if not ls['valid']),
         layers=layers,
         crs=project.crs().userFriendlyIdentifier(),
-        last_modified=project.lastModified().toString(Qt.ISODate)
+        last_modified=project.lastModified().toString(Qt.ISODate),
     )

@@ -12,7 +12,7 @@ try:
     import psutil
     HAVE_PSUTIL = True
 except Exception:
-    print("WARNING: Failed to load 'PSutil', system metrics will not be collected")
+    print("WARNING: Failed to load 'PSutil', system metrics will not be collected") # noqa T201
     HAVE_PSUTIL = False
 
 

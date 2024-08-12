@@ -11,6 +11,10 @@ MANIFEST=pyqgisserver/build.manifest
 
 FLAVOR:=release
 
+PYTHON_PKG=pyqgisserver pyqgisservercontrib
+
+TESTDIR=tests/unittests
+
 # This is necessary with pytest as long it is not fixed
 # see also https://github.com/qgis/QGIS/pull/5337
 export QGIS_DISABLE_MESSAGE_HOOKS := 1
@@ -42,9 +46,25 @@ clean:
 
 test: lint test-test
 
-lint:
-	@flake8 pyqgisserver pyqgisservercontrib
+install-tests:
+	pip install -U --upgrade-strategy=eager -r tests/requirements.txt
 
+install-doc:
+	pip install -U --upgrade-strategy=eager -r doc/requirements.txt
+
+install-dev: install-tests install-doc
+
+install:
+	pip install -U --upgrade-strategy=eager -e .
+
+lint:
+	@ruff check $(PYTHON_PKG) $(TESTDIR)
+
+lint-preview:
+	@ruff check --preview $(PYTHON_PKG) $(TESTDIR)
+
+lint-fix:
+	@ruff check --preview --fix $(PYTHON_PKG) $(TESTDIR)
 
 test-%:
 	$(MAKE) -C tests env $* FLAVOR=$(FLAVOR)

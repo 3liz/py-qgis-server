@@ -44,7 +44,7 @@ class Pool:
         self._terminate = Finalize(
             self, self._terminate_pool,
             args=(self._pool,),
-            exitpriority=15
+            exitpriority=15,
         )
 
         self._repopulate_pool()
@@ -109,7 +109,7 @@ class Pool:
 
     def __reduce__(self) -> None:
         raise NotImplementedError(
-            'Pool objects cannot be passed between processes or pickled'
+            'Pool objects cannot be passed between processes or pickled',
         )
 
     def terminate(self) -> None:

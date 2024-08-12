@@ -13,6 +13,7 @@ import signal
 import sys
 
 from multiprocessing import Process
+from typing import Optional
 
 import tornado.platform.asyncio
 import tornado.web
@@ -49,7 +50,7 @@ def configure_handlers(client: client.AsyncClient) -> [tornado.web.RequestHandle
         client=client,
         monitor=monitor,
         timeout=cfg.getint('timeout'),
-        allowed_hdrs=tuple(k.upper() for k in cfg.get('allow_headers').split(','))
+        allowed_hdrs=tuple(k.upper() for k in cfg.get('allow_headers').split(',')),
     )
 
     end = r"(?:\.html|\.json|/?)"
@@ -187,7 +188,7 @@ def initialize_middleware(app):
     return router
 
 
-def run_server(port: int, address: str = "", user: str = None, workers: int = 0) -> None:
+def run_server(port: int, address: str = "", user: Optional[str] = None, workers: int = 0):
     """ Run the server
 
         :param port: port number
@@ -279,14 +280,14 @@ def run_server(port: int, address: str = "", user: str = None, workers: int = 0)
         # See https://github.com/tornadoweb/tornado/issues/3033
         asyncio.run(_main())
     except Exception:
-        print("Server exited from exception")
+        print("Server exited from exception")  # noqa: T201
         traceback.print_exc()
         exit_code = 1
     except KeyboardInterrupt:
-        print("Keyboard Interrupt", flush=True)
+        print("Keyboard Interrupt", flush=True)  # noqa: T201
         exit_code = 15
     except SystemExit as exc:
-        print("Exiting with code:", exc.code, flush=True)
+        print("Exiting with code:", exc.code, flush=True)  # noqa: T201
         exit_code = exc.code
     else:
         exit_code = 0
@@ -300,16 +301,16 @@ def run_server(port: int, address: str = "", user: str = None, workers: int = 0)
     if application is not None:
         application.terminate()
         application = None
-        print(f"PID {os.getpid()}: Server instance stopped", flush=True)
+        print(f"PID {os.getpid()}: Server instance stopped", flush=True)  # noqa: T201
     if cache_observer:
         cache_observer.stop()
     if worker_pool:
-        print("Stopping workers", flush=True)
+        print("Stopping workers", flush=True)  # noqa: T201
         worker_pool.terminate()
     if broker_pr:
-        print("Stopping broker", flush=True)
+        print("Stopping broker", flush=True)  # noqa: T201
         broker_pr.terminate()
         broker_pr.join()
 
-    print("Server shutdown", flush=True)
+    print("Server shutdown", flush=True)  # noqa: T201
     sys.exit(exit_code)

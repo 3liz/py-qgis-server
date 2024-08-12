@@ -40,7 +40,7 @@ class Monitor(MonitorBase):
 
     def __init__(self, amqp_client: 'AsyncPublisher',
                  routing_key: str,
-                 default_routing: Optional[str] = None) -> None:  # noqa: F821
+                 default_routing: Optional[str] = None) -> None:
         """ Init AMQP monitor
         """
         super().__init__()
@@ -119,7 +119,10 @@ class Monitor(MonitorBase):
             except Exception:
                 LOGGER.error("Failed to initialize AMQP logger: %s", traceback.format_exc())
 
-        asyncio.ensure_future(connect())
+        bckgnd_task = set()
+        connect_task = asyncio.create_task(connect())
+        bckgnd_task.add(connect_task)
+        connect_task.add_done_callback(bckgnd_task.discard)
 
         # Get default routing key in case as fallback in case
         # We fail to get dynamic key

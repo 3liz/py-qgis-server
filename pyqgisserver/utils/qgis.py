@@ -11,6 +11,8 @@ import logging
 import os
 import sys
 
+from typing import Optional
+
 
 def setup_qgis_paths() -> None:
     """ Init qgis paths
@@ -28,7 +30,7 @@ def start_qgis_application(
         enable_gui: bool = False,
         enable_processing: bool = False, verbose: bool = False,
         cleanup: bool = True,
-        logger: logging.Logger = None,
+        logger: Optional[logging.Logger] = None,
         logprefix: str = 'Qgis:') -> 'QgsApplication':  # noqa: F821
     """ Start qgis application
 
@@ -87,7 +89,7 @@ def start_qgis_application(
                 del qgis_application
 
     if verbose:
-        print(qgis_application.showSettings())
+        print(qgis_application.showSettings())  # noqa T201
 
     # Install logger hook
     install_logger_hook(logger, logprefix, verbose=verbose)
@@ -103,6 +105,7 @@ def start_qgis_application(
 
 def init_processing() -> None:
     from processing.core.Processing import Processing
+
     from qgis.analysis import QgsNativeAlgorithms
     from qgis.core import QgsApplication
     QgsApplication.processingRegistry().addProvider(QgsNativeAlgorithms())
@@ -145,14 +148,17 @@ def set_proxy_configuration(logger: logging.Logger) -> None:
     if proxy_type == QNetworkProxy.NoProxy:
         return
 
-    logger.info("QGIS Proxy configuration enabled: %s:%s, type: %s",
-                proxy.hostName(), proxy.port(),
-                {QNetworkProxy.DefaultProxy: 'DefaultProxy',
-                 QNetworkProxy.Socks5Proxy: 'Socks5Proxy',
-                 QNetworkProxy.HttpProxy: 'HttpProxy',
-                 QNetworkProxy.HttpCachingProxy: 'HttpCachingProxy',
-                 QNetworkProxy.HttpCachingProxy: 'FtpCachingProxy',
-                }.get(proxy_type, 'Undetermined'))  # noqa E124
+    logger.info(
+        "QGIS Proxy configuration enabled: %s:%s, type: %s",
+        proxy.hostName(), proxy.port(),
+        {
+            QNetworkProxy.DefaultProxy: 'DefaultProxy',
+            QNetworkProxy.Socks5Proxy: 'Socks5Proxy',
+            QNetworkProxy.HttpProxy: 'HttpProxy',
+            QNetworkProxy.HttpCachingProxy: 'HttpCachingProxy',
+            QNetworkProxy.HttpCachingProxy: 'FtpCachingProxy',
+        }.get(proxy_type, 'Undetermined'),
+    )
 
 
 def init_qgis_server(**kwargs) -> 'QgsServer':  # noqa: F821
@@ -179,10 +185,10 @@ def print_qgis_version(verbose: bool = False) -> None:
     from qgis.core import Qgis
 
     if Qgis.QGIS_VERSION_INT < 32200:
-        print(f"QGIS {Qgis.QGIS_VERSION} '{Qgis.QGIS_RELEASE_NAME}' ({Qgis.QGIS_VERSION_INT})")
+        print(f"QGIS {Qgis.QGIS_VERSION} '{Qgis.QGIS_RELEASE_NAME}' ({Qgis.QGIS_VERSION_INT})")  # noqa T201 
     else:
         from qgis.core import QgsCommandLineUtils
-        print(QgsCommandLineUtils.allVersions())
+        print(QgsCommandLineUtils.allVersions())  # noqa T201
 
     if verbose:
         start_qgis_application(verbose=True)

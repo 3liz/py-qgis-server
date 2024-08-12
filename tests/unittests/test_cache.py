@@ -1,26 +1,30 @@
-import pytest
-import os
-
-from qgis.core import Qgis,QgsProject
 
 from pathlib import Path
-from pyqgisserver.qgscache.cachemanager import (QgsCacheManager, 
-                                                CacheType,
-                                                PathNotAllowedError,
-                                                preload_projects_file)
-from pyqgisserver.config import confservice
 
-def test_aliases() -> None:
+import pytest
+
+from qgis.core import Qgis, QgsProject
+
+from pyqgisserver.config import confservice
+from pyqgisserver.qgscache.cachemanager import (
+    CacheType,
+    PathNotAllowedError,
+    QgsCacheManager,
+    preload_projects_file,
+)
+
+
+def test_aliases():
     """ Test alias resolution for file
     """
-    rootpath = Path(confservice.get('projects.cache','rootdir'))
+    rootpath = Path(confservice.get('projects.cache', 'rootdir'))
 
     cacheservice = QgsCacheManager()
 
     url = cacheservice.resolve_alias('france_parts')
     assert url.scheme == 'file'
     assert url.path   == str(rootpath / 'france_parts')
-    
+
     url = cacheservice.resolve_alias('file:france_parts')
     assert url.scheme == 'file'
     assert url.path   == str(rootpath / 'france_parts')
@@ -39,7 +43,7 @@ def test_aliases() -> None:
     assert url.query  == 'data=france_parts'
 
 
-def test_absolute_path_with_alias() -> None:
+def test_absolute_path_with_alias():
     """
     """
     cacheservice = QgsCacheManager()
@@ -55,14 +59,12 @@ def test_absolute_path_with_alias() -> None:
     with pytest.raises(PathNotAllowedError):
         url = cacheservice.resolve_alias('foo:/france_parts')
 
-  
-
 
 @pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 31000, reason="Test fail with qgis 3.4")
-def test_file_cache() -> None:
+def test_file_cache():
     """ Tetst file protocol handler
     """
-    rootpath = Path(confservice.get('projects.cache','rootdir'))
+    rootpath = Path(confservice.get('projects.cache', 'rootdir'))
 
     cacheservice = QgsCacheManager()
     details = cacheservice.peek('france_parts')
@@ -79,10 +81,10 @@ def test_file_cache() -> None:
 
 
 @pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 31000, reason="Test fail with qgis 3.4")
-def test_projects_scheme() -> None:
+def test_projects_scheme():
     """ Tetst file protocol handler
     """
-    rootpath = Path(confservice.get('projects.cache','rootdir'))
+    rootpath = Path(confservice.get('projects.cache', 'rootdir'))
 
     cacheservice = QgsCacheManager()
     details = cacheservice.peek('test:france_parts')
@@ -98,26 +100,24 @@ def test_projects_scheme() -> None:
     assert details.project is project
 
 
-def test_file_not_found() -> None:
+def test_file_not_found():
     """ Test non existant file return error
     """
     cacheservice = QgsCacheManager()
-    with pytest.raises(FileNotFoundError):    
+    with pytest.raises(FileNotFoundError):
         cacheservice.lookup('I_do_not_exists')
 
 
-def test_invalid_scheme() -> None:
+def test_invalid_scheme():
     """ Test non existant file return error
     """
     cacheservice = QgsCacheManager()
-    with pytest.raises(FileNotFoundError):    
+    with pytest.raises(FileNotFoundError):
         cacheservice.lookup('badscheme:///foo')
 
 
-
-   
 @pytest.mark.with_postgres
-def test_postgres_cache() -> None:
+def test_postgres_cache():
     """ Test postgres handler
     """
     cacheservice = QgsCacheManager()
@@ -129,12 +129,12 @@ def test_postgres_cache() -> None:
 
     project, updated = cacheservice.lookup(url)
     assert updated
-    assert isinstance(project,QgsProject)
+    assert isinstance(project, QgsProject)
 
     # Check that project is updated
     project, updated = cacheservice.lookup(url)
     assert not updated
-    assert isinstance(project,QgsProject)
+    assert isinstance(project, QgsProject)
 
     details = cacheservice.peek(url)
     assert details is not None
@@ -142,8 +142,8 @@ def test_postgres_cache() -> None:
 
 
 @pytest.mark.with_postgres
-def test_postgres_with_pgservice() -> None:
- 
+def test_postgres_with_pgservice():
+
     url = 'postgres:///?service=local&project=france_parts'
 
     cacheservice = QgsCacheManager()
@@ -153,7 +153,7 @@ def test_postgres_with_pgservice() -> None:
 
     project, updated = cacheservice.lookup(url)
     assert updated
-    assert isinstance(project,QgsProject)
+    assert isinstance(project, QgsProject)
 
     details = cacheservice.peek(url)
     assert details is not None
@@ -161,8 +161,8 @@ def test_postgres_with_pgservice() -> None:
 
 
 @pytest.mark.with_postgres
-def test_postgres_pgservice_fail() -> None:
- 
+def test_postgres_pgservice_fail():
+
     url = 'postgres:///?service=not_working&project=france_parts'
 
     cacheservice = QgsCacheManager()
@@ -171,7 +171,7 @@ def test_postgres_pgservice_fail() -> None:
         cacheservice.lookup(url)
 
 
-def test_preload_projects(data) -> None:
+def test_preload_projects(data: Path):
     """ Test preloading projects files
     """
     cacheservice = QgsCacheManager()
@@ -185,7 +185,7 @@ def test_preload_projects(data) -> None:
     # raster_layer.qgs (invalid layer)
 
     # Ensure  that items are in static cache
-    items = list(k for k,_ in cacheservice.items(CacheType.STATIC))
+    items = list(k for k, _ in cacheservice.items(CacheType.STATIC))
     assert "file:france_parts.qgs" in items
     assert "project_simple.qgs" in items
 
@@ -199,14 +199,14 @@ def test_preload_projects(data) -> None:
     assert details is None
 
 
-def test_get_modified_time(data) -> None:
+def test_get_modified_time(data: Path):
     """ Test modified time
     """
     cacheservice = QgsCacheManager()
 
     path = data / 'france_parts.qgs'
     modified_time1 = cacheservice.get_modified_time('file:france_parts.qgs')
-    
+
     # Check that no files is loaded
     assert cacheservice.peek('file:france_parts.qgs') is None
 
@@ -215,5 +215,3 @@ def test_get_modified_time(data) -> None:
     modified_time2 = cacheservice.get_modified_time('file:france_parts.qgs')
 
     assert modified_time2 > modified_time1
-
-

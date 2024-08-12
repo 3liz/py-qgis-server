@@ -22,9 +22,18 @@ import functools
 import logging
 import os
 
-from typing import Any, Iterable, Tuple
+from typing import (
+    Callable,
+    Iterable,
+    Literal,
+    Tuple,
+    TypeAlias,
+)
 
 from pyqgisservercontrib.core import componentmanager
+
+ConfigValue: TypeAlias = str | bool | int | float
+
 
 getenv = os.getenv
 
@@ -264,7 +273,13 @@ class ConfigService:
     def __init__(self):
         self.allow_env = True
 
-    def __get_impl(self, _get_fun, section: str, option: str, fallback: Any = NO_DEFAULT) -> Any:
+    def __get_impl(
+        self,
+        _get_fun: Callable[[str, str, str], ConfigValue],
+        section: str,
+        option: str,
+        fallback: ConfigValue | Literal[NO_DEFAULT] = NO_DEFAULT,
+    ) -> ConfigValue:
         """
         """
         value = _get_fun(section, option, fallback=NO_DEFAULT)
@@ -298,7 +313,7 @@ class ConfigService:
     def __contains__(self, section):
         return section in CONFIG
 
-    def set(self, section: str, option: str, value: Any) -> None:
+    def set(self, section: str, option: str, value: ConfigValue) -> None:
         CONFIG.set(section, option, value)
 
     def add_section(self, sectionname: str) -> None:

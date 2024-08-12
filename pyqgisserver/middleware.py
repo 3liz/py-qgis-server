@@ -13,6 +13,7 @@ from typing import List, NamedTuple, TypeVar
 
 import tornado.web
 
+from tornado.httpserver import HTTPRequest
 from tornado.routing import Router
 from tornado.web import HTTPError
 
@@ -59,7 +60,7 @@ class MiddleWareRouter(Router):
         self.app = app
         self.policies = load_access_policies()
 
-    def find_handler(self, request, **kwargs) -> HandlerDelegate:
+    def find_handler(self, request: HTTPRequest, **kwargs) -> HandlerDelegate:
         """ Define middleware prerocessing
         """
         # Find matching paths

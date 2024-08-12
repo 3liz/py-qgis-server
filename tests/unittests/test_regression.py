@@ -3,11 +3,12 @@
 """
 import pytest
 
-ns = { "wms": "http://www.opengis.net/wms" }
+from pyqgisserver.tests import HTTPTestCase
+
+ns = {"wms": "http://www.opengis.net/wms"}
 
 xlink = "{http://www.w3.org/1999/xlink}"
 
-from pyqgisserver.tests import HTTPTestCase
 
 class Tests(HTTPTestCase):
 
@@ -18,6 +19,5 @@ class Tests(HTTPTestCase):
         """
         urlref = ("?map=Hot_Spot_Deforestation_Patch_analysis.qgs&request=GetFeature&service=WFS"
                   "&typename=Near_real_time_deforestation&version=1.0.0")
-        rv = self.client.get( urlref )
+        rv = self.client.get(urlref)
         assert rv.status_code < 500
-

@@ -11,7 +11,10 @@ import logging
 import os
 import sys
 
-from typing import List
+from typing import (
+    List,
+    Optional,
+)
 
 from .config import (
     confservice,
@@ -27,15 +30,19 @@ from .version import __description__, __manifest__
 LOGGER = logging.getLogger('SRVLOG')
 
 
-def print_version(verbose=False) -> None:
+def print_version(verbose: bool = False):
     """ Display version infos
     """
+    m = __manifest__
     program = os.path.basename(sys.argv[0])
-    print("{program} {version} (build {buildid},commit {commitid})".format(program=program, **__manifest__))
+    print(  # noqa: T201
+        f"{program} {m['version']} "
+        f"(build {m['buildid']}, commit {m['commitid']})",
+    )
     print_qgis_version(verbose=verbose)
 
 
-def read_configuration(argv: List[str] = None) -> argparse.Namespace:
+def read_configuration(argv: Optional[List[str]] = None) -> argparse.Namespace:
     """ Parse command line and read configuration file
     """
     if argv is None:
@@ -43,20 +50,71 @@ def read_configuration(argv: List[str] = None) -> argparse.Namespace:
 
     cli_parser = argparse.ArgumentParser(description=__description__)
 
-    cli_parser.add_argument('-d', '--debug', action='store_true', default=False, help="debug mode")
-    cli_parser.add_argument('-c', '--config', metavar='PATH', nargs='?', dest='config',
-                            default=None, help="Configuration file")
-    cli_parser.add_argument('--version', action='store_true',
-                            default=False, help="Return version infos and exit")
-    cli_parser.add_argument('-p', '--port', type=int, help="http port", dest='port', default=argparse.SUPPRESS)
-    cli_parser.add_argument('-b', '--bind', metavar='IP', default=argparse.SUPPRESS,
-                            help="interface to bind to", dest='interfaces')
-    cli_parser.add_argument('-w', '--workers', metavar='NUM', type=int, default=argparse.SUPPRESS,
-                            help="num workers", dest='workers')
-    cli_parser.add_argument('-u', '--setuid', default='', help="uid to switch to", dest='setuid')
-    cli_parser.add_argument('--rootdir', default=argparse.SUPPRESS, metavar='PATH',
-                            help='path to qgis projects')
-    cli_parser.add_argument('--proxy', action='store_true', default=False, help='run only as proxy')
+    cli_parser.add_argument(
+        '-d',
+        '--debug',
+        action='store_true',
+        default=False,
+        help="debug mode",
+    )
+    cli_parser.add_argument(
+        '-c',
+        '--config',
+        metavar='PATH',
+        nargs='?',
+        dest='config',
+        default=None,
+        help="Configuration file",
+    )
+    cli_parser.add_argument(
+        '--version',
+        action='store_true',
+        default=False,
+        help="Return version infos and exit",
+    )
+    cli_parser.add_argument(
+        '-p',
+        '--port',
+        type=int,
+        help="http port",
+        dest='port',
+        default=argparse.SUPPRESS,
+    )
+    cli_parser.add_argument(
+        '-b',
+        '--bind',
+        metavar='IP',
+        default=argparse.SUPPRESS,
+        help="interface to bind to", dest='interfaces',
+    )
+    cli_parser.add_argument(
+        '-w',
+        '--workers',
+        metavar='NUM',
+        type=int,
+        default=argparse.SUPPRESS,
+        help="num workers",
+        dest='workers',
+    )
+    cli_parser.add_argument(
+        '-u',
+        '--setuid',
+        default='',
+        help="uid to switch to",
+        dest='setuid',
+    )
+    cli_parser.add_argument(
+        '--rootdir',
+        default=argparse.SUPPRESS,
+        metavar='PATH',
+        help='path to qgis projects',
+    )
+    cli_parser.add_argument(
+        '--proxy',
+        action='store_true',
+        default=False,
+        help='run only as proxy',
+    )
 
     args = cli_parser.parse_args(argv)
 
@@ -88,7 +146,7 @@ def read_configuration(argv: List[str] = None) -> argparse.Namespace:
 
     # set log level
     setup_log_handler(confservice.get('logging', 'level'))
-    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
+    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)  # noqa: T201
 
     conf = confservice['server']
     args.port = conf.getint('port')

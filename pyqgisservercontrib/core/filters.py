@@ -34,9 +34,14 @@
 import logging
 import re
 
-from typing import Awaitable, Callable, Optional, Tuple, Union
-
 from tornado.httputil import HTTPServerRequest
+from typing_extensions import (
+    Callable,
+    Optional,
+    Self,
+    Tuple,
+    Union,
+)
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -76,13 +81,12 @@ class _FilterBase:
 
         return False, None
 
-    def __call__(self, fn: Callable):
+    def __call__(self, fn: Callable) -> Self:
         self.fn = fn
         return self
 
-    def apply(self, request: HTTPServerRequest) -> Optional[Awaitable]:
+    def apply(self, request: HTTPServerRequest):
         self.fn(request, *self.match_args, **self.match_kwargs)
-        return
 
 
 class policy_filter(_FilterBase):

@@ -11,11 +11,11 @@
 import json
 import logging
 
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 import tornado.web
 
-from tornado.web import HTTPError  # noqa F401
+from tornado.web import HTTPError  # F401
 
 from ..config import confservice
 from ..version import __version__
@@ -100,7 +100,7 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_access_control_headers()
         self.write(chunk)
 
-    def write_error(self, status_code: int, **kwargs: Any) -> None:
+    def write_error(self, status_code: int, **kwargs) -> None:
         """ Override, format error as json
         """
         message = self._reason
@@ -159,7 +159,7 @@ class NotFoundHandler(BaseHandler):
     def prepare(self):  # for all methods
         raise HTTPError(
             status_code=404,
-            reason="Invalid resource path."
+            reason="Invalid resource path.",
         )
 
 

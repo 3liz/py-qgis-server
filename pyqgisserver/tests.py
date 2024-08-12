@@ -9,10 +9,11 @@
 import json
 import logging
 
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 import lxml.etree
 
+from tornado.httpclient import HTTPResponse
 from tornado.testing import AsyncHTTPTestCase
 
 from .config import load_configuration
@@ -34,7 +35,7 @@ NAMESPACES = {
     'wps': "http://www.opengis.net/wps/1.0.0",
     'ows': "http://www.opengis.net/ows/1.1",
     'gml': "http://www.opengis.net/gml",
-    'xsi': "http://www.w3.org/2001/XMLSchema-instance"
+    'xsi': "http://www.w3.org/2001/XMLSchema-instance",
 }
 
 
@@ -87,13 +88,13 @@ class HTTPTestCase(AsyncHTTPTestCase):
 
 class HTTPTestResponse:
 
-    def __init__(self, http_response) -> None:
+    def __init__(self, http_response: HTTPResponse):
         self.http_response = http_response
         if self.headers.get('Content-Type', '').find('text/xml') == 0:
             self.xml = lxml.etree.fromstring(self.content)
 
     @property
-    def content(self) -> Any:
+    def content(self) -> bytes | str:
         return self.http_response.body
 
     @property
@@ -110,7 +111,7 @@ class HTTPTestResponse:
     def xpath_text(self, path: str) -> str:
         return ' '.join(e.text for e in self.xpath(path))
 
-    def json(self) -> Any:
+    def json(self) -> object:
         return json.loads(self.content)
 
 
@@ -119,27 +120,86 @@ class OWSTestClient:
     def __init__(self, testcase: HTTPTestCase) -> None:
         self._testcase = testcase
 
-    def post(self, data: Any, headers: Optional[Dict] = None, path: str = '/ows/') -> HTTPTestResponse:
-        return HTTPTestResponse(self._testcase.fetch(path, method='POST', body=data, raise_error=False,
-                                headers=headers))
+    def post(
+        self,
+        data: bytes | str,
+        headers: Optional[Dict] = None,
+        path: str = '/ows/',
+    ) -> HTTPTestResponse:
+        return HTTPTestResponse(
+            self._testcase.fetch(
+                path, method='POST',
+                body=data,
+                raise_error=False,
+                headers=headers,
+            ),
+        )
 
-    def get(self, query: str, headers: Optional[Dict] = None, path: str = '/ows/') -> HTTPTestResponse:
-        return HTTPTestResponse(self._testcase.fetch(path + query, raise_error=False,
-                                headers=headers))
+    def get(
+        self,
+        query: str,
+        headers: Optional[Dict] = None,
+        path: str = '/ows/',
+    ) -> HTTPTestResponse:
+        return HTTPTestResponse(
+            self._testcase.fetch(
+                path + query,
+                raise_error=False,
+                headers=headers,
+            ),
+        )
 
-    def put(self, data: Any, headers: Optional[Dict] = None, path: str = '/ows/') -> HTTPTestResponse:
-        return HTTPTestResponse(self._testcase.fetch(path, method='PUT', body=data, raise_error=False,
-                                headers=headers))
+    def put(self,
+        data: bytes | str,
+        headers: Optional[Dict] = None,
+        path: str = '/ows/',
+    ) -> HTTPTestResponse:
+        return HTTPTestResponse(
+            self._testcase.fetch(
+                path,
+                method='PUT',
+                body=data,
+                raise_error=False,
+                headers=headers,
+            ),
+        )
 
-    def post_xml(self, doc: lxml.etree.Element, headers: Optional[Dict] = None,
-                 path: str = '/ows/') -> HTTPTestResponse:
-        return self.post(data=lxml.etree.tostring(doc, pretty_print=True),
-                         headers=headers, path=path)
+    def post_xml(
+        self,
+        doc: lxml.etree.Element,
+        headers: Optional[Dict] = None,
+        path: str = '/ows/',
+    ) -> HTTPTestResponse:
+        return self.post(
+            data=lxml.etree.tostring(doc, pretty_print=True),
+            headers=headers,
+            path=path,
+        )
 
-    def options(self, headers: Optional[Dict] = None, path: str = '/ows/') -> HTTPTestResponse:
-        return HTTPTestResponse(self._testcase.fetch(path, method='OPTIONS',
-                                headers=headers, raise_error=False))
+    def options(
+        self,
+        headers: Optional[Dict] = None,
+        path: str = '/ows/',
+    ) -> HTTPTestResponse:
+        return HTTPTestResponse(
+            self._testcase.fetch(
+                path, method='OPTIONS',
+                headers=headers,
+                raise_error=False,
+            ),
+        )
 
-    def head(self, query: str, headers: Optional[Dict] = None, path: str = '/ows/') -> HTTPTestResponse:
-        return HTTPTestResponse(self._testcase.fetch(path + query, method='HEAD',
-                                headers=headers, raise_error=False))
+    def head(
+        self,
+        query: str,
+        headers: Optional[Dict] = None,
+        path: str = '/ows/',
+    ) -> HTTPTestResponse:
+        return HTTPTestResponse(
+            self._testcase.fetch(
+                path + query,
+                method='HEAD',
+                headers=headers,
+                raise_error=False,
+            ),
+        )

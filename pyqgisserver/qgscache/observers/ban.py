@@ -52,4 +52,7 @@ async def ban(key: str) -> None:
 
 
 def observe(key: str, datetime: datetime, inserted: bool) -> None:
-    asyncio.create_task(ban(key))
+    background_tasks = set()
+    task = asyncio.create_task(ban(key))
+    background_tasks.add(task)
+    task.add_done_callback(background_tasks.discard)

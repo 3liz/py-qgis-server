@@ -22,8 +22,11 @@ import os
 import signal
 import traceback
 
-from collections import namedtuple
-from typing import Any, Awaitable
+from typing import (
+    Awaitable,
+    NamedTuple,
+    TypeVar,
+)
 
 import zmq
 import zmq.asyncio
@@ -32,12 +35,18 @@ from .utils import _get_ipc
 
 LOGGER = logging.getLogger('SRVLOG')
 
-_Report = namedtuple('_Report', ('data'))
+
+T = TypeVar('T')
+
+
+# Generic NamedTuple only supported in 3.11+
+class _Report(NamedTuple):  # , Generic[T]):
+    data: T
 
 
 class Client:
 
-    def __init__(self) -> None:
+    def __init__(self):
         """ Supervised client notifier
         """
         try:
@@ -54,7 +63,7 @@ class Client:
         self._pid = os.getpid()
         self._busy = False
 
-    def _send(self, data: Any) -> None:
+    def _send(self, data: bytes | _Report):
         if not self._sock:
             return
         try:
@@ -63,14 +72,14 @@ class Client:
             if err.errno != zmq.EAGAIN:
                 LOGGER.error("%s (%s)", zmq.strerror(err.errno), err.errno)
 
-    def notify_done(self) -> None:
+    def notify_done(self):
         """ Send 'ready' notification
         """
         if self._busy:
             self._busy = False
             self._send(b'DONE')
 
-    def notify_busy(self) -> None:
+    def notify_busy(self):
         """ send 'busy' notification
         """
         if not self._busy:
@@ -81,13 +90,13 @@ class Client:
         if self._sock:
             self._sock.close()
 
-    def send_report(self, data: Any) -> None:
+    def send_report(self, data: T):
         self._send(_Report(data=data))
 
 
 class Supervisor:
 
-    def __init__(self, timeout: int) -> None:
+    def __init__(self, timeout: int):
         """ Run supervisor
 
             :param timeout: timeout delay in seconds
@@ -155,7 +164,7 @@ class Supervisor:
     def clear_reports(self):
         self._reports = {}
 
-    def stop(self) -> None:
+    def stop(self):
         """ Stop the supervisor
         """
         LOGGER.info("Stopping supervisor")

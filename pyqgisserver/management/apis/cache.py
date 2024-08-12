@@ -12,7 +12,9 @@
 """
 import logging
 
-from tornado.web import HTTPError  # noqa F401
+from typing import Optional
+
+from tornado.web import HTTPError  # F401
 
 from pyqgisserver.qgscache.cachemanager import (
     get_cacheservice,
@@ -26,7 +28,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class CacheCollection(RequestHandler):
 
-    def get(self, key: str = None) -> None:
+    def get(self, key: Optional[str] = None) -> None:
         """ Return project cache info
         """
         if not key:

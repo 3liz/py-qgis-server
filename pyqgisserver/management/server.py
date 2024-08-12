@@ -12,16 +12,18 @@
 import logging
 import os
 
-from typing import Awaitable
+from typing import Dict, Optional
 from urllib.parse import quote_plus
 
 import tornado.web
 
+from tornado.httpserver import HTTPRequest
+
 from ..config import confservice
-from ..handlers import BaseHandler, NotFoundHandler
+from ..handlers import BaseHandler, NotFoundHandler, StatusHandler
 from ..handlers import OAPIHandler as QgisHandler
-from ..handlers import StatusHandler
 from ..logger import log_request
+from ..qgspool import WorkerPoolServer
 from ..zeromq import client
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -29,7 +31,7 @@ LOGGER = logging.getLogger('SRVLOG')
 
 class _PoolHandler(BaseHandler):
 
-    def initialize(self, poolserver) -> None:
+    def initialize(self, poolserver: WorkerPoolServer) -> None:
         super().initialize()
         self._poolserver = poolserver
 
@@ -41,7 +43,7 @@ class _PoolHandler(BaseHandler):
 
 class _RestartHandler(_PoolHandler):
 
-    def post(self, action) -> None:
+    def post(self, action: str) -> None:
         """ Handle POST method
         """
         # Broadcast 'restart' to workers
@@ -52,7 +54,7 @@ class _RestartHandler(_PoolHandler):
         self.write_json({'status': 'ok'})
 
 
-def _get_cache_link(key: str, req) -> str:
+def _get_cache_link(key: str, req: HTTPRequest) -> str:
     """ Build cache link
 
         Take care of absolute path
@@ -67,7 +69,7 @@ def _get_cache_link(key: str, req) -> str:
 
 class _ReportHandler(_PoolHandler):
 
-    async def get(self) -> Awaitable[None]:
+    async def get(self) -> None:
         """ Return worker reports
         """
         req = self.request
@@ -85,7 +87,7 @@ class _RootHandler(BaseHandler):
         """
         req = self.request
 
-        def _link(path: str, title: str):
+        def _link(path: str, title: str) -> Dict[str, str]:
             return {
                 'href': f"{req.protocol}://{req.host}{path}",
                 'title': title,
@@ -98,7 +100,7 @@ class _RootHandler(BaseHandler):
                 _link("/plugins", "Plugins managment"),
                 _link("/cache", "Projects cache managment"),
                 _link("/pool", "Workers pool status"),
-            ]
+            ],
         )
         self.write(data)
 
@@ -110,7 +112,7 @@ class _RootHandler(BaseHandler):
 
 class _CacheHandler(QgisHandler):
 
-    async def get(self, key: str = None) -> None:
+    async def get(self, key: Optional[str] = None) -> None:
         """ Return project cache info
         """
         if not key:
@@ -141,7 +143,10 @@ class _CacheHandler(QgisHandler):
         await super().handle_request('GET')
 
 
-def configure_handlers(poolserver, client: client.AsyncClient) -> [tornado.web.RequestHandler]:
+def configure_handlers(
+    poolserver: WorkerPoolServer,
+    client: client.AsyncClient,
+) -> [tornado.web.RequestHandler]:
     """
     """
     kwargs = {
@@ -165,7 +170,7 @@ def configure_handlers(poolserver, client: client.AsyncClient) -> [tornado.web.R
 
 class _Management(tornado.web.Application):
 
-    def __init__(self, poolserver, router: str) -> None:
+    def __init__(self, poolserver: WorkerPoolServer, router: str) -> None:
         """
         """
         identity = bytes(f"MANAGEMENT-{os.getpid()}".encode('ascii'))
@@ -191,7 +196,7 @@ def create_ssl_context(conf):
     return ssl_ctx
 
 
-def start_management_server(poolserver, router: str) -> _Management:
+def start_management_server(poolserver: WorkerPoolServer, router: str) -> _Management:
     """ Start management server,
     """
     conf = confservice['management']

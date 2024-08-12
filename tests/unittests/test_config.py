@@ -1,10 +1,10 @@
-import os
+from pyqgisserver.config import confservice
 from pyqgisserver.server import read_configuration
-from pyqgisserver.config import (confservice, read_config_file, validate_config_path)
+
 
 def test_argument_precedence():
     """ Test argument precedences
-    
+
         From lowest to highest:
          - default
          - environment
@@ -12,9 +12,9 @@ def test_argument_precedence():
          - command line
     """
     args = read_configuration([
-            '--workers','3',
-            '--port','9090',
-            '--config','test.conf',
+            '--workers', '3',
+            '--port', '9090',
+            '--config', 'test.conf',
         ])
 
     conf = confservice['server']
@@ -28,5 +28,4 @@ def test_argument_precedence():
     assert conf.getint('port') == 9090
 
     # rootdir must be '/tmp/' defined in config file
-    assert confservice.get('projects.cache','rootdir') == '/tmp/'
-
+    assert confservice.get('projects.cache', 'rootdir') == '/tmp/'

@@ -2,13 +2,18 @@
 """
 import os
 
-from typing import Any, Dict
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    Tuple,
+)
 
 TAG_PREFIX_LEGACY = 'AMQP_GLOBAL_TAG_'
 TAG_PREFIX = 'QGSRV_MONITOR_TAG_'
 
 
-def _get_tags(prefix: str):
+def _get_tags(prefix: str) -> Iterator[Tuple[str, str]]:
     return ((e.partition(prefix)[2], os.environ[e]) for e in os.environ if e.startswith(prefix))
 
 

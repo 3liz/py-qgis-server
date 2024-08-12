@@ -3,12 +3,13 @@
 """
 from pyqgisserver.tests import HTTPTestCase
 
+
 class Tests(HTTPTestCase):
 
     def test_status_request(self):
         """ Test response from root path
         """
-        rv = self.client.get('',path='/status/')
+        rv = self.client.get('', path='/status/')
         assert rv.status_code == 200
 
     def test_wms_getcapabilitiesatlas(self):
@@ -26,7 +27,7 @@ class Tests(HTTPTestCase):
         assert rv.headers['Content-Type'] == 'text/xml; charset=utf-8'
 
     def test_wfs_getcaps(self):
-        """ 
+        """
         """
         rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WFS&request=GetCapabilities")
         assert rv.status_code == 200
@@ -81,15 +82,12 @@ class Tests(HTTPTestCase):
             Use the 'headers' test plugin
         """
         headers = {
-            'X-Qgis-Test': 'This is Qgis header',        
-            'X-Lizmap-Test': 'This is Lizmap header',        
+            'X-Qgis-Test': 'This is Qgis header',
+            'X-Lizmap-Test': 'This is Lizmap header',
         }
 
         rv = self.client.get("?MAP=france_parts&SERVICE=WFS&request=GetCapabilities",
-                             headers = headers)
+                             headers=headers)
         assert rv.status_code == 200
         assert rv.headers['X-Qgis-Header'] == headers['X-Qgis-Test']
         assert rv.headers['X-Lizmap-Header'] == headers['X-Lizmap-Test']
-
-        
-

@@ -10,17 +10,14 @@ def test_lru_ordering():
     c['k2'] = 'bar'
     c['k3'] = 'baz'
 
-    assert tuple(c.keys()) == ('k3','k2','k1')
+    assert tuple(c.keys()) == ('k3', 'k2', 'k1')
 
     # Access key and test reordering
-    k = c['k1']
-    assert tuple(c.keys()) == ('k1','k3','k2')
+    _k = c['k1']
+    assert tuple(c.keys()) == ('k1', 'k3', 'k2')
 
     # Test size keeping
     c['k4'] = 'foo'
 
     assert len(c) == 3
-    assert tuple(c.keys()) == ('k4','k1','k3')
-
-
-
+    assert tuple(c.keys()) == ('k4', 'k1', 'k3')

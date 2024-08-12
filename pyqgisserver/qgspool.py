@@ -82,11 +82,16 @@ class _RestartHandler:
         self._restart.start()
 
 
-class _Server:
+class WorkerPoolServer:
 
-    def __init__(self, broadcastaddr: str, pool: Process, timeout: int,
-                 num_workers: int,
-                 high_water_mark: float = 1.0) -> None:
+    def __init__(
+        self,
+        broadcastaddr: str,
+        pool: Process,
+        timeout: int,
+        num_workers: int,
+        high_water_mark: float = 1.0,
+    ) -> None:
 
         ctx = zmq.Context.instance()
         pub = ctx.socket(zmq.PUB)
@@ -112,7 +117,7 @@ class _Server:
         self._terminate = Finalize(
             self, self._terminate_pool,
             args=(self._pool,),
-            exitpriority=16
+            exitpriority=16,
         )
 
     async def healthcheck(self) -> Awaitable[None]:
@@ -206,7 +211,7 @@ class _Server:
         return mem / 100.0
 
 
-def create_poolserver(numworkers: int) -> _Server:
+def create_poolserver(numworkers: int) -> WorkerPoolServer:
     """ Run workers pool in its own process
 
         This ensure that sub-processes all always forked from
@@ -221,7 +226,7 @@ def create_poolserver(numworkers: int) -> _Server:
     p = Process(target=run_worker_pool, args=(numworkers, broadcastaddr, router))
     p.start()
 
-    poolserver = _Server(broadcastaddr, p, timeout, numworkers,
+    poolserver = WorkerPoolServer(broadcastaddr, p, timeout, numworkers,
                          high_water_mark=high_water_mark)
     return poolserver
 

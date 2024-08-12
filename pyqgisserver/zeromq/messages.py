@@ -6,23 +6,25 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from collections import namedtuple
+from typing import Dict, NamedTuple, TypeVar
 
 WORKER_READY = b"ready"
 
+Meta = TypeVar("Meta")
+
 # Message structure
 
-RequestMessage = namedtuple("RequestMessage", (
-    "query",
-    "headers",
-    "method",
-    "data"
-))
+
+class RequestMessage(NamedTuple):
+    query: str
+    headers: Dict[str, str]
+    method: str
+    data: bytes
 
 
-ReplyMessage = namedtuple("ReplyMessage", (
-    "status",
-    "headers",
-    "data",
-    "meta",
-))
+# Generic namedTuple only supported in 3.11
+class ReplyMessage(NamedTuple):  # , Generic[Meta]):
+    status: int
+    headers: Dict[str, str]
+    data: bytes
+    meta: Meta

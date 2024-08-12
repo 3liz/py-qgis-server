@@ -16,7 +16,7 @@ import sys
 import traceback
 import uuid
 
-from typing import Any, Mapping, Tuple
+from typing import Mapping, Optional, Tuple
 
 import zmq
 import zmq.asyncio
@@ -111,7 +111,7 @@ class AsyncClient:
     """ Async DEALER ZMQ client
     """
 
-    def __init__(self, address: str, identity: bytes = None) -> None:
+    def __init__(self, address: str, identity: Optional[bytes] = None):
 
         context = zmq.asyncio.Context.instance()
 
@@ -127,6 +127,7 @@ class AsyncClient:
         self._handlers = {}
         self._socket = sock
         self._polling = False
+        self._poll_task: Optional[asyncio.Task] = None
         LOGGER.info("Starting client %s", self.identity)
 
     async def _poll(self) -> None:
@@ -153,9 +154,15 @@ class AsyncClient:
             except Exception as err:
                 LOGGER.error("%s exception %s\n%s", self.identity, err, traceback.format_exc())
         self._polling = False
+        self._poll_task = None
 
-    async def fetch(self, query: str, method: str = 'GET', headers: Mapping[str, str] = {},
-                    data: Any = None, timeout: int = 5) -> AsyncResponseHandler:
+    async def fetch(
+        self, query: str,
+        method: str = 'GET',
+        headers: Mapping[str, str] = {},
+        data: Optional[bytes] = None,
+        timeout: int = 5,
+    ) -> AsyncResponseHandler:
         """ Send a request message to the worker
         """
         # Send request
@@ -173,7 +180,7 @@ class AsyncClient:
         self._handlers[correlation_id] = handler
         # Run poller if needed
         if not self._polling:
-            asyncio.ensure_future(self._poll())
+            self._poll_task = asyncio.create_task(self._poll())
 
         # Wait for response
         try:
@@ -219,7 +226,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     setup_log_handler(args.logging)
-    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
+    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)  # noqa: T201
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 
@@ -229,9 +236,9 @@ if __name__ == '__main__':
     async def fetch(index):
         try:
             response = await client.fetch(query="?service=WMS", data=b"Hello world from %d" % index)
-            print("%d -> response = %s" % (index, response.data))
+            print("%d -> response = %s" % (index, response.data))  # noqa: T201
             async for chunk in client.fetch_more(response):
-                print("%d -> chunk = %s" % (index, chunk))
+                print("%d -> chunk = %s" % (index, chunk))  # noqa: T201
         except RequestTimeoutError:
             LOGGER.error("%d -> TIMEOUT", index)
         except RequestGatewayError:
@@ -243,4 +250,4 @@ if __name__ == '__main__':
 
     client.terminate()
 
-    print("DONE", file=sys.stderr)
+    print("DONE", file=sys.stderr)  # noqa: T201

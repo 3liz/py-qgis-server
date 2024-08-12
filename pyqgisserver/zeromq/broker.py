@@ -154,23 +154,50 @@ def run_broker(inaddr: str, outaddr: str, maxqueue: int = 100, timeout: int = 30
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Test broker')
-    parser.add_argument('--iface', metavar="host", default="tcp://127.0.0.1",
-                        help="Interface to bind to")
-    parser.add_argument('--in', dest='inaddr', metavar='address', default='{iface}:8880',
-                        help="frontend address")
-    parser.add_argument('--out', dest='outaddr', metavar='address', default='{iface}:8881',
-                        help="backend address")
-    parser.add_argument('--logging', choices=['debug', 'info', 'warning', 'error'], default='info',
-                        help="set log level")
-    parser.add_argument('--maxqueue', metavar='NUM', type=int, default=100,
-                        help="Max waiting queue")
-    parser.add_argument('--timeout', metavar='NUM', type=int, default=3000,
-                        help="Set timeout in ms for waiting requests")
+    parser.add_argument(
+        '--iface',
+        metavar="host",
+        default="tcp://127.0.0.1",
+        help="Interface to bind to",
+    )
+    parser.add_argument(
+        '--in',
+        dest='inaddr',
+        metavar='address',
+        default='{iface}:8880',
+        help="frontend address",
+    )
+    parser.add_argument(
+        '--out',
+        dest='outaddr',
+        metavar='address',
+        default='{iface}:8881',
+        help="backend address",
+    )
+    parser.add_argument(
+        '--logging',
+        choices=['debug', 'info', 'warning', 'error'],
+        default='info',
+        help="set log level",
+    )
+    parser.add_argument(
+        '--maxqueue',
+        metavar='NUM',
+        type=int, default=100,
+        help="Max waiting queue",
+    )
+    parser.add_argument(
+        '--timeout',
+        metavar='NUM',
+        type=int,
+        default=3000,
+        help="Set timeout in ms for waiting requests",
+    )
 
     args = parser.parse_args()
 
     setup_log_handler(args.logging)
-    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
+    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)  # noqa: T201
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 
@@ -178,4 +205,4 @@ if __name__ == '__main__':
                args.outaddr.format(iface=args.iface),
                maxqueue=args.maxqueue,
                timeout=args.timeout)
-    print("DONE", file=sys.stderr)
+    print("DONE", file=sys.stderr)  # noqa: T201

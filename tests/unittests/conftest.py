@@ -1,11 +1,10 @@
-import sys
-import os
+from pathlib import Path
+from time import sleep
+
 import pytest
 
 from pyqgisserver.tests import TestRuntime
-from time import sleep
 
-from pathlib import Path
 
 def pytest_addoption(parser):
     parser.addoption("--with-postgres", action="store_true", help="Run postgres tests",
@@ -19,7 +18,7 @@ def pytest_configure(config):
     # Debug mode
     global postgres_user
 
-    # Postgres 
+    # Postgres
     config.with_postgres = config.getoption('with_postgres')
     config.addinivalue_line("markers", "with_postgres: mark test as postgres run")
 
@@ -60,5 +59,3 @@ def pytest_sessionfinish(session, exitstatus):
     """
     rt = TestRuntime.instance()
     rt.stop()
-   
-

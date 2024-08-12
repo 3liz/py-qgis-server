@@ -1,7 +1,7 @@
 
 # Project version
 
-VERSION:=1.8.8
+VERSION:=1.9
 
 ifndef CI_COMMIT_TAG
 VERSION_TAG=$(VERSION)rc0

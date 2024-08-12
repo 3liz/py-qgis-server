@@ -18,7 +18,16 @@ import os
 import traceback
 
 from datetime import datetime
-from typing import Any, Awaitable, Iterable, NamedTuple, Optional, Tuple
+from typing import (
+    Any,
+    Awaitable,
+    ClassVar,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+)
 
 import zmq
 import zmq.asyncio
@@ -48,7 +57,7 @@ class Client:
         self._sock.connect(address)
         self._pid = os.getpid()
 
-    def _send(self, data: Any) -> None:
+    def _send(self, data: Any) -> None:   # noqa ANN401
         try:
             self._sock.send_pyobj((self._pid, data), flags=zmq.DONTWAIT)
         except zmq.ZMQError as err:
@@ -66,8 +75,8 @@ class Client:
 
 class Server:
 
-    _declared_observers = []
-    _enabled = False
+    _declared_observers: ClassVar[List] = []
+    _enabled: ClassVar[bool] = False
 
     @classmethod
     def declare_observers(cls):
@@ -174,7 +183,7 @@ class Server:
         if self._task and not self._task.cancelled():
             self._task.cancel()
 
-    def notify_observers(self, key: str, modified_time: datetime, state=UpdateState) -> None:
+    def notify_observers(self, key: str, modified_time: datetime, state: UpdateState) -> None:
         """ Run registered observers
         """
         for obs in self._observers:

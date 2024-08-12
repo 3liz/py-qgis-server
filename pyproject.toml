@@ -27,6 +27,7 @@ dependencies = [
     "tornado >= 5",
     "pyzmq >= 17",
     "PyYAML",
+    "typing-extensions",
 ]
 dynamic = ["version"]
 

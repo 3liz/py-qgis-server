@@ -16,10 +16,10 @@
 """
 
 import logging
-import sys
 
 from collections import namedtuple
-from typing import Any, Callable, Optional
+from importlib import metadata
+from typing import Any, Callable, Optional, Sequence
 
 
 class ComponentManagerError(Exception):
@@ -43,40 +43,21 @@ LOGGER = logging.getLogger('SRVLOG')
 FactoryEntry = namedtuple('FactoryEntry', ('create_instance', 'service'))
 
 
-def _entry_points(group: str, name: Optional[str] = None):
+def _entry_points(group: str, name: Optional[str] = None) -> Sequence[metadata.EntryPoint]:
     """ Return entry points
     """
-    ver = sys.version_info[:2]
-    if ver >= (3, 10):
-        from importlib import metadata
-
-        # See https://docs.python.org/3.10/library/importlib.metadata.html
-        return metadata.entry_points().select(group=group, name=name)
-    elif ver >= (3, 8):
-        from importlib import metadata
-
-        # Return a dict
-        # see https://docs.python.org/3.8/library/importlib.metadata.html
-        eps = metadata.entry_points().get(group, [])
-        if name:
-            eps = [ep for ep in eps if ep.name == name]
-        return eps
-    else:
-        from pkg_resources import iter_entry_points
-        eps = iter_entry_points(group)
-        if name:
-            eps = [ep for ep in eps if ep.name == name]
-        return eps
+    # See https://docs.python.org/3.10/library/importlib.metadata.html
+    return metadata.entry_points().select(group=group, name=name)
 
 
 class ComponentManager:
 
-    def __init__(self) -> None:
+    def __init__(self):
         """ Component Manager
         """
         self._contractIDs = {}
 
-    def register_entrypoints(self, category, *args, **kwargs) -> None:
+    def register_entrypoints(self, category, *args, **kwargs):
         """ Load extension modules
 
             Loaded modules will do self-registration
@@ -90,7 +71,7 @@ class ComponentManager:
             return ep.load()
         raise EntryPointNotFoundError(name)
 
-    def register_factory(self, contractID: str, factory: Callable[[], None]) -> None:
+    def register_factory(self, contractID: str, factory: Callable[[], None]):
         """ Register a factory for the given contract ID
         """
         if not callable(factory):
@@ -99,7 +80,7 @@ class ComponentManager:
         LOGGER.debug("Registering factory: %s", contractID)
         self._contractIDs[contractID] = FactoryEntry(factory, None)
 
-    def register_service(self, contractID: str, service: Any) -> None:
+    def register_service(self, contractID: str, service: Any):
         """ Register an instance object as singleton service
         """
         def nullFactory():
@@ -145,7 +126,7 @@ def create_instance(contractID: str) -> Any:
     return gComponentManager.create_instance(contractID)
 
 
-def register_entrypoints(category: str, *args, **kwargs) -> None:
+def register_entrypoints(category: str, *args, **kwargs):
     """ Alias to component_manager.register_components
     """
     gComponentManager.register_entrypoints(category, *args, **kwargs)
@@ -161,15 +142,15 @@ def load_entrypoint(category: str, name: str) -> Any:
 #
 
 
-def register_service(contractID: str) -> Any:
-    def wrapper(obj: Any):
+def register_service(contractID: str) -> Callable:
+    def wrapper(obj):
         gComponentManager.register_service(contractID, obj)
         return obj
     return wrapper
 
 
-def register_factory(contractID: str) -> Any:
-    def wrapper(obj: Any):
+def register_factory(contractID: str) -> Callable:
+    def wrapper(obj):
         gComponentManager.register_factory(contractID, obj)
         return obj
     return wrapper

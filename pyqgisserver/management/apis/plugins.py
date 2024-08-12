@@ -14,7 +14,7 @@ import logging
 
 from typing import Optional
 
-from tornado.web import HTTPError  # noqa F401
+from tornado.web import HTTPError  # F401
 
 from pyqgisserver.plugins import failed_plugins, plugin_list, plugin_metadata
 

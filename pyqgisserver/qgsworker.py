@@ -26,7 +26,7 @@ except ImportError:
 
 from datetime import datetime
 from time import time
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QBuffer, QByteArray, QIODevice, Qt
@@ -60,7 +60,7 @@ HTTP_METHODS = {
 
 class Request(QgsServerRequest):
 
-    def __init__(self, handler: RequestHandler) -> None:
+    def __init__(self, handler: RequestHandler):
         """ Create a new QgsServerRequest from zmq handler request
         """
         req = handler.request
@@ -87,7 +87,7 @@ class Response(QgsServerResponse):
         The data is written at 'flush()' call.
     """
 
-    def __init__(self, handler: RequestHandler, metadata_fn: Callable) -> None:
+    def __init__(self, handler: RequestHandler, metadata_fn: Callable):
         super().__init__()
         self._handler = handler
         self._buffer = QBuffer()
@@ -102,13 +102,13 @@ class Response(QgsServerResponse):
         if self._metadata_fn:
             return self._metadata_fn()
 
-    def setExtraHeader(self, key: str, value: str) -> None:
+    def setExtraHeader(self, key: str, value: str):
         # Keep extra headers so we may
         # set them again on clear()
         self._extra_headers[key] = value
         self.setHeader(key, value)
 
-    def setStatusCode(self, code: int) -> None:
+    def setStatusCode(self, code: int):
         if not self._handler.header_written:
             self._handler.status_code = code
         else:
@@ -117,13 +117,13 @@ class Response(QgsServerResponse):
     def statusCode(self) -> int:
         return self._handler.status_code
 
-    def finish(self) -> None:
+    def finish(self):
         """ Terminate the request
         """
         self._finish = True
         self.flush()
 
-    def flush(self) -> None:
+    def flush(self):
         """ Write the data to the handler buffer
             and flush the socket
 
@@ -177,16 +177,16 @@ class Response(QgsServerResponse):
         """
         return self._buffer.data()
 
-    def setHeader(self, key: str, value: str) -> None:
+    def setHeader(self, key: str, value: str):
         if not self._handler.header_written:
             self._handler.headers[key] = value
         else:
             LOGGER.error("Cannot set header after header written")
 
-    def removeHeader(self, key: str) -> None:
+    def removeHeader(self, key: str):
         self._handler.headers.pop(key, None)
 
-    def sendError(self, code: int, message: Optional[str] = None) -> None:
+    def sendError(self, code: int, message: Optional[str] = None):
         try:
             if not self._handler.header_written:
                 LOGGER.error("%s (%s)", message, code)
@@ -198,20 +198,20 @@ class Response(QgsServerResponse):
         except Exception:
             LOGGER.critical("Unrecoverable exception:\n%s", traceback.format_exc())
 
-    def _clearHeaders(self) -> None:
+    def _clearHeaders(self):
         """ Clear headers set so far
         """
         self._handler.headers = {}
         self._handler.headers.update(self._extra_headers)
 
-    def clear(self) -> None:
+    def clear(self):
         self._clearHeaders()
         self.truncate()
 
     def headersSent(self) -> bool:
         return self._handler.header_written
 
-    def truncate(self) -> None:
+    def truncate(self):
         """ Truncate buffer
         """
         self._buffer.seek(0)
@@ -221,7 +221,7 @@ class Response(QgsServerResponse):
 class QgsRequestHandler(RequestHandler):
 
     @classmethod
-    def init_server(cls) -> None:
+    def init_server(cls):
         """ Initialize qgis server
         """
         if hasattr(cls, 'qgis_server'):
@@ -294,7 +294,7 @@ class QgsRequestHandler(RequestHandler):
         return cls._default_project_location
 
     @classmethod
-    def refresh_cache(cls) -> None:
+    def refresh_cache(cls):
         if cls._cache_check_interval <= 0 or time() - cls._cache_last_check < cls._cache_check_interval:
             return
         LOGGER.debug("Refreshing cache")
@@ -308,11 +308,11 @@ class QgsRequestHandler(RequestHandler):
         cls._cache_last_check = time()
 
     @classmethod
-    def cache_lookup(cls, key) -> Tuple[QgsProject, UpdateState]:
+    def cache_lookup(cls, key: str) -> Tuple[QgsProject, UpdateState]:
         return cls._cache_service.lookup(key, refresh=cls._cache_check_interval <= 0)
 
     @classmethod
-    def post_process(cls, idle: bool) -> None:
+    def post_process(cls, idle: bool):
         """ Post processing operation
 
             At this time request has been replied and worker is not busy anymore
@@ -360,7 +360,7 @@ class QgsRequestHandler(RequestHandler):
         return etag == "*" or etag == computed_etag
 
     @staticmethod
-    def run(router: str, identity: str = "", **kwargs: Any) -> None:
+    def run(router: str, identity: str = "", **kwargs):
         """ Run qgis server worker loop
         """
         QgsRequestHandler.init_server()
@@ -381,7 +381,7 @@ class QgsRequestHandler(RequestHandler):
                 }
             return _metadata_report
 
-    def handle_message(self) -> None:
+    def handle_message(self):
         """ Override this method to handle_messages
         """
         LOGGER.debug("Handling request: %s", self.msgid)
@@ -425,7 +425,13 @@ class QgsRequestHandler(RequestHandler):
 
         self.handle_qgis_request(ogc_scheme, project_location, request, response)
 
-    def handle_qgis_request(self, ogc_scheme: str, project_location: str, request: Request, response: Response) -> None:
+    def handle_qgis_request(
+        self,
+        ogc_scheme: str,
+        project_location: str,
+        request: Request,
+        response: Response,
+    ):
         """ Handle request passed to Qgis
         """
         if not project_location:
@@ -474,7 +480,7 @@ class QgsRequestHandler(RequestHandler):
     def get_report(cls):
         report = super().get_report()
 
-        def _to_json(key: str, project: QgsProject, static: bool):
+        def _to_json(key: str, project: QgsProject, static: bool) -> Dict:
             return dict(
                 key=key,
                 filename=project.fileName(),
@@ -487,7 +493,7 @@ class QgsRequestHandler(RequestHandler):
         items.update((k, (d, True)) for (k, d) in get_cacheservice().items(CacheType.STATIC))
 
         report.update(
-            cache=[_to_json(k, d.project, static) for (k, (d, static)) in items.items()]
+            cache=[_to_json(k, d.project, static) for (k, (d, static)) in items.items()],
         )
         return report
 
@@ -519,12 +525,15 @@ def main():
 
     args = parser.parse_args()
 
-    def print_version(verbose=False) -> None:
+    def print_version(verbose: bool = False):
         """ Display version infos
         """
+        m = __manifest__
         from .utils.qgis import print_qgis_version
         program = os.path.basename(sys.argv[0])
-        print("{program} {version} (build {buildid},commit {commitid})".format(program=program, **__manifest__))
+        print(  # noqa: T201
+            f"{program} {m['version']} (build {m['buildid']},commit {m['commitid']})",
+        )
         print_qgis_version(verbose=verbose)
 
     if args.version:
@@ -540,7 +549,7 @@ def main():
             read_config_file(config_file)
 
     # Override config
-    def set_arg(section: str, name: str) -> None:
+    def set_arg(section: str, name: str):
         if name in args:
             confservice.set(section, name, str(getattr(args, name)))
 
@@ -556,7 +565,10 @@ def main():
     validate_config_path('projects.cache', 'rootdir')
 
     setup_log_handler(confservice.get('logging', 'level'))
-    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
+    print(  # noqa: T201
+        f"Log level set to {logging.getLevelName(LOGGER.level)}\n",
+        file=sys.stderr,
+    )
 
     broadcastaddr = confservice.get('zmq', 'broadcastaddr')
     router = confservice.get('zmq', 'bindaddr')
@@ -564,4 +576,4 @@ def main():
     QgsRequestHandler.run(router, identity=args.identity,
                           broadcastaddr=broadcastaddr)
 
-    print("Qgis worker terminated", file=sys.stderr)
+    print("Qgis worker terminated", file=sys.stderr)  # noqa: T201

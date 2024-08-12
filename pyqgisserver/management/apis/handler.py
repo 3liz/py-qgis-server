@@ -15,16 +15,27 @@ import logging
 import sys
 import traceback
 
-from typing import Any, List, Optional, Tuple, Type, Union
+from types import MappingProxyType
+
+from tornado import httputil
+from tornado.web import HTTPError  # F401
+from typing_extensions import (
+    ClassVar,
+    List,
+    Optional,
+    Self,
+    Tuple,
+    Type,
+    Union,
+)
 
 from qgis.PyQt.QtCore import QRegularExpression, QUrl
 from qgis.server import (
+    QgsServerInterface,
     QgsServerOgcApi,
     QgsServerOgcApiHandler,
     QgsServerRequest,
 )
-from tornado import httputil
-from tornado.web import HTTPError  # noqa F401
 
 LOGGER = logging.getLogger('SRVLOG')
 
@@ -45,7 +56,7 @@ class RequestHandler:
     def request(self) -> QgsServerRequest:
         return self._request
 
-    def public_url(self, path="", rootpath: Optional[str] = None) -> str:
+    def public_url(self, path: str = "", rootpath: Optional[str] = None) -> str:
         """ Return the public base url
         """
         url = self._request.originalUrl()
@@ -84,7 +95,7 @@ class RequestHandler:
         else:
             self._reason = httputil.responses.get(status_code, "Unknown")
 
-    def send_error(self, status_code: int = 500, **kwargs: Any) -> None:
+    def send_error(self, status_code: int = 500, **kwargs) -> None:
         """
         """
         self._response.clear()
@@ -115,14 +126,14 @@ class RequestHandler:
     patch = _unimplemented_method
     put = _unimplemented_method
 
-    METHODS = {
+    METHODS = MappingProxyType({
         QgsServerRequest.HeadMethod: 'head',
         QgsServerRequest.PutMethod: 'put',
         QgsServerRequest.GetMethod: 'get',
         QgsServerRequest.PostMethod: 'post',
         QgsServerRequest.PatchMethod: 'patch',
         QgsServerRequest.DeleteMethod: 'delete',
-    }
+    })
 
     def _execute(self, values):
         """ Execute the request
@@ -161,10 +172,13 @@ class RequestHandlerDelegate(QgsServerOgcApiHandler):
 
     # XXX We need to preserve instances from garbage
     # collection
-    __instances = []
+    __instances: ClassVar[List[Self]] = []
 
-    def __init__(self, path: str, handler: Type[RequestHandler],
-                 content_types=[QgsServerOgcApi.JSON]):
+    def __init__(
+        self, path: str,
+        handler: Type[RequestHandler],
+        content_types: List[str] = [QgsServerOgcApi.JSON],
+    ):
 
         super().__init__()
         if content_types:
@@ -209,7 +223,7 @@ class RequestHandlerDelegate(QgsServerOgcApiHandler):
 
 class _ServerApi(QgsServerOgcApi):
 
-    __instances = []
+    __instances: ClassVar[List[Self]] = []
 
     # See above
     def __init__(self, *args, **kwargs):
@@ -223,11 +237,16 @@ class _ServerApi(QgsServerOgcApi):
         return url.path().startswith(self.rootPath())
 
 
-def register_handlers(serverIface, rootpath: str, name: str, handlers: List[Tuple[str, Type[RequestHandler]]],
-                      descripton: Optional[str] = None,
-                      version: Optional[str] = None) -> None:
+def register_handlers(
+    serverIface: QgsServerInterface,
+    rootpath: str,
+    name: str,
+    handlers: List[Tuple[str, Type[RequestHandler]]],
+    description: Optional[str] = None,
+    version: Optional[str] = None,
+) -> None:
 
-    api = _ServerApi(serverIface, rootpath, name, descripton, version)
+    api = _ServerApi(serverIface, rootpath, name, description, version)
     for (path, handler) in handlers:
         api.registerHandler(RequestHandlerDelegate(path, handler))
 

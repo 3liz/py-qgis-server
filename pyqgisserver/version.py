@@ -19,7 +19,7 @@ def read_manifest() -> Dict:
         with resource_stream('pyqgisserver', 'build.manifest') as stream:
             manifest.update(line.decode().strip().split('=')[:2] for line in stream.readlines())
     except Exception as e:
-        print("WARNING: Failed to read manifest ! %s " % e, file=sys.stderr)
+        print("WARNING: Failed to read manifest ! %s " % e, file=sys.stderr)  # noqa: T201
     return manifest
 
 

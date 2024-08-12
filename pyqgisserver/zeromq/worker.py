@@ -22,13 +22,13 @@ import sys
 import traceback
 import uuid
 
-from typing import Any, Callable, Optional, Type, TypeVar
+from typing import Callable, Optional, Type, TypeVar
 
 import zmq
 
 from ..logger import setup_log_handler
 from ..utils import stats
-from .messages import WORKER_READY, ReplyMessage
+from .messages import WORKER_READY, Meta, ReplyMessage
 from .supervisor import Client as SupervisorClient
 
 LOGGER = logging.getLogger('SRVLOG')
@@ -65,7 +65,7 @@ class RequestHandler:
             self._correlation_id,
             data])
 
-    def send(self, data: bytes, send_more: bool = False, meta: Any = None) -> None:
+    def send(self, data: bytes, send_more: bool = False, meta: Optional[Meta] = None) -> None:
         """ Send data
         """
         if not self.header_written:
@@ -74,7 +74,15 @@ class RequestHandler:
             if send_more and self.status_code == 200:
                 self.status_code = 206
             # Create a Header Message
-            message = pickle.dumps(ReplyMessage(self.status_code, headers=self.headers, data=data, meta=meta), -1)
+            message = pickle.dumps(
+                ReplyMessage(
+                    self.status_code,
+                    headers=self.headers,
+                    data=data,
+                    meta=meta,
+                ),
+                -1,
+            )
             self._write(message)
             self.header_written = True
         elif self.status_code == 206:
@@ -95,7 +103,7 @@ class RequestHandler:
     def handle_message(self) -> None:
         """ Override this method to handle_messages
         """
-        print("Received", self.request.data, "from", self._client_id)
+        print("Received", self.request.data, "from", self._client_id)  # noqa T201
         self.send(b"Hello %s" % self._client_id, True)
         self.send(b"Chunk 1", True)
         self.send(b"Chunk 2", True)
@@ -136,9 +144,13 @@ def broadcast_socket(ctx: zmq.Context, broadcastaddr: str) -> zmq.Socket:
     return sub
 
 
-def run_worker(address: str, handler_factory: Type[RequestHandler],
-               identity: Optional[bytes] = None, broadcastaddr: Optional[str] = None,
-               postprocess=Callable[[], None]) -> None:
+def run_worker(
+    address: str,
+    handler_factory: Type[RequestHandler],
+    identity: Optional[bytes] = None,
+    broadcastaddr: Optional[str] = None,
+    postprocess: Optional[Callable[[], None]] = None,
+) -> None:
     """ Enter the message loop
     """
     ctx = zmq.Context.instance()
@@ -228,10 +240,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     setup_log_handler(args.logging)
-    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)
+    print(f"Log level set to {logging.getLevelName(LOGGER.level)}\n", file=sys.stderr)  # noqa: T201
 
     LOGGER.setLevel(getattr(logging, args.logging.upper()))
 
     run_worker(args.router.format(host=args.host), RequestHandler,
                identity=bytes(args.identity.encode('ascii')))
-    print("DONE", file=sys.stderr)
+    print("DONE", file=sys.stderr)  # noqa: T201
