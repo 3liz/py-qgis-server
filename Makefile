@@ -44,7 +44,11 @@ dist: dirs configure
 clean:
 	rm -rf $(BUILDDIR)
 
-test: lint test-test
+test: lint
+	make -C tests test PYTEST_ADDOPTS=$(PYTEST_ADDOPTS)
+
+install:
+	pip install -U --upgrade-strategy=eager -e .
 
 install-tests:
 	pip install -U --upgrade-strategy=eager -r tests/requirements.txt
@@ -53,9 +57,6 @@ install-doc:
 	pip install -U --upgrade-strategy=eager -r doc/requirements.txt
 
 install-dev: install-tests install-doc
-
-install:
-	pip install -U --upgrade-strategy=eager -e .
 
 lint:
 	@ruff check $(PYTHON_PKG) $(TESTDIR)
@@ -69,5 +70,3 @@ lint-fix:
 typing:
 	mypy --config-file=$(topsrcdir)/mypy.ini -p pyqgisserver
 
-test-%:
-	$(MAKE) -C tests env $* FLAVOR=$(FLAVOR)

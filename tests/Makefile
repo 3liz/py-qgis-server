@@ -23,14 +23,6 @@ SRCDIR=$(shell realpath ..)
 
 PLUGINPATH:=$(SRCDIR)/tests/plugins
 
-local:
-	mkdir -p $$(pwd)/.local  $$(pwd)/.cache
-
-_clean:
-	rm -rf $$(pwd)/.local $$(pwd)/.cache
-
-clean: _clean env
-
 PGUSER ?= $(USER)
 PGDATABASE ?= $(USER)
 PGAPPNAME ?= py-qgis-server-tests
@@ -43,7 +35,7 @@ STRICT_CHECK:=yes
 WORKERS:=1
 PROJECTPATH:=$(SRCDIR)/tests/data
 
-env: local
+env:
 	@echo "Creating environment file for docker-compose"
 	@cat <<-EOF > .env
 		SRCDIR=$(SRCDIR)
@@ -70,8 +62,14 @@ env: local
 		COMPOSE_PROJECT_NAME=test-py-qgis-server
 		EOF
 
-test: export RUN_COMMAND=./tests/run_tests.sh
-test: env up stop
+test: 
+	SRCDIR=$(SRCDIR) source tests.env \
+	&& export $$(cut -d= -f1 tests.env) \
+	&& cd unittests \
+	&& pytest -v $(ADDOPTS)
+
+#test: export RUN_COMMAND=./tests/run_tests.sh
+#test: env up stop
 
 %-test: export RUN_COMMAND=./tests/run_tests.sh
 %-test: env
@@ -84,7 +82,7 @@ test: env up stop
 run: export RUN_COMMAND=./tests/run_server.sh
 run: up
 
-up:
+up: env
 	docker compose up -V --quiet-pull  --remove-orphans \
 		--force-recreate --exit-code-from qgis-server
 
@@ -95,12 +93,12 @@ stop:
 # Run server with extra services
 #
 %-run: export RUN_COMMAND=./tests/run_server.sh
-%-run:
+%-run: env
 	docker compose \
 	-f docker-compose.yml \
 	-f docker-compose.$*.yml up -V --quiet-pull --remove-orphans --force-recreate -d
 
-run-proxy: 
+run-proxy: env
 	docker compose -f docker-compose.proxy.yml \
 		up -V --quiet-pull --remove-orphans --force-recreate -d
 

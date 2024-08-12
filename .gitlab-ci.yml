@@ -4,7 +4,6 @@ variables:
 
 stages:
 - test
-- build
 - docker
 - deploy
 - release
@@ -15,11 +14,15 @@ stages:
 #-----------------
 
 .tests:
+  image: ${REGISTRY_URL}/factory-ci-runner:qgis-${QGIS_FLAVOR}
   stage: test
   script:
-    - make manifest test FLAVOR=$QGIS_FLAVOR
+    - source ~/.bashrc
+    - make install install-tests
+    - pip list -l
+    - make manifest test
   tags:
-    - infrav3-dind
+    - factory-plain
 
 tests:ltr:
   extends: .tests
@@ -39,26 +42,6 @@ tests:3.28:
     - "tests:release"
   variables:
     QGIS_FLAVOR: "3.28"
-
-#---------------
-# Build
-#---------------
-
-build:
-  stage: build
-  script:
-    - make dist deliver
-  environment:
-    name: snap
-  tags:
-    - infrav3-plain
-  only:
-    refs:
-      - tags
-      - master
-  except:
-      - schedules
-      - triggers
 
 # Docker build
 include: '/docker/.gitlab-ci.yml'
