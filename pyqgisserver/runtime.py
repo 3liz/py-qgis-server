@@ -21,7 +21,6 @@ import tornado.platform.asyncio
 import tornado.web
 
 from tornado.routing import _RuleList
-from tornado.web import RedirectHandler
 
 from .config import confservice, qgis_api_endpoints
 from .handlers import (
@@ -84,9 +83,6 @@ def configure_handlers(client: client.AsyncClient) -> _RuleList:
         rf"/api{end}",
         r"/static/.*",
     ]
-
-    # XXX DEPRECATED (to be removed in 1.9)
-    handlers.append((rf"/ows/wfs3({end}.*)", RedirectHandler, {'url': "/wfs3{0}"}))
 
     # New scheme
     kw = _ows_args(service='WFS3')
