@@ -14,10 +14,7 @@ NAME=qgis-map-server
 FLAVOR:=release
 
 # Server version
-BUILD_VERSION:=$(shell cd .. && python3 setup.py --version)
-ifeq ($(BUILD_VERSION),)
-$(error failed to retrieve build version)
-endif
+BUILD_VERSION:=$(VERSION_TAG)
 
 ifdef PYPISERVER
 PYPISERVER_SCHEME ?= https
