@@ -5,12 +5,9 @@
 
 import pytest
 
-from qgis.core import Qgis
-
 from pyqgisserver.tests import HTTPTestCase
 
 
-@pytest.mark.skipif(Qgis.QGIS_VERSION_INT < 32000, reason="Requires qgis >= 3.20")
 class Tests(HTTPTestCase):
 
     # XXX This test takes an insane amount with QGIS >= 3.26+

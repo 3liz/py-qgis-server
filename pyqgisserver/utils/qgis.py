@@ -52,8 +52,8 @@ def start_qgis_application(
 
     logger.info("Starting Qgis application: %s", Qgis.QGIS_VERSION)
 
-    if QgsApplication.QGIS_APPLICATION_NAME != "QGIS3":
-        raise RuntimeError("You need QGIS3 (found %s)" % QgsApplication.QGIS_APPLICATION_NAME)
+    if Qgis.QGIS_VERSION_INT < 32800:
+        raise RuntimeError(f"You need QGIS 3.28+ (found {Qgis.QGIS_VERSION_INT})")
 
     if not enable_gui:
         #  We MUST set the QT_QPA_PLATFORM to prevent
@@ -183,13 +183,8 @@ def init_qgis_server(**kwargs) -> qgis.server.QgsServer:
 def print_qgis_version(verbose: bool = False) -> None:
     """ Output the qgis version
     """
-    from qgis.core import Qgis
-
-    if Qgis.QGIS_VERSION_INT < 32200:
-        print(f"QGIS {Qgis.QGIS_VERSION} '{Qgis.QGIS_RELEASE_NAME}' ({Qgis.QGIS_VERSION_INT})")  # noqa T201 
-    else:
-        from qgis.core import QgsCommandLineUtils
-        print(QgsCommandLineUtils.allVersions())  # noqa T201
+    from qgis.core import QgsCommandLineUtils
+    print(QgsCommandLineUtils.allVersions())  # noqa T201
 
     if verbose:
         start_qgis_application(verbose=True)

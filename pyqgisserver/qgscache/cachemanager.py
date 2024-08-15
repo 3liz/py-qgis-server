@@ -163,10 +163,7 @@ class QgsCacheManager:
         self._default_scheme = cnf.get('default_handler')
         self._observers = []
 
-        if Qgis.QGIS_VERSION_INT < 32800:
-            self._read_only_layers = False
-        else:
-            self._read_only_layers = cnf.getboolean('force_readonly_layers')
+        self._read_only_layers = cnf.getboolean('force_readonly_layers')
 
         allowed_schemes = cnf.get('allow_storage_schemes')
         if allowed_schemes != '*':
@@ -429,22 +426,14 @@ class QgsCacheManager:
         LOGGER.debug("Reading Qgis project %s", uri)
 
         # see https://github.com/qgis/QGIS/pull/49266
-        if Qgis.QGIS_VERSION_INT < 32601:
-            project = self._create_project()
-            readflags = QgsProject.ReadFlags()
-            if self._trust_layer_metadata:
-                readflags |= QgsProject.FlagTrustLayerMetadata
-            if self._disable_getprint:
-                readflags |= QgsProject.FlagDontLoadLayouts
-        else:
-            project = self._create_project(capabilities=Qgis.ProjectCapabilities())
-            readflags = Qgis.ProjectReadFlags()
-            if self._trust_layer_metadata:
-                readflags |= Qgis.ProjectReadFlag.TrustLayerMetadata
-            if self._disable_getprint:
-                readflags |= Qgis.ProjectReadFlag.DontLoadLayouts
-            if self._read_only_layers:
-                readflags |= Qgis.ProjectReadFlag.ForceReadOnlyLayers
+        project = self._create_project(capabilities=Qgis.ProjectCapabilities())
+        readflags = Qgis.ProjectReadFlags()
+        if self._trust_layer_metadata:
+            readflags |= Qgis.ProjectReadFlag.TrustLayerMetadata
+        if self._disable_getprint:
+            readflags |= Qgis.ProjectReadFlag.DontLoadLayouts
+        if self._read_only_layers:
+            readflags |= Qgis.ProjectReadFlag.ForceReadOnlyLayers
 
         badlayerh = BadLayerHandler()
         project.setBadLayerHandler(badlayerh)

@@ -41,8 +41,8 @@ See the QGIS [roadmap](https://www.qgis.org/en/site/getinvolved/development/road
 ## Requirements:
 
 - OS: Unix/Posix variants (Linux or OSX) (Windows not officially supported)
-- Python >= 3.6
-- Qgis >= 3.16
+- Python >= 3.10
+- Qgis >= 3.28
 - Some python knowledge about python virtualenv and package installation.
 - libzmq >= 4.0.1 and pyzmq >= 17
 

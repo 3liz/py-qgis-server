@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from qgis.core import Qgis, QgsProject
+from qgis.core import QgsProject
 
 from pyqgisserver.config import confservice
 from pyqgisserver.qgscache.cachemanager import (
@@ -60,7 +60,6 @@ def test_absolute_path_with_alias():
         url = cacheservice.resolve_alias('foo:/france_parts')
 
 
-@pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 31000, reason="Test fail with qgis 3.4")
 def test_file_cache():
     """ Tetst file protocol handler
     """
@@ -80,7 +79,6 @@ def test_file_cache():
     assert details.project is project
 
 
-@pytest.mark.skipif(Qgis.QGIS_VERSION_INT <= 31000, reason="Test fail with qgis 3.4")
 def test_projects_scheme():
     """ Tetst file protocol handler
     """

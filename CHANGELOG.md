@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
-
+* Remove support for Qgis < 3.28
 * Use Mypy and Ruff for lint and typecheck 
 * Remove dependency on 3liz/qgis-platform image for tests.
 * Remove deprecated features for 1.9+
