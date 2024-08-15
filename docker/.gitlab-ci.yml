@@ -3,6 +3,7 @@
 #-------------
 
 .build-docker:
+  image: ${REGISTRY_URL}/factory-ci-runner:build-package
   stage: docker
   script:
     - make version
@@ -17,7 +18,7 @@
       - tags
       - master
   tags:
-    - infrav3-dind
+    - factory-dind
 
 
 build-docker:release:
@@ -44,7 +45,7 @@ build-docker:3.28:
 #-------------
 
 deploy_snap:
-  image: ${REGISTRY_URL}/factory-ci-runner:package-management
+  image: ${REGISTRY_URL}/factory-ci-runner:build-package
   stage: deploy
   script:
     - update-service map
@@ -55,14 +56,14 @@ deploy_snap:
        - tags
        - master
   tags:
-    - infrav3-plain
+    - factory-plain
 
 #-------------
 # Release
 #-------------
 
 .release:
-  image: ${REGISTRY_URL}/factory-ci-runner:package-management
+  image: ${REGISTRY_URL}/factory-ci-runner:build-package
   stage: release
   script:
     - release-image.sh qgis-map-server-$QGIS_FLAVOR
@@ -76,7 +77,7 @@ deploy_snap:
     refs:
       - tags
   tags:
-    - infrav3-dind
+    - factory-dind
   variables:
     FACTORY_MANIFEST: "docker/factory-${QGIS_FLAVOR}.manifest"
 
