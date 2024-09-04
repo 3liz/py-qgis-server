@@ -18,7 +18,7 @@
       - tags
       - master
   tags:
-    - factory-dind
+    - factory
 
 
 build-docker:release:
@@ -66,7 +66,7 @@ deploy_snap:
   image: ${REGISTRY_URL}/factory-ci-runner:build-package
   stage: release
   script:
-    - release-image.sh qgis-map-server-$QGIS_FLAVOR
+    - release-image qgis-map-server-$QGIS_FLAVOR
     - push-to-docker-hub.sh --clean
   environment:
     name: production

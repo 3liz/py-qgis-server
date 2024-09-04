@@ -29,14 +29,13 @@ qgis_application = None
 
 
 def start_qgis_application(
-        enable_gui: bool = False,
-        enable_processing: bool = False, verbose: bool = False,
-        cleanup: bool = True,
-        logger: Optional[logging.Logger] = None,
-        logprefix: str = 'Qgis:') -> qgis.core.QgsApplication:
+    enable_processing: bool = False, verbose: bool = False,
+    cleanup: bool = True,
+    logger: Optional[logging.Logger] = None,
+    logprefix: str = 'Qgis:'
+) -> qgis.core.QgsApplication:
     """ Start qgis application
 
-        :param boolean enable_gui: Enable graphical interface, default to False
         :param boolean enable_processing: Enable processing, default to False
         :param boolean verbose: Output qgis settings, default to False
         :param boolean cleanup: Register atexit hook to close qgisapplication on exit().
@@ -55,15 +54,14 @@ def start_qgis_application(
     if Qgis.QGIS_VERSION_INT < 32800:
         raise RuntimeError(f"You need QGIS 3.28+ (found {Qgis.QGIS_VERSION_INT})")
 
-    if not enable_gui:
-        #  We MUST set the QT_QPA_PLATFORM to prevent
-        #  Qt trying to connect to display in containers
-        display = os.environ.get('DISPLAY')
-        if display is None:
-            logger.info("Setting offscreen mode")
-            os.environ['QT_QPA_PLATFORM'] = 'offscreen'
-        else:
-            logger.info(f"Using DISPLAY: {display}")
+    #  We MUST set the QT_QPA_PLATFORM to prevent
+    #  Qt trying to connect to display in containers
+    display = os.environ.get('DISPLAY')
+    if display is None:
+        logger.info("Setting offscreen mode")
+        os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+    else:
+        logger.info(f"Using DISPLAY: {display}")
 
     qgis_prefix = os.environ.get('QGIS3_HOME', '/usr')
 
@@ -73,7 +71,7 @@ def start_qgis_application(
 
     global qgis_application
 
-    qgis_application = QgsApplication([], enable_gui)
+    qgis_application = QgsApplication([], False)
     qgis_application.setPrefixPath(qgis_prefix, True)
 
     if cleanup:

@@ -9,8 +9,6 @@ DIST:=${BUILDDIR}/dist
 
 MANIFEST=pyqgisserver/build.manifest
 
-FLAVOR:=release
-
 PYTHON_PKG=pyqgisserver pyqgisservercontrib
 
 TESTDIR=tests/unittests
@@ -26,7 +24,7 @@ dirs:
 version:
 	echo $(VERSION_TAG) > VERSION
 
-configure: manifest version
+configure: manifest
 
 manifest: version
 	echo name=$(shell $(PYTHON) setup.py --name) > $(MANIFEST) && \

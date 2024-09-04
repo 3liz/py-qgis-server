@@ -2,6 +2,10 @@ SHELL:=bash
 .ONESHELL:
 .PHONY: env
 
+DEPTH=..
+
+include $(DEPTH)/config.mk
+
 # 
 #  Makefile for running server in docker containers
 #
@@ -19,7 +23,7 @@ MANAGEMENT_HTTP_PORT:=127.0.0.1:19876
 
 BECOME_USER:=$(shell id -u)
 
-SRCDIR=$(shell realpath ..)
+SRCDIR=$(topsrcdir)
 
 PLUGINPATH:=$(SRCDIR)/tests/plugins
 

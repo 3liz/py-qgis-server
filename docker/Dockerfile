@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # vim: ft=dockerfile
 ARG REGISTRY_PREFIX=''
-ARG QGIS_VERSION=latest
+ARG QGIS_VERSION=release
 
 FROM  ${REGISTRY_PREFIX}qgis-platform:${QGIS_VERSION} AS base
 
