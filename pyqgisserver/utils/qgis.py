@@ -32,7 +32,7 @@ def start_qgis_application(
     enable_processing: bool = False, verbose: bool = False,
     cleanup: bool = True,
     logger: Optional[logging.Logger] = None,
-    logprefix: str = 'Qgis:'
+    logprefix: str = 'Qgis:',
 ) -> qgis.core.QgsApplication:
     """ Start qgis application
 

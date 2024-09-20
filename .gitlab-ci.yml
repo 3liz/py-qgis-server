@@ -24,7 +24,7 @@ stages:
   tags:
     - factory-plain
   variables:
-    ASYNC_TEST_TIMEOUT: 20.0
+    ASYNC_TEST_TIMEOUT: "20.0"
 
 tests:ltr:
   extends: .tests

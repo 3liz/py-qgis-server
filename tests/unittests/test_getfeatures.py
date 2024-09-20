@@ -18,13 +18,33 @@ class Tests1(HTTPTestCase):
     def test_getfeature_nolimit(self):
         """ Test getcapabilities hrefs
         """
-        rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
-                              "&TYPENAME=france_parts_bordure")
+        rv = self.client.get(
+            "?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
+            "&TYPENAME=france_parts_bordure",
+        )
         assert rv.status_code == 200
         assert rv.headers['Content-Type'].startswith('text/xml;')
 
         features = rv.xml.findall(".//gml:featureMember", NAMESPACES)
         assert len(features) == 4
+
+    def test_getfeature_nolimit_geojson(self):
+        """ Test getcapabilities hrefs
+        """
+        rv = self.client.get(
+            "?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
+            "&TYPENAME=france_parts_bordure"
+            "&OUTPUTFORMAT=GeoJSON",
+        )
+        assert rv.status_code == 200
+        assert rv.headers['Content-Type'].startswith('application/vnd.geo+json;')
+
+        content = rv.json()
+
+        # print("\ntest_getfeature_nolimit_geojson", content)
+
+        assert content.get('type') == "FeatureCollection"
+        assert len(content["features"]) == 4
 
 
 class Tests2(HTTPTestCase):
@@ -39,8 +59,10 @@ class Tests2(HTTPTestCase):
 
         assert confservice.getint('server', 'getfeaturelimit') == 2
 
-        rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
-                              "&TYPENAME=france_parts_bordure")
+        rv = self.client.get(
+            "?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
+            "&TYPENAME=france_parts_bordure",
+        )
         assert rv.status_code == 200
         assert rv.headers['Content-Type'].startswith('text/xml;')
 
@@ -53,8 +75,10 @@ class Tests2(HTTPTestCase):
 
         assert confservice.getint('server', 'getfeaturelimit') == 2
 
-        rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
-                              "&TYPENAME=france_parts_bordure&MAXFEATURES=1")
+        rv = self.client.get(
+            "?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
+            "&TYPENAME=france_parts_bordure&MAXFEATURES=1",
+        )
         assert rv.status_code == 200
         assert rv.headers['Content-Type'].startswith('text/xml;')
 
@@ -66,8 +90,10 @@ class Tests2(HTTPTestCase):
         """
         assert confservice.getint('server', 'getfeaturelimit') == 2
 
-        rv = self.client.get("?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
-                              "&TYPENAME=france_parts_bordure&MAXFEATURES=3")
+        rv = self.client.get(
+            "?MAP=france_parts.qgs&SERVICE=WFS&REQUEST=GetFeature&VERSION=1.0.0"
+            "&TYPENAME=france_parts_bordure&MAXFEATURES=3",
+        )
         assert rv.status_code == 200
         assert rv.headers['Content-Type'].startswith('text/xml;')
 
