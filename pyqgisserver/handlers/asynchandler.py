@@ -64,6 +64,12 @@ class AsyncClientHandler(BaseHandler):
         # Pass etag
         headers['If-None-Match'] = self.request.headers.get("If-None-Match", "")
 
+        # Pass Accept
+        # This header is used by QGIS Server WFS3 to get the content type
+        # (html or json) if the request url does not have an extension
+        # See: QgsServerOgcApiHandler::contentTypeFromRequest()
+        headers['Accept'] = self.request.headers.get("Accept", "")
+
         def copy_headers(pats):
             headers.update((k, v) for k, v in self.request.headers.items() if
                            any(map(k.upper().startswith, pats)))
