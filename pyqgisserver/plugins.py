@@ -122,6 +122,11 @@ def load_plugins(serverIface: QgsServerInterface):
 
             # Initialize the plugin
             server_plugins[plugin] = package.serverClassFactory(serverIface)
+
+            # Mark packace as loaded by py_qgis_server
+            # allow plugins to check if it has bee loaded by py-qgis-server
+            package._is_py_qgis_server = True
+
             LOGGER.info(f"Loaded plugin {plugin}")
             success += 1
         except Exception:
