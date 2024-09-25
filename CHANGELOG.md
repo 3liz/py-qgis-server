@@ -13,13 +13,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 * Use Mypy and Ruff for lint and typecheck 
 * Remove dependency on 3liz/qgis-platform image for tests.
 * Remove deprecated features for 1.9+
+* Mark Qgis plugin package
 
 ### Fixed 
 
 * Fix `cross_origin` documentation according to the actual 
   default value
-
-### Added
+* Pass Accept Header to properly handle WFS3 requests
+    - https://github.com/3liz/py-qgis-server/pull/75
 
 ## 1.8.8 - 2023-04-04
 
