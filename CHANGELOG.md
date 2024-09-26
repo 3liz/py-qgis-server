@@ -7,13 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Removed
+
+* Remove support for QGIS < 3.28
+* Remove dependency on Docker 3liz/qgis-platform image for tests.
+* Remove deprecated features for 1.9+
+
 ### Added
 
-* Remove support for Qgis < 3.28
-* Use Mypy and Ruff for lint and typecheck 
-* Remove dependency on 3liz/qgis-platform image for tests.
-* Remove deprecated features for 1.9+
-* Mark Qgis plugin package
+* Use Mypy and Ruff for lint and typecheck
+* Mark QGIS plugin package
 
 ### Fixed 
 
@@ -36,7 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
     - Display comprehensive message when attempting to restart container
       started with `--user` option.
 * Changed '/ows/catalog' default entry point to '/catalog'
-* Use request path when logging qgis request.
+* Use request path when logging QGIS request.
 
 ## 1.8.7 - 2023-02-10
 

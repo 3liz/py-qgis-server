@@ -6,7 +6,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-""" Qgis server plugin managment
+""" QGIS server plugin management
 
 """
 import configparser
@@ -120,7 +120,7 @@ def load_plugins(serverIface: QgsServerInterface):
 
             package = sys.modules[plugin]
 
-            # Mark packace as loaded by py_qgis_server
+            # Mark package as loaded by py_qgis_server
             # allow plugins to check if it has been loaded by py-qgis-server
             package._is_py_qgis_server = True  # type: ignore [attr-defined]
 
