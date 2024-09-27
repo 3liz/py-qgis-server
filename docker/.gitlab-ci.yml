@@ -67,7 +67,7 @@ deploy_snap:
   stage: release
   script:
     - release-image qgis-map-server-$QGIS_FLAVOR
-    - push-to-docker-hub.sh --clean
+    - push-to-docker-hub --clean
   environment:
     name: production
   when: manual
