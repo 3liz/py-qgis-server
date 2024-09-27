@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VERSION=$1
-METADATA=$(cat Makefile | grep "VERSION:=" |  cut -d '=' -f2)
+METADATA=$(cat config.mk | grep "VERSION:=" |  cut -d '=' -f2)
 
 if [ "$METADATA" != "$VERSION" ];
 then
