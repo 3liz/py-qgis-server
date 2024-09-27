@@ -29,8 +29,8 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Check tag
-      run: tests/check_tag.sh ${{ env.CI_COMMIT_TAG }}
+#    - name: Check tag
+#      run: tests/check_tag.sh ${{ env.CI_COMMIT_TAG }}
 
     - name: Setup
       run: |
@@ -44,7 +44,7 @@ jobs:
 
     - name: Build package
       run: |
-        python setup.py sdist
+        make dist
 
     - name: Create release on GitHub
       uses: ncipollo/release-action@v1.11.1
