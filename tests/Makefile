@@ -72,9 +72,6 @@ test:
 	&& cd unittests \
 	&& pytest -v $(ADDOPTS)
 
-#test: export RUN_COMMAND=./tests/run_tests.sh
-#test: env up stop
-
 %-test: export RUN_COMMAND=./tests/run_tests.sh
 %-test: env
 	docker compose \
@@ -83,8 +80,11 @@ test:
 		--force-recreate --exit-code-from qgis-server
 	docker compose down -v --remove-orphans
 
-run: export RUN_COMMAND=./tests/run_server.sh
-run: up
+run:
+	SRCDIR=$(SRCDIR) source tests.env \
+	&& export $$(cut -d= -f1 tests.env) \
+	&& qgisserver
+
 
 up: env
 	docker compose up -V --quiet-pull  --remove-orphans \
