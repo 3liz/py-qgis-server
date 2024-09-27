@@ -4,14 +4,15 @@ DEPTH=.
 
 include $(DEPTH)/config.mk
 
-BUILDDIR:=build
-DIST:=${BUILDDIR}/dist
+DIST:=dist
 
 MANIFEST=pyqgisserver/build.manifest
 
 PYTHON_PKG=pyqgisserver pyqgisservercontrib
 
 TESTDIR=tests/unittests
+
+PYPISERVER:=storage
 
 # This is necessary with pytest as long it is not fixed
 # see also https://github.com/qgis/QGIS/pull/5337
@@ -33,14 +34,14 @@ manifest: version
 		echo commitid=$(COMMITID) >> $(MANIFEST)
 
 deliver:
-	twine upload -r storage $(DIST)/*
+	twine upload $(TWINE_OPTIONS) -r $(PYPISERVER) $(DIST)/*
 
 dist: dirs configure
 	rm -rf *.egg-info
 	$(PYTHON) setup.py sdist --dist-dir=$(DIST)
 
 clean:
-	rm -rf $(BUILDDIR)
+	rm -rf $(DIST)
 
 test: lint
 	make -C tests test PYTEST_ADDOPTS=$(PYTEST_ADDOPTS)

@@ -4,6 +4,7 @@ variables:
 
 stages:
 - test
+- build
 - docker
 - deploy
 - release
@@ -32,6 +33,29 @@ tests:
   parallel:
     matrix:
     - QGIS_FLAVOR: ['ltr', 'release', '3.28']
+
+#---------------
+# Build
+#---------------
+
+build:
+  image: ${REGISTRY_URL}/factory-ci-runner:python
+  stage: build
+  script:
+    - source ~/.bashrc
+    - make dist deliver
+  environment:
+    name: snap
+  tags:
+    - infrav3-plain
+  only:
+    refs:
+      - tags
+      - master
+  except:
+      - schedules
+      - triggers
+
 
 # Docker build
 include: '/docker/.gitlab-ci.yml'
