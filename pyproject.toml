@@ -4,12 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "py-qgis-server"
-description = """
-Py-Qgis-Server is an implementation of the OWS standards 
-standard from the Open Geospatial Consortium.
-Py-Qgis-Server written in Python and built on top of Qgis server
-implementation.
-"""
+description = "Py-Qgis-Server is an OWS/OGC server built on top of QGIS Server implementation"
 readme = "README.md"
 requires-python = ">= 3.10"
 classifiers=[
