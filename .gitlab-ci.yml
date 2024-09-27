@@ -74,6 +74,21 @@ tickets:
   tags:
     - factory-plain
 
+gitlab_release:
+  stage: release
+  rules:
+      - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+        # Running only when the tag is like X.Y.Z
+        when: always
+      - when: never
+  image:
+    name: $REGISTRY_URI/infra/ci-tools:latest
+  script:
+    - gitlab_release
+  tags:
+    - factory-plain
+
+
 monthly-release:
   stage: test
   rules:
