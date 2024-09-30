@@ -21,7 +21,7 @@ stages:
     - source ~/.bashrc
     - make install install-tests
     - pip list -l
-    - make manifest test
+    - make test
   tags:
     - factory-plain
   variables:

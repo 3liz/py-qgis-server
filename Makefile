@@ -28,10 +28,12 @@ version:
 configure: manifest
 
 manifest: version
-	echo name=$(shell $(PYTHON) setup.py --name) > $(MANIFEST) && \
-		echo version=$(shell $(PYTHON) setup.py --version) >> $(MANIFEST) && \
-		echo buildid=$(BUILDID)   >> $(MANIFEST) && \
-		echo commitid=$(COMMITID) >> $(MANIFEST)
+	echo name=$(PROJECT_NAME) > $(MANIFEST) && \
+	echo version=$(VERSION_TAG) >> $(MANIFEST) && \
+	echo buildid=$(BUILDID)   >> $(MANIFEST) && \
+	echo commitid=$(COMMITID) >> $(MANIFEST)
+	@echo "=== Written manifest ==="
+	@cat $(MANIFEST)
 
 deliver:
 	twine upload $(TWINE_OPTIONS) -r $(PYPISERVER) $(DIST)/*
@@ -43,10 +45,10 @@ dist: dirs configure
 clean:
 	rm -rf $(DIST)
 
-test: lint
+test: manifest lint
 	make -C tests test PYTEST_ADDOPTS=$(PYTEST_ADDOPTS)
 
-install:
+install: manifest
 	pip install -U --upgrade-strategy=eager -e .
 
 install-tests:

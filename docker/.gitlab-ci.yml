@@ -6,7 +6,7 @@
   image: ${REGISTRY_URL}/factory-ci-runner:build-package
   stage: docker
   script:
-    - make version
+    - make manifest
     - make -C docker build deliver pushrc clean FLAVOR=$QGIS_FLAVOR BUILD_TARGET=amqp
   environment:
     name: snap

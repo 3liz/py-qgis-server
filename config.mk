@@ -1,6 +1,8 @@
 
-# Project version
+# Name to be set in the manifest
+PROJECT_NAME:=py-qgis-server
 
+# Project version
 VERSION:=1.9.0
 
 ifndef CI_COMMIT_TAG

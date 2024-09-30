@@ -99,6 +99,10 @@ def load_configuration():
     #
 
     # Qgis api endpoints
+    #
+    # Note that landing is not available since 3.28 packaging
+    # See https://github.com/qgis/QGIS/issues/55462
+    #
     CONFIG.add_section('api.endpoints')
     CONFIG.set('api.endpoints', 'landing_page', getenv('QGSRV_API_ENDPOINTS_LANDING_PAGE', '/catalog'))
     CONFIG.set('api.endpoints', 'lizmap_api', getenv('QGSRV_API_ENDPOINTS_LIZMAP', '/lizmap'))

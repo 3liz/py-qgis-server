@@ -9,7 +9,6 @@ LABEL Description="QGIS3 Python Server" Vendor="3liz.org"
 LABEL Maintainer="David Marteau <david.marteau@3liz.com>"
 
 ARG PIP_OPTIONS
-ARG BUILD_VERSION
 
 # Setup will use this variable for copying manifest
 ENV QGSRV_DATA_PATH=/usr/local/share/qgis-server

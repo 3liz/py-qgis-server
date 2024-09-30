@@ -1,0 +1,29 @@
+services:
+  map:
+    image: 3liz/qgis-map-server:3.34
+    environment:
+      QGSRV_LOGGING_LEVEL: debug
+      QGSRV_SERVER_PLUGINPATH: /srv/lizmap-plugin-server
+      QGIS_OPTIONS_PATH: "/src/tests/qgis"
+      QGIS_SERVER_TRUST_LAYER_METADATA: "yes"
+      QGIS_SERVER_DISABLE_GETPRINT: "yes"
+      QGIS_SERVER_LIZMAP_REVEAL_SETTINGS: "yes"
+      QGIS_SERVER_PROJECT_CACHE_STRATEGY: "off"
+      QGSRV_CACHE_ROOTDIR: /src/tests/data
+      QGSRV_SERVER_WORKERS: "1"
+      QGSRV_PROJECTS_SCHEMES_TEST: /src/tests/data/
+      QGSRV_SERVER_STATUS_PAGE: "yes"
+      QGSRV_MANAGEMENT_ENABLED: "yes"
+      QGSRV_MANAGEMENT_INTERFACES: "0.0.0.0"
+      QGSRV_API_ENABLED_LIZMAP: "yes"
+      QGSRV_API_ENABLED_LANDING_PAGE: "yes"
+      QGSRV_API_ENDPOINTS_LANDING_PAGE: /ows/catalog
+      QGSRV_SERVER_TIMEOUT: "20"
+      QGSRV_CACHE_STRICT_CHECK: "yes"
+    volumes:
+    - type: bind
+      source: "../../../lizmap/lizmap-plugin-server"
+      target: /srv/lizmap-plugin-server
+    - { type: bind, source: "../../", target: "/src" }
+    ports:
+    - "127.0.0.1:9080:8080"

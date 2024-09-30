@@ -13,16 +13,12 @@ NAME=qgis-map-server
 # QGIS platform version
 FLAVOR:=release
 
-# Server version
-BUILD_VERSION:=$(VERSION_TAG)
-
 ifdef PYPISERVER
 PYPISERVER_SCHEME ?= https
 PIP_OPTIONS="--extra-index-url=$(PYPISERVER_SCHEME)://$(PYPISERVER) --trusted-host=$(PYPISERVER)"
 BUILD_ARGS=--build-arg PIP_OPTIONS=$(PIP_OPTIONS)
 endif
 
-BUILD_ARGS += --build-arg BUILD_VERSION=$(BUILD_VERSION)
 BUILD_ARGS += --build-arg QGIS_VERSION=$(FLAVOR)
 
 REGISTRY_URL ?= 3liz
