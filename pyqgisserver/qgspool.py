@@ -203,11 +203,8 @@ class WorkerPoolServer:
     def memory_fraction(self) -> float:
         """ Return total memory fraction used by pool
         """
-        if psutil is not None:
-            p = psutil.Process(self._pool.pid)
-            mem = sum(child.memory_percent() for child in p.children(recursive=True))
-        else:
-            mem = 0
+        p = psutil.Process(self._pool.pid)
+        mem = sum(child.memory_percent() for child in p.children(recursive=True))
         return mem / 100.0
 
 

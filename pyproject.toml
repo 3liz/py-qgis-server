@@ -25,6 +25,7 @@ dependencies = [
     "pyzmq >= 17",
     "PyYAML",
     "typing-extensions",
+    "psutil",
 ]
 dynamic = ["version"]
 
