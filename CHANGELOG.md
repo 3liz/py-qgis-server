@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+## 1.9.1 - 2024-09-27
+
+* Restore support for python 3.8/3.9
+
 ## 1.9.0 - 2024-09-27
 
 ### Removed
