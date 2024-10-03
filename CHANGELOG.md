@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## 1.9.1 - 2024-09-27
 
+### Added
+
 * Restore support for python 3.8/3.9
 
 ## 1.9.0 - 2024-09-27
