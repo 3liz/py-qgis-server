@@ -274,6 +274,8 @@ class QgsRequestHandler(RequestHandler):
         verbose = LOGGER.level <= logging.DEBUG or confservice.getboolean('logging', 'qgis_info')
 
         LOGGER.debug("Initializing qgis server")
+        # Disable Qgis cache strategy
+        os.environ['QGIS_SERVER_PROJECT_CACHE_STRATEGY'] = 'off'
         qgsserver = init_qgis_server(enable_processing=False,
                                      logger=LOGGER,
                                      verbose=verbose)
