@@ -29,11 +29,12 @@ from typing_extensions import (
     Literal,
     Tuple,
     TypeAlias,
+    Union,
 )
 
 from pyqgisservercontrib.core import componentmanager
 
-ConfigValue: TypeAlias = str | bool | int | float
+ConfigValue: TypeAlias = Union[str, bool, int, float]
 
 
 getenv = os.getenv
@@ -274,11 +275,11 @@ ENV_REPLACE_CHARS = ':.-@#$%&*'
 if TYPE_CHECKING:
     from mypy_extensions import DefaultNamedArg
     ConfigValueGetter = Callable[
-        [str, str, DefaultNamedArg(str | NO_DEFAULT_TYPE, 'fallback')],
+        [str, str, DefaultNamedArg(Union[str, NO_DEFAULT_TYPE], 'fallback')],
         ConfigValue,
     ]
 else:
-    ConfigValueGetter = Callable[[str, str, str | NO_DEFAULT_TYPE], ConfigValue]
+    ConfigValueGetter = Callable[[str, str, Union[str, NO_DEFAULT_TYPE]], ConfigValue]
 
 
 @componentmanager.register_factory('@3liz.org/config-service;1')
@@ -294,7 +295,7 @@ class ConfigService:
         _get_fun: ConfigValueGetter,
         section: str,
         option: str,
-        fallback: ConfigValue | NO_DEFAULT_TYPE = NO_DEFAULT,
+        fallback: Union[ConfigValue, NO_DEFAULT_TYPE] = NO_DEFAULT,
     ) -> ConfigValue:
         """
         """

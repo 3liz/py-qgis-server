@@ -12,7 +12,7 @@ import asyncio
 import logging
 
 from datetime import datetime
-from typing import cast
+from typing import Union, cast
 
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
@@ -21,7 +21,7 @@ from pyqgisserver.config import confservice
 LOGGER = logging.getLogger('SRVLOG')
 
 server_address: str
-http_client: AsyncHTTPClient | None = None
+http_client: Union[AsyncHTTPClient, None] = None
 
 
 def init() -> None:

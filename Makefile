@@ -60,7 +60,7 @@ install-doc:
 install-dev: install-tests install-doc
 
 lint:
-	@ruff check $(PYTHON_PKG) $(TESTDIR)
+	@ruff check --output-format=concise $(PYTHON_PKG) $(TESTDIR)
 
 lint-preview:
 	@ruff check --preview $(PYTHON_PKG) $(TESTDIR)

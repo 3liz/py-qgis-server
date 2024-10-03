@@ -15,7 +15,7 @@ import sys
 import traceback
 
 from pathlib import Path
-from typing import Dict, Generator, TypeVar
+from typing import Dict, Generator, TypeVar, Union
 
 from .config import confservice
 
@@ -156,7 +156,7 @@ def plugin_metadata(plugin: str) -> Dict:
         cp = configparser.ConfigParser()
         cp.read_file(f)
 
-        metadata: Dict[str, str | Dict[str, str]] = {s: dict(p.items()) for s, p in cp.items()}
+        metadata: Dict[str, Union[str, Dict[str, str]]] = {s: dict(p.items()) for s, p in cp.items()}
         metadata.pop('DEFAULT', None)
         metadata.update(path=str(path))
         return metadata

@@ -18,6 +18,7 @@ from typing_extensions import (
     Dict,
     Optional,
     Self,
+    Union,
     cast,
 )
 
@@ -101,7 +102,7 @@ class HTTPTestResponse:
             self.xml = lxml.etree.fromstring(self.content)
 
     @property
-    def content(self) -> bytes | str:
+    def content(self) -> Union[bytes, str]:
         return self.http_response.body
 
     @property
@@ -123,7 +124,7 @@ class OWSTestClient:
 
     def post(
         self,
-        data: bytes | str,
+        data: Union[bytes, str],
         headers: Optional[Dict] = None,
         path: str = '/ows/',
     ) -> HTTPTestResponse:
@@ -151,7 +152,7 @@ class OWSTestClient:
         )
 
     def put(self,
-        data: bytes | str,
+        data: Union[bytes, str],
         headers: Optional[Dict] = None,
         path: str = '/ows/',
     ) -> HTTPTestResponse:

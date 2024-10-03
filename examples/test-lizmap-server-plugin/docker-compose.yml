@@ -1,6 +1,6 @@
 services:
   map:
-    image: 3liz/qgis-map-server:3.34
+    image: 3liz/qgis-map-server:3.38-dev
     environment:
       QGSRV_LOGGING_LEVEL: debug
       QGSRV_SERVER_PLUGINPATH: /srv/lizmap-plugin-server

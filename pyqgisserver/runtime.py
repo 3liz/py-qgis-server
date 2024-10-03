@@ -289,13 +289,19 @@ def run_server(port: int, address: str = "", user: Optional[str] = None, workers
         exit_code = 15
     except SystemExit as exc:
         print("Exiting with code:", exc.code, flush=True)  # noqa: T201
-        match exc.code:
-            case int(code):
-                exit_code = code
-            case None:
-                exit_code = 0
-            case _:
-                exit_code = 1
+        # match exc.code:
+        #    case int(code):
+        #        exit_code = code
+        #    case None:
+        #        exit_code = 0
+        #    case _:
+        #        exit_code = 1
+        if exc.code is None:
+            exit_code = 0
+        elif isinstance(exc.code, int):
+            exit_code = exc.code
+        else:
+            exit_code = 1
     else:
         exit_code = 0
 

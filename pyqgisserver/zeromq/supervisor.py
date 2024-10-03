@@ -27,6 +27,7 @@ from typing import (
     Dict,
     NamedTuple,
     Optional,
+    Union,
 )
 
 import zmq
@@ -60,7 +61,7 @@ class Client:
         self._pid = os.getpid()
         self._busy = False
 
-    def _send(self, data: bytes | _Report):
+    def _send(self, data: Union[bytes, _Report]):
         if not self._sock:
             return
         try:

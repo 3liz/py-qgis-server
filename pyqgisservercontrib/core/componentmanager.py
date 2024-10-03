@@ -16,6 +16,7 @@
 """
 
 import logging
+import sys
 
 from collections import namedtuple
 from importlib import metadata
@@ -46,12 +47,21 @@ FactoryEntry = namedtuple('FactoryEntry', ('create_instance', 'service'))
 def _entry_points(group: str, name: Optional[str] = None) -> Sequence[metadata.EntryPoint]:
     """ Return entry points
     """
-    # See https://docs.python.org/3.10/library/importlib.metadata.html
-    entry_points = metadata.entry_points()
-    if name:
-        return entry_points.select(group=group, name=name)
+    ver = sys.version_info[:2]
+    if ver >= (3, 10):
+        # See https://docs.python.org/3.10/library/importlib.metadata.html
+        entry_points = metadata.entry_points()
+        if name:
+            return entry_points.select(group=group, name=name)
+        else:
+            return entry_points.select(group=group)
     else:
-        return entry_points.select(group=group)
+        # Return a dict
+        # see https://docs.python.org/3.8/library/importlib.metadata.html
+        eps = metadata.entry_points().get(group, [])  # type: ignore [var-annotated]
+        if name:
+            eps = [ep for ep in eps if ep.name == name]
+        return eps
 
 
 class ComponentManager:

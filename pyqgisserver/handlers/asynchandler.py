@@ -11,7 +11,7 @@
 import logging
 
 from time import time
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Union, cast
 from urllib.parse import urlencode
 
 from ..logger import log_rrequest
@@ -46,7 +46,7 @@ class AsyncClientHandler(BaseHandler):
         self._stats = self.application.stats  # type: ignore [attr-defined]
         self._allowed_hdrs = allowed_hdrs
 
-        self.ogc_scheme: str | None = None
+        self.ogc_scheme: Union[str, None] = None
 
     def encode_arguments(self) -> str:
         return '?' + urlencode({k: v[0] for k, v in self.request.arguments.items()})
@@ -89,7 +89,7 @@ class AsyncClientHandler(BaseHandler):
 
             headers = {}
             proxy_url = self.proxy_url()
-            req_url: str | None
+            req_url: Union[str, None]
             if proxy_url:
                 # Send the full path to Qgis
                 req_url = f"{proxy_url}{self.request.path.lstrip('/')}"

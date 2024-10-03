@@ -20,7 +20,7 @@ import traceback
 from glob import glob
 from multiprocessing import Process
 from multiprocessing.util import Finalize
-from typing import Awaitable, Callable, Dict, List, cast
+from typing import Awaitable, Callable, Dict, List, Union, cast
 
 import psutil
 import zmq
@@ -38,7 +38,7 @@ LOGGER = logging.getLogger('SRVLOG')
 class _RestartHandler:
 
     def __init__(self) -> None:
-        self._restart: None | Scheduler = None
+        self._restart: Union[None, Scheduler] = None
         self._watch_files: List[str] = []
 
     def update_files(self) -> None:
@@ -102,7 +102,7 @@ class WorkerPoolServer:
 
         LOGGER.debug("Started pool server")
         self._pool = pool
-        self._supervisor: Supervisor | None = None
+        self._supervisor: Union[Supervisor, None] = None
         self._healthcheck = None
 
         self._restart_handler = _RestartHandler()

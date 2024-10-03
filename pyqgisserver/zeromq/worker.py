@@ -29,6 +29,7 @@ from typing import (
     Optional,
     Protocol,
     Type,
+    Union,
 )
 
 import zmq
@@ -115,7 +116,7 @@ class RequestHandler:
         return self._correlation_id
 
     @property
-    def identity(self) -> bytes | str | int:
+    def identity(self) -> Union[bytes, str, int]:
         return self._socket.identity
 
     def handle_message(self):
