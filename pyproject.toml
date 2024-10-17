@@ -8,6 +8,7 @@ description = "Py-Qgis-Server is an OWS/OGC server built on top of QGIS Server i
 readme = "README.md"
 requires-python = ">= 3.8"
 classifiers=[
+    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
