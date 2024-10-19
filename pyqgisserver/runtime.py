@@ -56,6 +56,7 @@ def configure_handlers(client: client.AsyncClient) -> _RuleList:
     )
 
     end = r"(?:\.html|\.json|/?)"
+    collection_end = r"(?:\.html|\.json|\.geojson|/?)"
 
     handlers: _RuleList = [
         (r"/", LandingPage),
@@ -78,7 +79,7 @@ def configure_handlers(client: client.AsyncClient) -> _RuleList:
 
     wfs3_api_endpoints = [
         rf"{end}",
-        rf"/collections(?:/[^/]+(?:/items)?(?:/[0-9]+)?)?{end}",
+        rf"/collections(?:/[^/]+(?:/items)?(?:/[0-9]+)?)?{collection_end}",
         rf"/conformance{end}",
         rf"/api{end}",
         r"/static/.*",
