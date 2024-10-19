@@ -11,3 +11,4 @@ types-psycopg2
 pipdeptree
 lxml
 lxml-stubs
+build
