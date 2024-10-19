@@ -39,8 +39,9 @@ deliver:
 	twine upload $(TWINE_OPTIONS) -r $(PYPISERVER) $(DIST)/*
 
 dist: dirs configure
-	rm -rf *.egg-info
-	$(PYTHON) setup.py sdist --dist-dir=$(DIST)
+	rm -f $(DIST)/*.tar.gz
+	$(PYTHON) -m pip install -U --upgrade-strategy=eager build
+	$(PYTHON) -m build --sdist --outdir=$(DIST)
 
 clean:
 	rm -rf $(DIST)
