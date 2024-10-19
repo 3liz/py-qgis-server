@@ -78,7 +78,7 @@ def configure_handlers(client: client.AsyncClient) -> _RuleList:
 
     wfs3_api_endpoints = [
         rf"{end}",
-        rf"/collections(?:/[^/]+(?:/items)?)?{end}",
+        rf"/collections(?:/[^/]+(?:/items)?(?:/[0-9]+)?)?{end}",
         rf"/conformance{end}",
         rf"/api{end}",
         r"/static/.*",
