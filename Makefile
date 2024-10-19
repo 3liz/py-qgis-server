@@ -70,4 +70,3 @@ lint-fix:
 
 typing:
 	mypy --config-file=$(topsrcdir)/mypy.ini -p pyqgisserver
-
