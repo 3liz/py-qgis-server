@@ -2,3 +2,7 @@
 symbology-style.db
 .env
 
+*.request
+legend.json
+/plugins/lizmap_server
+

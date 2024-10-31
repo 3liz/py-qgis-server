@@ -33,7 +33,7 @@ RUN mkdir -p /opt/local/ \
 
 COPY pyqgisserver py-qgis-server/pyqgisserver
 COPY pyqgisservercontrib py-qgis-server/pyqgisservercontrib
-COPY setup.py pyproject.toml VERSION py-qgis-server/
+COPY pyproject.toml VERSION py-qgis-server/
 
 # Create virtualenv for installing server
 RUN mkdir -p /opt/local/ \ 

@@ -40,7 +40,7 @@ deliver:
 
 dist: dirs configure
 	rm -rf *.egg-info
-	$(PYTHON) setup.py sdist --dist-dir=$(DIST)
+	$(PYTHON) -m build --no-isolation --sdist --outdir=$(DIST)
 
 clean:
 	rm -rf $(DIST)
