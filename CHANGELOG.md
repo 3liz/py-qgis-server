@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Fixed
+
+* Fix wfs3 geojson support and feature url support 
+    - https://github.com/3liz/py-qgis-server/pull/76/files
+
 ## 1.9.1 - 2024-09-27
 
 ### Added
