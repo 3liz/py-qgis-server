@@ -42,7 +42,7 @@ name = "David Marteau"
 email = "david.marteau@3liz.com"
 
 [project.urls]
-Homepage = "https://gitthub.com/3liz/py-qgis-server"
+Homepage = "https://github.com/3liz/py-qgis-server"
 Repository = "https://github.com/3liz/py-qgis-server.git"
 Documentation = "https://docs.3liz.org/py-qgis-server"
 
