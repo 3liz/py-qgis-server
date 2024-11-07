@@ -43,9 +43,9 @@ class Tests(HTTPTestCase):
         assert len(elem) > 0
 
         href = urlparse(elem[0].get(xlink + 'href'))
-        assert href.scheme   == urlref.scheme
+        assert href.scheme == urlref.scheme
         assert href.hostname == urlref.hostname
-        assert href.path     == f"{urlref.path}ows/"
+        assert href.path == f"{urlref.path}ows/"
 
     def test_wmsurl(self):
         """ Test proxy location is overrided by WMSUrl
@@ -68,9 +68,9 @@ class Tests(HTTPTestCase):
             urlref = urlparse("http://test.proxy.loc/whatever/")
 
         href = urlparse(elem[0].get(xlink + 'href'))
-        assert href.scheme   == urlref.scheme
+        assert href.scheme == urlref.scheme
         assert href.hostname == urlref.hostname
-        assert href.path     == urlref.path
+        assert href.path == urlref.path
 
     def test_cors_options(self):
         """ Test CORS options
@@ -114,9 +114,9 @@ class Tests(HTTPTestCase):
         assert len(elem) > 0
 
         href = urlparse(elem[0].get(xlink + 'href'))
-        assert href.scheme   == urlref.scheme
+        assert href.scheme == urlref.scheme
         assert href.hostname == urlref.hostname
-        assert href.path     == urlref.path
+        assert href.path == urlref.path
 
     def test_getcapabilities_etag(self):
         """ Test getcapabilities etag

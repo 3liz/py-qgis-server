@@ -58,6 +58,9 @@ test = "pyqgisserver.monitors.test"
 test = "pyqgisserver.qgscache.observers.test"
 ban = "pyqgisserver.qgscache.observers.ban"
 
+[project.entry-points."py_qgis_server.access_policy"]
+request_logger = "pyqgisservercontrib.middlewares.request_logger:register_filters"
+
 [tool.setuptools.dynamic]
 version = { file = ["VERSION"] }
 

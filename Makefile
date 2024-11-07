@@ -69,5 +69,5 @@ lint-fix:
 	@ruff check --preview --fix $(PYTHON_PKG) $(TESTDIR)
 
 typing:
-	mypy --config-file=$(topsrcdir)/mypy.ini -p pyqgisserver
+	mypy --config-file=$(topsrcdir)/mypy.ini -p pyqgisserver -p pyqgisservercontrib
 

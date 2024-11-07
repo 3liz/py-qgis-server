@@ -23,24 +23,24 @@ def test_aliases():
 
     url = cacheservice.resolve_alias('france_parts')
     assert url.scheme == 'file'
-    assert url.path   == str(rootpath / 'france_parts')
+    assert url.path == str(rootpath / 'france_parts')
 
     url = cacheservice.resolve_alias('file:france_parts')
     assert url.scheme == 'file'
-    assert url.path   == str(rootpath / 'france_parts')
+    assert url.path == str(rootpath / 'france_parts')
 
     url = cacheservice.resolve_alias('foo:france_parts')
     assert url.scheme == 'file'
-    assert url.path   == '/foobar/france_parts'
+    assert url.path == '/foobar/france_parts'
 
     url = cacheservice.resolve_alias('test:france_parts')
     assert url.scheme == ''
-    assert url.path   == str(rootpath / 'france_parts')
+    assert url.path == str(rootpath / 'france_parts')
 
     url = cacheservice.resolve_alias('bar:france_parts')
     assert url.scheme == 'file'
-    assert url.path   == 'foobar'
-    assert url.query  == 'data=france_parts'
+    assert url.path == 'foobar'
+    assert url.query == 'data=france_parts'
 
 
 def test_absolute_path_with_alias():
@@ -52,7 +52,7 @@ def test_absolute_path_with_alias():
     # the scheme base url is ok
     url = cacheservice.resolve_alias('foo:/foobar/france_parts')
     assert url.scheme == 'file'
-    assert url.path   == '/foobar/france_parts'
+    assert url.path == '/foobar/france_parts'
 
     # But not a path wich does is no a relative path
     # to base url

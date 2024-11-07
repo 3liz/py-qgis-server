@@ -1,7 +1,7 @@
 import os
 import pytest
 
-server_host = "localhost:8888"
+server_host = "localhost:8080"
 
 
 def pytest_addoption(parser):

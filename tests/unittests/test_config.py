@@ -20,11 +20,11 @@ def test_argument_precedence():
     conf = confservice['server']
 
     # Workers must be 3
-    assert args.workers ==  3
+    assert args.workers == 3
     assert conf.getint('workers') == 3
 
     # Port must be 9090
-    assert args.port ==  9090
+    assert args.port == 9090
     assert conf.getint('port') == 9090
 
     # rootdir must be '/tmp/' defined in config file
