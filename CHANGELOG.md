@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+
+### 1.9.2 - 2024-11-07
+
 ### Fixed
 
 * Fix wfs3 geojson support and feature url support 
