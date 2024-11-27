@@ -3,7 +3,7 @@
 #-------------
 
 .build-docker:
-  image: ${REGISTRY_URL}/factory-ci-runner:build-package
+  image: ${REGISTRY_URL}/factory-ci-runner:factory-ci
   stage: docker
   script:
     - make manifest
@@ -45,7 +45,7 @@ build-docker:3.28:
 #-------------
 
 deploy_snap:
-  image: ${REGISTRY_URL}/factory-ci-runner:build-package
+  image: ${REGISTRY_URL}/factory-ci-runner:factory-ci
   stage: deploy
   script:
     - update-service map
@@ -63,7 +63,7 @@ deploy_snap:
 #-------------
 
 .release:
-  image: ${REGISTRY_URL}/factory-ci-runner:build-package
+  image: ${REGISTRY_URL}/factory-ci-runner:factory-ci
   stage: release
   script:
     - release-image qgis-map-server-$QGIS_FLAVOR

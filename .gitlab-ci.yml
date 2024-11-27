@@ -39,7 +39,7 @@ tests:
 #---------------
 
 build:
-  image: ${REGISTRY_URL}/factory-ci-runner:python
+  image: ${REGISTRY_URL}/factory-ci-runner:factory-ci
   stage: build
   script:
     - source ~/.bashrc
