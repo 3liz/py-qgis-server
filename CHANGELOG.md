@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Adde
+
+* Support for X-Request-Id header
 
 ### 1.9.2 - 2024-11-07
 
