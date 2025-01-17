@@ -11,7 +11,7 @@
 import logging
 
 from time import time
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urlencode
 
 from ..logger import log_rrequest
@@ -63,6 +63,9 @@ class AsyncClientHandler(BaseHandler):
 
         # Pass etag
         headers['If-None-Match'] = self.request.headers.get("If-None-Match", "")
+
+        # Get Request id
+        headers['X-Request-Id'] = self.request.headers.get('X-request-Id')
 
         # Pass Accept
         # This header is used by QGIS Server WFS3 to get the content type
@@ -118,7 +121,7 @@ class AsyncClientHandler(BaseHandler):
             )
 
             status = response.status
-            hdrs = cast(Dict, response.headers)
+            hdrs = response.headers
             delta = time() - reqtime
 
             log_rrequest(req_url, status, method, query, delta, hdrs)

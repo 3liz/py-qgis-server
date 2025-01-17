@@ -75,6 +75,7 @@ class Request(QgsServerRequest):
             location += f"?{query}"
 
         self._data = req.data
+
         super().__init__(location, HTTP_METHODS[req.method], headers=req.headers)
 
     def data(self) -> QByteArray:
@@ -479,6 +480,11 @@ class QgsRequestHandler(RequestHandler):
             # is useful for invalidating front-end cache
             response.setExtraHeader('X-Map-Id', project_location)
             response.setExtraHeader('Last-Modified', last_modified.astimezone().isoformat())
+
+            # Set request id
+            request_id = self.request.headers.get('X-Request-Id')
+            if request_id:
+                response.setExtraHeader('X-Request-Id', request_id)
 
             # Check etag for OWS requests
             if ogc_scheme == 'OWS':

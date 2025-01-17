@@ -10,7 +10,7 @@ import logging
 
 REQ_LOG_TEMPLATE = "{ip}\t{code}\t{method}\t{url}\t{time}\t{length}\t"
 REQ_FORMAT = REQ_LOG_TEMPLATE + '{agent}\t{referer}'
-RREQ_FORMAT = REQ_LOG_TEMPLATE
+RREQ_FORMAT = REQ_LOG_TEMPLATE + '{extra}'
 
 # Lies between info and warning
 REQ = 21
@@ -100,13 +100,17 @@ def format_log_rrequest(path, code, method, query, reqtime, headers, addr=''):
     except KeyError:
         pass
 
+    request_id = headers.get('X-Request-Id')
+
     fmt = RREQ_FORMAT.format(
         ip=addr,
         method=method,
         url=f"{path.rstrip('/')}/{query}",
         code=code,
         time=int(1000.0 * reqtime),
-        length=length)
+        length=length,
+        extra=f"REQ_ID:{request_id}" if request_id else '',
+    )
 
     return fmt
 
