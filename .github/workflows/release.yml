@@ -37,7 +37,7 @@ jobs:
         make manifest
 
     - name: Install Python requirements
-      run: pip3 install --upgrade qgis-plugin-ci build
+      run: pip3 install --upgrade setuptools qgis-plugin-ci build
 
     - name : Get current changelog
       run: qgis-plugin-ci changelog ${{ env.CI_COMMIT_TAG }} >> release.md
