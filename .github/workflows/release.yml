@@ -22,7 +22,7 @@ jobs:
 
     - name: Changelog
       id: changelog
-      uses: 3liz/changelog-release@0.2.0
+      uses: 3liz/changelog-release@0.3.0
 
     - name: Set up Python 3.13
       uses: actions/setup-python@v2.3.1
