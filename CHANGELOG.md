@@ -11,13 +11,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 
-* Support for X-Request-Id header
+* Support for `X-Request-Id` header
 
 ### 1.9.2 - 2024-11-07
 
 ### Fixed
 
-* Fix wfs3 geojson support and feature url support 
+* Fix WFS3 GeoJSON support and feature url support
     - https://github.com/3liz/py-qgis-server/pull/76/files
 
 ## 1.9.1 - 2024-09-27
