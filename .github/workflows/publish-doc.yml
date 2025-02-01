@@ -50,7 +50,7 @@ jobs:
       run: touch doc/build/html/.nojekyll
 
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@4.1.7
+      uses: JamesIves/github-pages-deploy-action@v4.7.2
       with:
         branch: gh-pages
         folder: doc/build/html
