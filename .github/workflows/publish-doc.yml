@@ -19,17 +19,17 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Python 3.13
-      uses: actions/setup-python@v2.3.1
+      uses: actions/setup-python@v5.4.0
       with:
         python-version: '3.13'
 
     - name: Set up NodeJS (for search index prebuilding)
-      uses: actions/setup-node@v4.1.0
+      uses: actions/setup-node@v4.2.0
       with:
         node-version: '18'
 
     - name: Cache project dependencies (pip)
-      uses: actions/cache@v2.1.5
+      uses: actions/cache@v4.2.2
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('doc/requirements.txt') }}
@@ -50,7 +50,7 @@ jobs:
       run: touch doc/build/html/.nojekyll
 
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@4.1.7
+      uses: JamesIves/github-pages-deploy-action@4.7.3
       with:
         branch: gh-pages
         folder: doc/build/html
