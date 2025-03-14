@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+### Added
+
+* Log request id for all output logs
+
 ## 1.9.3 - 2025-01-24
 
 ### Added

@@ -9,7 +9,7 @@
 import logging
 
 REQ_LOG_TEMPLATE = "{ip}\t{code}\t{method}\t{url}\t{time}\t{length}\t"
-REQ_FORMAT = REQ_LOG_TEMPLATE + '{agent}\t{referer}'
+REQ_FORMAT = REQ_LOG_TEMPLATE + '{agent}\t{referer}{extra}'
 RREQ_FORMAT = REQ_LOG_TEMPLATE + '{extra}'
 
 # Lies between info and warning
@@ -55,6 +55,8 @@ def format_log_request(handler):
     agent = request.headers.get('User-Agent') or ""
     referer = request.headers.get('Referer') or ""
 
+    request_id = request.headers.get('X-Request-Id')
+
     fmt = REQ_FORMAT.format(
         ip=request.remote_ip,
         method=request.method,
@@ -63,7 +65,9 @@ def format_log_request(handler):
         time=int(1000.0 * reqtime),
         length=length,
         referer=referer,
-        agent=agent)
+        agent=agent,
+        extra=f"\tREQ_ID:{request_id}" if request_id else '',
+    )
 
     return fmt, code, reqtime, length
 
