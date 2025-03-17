@@ -15,7 +15,7 @@ import sys
 import traceback
 
 from pathlib import Path
-from typing import Dict, Generator, TypeVar, Union
+from typing import Dict, Generator, Optional, TypeVar, Union
 
 from .config import confservice
 
@@ -25,7 +25,7 @@ server_plugins = {}
 failed_plugins = {}
 
 
-def checkQgisVersion(minver: str, maxver: str) -> bool:
+def checkQgisVersion(minver: Optional[str], maxver: Optional[str]) -> bool:
     from qgis.core import Qgis
 
     def to_int(ver):

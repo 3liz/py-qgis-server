@@ -39,19 +39,19 @@ class LandingPage(BaseHandler):
         self.write_json(doc)
 
     def service_infos(self):
-        _m = self._metadata.get
+        m = self._metadata.get
         doc = {
-            'title': _m('title'),
-            'description': _m('description'),
-            'termsOfService': _m('terms_of_service'),
+            'title': m('title'),
+            'description': m('description'),
+            'termsOfService': m('terms_of_service'),
             'contact': {
-                'name': _m('contact_name'),
-                'url': _m('contact_url'),
-                'email': _m('contact_email'),
+                'name': m('contact_name'),
+                'url': m('contact_url'),
+                'email': m('contact_email'),
             },
             'licence': {
-                'name': _m('licence_name'),
-                'url': _m('licence_url'),
+                'name': m('licence_name'),
+                'url': m('licence_url'),
             },
             'version': __version__,
         }

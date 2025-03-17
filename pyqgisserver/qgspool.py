@@ -20,7 +20,14 @@ import traceback
 from glob import glob
 from multiprocessing import Process
 from multiprocessing.util import Finalize
-from typing import Awaitable, Callable, Dict, List, Union, cast
+from typing import (
+    Awaitable,
+    Callable,
+    Iterator,
+    Optional,
+    Union,
+    cast,
+)
 
 import psutil
 import zmq
@@ -38,8 +45,8 @@ LOGGER = logging.getLogger('SRVLOG')
 class _RestartHandler:
 
     def __init__(self) -> None:
-        self._restart: Union[None, Scheduler] = None
-        self._watch_files: List[str] = []
+        self._restart: Optional[Scheduler] = None
+        self._watch_files: list[str] = []
 
     def update_files(self) -> None:
         """ update files to watch
@@ -85,7 +92,7 @@ class WorkerPoolServer:
         pool: Process,
         timeout: int,
         num_workers: int,
-        high_water_mark: float = 1.0,
+        high_water_mark: float,
     ) -> None:
 
         ctx = zmq.Context.instance()
@@ -122,12 +129,10 @@ class WorkerPoolServer:
                 LOGGER.critical("Pool failure, exiting because of unrecoverable error...")
                 raise SystemExit(1)
             # Check high water mark
-            if self.memory_fraction() > self._high_water_mark:
-                LOGGER.critical(
-                    "High memory water mark reached (%s): restarting workers",
-                    self._high_water_mark,
-                )
-                self.restart()
+            try:
+                self.check_oom_status()
+            except Exception:
+                LOGGER.error(traceback.format_exc())
             await asyncio.sleep(5)
 
     def start_supervisor(self):
@@ -172,6 +177,7 @@ class WorkerPoolServer:
         try:
             self._sock.send(command, zmq.NOBLOCK)
         except zmq.ZMQError as err:
+
             if err.errno != zmq.EAGAIN:
                 LOGGER.error("Broadcast Error %s\n%s", err, traceback.format_exc())
 
@@ -184,7 +190,7 @@ class WorkerPoolServer:
     def num_workers(self) -> int:
         return self._num_workers
 
-    async def get_reports(self) -> List[Dict]:
+    async def get_reports(self) -> list[dict]:
         """ Collect reports
         """
         if self._supervisor is None:
@@ -203,12 +209,38 @@ class WorkerPoolServer:
                 break
         return supervisor.reports
 
-    def memory_fraction(self) -> float:
-        """ Return total memory fraction used by pool
+    def check_oom_status(self):
+        """Kill out-of-memory children
+
+        This will kill the children using the most memory
+        until the memory goes below high water mark
         """
-        p = psutil.Process(self._pool.pid)
-        mem = sum(child.memory_percent() for child in p.children(recursive=True))
-        return mem / 100.0
+        # Compute memory used for all childs
+        def _mem_usage() -> Iterator[tuple[psutil.Process, float]]:
+            for p in psutil.Process(self._pool.pid).children():
+                mem = p.memory_percent()
+                mem += sum(pp.memory_percent() for pp in p.children(recursive=True))
+                yield (p, mem / 100.0)
+
+        childs = list(_mem_usage())
+
+        # Total mem
+        memory_fraction = sum(t[1] for t in childs)
+        if memory_fraction > self._high_water_mark:
+            LOGGER.critical(
+                "High memory water mark reached (%s)",
+                self._high_water_mark,
+            )
+
+            # Sort childs process in descending order
+            # kill child processes until memory get low
+            childs.sort(key=lambda t: t[1], reverse=True)
+            for (p, mem) in childs:
+                LOGGER.critical("OOM: killing worker: %s (mem usage: %s)", p.pid, mem)
+                p.kill()
+                memory_fraction -= mem
+                if memory_fraction < self._high_water_mark:
+                    break
 
 
 def create_poolserver(numworkers: int) -> WorkerPoolServer:
@@ -226,8 +258,13 @@ def create_poolserver(numworkers: int) -> WorkerPoolServer:
     p = Process(target=run_worker_pool, args=(numworkers, broadcastaddr, router))
     p.start()
 
-    poolserver = WorkerPoolServer(broadcastaddr, p, timeout, numworkers,
-                         high_water_mark=high_water_mark)
+    poolserver = WorkerPoolServer(
+        broadcastaddr,
+        p,
+        timeout,
+        numworkers,
+        high_water_mark=high_water_mark,
+    )
     return poolserver
 
 
