@@ -123,7 +123,10 @@ class WorkerPoolServer:
                 raise SystemExit(1)
             # Check high water mark
             if self.memory_fraction() > self._high_water_mark:
-                LOGGER.critical("High memory water mark reached: restarting workers %s", self._high_water_mark)
+                LOGGER.critical(
+                    "High memory water mark reached (%s): restarting workers",
+                    self._high_water_mark,
+                )
                 self.restart()
             await asyncio.sleep(5)
 
