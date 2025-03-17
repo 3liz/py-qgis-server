@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## 1.9.5 - 2025-03-17
 
 * Change worker OOM handling strategy
+* Log incoming request id in worker
 
 ## 1.9.4 - 2025-03-15
 

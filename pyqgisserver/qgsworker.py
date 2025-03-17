@@ -459,6 +459,15 @@ class QgsRequestHandler(RequestHandler):
     ):
         """ Handle request passed to Qgis
         """
+        # Set request id
+        request_id = self.request.headers.get('X-Request-Id')
+        if request_id:
+            LOGGER.info(
+                "QGIS Request accepted\tMAP:%s\tREQ_ID:%s",
+                project_location or "<notset>",
+                request_id,
+            )
+
         if not project_location:
             # Pass request directly
             self.qgis_server.handleRequest(request, response)
@@ -481,9 +490,8 @@ class QgsRequestHandler(RequestHandler):
             response.setExtraHeader('X-Map-Id', project_location)
             response.setExtraHeader('Last-Modified', last_modified.astimezone().isoformat())
 
-            # Set request id
-            request_id = self.request.headers.get('X-Request-Id')
             if request_id:
+                # Set request id in response headers
                 response.setExtraHeader('X-Request-Id', request_id)
 
             # Check etag for OWS requests
