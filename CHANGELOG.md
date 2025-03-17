@@ -7,11 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
-### Fixed
+## 1.9.5 - 2025-03-17
 
 * Change worker OOM handling strategy
 
-## 1.9.4 - 2025-03-24
+## 1.9.4 - 2025-03-15
 
 ### Added
 
