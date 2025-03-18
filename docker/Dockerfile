@@ -19,9 +19,9 @@ RUN --mount=type=cache,target=/.python-cache mkdir -p /opt/local/ \
     && python3 -m venv --system-site-packages /opt/local/plugin-manager \
     && cd /usr/local/bin \
     && /opt/local/plugin-manager/bin/pip install -U --upgrade-strategy=eager \
-        --no-cache-dir pip setuptools wheel packaging>=22.0 \
+        --cache-dir=/.python-cache pip setuptools wheel packaging>=22.0 \
     && /opt/local/plugin-manager/bin/pip install -U --upgrade-strategy=eager \
-         --no-cache-dir qgis-plugin-manager \
+         --cache-dir=/.python-cache qgis-plugin-manager \
     && cd /usr/local/bin \
     && echo "#!/bin/bash" > qgis-plugin-manager \
     && echo "export QGIS_PLUGINPATH=\${QGIS_PLUGINPATH:-\$QGSRV_SERVER_PLUGINPATH}" >> qgis-plugin-manager \
