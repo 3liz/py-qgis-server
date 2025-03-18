@@ -39,7 +39,10 @@ fi
 if [[ "$1" = "qgisserver-proxy" ]]; then
     shift
     echo "Running Qgis server proxy"
-    exec gosu $QGSRV_USER qgisserver --proxy $@
+
+    REUID=`echo $QGSRV_USER|cut -d: -f1`
+    REGID=`echo $QGSRV_USER|cut -d: -f2`
+    exec setpriv --clear-groups --reuid=$REUID --regid=$REGID qgisserver --proxy $@
 fi 
 
 # Qgis need a HOME
@@ -64,7 +67,10 @@ if [ "$(id -u)" = '0' ]; then
         mkdir -p $QGSRV_CACHE_ROOTDIR
         chown $QGSRV_USER $QGSRV_CACHE_ROOTDIR
     fi
-    exec gosu $QGSRV_USER  "$BASH_SOURCE" "$@"
+
+    REUID=`echo $QGSRV_USER|cut -d: -f1`
+    REGID=`echo $QGSRV_USER|cut -d: -f2`
+    exec setpriv --clear-groups --reuid=$REUID --regid=$REGID "$BASH_SOURCE" "$@"
 fi
 
 echo "Running as $QGSRV_USER"
@@ -117,7 +123,7 @@ if [[ "$QGSRV_DISPLAY_XVFB" == "ON" ]]; then
     
  # RUN Xvfb in the background
  echo "Running Xvfb"
- nohup /usr/bin/Xvfb $XVFB_ARGS &
+ nohup /usr/bin/Xvfb $XVFB_ARGS >/tmp/xvfb.log 2>&1 &
  export DISPLAY=":99"
 fi
 

@@ -15,7 +15,7 @@ ENV QGSRV_DATA_PATH=/usr/local/share/qgis-server
 
 
 # Install qgis-plugin-manager
-RUN mkdir -p /opt/local/ \
+RUN --mount=type=cache,target=/.python-cache mkdir -p /opt/local/ \
     && python3 -m venv --system-site-packages /opt/local/plugin-manager \
     && cd /usr/local/bin \
     && /opt/local/plugin-manager/bin/pip install -U --upgrade-strategy=eager \
@@ -36,11 +36,14 @@ COPY pyqgisservercontrib py-qgis-server/pyqgisservercontrib
 COPY pyproject.toml VERSION py-qgis-server/
 
 # Create virtualenv for installing server
-RUN mkdir -p /opt/local/ \ 
+RUN --mount=type=cache,target=/.python-cache mkdir -p /opt/local/ \
     && python3 -m venv --system-site-packages /opt/local/pyqgisserver \
     && cd /usr/local/bin \
-    && /opt/local/pyqgisserver/bin/pip install -U --no-cache-dir pip setuptools wheel \
-    && /opt/local/pyqgisserver/bin/pip install --no-cache-dir \
+    && /opt/local/pyqgisserver/bin/pip install -U \
+        --cache-dir=/.python-cache pip setuptools wheel \
+        --upgrade-strategy=eager \
+    && /opt/local/pyqgisserver/bin/pip install -U --cache-dir=/.python-cache \
+        --upgrade-strategy=eager \
         -e /py-qgis-server \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver-worker \
