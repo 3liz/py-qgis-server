@@ -25,7 +25,7 @@ jobs:
       uses: 3liz/changelog-release@0.3.0
 
     - name: Set up Python 3.13
-      uses: actions/setup-python@v5.4.0
+      uses: actions/setup-python@v5.5.0
       with:
         python-version: '3.13'
 
