@@ -37,6 +37,7 @@ class AsyncClientHandler(BaseHandler):
         timeout: int,
         monitor: Optional[MonitorABC] = None,
         allowed_hdrs: List[str] = [],
+        debug_request_id: Optional[str] = None,
     ):
         super().initialize()
 
@@ -45,6 +46,7 @@ class AsyncClientHandler(BaseHandler):
         self._monitor = monitor
         self._stats = self.application.stats  # type: ignore [attr-defined]
         self._allowed_hdrs = allowed_hdrs
+        self._debug_request_id = debug_request_id
 
         self.ogc_scheme: Union[str, None] = None
 
@@ -65,7 +67,12 @@ class AsyncClientHandler(BaseHandler):
         headers['If-None-Match'] = self.request.headers.get("If-None-Match", "")
 
         # Get Request id
-        headers['X-Request-Id'] = self.request.headers.get('X-request-Id')
+        headers['X-Request-Id'] = self.request.headers.get('X-Request-Id')
+
+        # Get Debug activation identity
+        debug_id = self.request.headers.get('X-Debug-Id')
+        if debug_id and (self._debug_request_id == "*" or debug_id == self._debug_request_id):
+            headers['X-Debug-Id'] = debug_id
 
         # Pass Accept
         # This header is used by QGIS Server WFS3 to get the content type

@@ -87,7 +87,7 @@ def load_configuration():
     CONFIG.set('server', 'getfeaturelimit', getenv('QGSRV_SERVER_GETFEATURELIMIT', '-1'))
     CONFIG.set('server', 'pluginpath',
                getenv2('QGSRV_SERVER_PLUGINPATH', 'QGIS_PLUGINPATH', ''))
-
+    CONFIG.set('server', 'debug_request_id', getenv('QGSRV_SERVER_DEBUG_REQUEST_ID', '*'))
     #
     # Logging
     #

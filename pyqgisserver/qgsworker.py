@@ -19,9 +19,10 @@ import logging
 import os
 import traceback
 
+from contextlib import contextmanager
 from datetime import datetime
 from time import time
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Generator, Optional, Tuple
 
 import psutil
 
@@ -240,8 +241,10 @@ class QgsRequestHandler(RequestHandler):
 
         from .utils.qgis import init_qgis_server
 
+        verbose = LOGGER.level <= logging.DEBUG or confservice.getboolean('logging', 'qgis_info')
+
         # Enable qgis server verbosity
-        if LOGGER.isEnabledFor(logging.DEBUG):
+        if verbose or LOGGER.isEnabledFor(logging.DEBUG):
             os.environ['QGIS_SERVER_LOG_LEVEL'] = '0'
             os.environ['QGIS_DEBUG'] = '1'
 
@@ -272,14 +275,14 @@ class QgsRequestHandler(RequestHandler):
         for name, _ in qgis_api_endpoints(enabled_only=False):
             configure_qgis_api(name)
 
-        verbose = LOGGER.level <= logging.DEBUG or confservice.getboolean('logging', 'qgis_info')
-
         LOGGER.debug("Initializing qgis server")
         # Disable Qgis cache strategy
         os.environ['QGIS_SERVER_PROJECT_CACHE_STRATEGY'] = 'off'
-        qgsserver = init_qgis_server(enable_processing=False,
-                                     logger=LOGGER,
-                                     verbose=verbose)
+        qgsserver = init_qgis_server(
+            enable_processing=False,
+            logger=LOGGER,
+            verbose=verbose,
+        )
 
         serverIface = qgsserver.serverInterface()
         load_plugins(serverIface)
@@ -406,6 +409,21 @@ class QgsRequestHandler(RequestHandler):
         else:
             return None
 
+    @contextmanager
+    def debug_request(self, request_id: Optional[str]) -> Generator[None, None, None]:
+        debug_id = self.request.headers.pop('X-Debug-Id', None)
+        previous_level: Optional[int] = None
+        if debug_id and not LOGGER.isEnabledFor(logging.DEBUG):
+            previous_level = LOGGER.level
+            LOGGER.setLevel(logging.DEBUG)
+            LOGGER.debug("[DEBUG ON][REQ_ID: %s]", request_id or "-")
+        try:
+            yield
+        finally:
+            if previous_level is not None:
+                LOGGER.debug("[DEBUG OFF][REQ_ID: %s]", request_id or "-")
+                LOGGER.setLevel(previous_level)
+
     def handle_message(self):
         """ Override this method to handle_messages
         """
@@ -427,28 +445,32 @@ class QgsRequestHandler(RequestHandler):
             # Try to get project from environment
             project_location = self.default_project_location()
 
-        if ogc_scheme == 'OWS':
-            if not project_location and request.parameter('SERVICE'):
-                # Prevent qgis for returning 500 when MAP is not defined for
-                # OWS services
-                LOGGER.error("No project defined for %s", request.parameter('SERVICE'))
-                # A project is required
-                exception = QgsServerException(self.QGIS_NO_MAP_ERROR_MSG, 400)
-                response.write(exception)
-                response.finish()
-                return
+        request_id = self.request.headers.get('X-Request-Id')
 
-            # Handle HEAD method for OWS requests
-            # Note that Qgis Server return 501 on head method on OWS methods
-            if request.method() == QgsServerRequest.HeadMethod:
-                # We can compute etag without loading resource
-                if project_location:
-                    last_modified = self.get_modified_time(project_location, from_cache=False)
-                    self.set_etag_header(project_location, last_modified, request, response)
+        with self.debug_request(request_id):
+            #
+            if ogc_scheme == 'OWS':
+                if not project_location and request.parameter('SERVICE'):
+                    # Prevent qgis for returning 500 when MAP is not defined for
+                    # OWS services
+                    LOGGER.error("No project defined for %s", request.parameter('SERVICE'))
+                    # A project is required
+                    exception = QgsServerException(self.QGIS_NO_MAP_ERROR_MSG, 400)
+                    response.write(exception)
                     response.finish()
                     return
 
-        self.handle_qgis_request(ogc_scheme, project_location, request, response)
+                # Handle HEAD method for OWS requests
+                # Note that Qgis Server return 501 on head method on OWS methods
+                if request.method() == QgsServerRequest.HeadMethod:
+                    # We can compute etag without loading resource
+                    if project_location:
+                        last_modified = self.get_modified_time(project_location, from_cache=False)
+                        self.set_etag_header(project_location, last_modified, request, response)
+                        response.finish()
+                        return
+
+            self.handle_qgis_request(ogc_scheme, project_location, request, response, request_id)
 
     def handle_qgis_request(
         self,
@@ -456,11 +478,11 @@ class QgsRequestHandler(RequestHandler):
         project_location: str,
         request: Request,
         response: Response,
+        request_id: Optional[str],
     ):
         """ Handle request passed to Qgis
         """
         # Set request id
-        request_id = self.request.headers.get('X-Request-Id')
         if request_id:
             LOGGER.info(
                 "QGIS Request accepted\tMAP:%s\tREQ_ID:%s",

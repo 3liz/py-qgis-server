@@ -92,7 +92,7 @@ def start_qgis_application(
         print(qgis_application.showSettings())  # noqa T201
 
     # Install logger hook
-    install_logger_hook(logger, logprefix, verbose=verbose)
+    install_logger_hook(logger, logprefix)
 
     logger.info("%s Qgis application initialized......" % logprefix)
 
@@ -112,7 +112,7 @@ def init_processing() -> None:
     Processing.initialize()
 
 
-def install_logger_hook(logger: logging.Logger, logprefix: str, verbose: bool = False) -> None:
+def install_logger_hook(logger: logging.Logger, logprefix: str) -> None:
     """ Install message log hook
     """
     from qgis.core import Qgis, QgsApplication
@@ -125,9 +125,9 @@ def install_logger_hook(logger: logging.Logger, logprefix: str, verbose: bool = 
             logger.warning(arg)
         elif level == Qgis.Critical:
             logger.error(arg)
-        elif verbose:
+        else:
             # Qgis is somehow very noisy
-            # log only if verbose is set
+            # log only in debug mode
             logger.debug(arg)
 
     messageLog = QgsApplication.messageLog()

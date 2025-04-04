@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+* Enable debug logging on specific request
+
 ## 1.9.5 - 2025-03-17
 
 * Change worker OOM handling strategy

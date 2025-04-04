@@ -53,6 +53,7 @@ def configure_handlers(client: client.AsyncClient) -> _RuleList:
         monitor=monitor,
         timeout=cfg.getint('timeout'),
         allowed_hdrs=tuple(k.upper() for k in cfg.get('allow_headers').split(',')),
+        debug_request_id=cfg.get('debug_request_id'),
     )
 
     end = r"(?:\.html|\.json|/?)"
