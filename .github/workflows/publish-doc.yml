@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - 'doc/**'
-      - '.github/workflows/publisch-doc.yml'
+      - '.github/workflows/publish-doc.yml'
 
 jobs:
   deploy:
@@ -50,7 +50,7 @@ jobs:
       run: touch doc/build/html/.nojekyll
 
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@4.7.3
+      uses: JamesIves/github-pages-deploy-action@v4.7.3
       with:
         branch: gh-pages
         folder: doc/build/html
