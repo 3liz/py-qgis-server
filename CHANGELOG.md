@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+## 1.9.6 - 2025-06-10
+
+### Added
+
 * Enable debug logging on specific request
 
 ## 1.9.5 - 2025-03-17

@@ -40,11 +40,6 @@ build-docker:3.34:
   variables:
     QGIS_FLAVOR: "3.34"
 
-build-docker:3.28:
-  extends: .build-docker
-  variables:
-    QGIS_FLAVOR: "3.28"
-
 
 #-------------
 # deploy
@@ -112,9 +107,3 @@ release:3.34:
   dependencies:
     - build-docker:3.34
 
-release:3.28:
-  extends: .release
-  variables:
-    QGIS_FLAVOR: "3.28"
-  dependencies:
-    - build-docker:3.28
