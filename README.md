@@ -1,8 +1,8 @@
 # QGIS embedded WMS/WFS/WCS asynchronous scalable server
 
 
-[!NOTE]
-Check [QJazz](https://github.com/3liz/qjazz) the new platform for QGIS embedded services.
+> [!NOTE]
+> Check [QJazz](https://github.com/3liz/qjazz) the new platform for QGIS embedded services.
 
 
 [![PyPi version badge](https://badgen.net/pypi/v/py-qgis-server)](https://pypi.org/project/py-qgis-server/)
