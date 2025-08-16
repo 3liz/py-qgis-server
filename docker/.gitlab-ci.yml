@@ -18,7 +18,7 @@
       - tags
       - master
   tags:
-    - factory
+    - factory-dind
 
 
 build-docker:release:
@@ -52,6 +52,7 @@ deploy_snap:
     - update-service map
   environment:
     name: snap
+  allow_failure: true
   only:
     refs:
        - tags

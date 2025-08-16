@@ -47,7 +47,7 @@ build:
   environment:
     name: snap
   tags:
-    - infrav3-plain
+    - factory-plain
   only:
     refs:
       - tags

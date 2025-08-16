@@ -3,7 +3,7 @@
 PROJECT_NAME:=py-qgis-server
 
 # Project version
-VERSION:=1.9.7
+VERSION:=1.9.6
 
 ifndef CI_COMMIT_TAG
 VERSION_TAG=$(VERSION)rc0
