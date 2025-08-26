@@ -60,19 +60,6 @@ build:
 # Docker build
 include: '/docker/.gitlab-ci.yml'
 
-tickets:
-  stage: post_release
-  only:
-    - tags
-  needs:
-    - "release:release"
-    - "release:ltr"
-  image:
-    name: $REGISTRY_URI/infra/ci-tools:latest
-  script:
-    - create_ticket.py
-  tags:
-    - factory-plain
 
 gitlab_release:
   stage: release
