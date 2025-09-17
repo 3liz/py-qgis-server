@@ -5,13 +5,9 @@ updates:
     schedule:
       interval: "cron"
       cronjob: "0 4 2 */4 *"
-    assignees:
-      - "Gustry"
 
   - package-ecosystem: "pip"
     directory: "/requirements/"
     schedule:
       interval: "cron"
       cronjob: "0 4 2 */4 *"
-    assignees:
-      - "Gustry"
