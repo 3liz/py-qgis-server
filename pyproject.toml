@@ -6,14 +6,13 @@ build-backend = "setuptools.build_meta"
 name = "py-qgis-server"
 description = "Py-Qgis-Server is an OWS/OGC server built on top of QGIS Server implementation"
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.9"
 classifiers=[
     "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
