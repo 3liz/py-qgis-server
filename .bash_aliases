@@ -1,2 +1,0 @@
-# Activate environment
-workon dev
