@@ -5,7 +5,7 @@ target-version = "py310"
 
 [lint]
 extend-select = ["E", "F", "I", "ANN", "W", "T", "COM", "RUF"]
-ignore = ["ANN002", "ANN003"]
+ignore = ["ANN002", "ANN003", "ANN401"]
 
 [format]
 indent-style = "space"

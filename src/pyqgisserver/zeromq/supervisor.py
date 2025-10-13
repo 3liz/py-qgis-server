@@ -88,7 +88,7 @@ class Client:
         if self._sock:
             self._sock.close()
 
-    def send_report(self, data: Any):  # noqa: ANN401
+    def send_report(self, data: Any):
         self._send(_Report(data=data))
 
 

@@ -1,10 +1,11 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.9.2,<1.0.0"]
+build-backend = "uv_build"
 
 [project]
 name = "py-qgis-server"
 description = "Py-Qgis-Server is an OWS/OGC server built on top of QGIS Server implementation"
+version = "1.9.6"
 readme = "README.md"
 requires-python = ">= 3.9"
 classifiers=[
@@ -27,10 +28,7 @@ dependencies = [
     "typing-extensions",
     "psutil",
 ]
-dynamic = ["version"]
 
-[project.optional-dependencies]
-amqp = ["py-amqp-client<2.0.0"]
 
 [[project.authors]]
 name = "3Liz"
@@ -60,12 +58,29 @@ ban = "pyqgisserver.qgscache.observers.ban"
 [project.entry-points."py_qgis_server.access_policy"]
 request_logger = "pyqgisservercontrib.middlewares.request_logger:register_filters"
 
-[tool.setuptools.dynamic]
-version = { file = ["VERSION"] }
-
-[tool.setuptools.packages.find]
-include = [
-    "pyqgisserver",
-    "pyqgisserver.*",
-    "pyqgisservercontrib.*",
+[dependency-groups]
+dev = [
+    {include-group = "tests"},
+    {include-group = "lint"},
 ]
+tests = [
+    "pytest",
+    "lxml",
+]
+lint = [
+    "ruff",
+    "mypy",
+    "mypy-extensions",
+    "types-psutil",
+    "types-PyYAML",
+    "types-requests",
+    "types-psycopg2",
+    "lxml-stubs",
+]
+package = [
+    "twine",
+]
+
+
+[tool.uv.build-backend]
+module-name = ["pyqgisserver", "pyqgisservercontrib"]

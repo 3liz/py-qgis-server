@@ -411,7 +411,7 @@ class QgsRequestHandler(RequestHandler):
 
     @contextmanager
     def debug_request(self, request_id: Optional[str]) -> Generator[None, None, None]:
-        debug_id = self.request.headers.pop('X-Debug-Id', None)
+        debug_id = self.request.headers.pop('X-Debug-Id', None) # type: ignore [attr-defined]
         previous_level: Optional[int] = None
         if debug_id and not LOGGER.isEnabledFor(logging.DEBUG):
             previous_level = LOGGER.level

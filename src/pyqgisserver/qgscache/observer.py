@@ -56,7 +56,7 @@ class Client:
         self._sock.connect(address)
         self._pid = os.getpid()
 
-    def _send(self, data: Any):   # noqa ANN401
+    def _send(self, data: Any):
         try:
             self._sock.send_pyobj((self._pid, data), flags=zmq.DONTWAIT)
         except zmq.ZMQError as err:

@@ -14,12 +14,11 @@ import sys
 
 from multiprocessing import Process
 from typing import (
+    List,
     Optional,
 )
 
 import tornado.web
-
-from tornado.routing import _RuleList
 
 from .config import confservice, qgis_api_endpoints
 from .handlers import (
@@ -40,7 +39,7 @@ from .zeromq import broker, client
 LOGGER = logging.getLogger('SRVLOG')
 
 
-def configure_handlers(client: client.AsyncClient) -> _RuleList:
+def configure_handlers(client: client.AsyncClient) -> List:
     """ Configure request handlers
     """
     cfg = confservice['server']
@@ -58,7 +57,7 @@ def configure_handlers(client: client.AsyncClient) -> _RuleList:
     end = r"(?:\.html|\.json|/?)"
     collection_end = r"(?:\.html|\.json|\.geojson|/?)"
 
-    handlers: _RuleList = [
+    handlers: List = [
         (r"/", LandingPage),
         (r"/ping", PingHandler),
     ]

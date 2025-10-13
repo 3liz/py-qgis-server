@@ -76,7 +76,7 @@ class FileProtocolHandler:
             raise ValueError('Cannot get path from arguments')
 
         if not path:
-            LOGGER.error("File protocol handler: File not found: %s", str(path))
+            LOGGER.error("File protocol handler: File not found: %s", path)
             raise FileNotFoundError(str(path))
 
         modified_time = datetime.fromtimestamp(path.stat().st_mtime)

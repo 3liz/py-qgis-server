@@ -6,9 +6,9 @@ include $(DEPTH)/config.mk
 
 DIST:=dist
 
-MANIFEST=pyqgisserver/build.manifest
+MANIFEST=src/pyqgisserver/build.manifest
 
-PYTHON_PKG=pyqgisserver pyqgisservercontrib
+PYTHON_PKG=src
 
 TESTDIR=tests/unittests
 
@@ -46,18 +46,19 @@ clean:
 	rm -rf $(DIST)
 
 test: manifest lint
-	make -C tests test PYTEST_ADDOPTS=$(PYTEST_ADDOPTS)
+	@make -C tests test PYTEST_ADDOPTS=$(PYTEST_ADDOPTS)
+  
+
+ifdef VIRTUAL_ENV
+# Always prefer active environment
+ACTIVE_VENV=--active
+endif
 
 install: manifest
-	pip install -U --upgrade-strategy=eager -e .
+	@uv sync --frozen $(ACTIVE_VENV)
 
-install-tests:
-	pip install -U --upgrade-strategy=eager -r tests/requirements.txt
-
-install-doc:
-	pip install -U --upgrade-strategy=eager -r doc/requirements.txt
-
-install-dev: install-tests install-doc
+upgrade-requirements: 
+	@uv sync -U $(ACTIVE_VENV)
 
 lint:
 	@ruff check --output-format=concise $(PYTHON_PKG) $(TESTDIR)
@@ -68,6 +69,32 @@ lint-preview:
 lint-fix:
 	@ruff check --preview --fix $(PYTHON_PKG) $(TESTDIR)
 
-typing:
-	mypy --config-file=$(topsrcdir)/mypy.ini -p pyqgisserver -p pyqgisservercontrib
+typecheck:
+	@mypy --config-file=$(topsrcdir)/mypy.ini src
+
+
+REQUIREMENT_GROUPS=\
+  tests \
+  lint \
+  $(NULL)
+
+REQUIREMENTS=requirements.txt $(patsubst %, update-requirements-%, $(REQUIREMENT_GROUPS))
+
+requirements.txt:
+	@echo "Updating requirements.txt"; \
+	uv export --format requirements.txt \
+		--no-annotate \
+		--no-editable \
+		--no-hashes -q -o requirements.txt;
+
+update-requirements-%:
+	@echo "Updating requirqments for '$*'"; \
+	uv export --format requirements.txt \
+		--no-annotate \
+		--no-editable \
+		--no-hashes \
+		--only-group $* \
+		-q -o requirements/$*.txt;
+
+update-requirements: $(REQUIREMENTS)
 

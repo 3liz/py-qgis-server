@@ -109,10 +109,10 @@ def _check_unsafe_url(insecure: bool, url: urllib.parse.ParseResult) -> Tuple[st
         LOGGER.debug("**** Postgres metadata for '%s': %s", prjname, metadata)
         conn.close()
     except psycopg2.OperationalError as e:
-        LOGGER.error("Postgres handler Connection error: %s", str(e))
+        LOGGER.error("Postgres handler Connection error: %s", e)
         raise FileNotFoundError(urlstr)
     except psycopg2.Error as e:
-        LOGGER.error("Postgres handler Connection error: %s", str(e))
+        LOGGER.error("Postgres handler Connection error: %s", e)
         raise RuntimeError("Connection failed: %s", urlstr)
 
     modified_time = datetime.fromisoformat(metadata['last_modified_time'])
