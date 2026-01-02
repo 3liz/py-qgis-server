@@ -18,7 +18,7 @@ jobs:
       run: echo "CI_COMMIT_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
     - name: Get source code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Changelog
       id: changelog
