@@ -17,7 +17,6 @@ from typing import (
     Optional,
 )
 
-import tornado.platform.asyncio
 import tornado.web
 
 from tornado.routing import _RuleList

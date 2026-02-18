@@ -7,17 +7,18 @@
 
 import sys
 
+from pathlib import Path
 from typing import Dict
 
 
 def read_manifest() -> Dict:
-    from pkg_resources import resource_stream
+    from importlib import resources
 
     # Read build manifest
     manifest = {'commitid': 'n/a', 'buildid': 'n/a', 'version': 'n/a'}
     try:
-        with resource_stream('pyqgisserver', 'build.manifest') as stream:
-            manifest.update(line.decode().strip().split('=')[:2] for line in stream.readlines())
+        with Path(str(resources.files('pyqgisserver')), 'build.manifest').open() as f:
+            manifest.update(line.strip().split('=')[:2] for line in f.readlines())
     except Exception as e:
         print("WARNING: Failed to read manifest ! %s " % e, file=sys.stderr)  # noqa: T201
     return manifest
