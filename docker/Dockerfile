@@ -18,9 +18,9 @@ ENV QGSRV_DATA_PATH=/usr/local/share/qgis-server
 RUN --mount=type=cache,target=/.python-cache mkdir -p /opt/local/ \
     && python3 -m venv --system-site-packages /opt/local/plugin-manager \
     && cd /usr/local/bin \
-    && /opt/local/plugin-manager/bin/pip install -U --upgrade-strategy=eager \
+    && /opt/local/plugin-manager/bin/pip install -U --upgrade-strategy=eager --compile \
         --cache-dir=/.python-cache pip setuptools wheel packaging>=22.0 \
-    && /opt/local/plugin-manager/bin/pip install -U --upgrade-strategy=eager \
+    && /opt/local/plugin-manager/bin/pip install -U --upgrade-strategy=eager --compile \
          --cache-dir=/.python-cache qgis-plugin-manager \
     && cd /usr/local/bin \
     && echo "#!/bin/bash" > qgis-plugin-manager \

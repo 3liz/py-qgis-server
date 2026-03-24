@@ -8,6 +8,7 @@ copy_qgis_configuration() {
         echo "Copying Qgis configuration: $QGIS_CUSTOM_CONFIG_PATH"
         cp -RL $QGIS_CUSTOM_CONFIG_PATH/* $HOME/
     fi
+    echo "QGIS HOME set to: $HOME"
     export QGIS_CUSTOM_CONFIG_PATH=$HOME
     export QGIS_OPTIONS_PATH=$HOME
 }

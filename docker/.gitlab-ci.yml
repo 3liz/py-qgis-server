@@ -21,15 +21,15 @@
     - factory-dind
 
 
-build-docker:release:
+build-docker:3.44:
   extends: .build-docker
   variables:
-    QGIS_FLAVOR: release
+    QGIS_FLAVOR: "3.44"
 
-build-docker:ltr:
+build-docker:3.40:
   extends: .build-docker
   variables:
-    QGIS_FLAVOR: ltr
+    QGIS_FLAVOR: "3.40"
 
 #
 # Compatibility with previous ltr
@@ -83,23 +83,20 @@ deploy_snap:
   variables:
     FACTORY_MANIFEST: "docker/factory-${QGIS_FLAVOR}.manifest"
 
-release:release:
+release:3.44:
   extends: .release
   variables:
-    QGIS_FLAVOR: release
+    QGIS_FLAVOR: "3.44"
   dependencies:
-    - build-docker:release
+    - build-docker:3.44
 
-release:ltr:
+release:3.40:
   extends: .release
   variables:
-    QGIS_FLAVOR: ltr
+    QGIS_FLAVOR: "3.40"
   dependencies:
-    - build-docker:ltr
+    - build-docker:3.40
 
-#
-# Compatibility with previous ltr
-#
 
 release:3.34:
   extends: .release

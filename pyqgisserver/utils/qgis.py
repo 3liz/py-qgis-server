@@ -71,6 +71,8 @@ def start_qgis_application(
 
     global qgis_application
 
+    logger.info("QGIS_OPTIONS path set to '%s'", os.getenv("QGIS_OPTIONS_PATH"))
+
     qgis_application = QgsApplication([], False)
     qgis_application.setPrefixPath(qgis_prefix, True)
 
