@@ -14,7 +14,5 @@ endif
 BUILDID=$(shell date +"%Y%m%d%H%M")
 COMMITID=$(shell git rev-parse --short HEAD)
 
-PYTHON=python3
-
 topsrcdir:=$(shell realpath $(DEPTH))
 

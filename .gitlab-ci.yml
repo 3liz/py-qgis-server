@@ -5,6 +5,7 @@ variables:
 stages:
 - test
 - build
+- package
 - docker
 - deploy
 - release
@@ -38,23 +39,25 @@ tests:
 # Build
 #---------------
 
+.release_rules:
+  - if: '$CI_COMMIT_TAG =~ /^(?:release-|v)?\d+\.\d+\.\d+(?:-.*)?$/'
+    variables:
+      DIST_RELEASE: "true"
+
 build:
   image: ${REGISTRY_URL}/factory-ci-runner:factory-ci
+  tags:
+    - factory-plain
   stage: build
+  rules:
+    - if: $RELEASE_BRANCH == "true"
+    - !reference [.release_rules]
   script:
-    - source ~/.bashrc
     - make dist deliver
   environment:
     name: snap
   tags:
     - factory-plain
-  only:
-    refs:
-      - tags
-      - master
-  except:
-      - schedules
-      - triggers
 
 
 # Docker build

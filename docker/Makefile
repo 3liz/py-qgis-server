@@ -11,7 +11,7 @@ include $(DEPTH)/config.mk
 NAME=qgis-map-server
 
 # QGIS platform version
-FLAVOR:=release
+FLAVOR:=ltr
 
 ifdef PYPISERVER
 PYPISERVER_SCHEME ?= https
@@ -142,14 +142,3 @@ run-worker:
        -e QGSRV_LOGGING_LEVEL=DEBUG \
        -e ROUTER_HOST=map-proxy-$(COMMITID) \
        $(BUILDIMAGE) qgisserver-worker
-
-
-# Push to docker hub as rc version
-pushrc:
-ifdef CI_COMMIT_TAG
-	@echo "This is a TAG commit"
-else
-	cat $(DOCKERPASS) | docker login -u 3liz --password-stdin
-	docker tag $(BUILDIMAGE) 3liz/$(NAME):$(FLAVOR)-rc
-	docker push 3liz/$(NAME):$(FLAVOR)-rc
-endif

@@ -4,32 +4,40 @@
 
 .build-docker:
   image: ${REGISTRY_URL}/factory-ci-runner:factory-ci
+  tags:
+    - factory-dind
   stage: docker
+  rules:
+    - if: $RELEASE_BRANCH == "true"
+    - !reference [.release_rules]
   script:
     - make manifest
-    - make -C docker build deliver pushrc clean FLAVOR=$QGIS_FLAVOR BUILD_TARGET=amqp
+    - make -C docker build deliver FLAVOR=$QGIS_FLAVOR BUILD_TARGET=amqp
   environment:
     name: snap
   artifacts:
     paths:
       - "docker/factory-${QGIS_FLAVOR}.manifest"
-  only:
-    refs:
-      - tags
-      - master
-  tags:
-    - factory-dind
 
+.ltr-rc:
+  after_script:
+    - cat ${DOCKERPASS} | docker login -u 3liz --password-stdin
+    - docker tag ${REGISTRY_URL}/qgis-map-server:$QGIS_FLAVOR-dev  3liz/qgis-map-server:ltr-rc
+    - docker push 3liz/qgis-map-server:ltr-rc
 
 build-docker:3.44:
   extends: .build-docker
   variables:
     QGIS_FLAVOR: "3.44"
+  after_script:
+      - !reference [.ltr-rc, after_script] 
 
 build-docker:3.40:
   extends: .build-docker
   variables:
     QGIS_FLAVOR: "3.40"
+
+
 
 #
 # Compatibility with previous ltr
@@ -47,18 +55,17 @@ build-docker:3.34:
 
 deploy_snap:
   image: ${REGISTRY_URL}/factory-ci-runner:factory-ci
+  tags:
+    - factory-plain
   stage: deploy
+  rules:
+    - if: $RELEASE_BRANCH == "true"
+    - !reference [.release_rules]
   script:
     - update-service map
   environment:
     name: snap
   allow_failure: true
-  only:
-    refs:
-       - tags
-       - master
-  tags:
-    - factory-plain
 
 #-------------
 # Release
@@ -66,7 +73,11 @@ deploy_snap:
 
 .release:
   image: ${REGISTRY_URL}/factory-ci-runner:factory-ci
+  tags:
+    - factory-dind
   stage: release
+  rules:
+    - !reference [.release_rules]
   script:
     - release-image qgis-map-server-$QGIS_FLAVOR
     - push-to-docker-hub --clean
@@ -75,11 +86,6 @@ deploy_snap:
   when: manual
   # See https://about.gitlab.com/blog/2021/05/20/dag-manual-fix/#what-if-i-dont-want-this-new-behavior
   allow_failure: false
-  only:
-    refs:
-      - tags
-  tags:
-    - factory-dind
   variables:
     FACTORY_MANIFEST: "docker/factory-${QGIS_FLAVOR}.manifest"
 
