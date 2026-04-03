@@ -1,8 +1,10 @@
+from pathlib import Path
+
 from pyqgisserver.config import confservice
 from pyqgisserver.server import read_configuration
 
 
-def test_argument_precedence():
+def test_argument_precedence(rootdir: Path):
     """ Test argument precedences
 
         From lowest to highest:
@@ -14,7 +16,7 @@ def test_argument_precedence():
     args = read_configuration([
             '--workers', '3',
             '--port', '9090',
-            '--config', 'test.conf',
+            '--config', str(rootdir.joinpath("test.conf")),
         ])
 
     conf = confservice['server']

@@ -4,8 +4,22 @@ line-length = 120
 target-version = "py310"
 
 [lint]
-extend-select = ["E", "F", "I", "ANN", "W", "T", "COM", "RUF"]
-ignore = ["ANN002", "ANN003", "ANN401"]
+extend-select = [
+    "E", "F", "I", "ANN", "W", "T", "COM", "RUF",
+    "C4", "SIM", "TC", "RET", "ARG",
+]
+ignore = [
+    "ANN002", 
+    "ANN003", 
+    "ANN401",
+    "COM812",
+    # FIXME
+    "C4",
+    "RET",
+    "TC",
+    "ARG",
+    "SIM",
+]
 
 [format]
 indent-style = "space"

@@ -91,8 +91,11 @@ class Tests(HTTPTestCase):
         rv = self.client.get("?MAP=france_parts&SERVICE=WFS&request=GetCapabilities",
                              headers=headers)
         assert rv.status_code == 200
+        print("\n::test_allowed_headers::header:s")
+        print(rv.headers)
+
         assert rv.headers['X-Qgis-Header'] == headers['X-Qgis-Test']
         assert rv.headers['X-Lizmap-Header'] == headers['X-Lizmap-Test']
 
-        # Check that X-Request-Id is correctly formarded
+        # Check that X-Request-Id is correctly forwarded
         assert rv.headers['X-Request-Id'] == headers['X-Request-Id']

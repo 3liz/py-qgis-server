@@ -4,90 +4,51 @@ DEPTH=.
 
 include $(DEPTH)/config.mk
 
-DIST:=dist
-
 MANIFEST=src/pyqgisserver/build.manifest
 
 PYTHON_PKG=src
 
 TESTDIR=tests/unittests
 
-PYPISERVER:=storage
 
-# This is necessary with pytest as long it is not fixed
-# see also https://github.com/qgis/QGIS/pull/5337
-export QGIS_DISABLE_MESSAGE_HOOKS := 1
-export QGIS_NO_OVERRIDE_IMPORT := 1
+#
+# Configure
+#
 
-dirs:
-	mkdir -p $(DIST)
-
-version:
-	echo $(VERSION_TAG) > VERSION
-
-configure: manifest
-
-manifest: version
-	echo name=$(PROJECT_NAME) > $(MANIFEST) && \
-	echo version=$(VERSION_TAG) >> $(MANIFEST) && \
-	echo buildid=$(BUILDID)   >> $(MANIFEST) && \
-	echo commitid=$(COMMITID) >> $(MANIFEST)
-	@echo "=== Written manifest ==="
-	@cat $(MANIFEST)
-
-deliver:
-	twine upload $(TWINE_OPTIONS) -r $(PYPISERVER) $(DIST)/*
-
-dist: dirs configure
-	rm -rf *.egg-info
-	$(PYTHON) -m build --no-isolation --sdist --outdir=$(DIST)
-
-clean:
-	rm -rf $(DIST)
-
-test: manifest lint
-	@make -C tests test PYTEST_ADDOPTS=$(PYTEST_ADDOPTS)
-  
-
+# Check if uv is available
+$(eval UV_PATH=$(shell which uv))
+ifdef UV_PATH
+# Use installed python
+export UV_NO_MANAGED_PYTHON=true
 ifdef VIRTUAL_ENV
 # Always prefer active environment
-ACTIVE_VENV=--active
+UV_OPTS += --active
+endif
+UV=uv run $(UV_OPTS)
 endif
 
-install: manifest
-	@uv sync --frozen $(ACTIVE_VENV)
-
-upgrade-requirements: 
-	@uv sync -U $(ACTIVE_VENV)
-
-lint:
-	@ruff check --output-format=concise $(PYTHON_PKG) $(TESTDIR)
-
-lint-preview:
-	@ruff check --preview $(PYTHON_PKG) $(TESTDIR)
-
-lint-fix:
-	@ruff check --preview --fix $(PYTHON_PKG) $(TESTDIR)
-
-typecheck:
-	@mypy --config-file=$(topsrcdir)/mypy.ini src
-
+-include .localconfig.mk
 
 REQUIREMENT_GROUPS=\
+  dev \
   tests \
   lint \
   $(NULL)
 
+.PHONY: update-requirements
+
 REQUIREMENTS=requirements.txt $(patsubst %, update-requirements-%, $(REQUIREMENT_GROUPS))
 
-requirements.txt:
+update-requirements: $(REQUIREMENTS)
+
+requirements.txt: uv.lock
 	@echo "Updating requirements.txt"; \
-	uv export --format requirements.txt \
+	uv export --no-dev  --format requirements.txt \
 		--no-annotate \
 		--no-editable \
 		--no-hashes -q -o requirements.txt;
 
-update-requirements-%:
+update-requirements-%: uv.lock
 	@echo "Updating requirqments for '$*'"; \
 	uv export --format requirements.txt \
 		--no-annotate \
@@ -96,5 +57,83 @@ update-requirements-%:
 		--only-group $* \
 		-q -o requirements/$*.txt;
 
-update-requirements: $(REQUIREMENTS)
+
+# Install all dev requirements using frozen packagess
+install:
+	@ uv sync --all-groups --frozen $(UV_OPTS)
+
+version:
+	echo $(VERSION) > VERSION
+
+configure: manifest
+
+manifest: version
+	echo name=$(PROJECT_NAME) > $(MANIFEST) && \
+	echo version=$(VERSION) >> $(MANIFEST) && \
+	echo buildid=$(BUILDID)   >> $(MANIFEST) && \
+	echo commitid=$(COMMITID) >> $(MANIFEST)
+	@echo "=== Written manifest ==="
+	@cat $(MANIFEST)
+#
+# Release
+#
+
+bump-release-version:
+	@echo "Bumping to release version"
+	@ uv version --bump stable $(UV_OPTS)
+
+#
+# Static analysis
+#
+
+LINT_TARGETS=$(PYTHON_PKG) $(TESTDIR)
+
+lint::
+	@ $(UV) ruff check --output-format=concise $(LINT_TARGETS)
+
+lint-preview:
+	@ $(UV) ruff check --preview $(LINT_TARGETS)
+
+lint-fix:
+	@ $(UV) ruff check --fix $(LINT_TARGETS)
+
+format:
+	@ $(UV) ruff format $(LINT_TARGETS) 
+
+format-diff:
+	@ $(UV) ruff format --diff $(LINT_TARGETS) 
+
+typecheck:
+	@ $(UV) mypy --config-file=$(topsrcdir)/mypy.ini src
+
+#
+# Tests
+#
+
+test: manifest
+	$(UV) pytest -v $(TESTDIR)
+  
+#
+# Packaging
+#
+
+ifeq ($(DIST_RELEASE), true)
+dist:: bump-release-version
+endif
+
+dist:: clean
+	@uv build --sdist --wheel
+
+clean:
+	rm -rf *.egg-info ./dist
+
+#
+# Deprecated
+#
+
+PYPISERVER:=storage
+
+deliver:
+	twine upload $(TWINE_OPTIONS) -r $(PYPISERVER) dist/*.tar.gz
+
 

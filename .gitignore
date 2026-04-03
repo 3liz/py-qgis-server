@@ -52,7 +52,7 @@ docker-test.log
 *.bak
 *.bak~
 
-qgis.db
+*.db
 
 VERSION
 .env

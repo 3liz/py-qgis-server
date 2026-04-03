@@ -5,7 +5,7 @@ build-backend = "uv_build"
 [project]
 name = "py-qgis-server"
 description = "Py-Qgis-Server is an OWS/OGC server built on top of QGIS Server implementation"
-version = "1.9.6"
+version = "1.9.6rc"
 readme = "README.md"
 requires-python = ">= 3.9"
 classifiers=[
@@ -18,6 +18,8 @@ classifiers=[
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: POSIX :: Linux",
     "Topic :: Scientific/Engineering :: GIS",
 ]
@@ -60,11 +62,13 @@ request_logger = "pyqgisservercontrib.middlewares.request_logger:register_filter
 
 [dependency-groups]
 dev = [
+    "coverage[toml]",
     {include-group = "tests"},
     {include-group = "lint"},
 ]
 tests = [
     "pytest",
+    "coverage",
     "lxml",
 ]
 lint = [
@@ -77,10 +81,8 @@ lint = [
     "types-psycopg2",
     "lxml-stubs",
 ]
-package = [
-    "twine",
-]
 
 
 [tool.uv.build-backend]
 module-name = ["pyqgisserver", "pyqgisservercontrib"]
+

@@ -18,6 +18,7 @@ Options
 """
 
 import configparser
+import contextlib
 import functools
 import logging
 import os
@@ -335,10 +336,8 @@ class ConfigService:
 
     def add_section(self, sectionname: str):
         # We do not care if the section already exists
-        try:
+        with contextlib.suppress(configparser.DuplicateSectionError):
             CONFIG.add_section(sectionname)
-        except configparser.DuplicateSectionError:
-            pass
 
 
 confservice = ConfigService()
