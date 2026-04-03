@@ -60,7 +60,7 @@ update-requirements-%: uv.lock
 
 # Install all dev requirements using frozen packagess
 install:
-	@ uv sync --all-groups --frozen $(UV_OPTS)
+	@ uv sync --frozen $(UV_OPTS)
 
 version:
 	echo $(VERSION) > VERSION

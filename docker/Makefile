@@ -19,8 +19,6 @@ PIP_OPTIONS="--extra-index-url=$(PYPISERVER_SCHEME)://$(PYPISERVER) --trusted-ho
 BUILD_ARGS=--build-arg PIP_OPTIONS=$(PIP_OPTIONS)
 endif
 
-BUILD_ARGS += --build-arg QGIS_VERSION=$(FLAVOR)
-
 REGISTRY_URL ?= 3liz
 REGISTRY_PREFIX=$(REGISTRY_URL)/
 BUILD_ARGS += --build-arg REGISTRY_PREFIX=$(REGISTRY_PREFIX)
@@ -38,7 +36,9 @@ all:
 BUILD_TARGET:=base
 
 build: manifest
-	docker build --rm --force-rm --no-cache $(DOCKER_BUILD_ARGS) --target $(BUILD_TARGET) \
+	docker build --rm --target $(BUILD_TARGET) --progress=plain  \
+		--build-arg QGIS_VERSION=$(FLAVOR) \
+		$(DOCKER_BUILD_ARGS) \
 		$(BUILD_ARGS) -t $(BUILDIMAGE) -f Dockerfile ..
 
 

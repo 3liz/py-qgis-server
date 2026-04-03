@@ -1,4 +1,5 @@
 import os
+
 from pathlib import Path
 from time import sleep
 
@@ -32,7 +33,7 @@ def rootdir(request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(scope="session")
-def data(rootdir: Path):
+def data(rootdir: Path) -> Path:
     return rootdir.joinpath("data")
 
 

@@ -3,6 +3,7 @@ variables:
   FACTORY_PACKAGE_TYPE: application
 
 stages:
+- lint
 - test
 - build
 - package
@@ -12,6 +13,24 @@ stages:
 - post_release
 
 #-----------------
+# Lint
+#-----------------
+
+lint:
+  image: ${REGISTRY_URL}/factory-ci-runner:qgis-${QGIS_FLAVOR}
+  stage: lint
+  script:
+    - make install lint
+  tags:
+    - factory-plain
+  variables:
+    ASYNC_TEST_TIMEOUT: "20"
+  parallel:
+    matrix:
+    - QGIS_FLAVOR: ["ltr"]
+
+
+#-----------------
 # Tests
 #-----------------
 
@@ -19,10 +38,7 @@ stages:
   image: ${REGISTRY_URL}/factory-ci-runner:qgis-${QGIS_FLAVOR}
   stage: test
   script:
-    - source ~/.bashrc
-    - make install install-tests
-    - pip list -l
-    - make test
+    - make install test
   tags:
     - factory-plain
   variables:
@@ -54,10 +70,33 @@ build:
     - !reference [.release_rules]
   script:
     - make dist deliver
+    - echo "WHEEL=`ls -1 dist/py_qgis_server-*.whl`" > build.env
+    - cat build.env
   environment:
     name: snap
+  artifacts:
+    reports:
+      dotenv: build.env
+    paths:
+      - "dist/py_qgis_server-*.whl"
+    expire_in: 1 week
+
+# --------------
+# Package
+# --------------
+
+package:
+  image: ${REGISTRY_URL}/factory-ci-runner:fabric-ci
   tags:
-    - factory-plain
+    - fabric
+  stage: package
+  rules:
+    - if: $RELEASE_BRANCH == "true"
+    - !reference [.release_rules]
+  dependencies:
+    - build
+  script:
+    - upload_to_packages_server ${WHEEL} pub/whl/py-qgis-server/
 
 
 # Docker build

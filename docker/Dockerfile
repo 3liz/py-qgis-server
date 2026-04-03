@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1
-# vim: ft=dockerfile
 ARG REGISTRY_PREFIX=''
-ARG QGIS_VERSION=release
+ARG QGIS_VERSION=ltr
 
 FROM  ${REGISTRY_PREFIX}qgis-platform:${QGIS_VERSION} AS base
 
@@ -31,20 +30,20 @@ RUN --mount=type=cache,target=/.python-cache mkdir -p /opt/local/ \
     ${NULL}
 
 
-COPY pyqgisserver py-qgis-server/pyqgisserver
-COPY pyqgisservercontrib py-qgis-server/pyqgisservercontrib
-COPY pyproject.toml VERSION py-qgis-server/
-
 # Create virtualenv for installing server
-RUN --mount=type=cache,target=/.python-cache mkdir -p /opt/local/ \
+RUN --mount=type=bind,target=/src,rw \
+    --mount=type=cache,target=/.python-cache \
+    mkdir -p /opt/local/ \
+    && cd /src \
     && python3 -m venv --system-site-packages /opt/local/pyqgisserver \
+    && /opt/local/pyqgisserver/bin/pip install \
+        --cache-dir=/.python-cache -U pip setuptools wheel \
+        --upgrade-strategy=eager --compile \
+    && /opt/local/pyqgisserver/bin/pip install \
+        --cache-dir=/.python-cache --compile -r /src/requirements.txt \
+    && /opt/local/pyqgisserver/bin/pip install \
+        --cache-dir=/.python-cache --compile --no-deps . \
     && cd /usr/local/bin \
-    && /opt/local/pyqgisserver/bin/pip install -U \
-        --cache-dir=/.python-cache pip setuptools wheel \
-        --upgrade-strategy=eager \
-    && /opt/local/pyqgisserver/bin/pip install -U --cache-dir=/.python-cache \
-        --upgrade-strategy=eager \
-        -e /py-qgis-server \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver \
     && ln -s /opt/local/pyqgisserver/bin/qgisserver-worker \
     ${NULL}
@@ -69,4 +68,4 @@ FROM base AS amqp
 
 ARG PIP_OPTIONS
 
-RUN /opt/local/pyqgisserver/bin/pip install --no-cache-dir $PIP_OPTIONS  "py-amqp-client<=2.0.0"
+RUN /opt/local/pyqgisserver/bin/pip install --no-cache-dir --compile $PIP_OPTIONS  "py-amqp-client<=2.0.0"
