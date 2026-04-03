@@ -147,18 +147,18 @@ def set_proxy_configuration(logger: logging.Logger) -> None:
 
     proxy = nam.fallbackProxy()
     proxy_type = proxy.type()
-    if proxy_type == QNetworkProxy.NoProxy:
+    if proxy_type == QNetworkProxy.ProxyType.NoProxy:
         return
 
     logger.info(
         "QGIS Proxy configuration enabled: %s:%s, type: %s",
         proxy.hostName(), proxy.port(),
         {
-            QNetworkProxy.DefaultProxy: 'DefaultProxy',
-            QNetworkProxy.Socks5Proxy: 'Socks5Proxy',
-            QNetworkProxy.HttpProxy: 'HttpProxy',
-            QNetworkProxy.HttpCachingProxy: 'HttpCachingProxy',
-            QNetworkProxy.HttpCachingProxy: 'FtpCachingProxy',
+            QNetworkProxy.ProxyType.DefaultProxy: 'DefaultProxy',
+            QNetworkProxy.ProxyType.Socks5Proxy: 'Socks5Proxy',
+            QNetworkProxy.ProxyType.HttpProxy: 'HttpProxy',
+            QNetworkProxy.ProxyType.HttpCachingProxy: 'HttpCachingProxy',
+            QNetworkProxy.ProxyType.HttpCachingProxy: 'FtpCachingProxy',
         }.get(proxy_type, 'Undetermined'),
     )
 

@@ -243,15 +243,25 @@ class QgsCacheManager:
             else:
                 LOGGER.info("Scheme '%s' aliased to %s", scheme, baseurl)
                 self._aliases[scheme] = baseurl
+
         if baseurl:
             if '{path}' in baseurl:
                 url = urlparse(baseurl.format(path=url.path))
             else:
                 baseurl = urlparse(baseurl)
+
                 # Build a new query from coercing with base url params
                 query = _merge_qs(baseurl.query, url.query)
                 # XXX Note that the path of the base url must be terminated by '/'
                 # otherwise urljoin() will replace the base name - may be not what we want
+
+                # Python 3.13 handle geturl() in a different way
+                # than previous versions :-/
+                # * In Python < 3.13, `file:path` convert `path` to `/path`
+                # * In python 3.13+, `file:path` convert `path` to `path`
+                if not baseurl.path.startswith("/"):
+                    baseurl = baseurl._replace(path=f"/{baseurl.path}")
+
                 url = urlparse(urljoin(baseurl.geturl(), url.path + '?' + query))
                 # Make sure that the result url path is relative to base url
                 try:

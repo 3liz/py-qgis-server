@@ -49,7 +49,7 @@ tests:
   resource_group: py_qgis_server_tests
   parallel:
     matrix:
-    - QGIS_FLAVOR: ['3.44', '3.40', '3.34']
+    - QGIS_FLAVOR: ['3.44', '3.40', '3.34', '4.0']
 
 #---------------
 # Build

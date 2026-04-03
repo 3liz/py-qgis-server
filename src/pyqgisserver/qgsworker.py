@@ -96,7 +96,7 @@ class Response(QgsServerResponse):
         super().__init__()
         self._handler = handler
         self._buffer = QBuffer()
-        self._buffer.open(QIODevice.ReadWrite)
+        self._buffer.open(QIODevice.OpenModeFlag.ReadWrite)
         self._numbytes = 0
         self._finish = False
         self._metadata_fn = metadata_fn

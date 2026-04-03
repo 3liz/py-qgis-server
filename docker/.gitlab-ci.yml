@@ -32,11 +32,18 @@ build-docker:3.44:
   after_script:
       - !reference [.ltr-rc, after_script] 
 
-build-docker:3.40:
+.release-rc:
+  after_script:
+    - cat ${DOCKERPASS} | docker login -u 3liz --password-stdin
+    - docker tag ${REGISTRY_URL}/qgis-map-server:$QGIS_FLAVOR-dev  3liz/qgis-map-server:release-rc
+    - docker push 3liz/qgis-map-server:release-rc
+
+build-docker:4.0:
   extends: .build-docker
   variables:
-    QGIS_FLAVOR: "3.40"
-
+    QGIS_FLAVOR: "4.0"
+  after_script:
+      - !reference [.release-rc, after_script] 
 
 
 #
@@ -48,6 +55,10 @@ build-docker:3.34:
   variables:
     QGIS_FLAVOR: "3.34"
 
+build-docker:3.40:
+  extends: .build-docker
+  variables:
+    QGIS_FLAVOR: "3.40"
 
 #-------------
 # deploy
@@ -88,6 +99,15 @@ deploy_snap:
   allow_failure: false
   variables:
     FACTORY_MANIFEST: "docker/factory-${QGIS_FLAVOR}.manifest"
+
+
+release:4.0:
+  extends: .release
+  variables:
+    QGIS_FLAVOR: "4.0"
+  dependencies:
+    - build-docker:4.0
+
 
 release:3.44:
   extends: .release
