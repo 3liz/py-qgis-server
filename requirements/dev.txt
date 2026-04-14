@@ -17,7 +17,7 @@ pathspec==1.0.4
 pluggy==1.6.0
 pygments==2.20.0
 pytest==8.4.2 ; python_full_version < '3.10'
-pytest==9.0.2 ; python_full_version >= '3.10'
+pytest==9.0.3 ; python_full_version >= '3.10'
 ruff==0.15.9
 tomli==2.4.1 ; python_full_version <= '3.11'
 types-psutil==7.2.2.20260130 ; python_full_version < '3.10'
