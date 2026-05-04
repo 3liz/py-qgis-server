@@ -1,4 +1,5 @@
 import os
+import sys
 
 from pathlib import Path
 from time import sleep
@@ -6,6 +7,21 @@ from time import sleep
 import pytest
 
 from pyqgisserver.tests import TestRuntime
+
+
+def pytest_report_header(config):
+    from osgeo import gdal
+
+    from qgis.core import Qgis
+    from qgis.PyQt.QtCore import QT_VERSION_STR
+
+    gdal_version = gdal.VersionInfo("VERSION_NUM")
+    return (
+        f"QGIS : {Qgis.versionInt()}\n"
+        f"QT : {QT_VERSION_STR}"
+        f"Python GDAL : {gdal_version}\n"
+        f"Python : {sys.version}\n"
+    )
 
 
 def pytest_addoption(parser):

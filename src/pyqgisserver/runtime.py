@@ -87,6 +87,7 @@ def configure_handlers(client: client.AsyncClient) -> List:
     # New scheme
     kw = _ows_args(service='WFS3')
     for endpoint in wfs3_api_endpoints:
+        handlers.append((rf"/ogcapi{endpoint}", OAPIHandler, kw))
         handlers.append((rf"/wfs3{endpoint}", OAPIHandler, kw))
 
     #
