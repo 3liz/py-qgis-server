@@ -17,4 +17,4 @@ types-pyyaml==6.0.12.20260408 ; python_full_version >= '3.10'
 types-requests==2.32.4.20260107 ; python_full_version < '3.10'
 types-requests==2.33.0.20260503 ; python_full_version >= '3.10'
 typing-extensions==4.15.0
-urllib3==2.6.3
+urllib3==2.7.0
