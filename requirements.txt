@@ -3,8 +3,7 @@
 .
 cffi==2.0.0 ; implementation_name == 'pypy'
 psutil==7.2.2
-pycparser==2.23 ; python_full_version < '3.10' and implementation_name == 'pypy'
-pycparser==3.0 ; python_full_version >= '3.10' and implementation_name == 'pypy'
+pycparser==3.0 ; implementation_name == 'pypy'
 pyyaml==6.0.3
 pyzmq==27.1.0
 tornado==6.5.5
