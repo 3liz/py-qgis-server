@@ -25,7 +25,7 @@ md: build
 build: templates
 templates: configuration.rst
 
-configuration.rst: ../pyqgisserver/config.yml configuration.rst.j2
+configuration.rst: ../src/pyqgisserver/config.yml configuration.rst.j2
 	./jtpl.py -c $^
 
 clean:
