@@ -29,22 +29,19 @@ jobs:
       with:
         python-version: '3.13'
 
-#    - name: Check tag
-#      run: tests/check_tag.sh ${{ env.CI_COMMIT_TAG }}
-
-    - name: Setup
+    - name: Fetch yapt
       run: |
-        make manifest
-
-    - name: Install Python requirements
-      run: pip3 install --upgrade setuptools qgis-plugin-ci build
+        curl ${{ vars.YAPT_REPOSITORY_URL }} | tar -xzf -
 
     - name : Get current changelog
-      run: qgis-plugin-ci changelog ${{ env.CI_COMMIT_TAG }} >> release.md
+      run: |
+        ./yapt-pkg changelog >> release.md
+        cat release.md        
 
     - name: Build package
       run: |
-        make dist
+        make configure
+        make manifest dist
 
     - name: Create release on GitHub
       uses: ncipollo/release-action@v1.21.0
