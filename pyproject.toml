@@ -88,3 +88,16 @@ lint = [
 [tool.uv.build-backend]
 module-name = ["pyqgisserver", "pyqgisservercontrib"]
 
+
+#
+# ty
+#
+[tool.ty.analysis]
+allowed-unresolved-imports = [
+    "qgis",
+    "processing",
+    "osgeo",
+    "psycopg",
+    "pika",
+    "amqpclient",
+]

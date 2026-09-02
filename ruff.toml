@@ -13,8 +13,17 @@ ignore = [
     "ANN003", 
     "ANN401",
     "COM812",
+    "DTZ",
     # FIXME
-    "C4",
+    "UP006" , # Use `dict` instead of `Dict` for type annotation
+    "UP007", # Use `X | Y` for type annotation
+    "UP035", # `typing.Dict|List|Tuple` is deprecated
+    "UP045", # Use `X | None` for type annotations
+    "BLE001", # Do not catch blind exception: `Exception` 
+    "D419", # Docstring is empty
+    "PIE790", # Unnecessary `pass` statement
+    "PLR2044", # Line with empty comment
+    #"C4",
     "RET",
     "TC",
     "ARG",
