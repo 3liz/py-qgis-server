@@ -81,7 +81,7 @@ def start_qgis_application(
         # prevent our app to segfault on exit()
         import atexit
 
-        logger.info("%s Installing cleanup hook" % logprefix)
+        logger.info("%s Installing cleanup hook", logprefix)
 
         @atexit.register
         def exitQgis():
@@ -96,11 +96,11 @@ def start_qgis_application(
     # Install logger hook
     install_logger_hook(logger, logprefix)
 
-    logger.info("%s Qgis application initialized......" % logprefix)
+    logger.info("%s Qgis application initialized......", logprefix)
 
     if enable_processing:
         init_processing()
-        logger.info("%s QGis processing initialized" % logprefix)
+        logger.info("%s QGis processing initialized", logprefix)
 
     return qgis_application
 

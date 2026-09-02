@@ -26,9 +26,9 @@ class Stats:
     def json(self):
         """ Return a json payload
         """
-        return dict(
-            num_request=self.num_requests,
-            num_errors=self.num_errors,
-            start_date=datetime.fromtimestamp(self.start_time).isoformat(),
-            uptime=timedelta(seconds=time() - self.start_time).total_seconds(),
-        )
+        return {
+            "num_request": self.num_requests,
+            "num_errors": self.num_errors,
+            "start_date": datetime.fromtimestamp(self.start_time).isoformat(),
+            "uptime": timedelta(seconds=time() - self.start_time).total_seconds(),
+        }

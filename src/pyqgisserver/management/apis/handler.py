@@ -105,9 +105,12 @@ class RequestHandler:
             if isinstance(exception, HTTPError) and exception.reason:
                 reason = exception.reason
         self.set_status(status_code, reason=reason)
-        self.write(dict(status="error" if status_code != 200 else "ok",
-                        httpcode=status_code,
-                        error={"message": self._reason}))
+        self.write({
+            "status": "error" if status_code != 200 else "ok",
+            "httpcode": status_code,
+            "error": {"message": self._reason},
+        })
+
         if not self._finished:
             self.finish()
 
@@ -177,10 +180,12 @@ class RequestHandlerDelegate(QgsServerOgcApiHandler):
     def __init__(
         self, path: str,
         handler: Type[RequestHandler],
-        content_types: List[str] = [QgsServerOgcApi.JSON],
+        content_types: Optional[List[str]] = None,
     ):
 
         super().__init__()
+        if content_types is None:
+            content_types = [QgsServerOgcApi.JSON]
         if content_types:
             self.setContentTypes(content_types)
         self._path = QRegularExpression(path)

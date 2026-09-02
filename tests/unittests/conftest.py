@@ -32,7 +32,6 @@ def pytest_addoption(parser):
 def pytest_configure(config):
 
     # Debug mode
-    global postgres_user
 
     # Postgres
     config.with_postgres = config.getoption("with_postgres")

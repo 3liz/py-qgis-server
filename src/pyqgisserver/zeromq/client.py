@@ -245,9 +245,9 @@ if __name__ == '__main__':
     async def fetch(index):
         try:
             response = await client.fetch(query="?service=WMS", data=b"Hello world from %d" % index)
-            print("%d -> response = %s" % (index, response.data))  # noqa: T201
+            print(f"{index} -> response = {response.data}")  # noqa: T201
             async for chunk in client.fetch_more(response):
-                print("%d -> chunk = %s" % (index, chunk))  # noqa: T201
+                print(f"{index} -> chunk = {chunk}")  # noqa: T201
         except RequestTimeoutError:
             LOGGER.error("%d -> TIMEOUT", index)
         except RequestGatewayError:

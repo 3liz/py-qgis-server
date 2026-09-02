@@ -36,7 +36,7 @@ class AsyncClientHandler(BaseHandler):
         client: AsyncClient,
         timeout: int,
         monitor: Optional[MonitorABC] = None,
-        allowed_hdrs: List[str] = [],
+        allowed_hdrs: Optional[List[str]] = None,
         debug_request_id: Optional[str] = None,
     ):
         super().initialize()
@@ -45,7 +45,7 @@ class AsyncClientHandler(BaseHandler):
         self._timeout = timeout
         self._monitor = monitor
         self._stats = self.application.stats  # type: ignore [attr-defined]
-        self._allowed_hdrs = allowed_hdrs
+        self._allowed_hdrs = allowed_hdrs or []
         self._debug_request_id = debug_request_id
 
         self.ogc_scheme: Union[str, None] = None
@@ -196,7 +196,7 @@ class AsyncClientHandler(BaseHandler):
                 RESPONSE_STATUS=status,
                 RESPONSE_MEMUSED=meta.get('mem_used', 0),
             )
-            self._monitor.emit(params, meta={k: v for k, v in self.request.headers.get_all()})
+            self._monitor.emit(params, meta=dict(self.request.headers.get_all()))
 
     async def get(self):
         """ Handle Get method

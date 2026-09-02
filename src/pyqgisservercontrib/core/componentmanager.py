@@ -89,7 +89,7 @@ class ComponentManager:
         """ Register a factory for the given contract ID
         """
         if not callable(factory):
-            raise ValueError('factory must be a callable object')
+            raise TypeError('factory must be a callable object')
 
         LOGGER.debug("Registering factory: %s", contractID)
         self._contractIDs[contractID] = FactoryEntry(factory, None)

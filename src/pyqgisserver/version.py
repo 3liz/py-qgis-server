@@ -20,7 +20,7 @@ def read_manifest() -> Dict:
         with res.open() as stream:
             manifest.update(line.strip().split('=')[:2] for line in stream.readlines()) # type: ignore [misc]
     except Exception as e:
-        print("WARNING: Failed to read manifest ! %s " % e, file=sys.stderr)  # noqa: T201
+        print(f"WARNING: Failed to read manifest ! {e}", file=sys.stderr)  # noqa: T201
     return manifest
 
 

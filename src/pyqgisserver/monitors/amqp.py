@@ -26,7 +26,7 @@ def _read_credentials(vhost: str, user: str) -> Optional[PlainCredentials]:
 
     LOGGER.debug("Using passfile %s", credential_file)
     with open(credential_file) as fp:
-        for line in fp.readlines():
+        for line in fp:
             credentials = line.strip()
             if credentials and not credentials.startswith('#'):
                 cr_vhost, cr_user, passwd = credentials.split(':')
@@ -131,5 +131,5 @@ class Monitor(MonitorABC):
         default_routing_key = conf.get('default_routing_key', fallback=None)
 
         inst = cls(client, routing_key, default_routing=default_routing_key)
-        setattr(cls, '_instance', inst)
+        cls._instance = inst
         return inst

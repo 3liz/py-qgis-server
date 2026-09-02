@@ -24,7 +24,7 @@ def stats(pid: Optional[int] = None) -> Dict:
         return {}
 
     proc = psutil.Process(pid)
-    return dict(
-        mem_usage=proc.memory_info().rss,
-        mem_percent=proc.memory_percent(),
-    )
+    return {
+        "mem_usage": proc.memory_info().rss,
+        "mem_percent": proc.memory_percent(),
+    }

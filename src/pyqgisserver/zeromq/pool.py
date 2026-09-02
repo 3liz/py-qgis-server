@@ -16,7 +16,13 @@ import time
 from multiprocessing import Process
 from multiprocessing.util import Finalize
 
-from typing_extensions import Callable, Dict, List, Sequence
+from typing_extensions import (
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+)
 
 # Early failure min delay
 # If any process fail before that starting delay
@@ -32,16 +38,15 @@ class Pool:
         self,
         num_workers: int,
         target: Callable,
-        args: Sequence = (),
-        kwargs: Dict = {},
+        args: Optional[Sequence] = None,
+        kwargs: Optional[Dict] = None,
     ):
-
         self.critical_failure = False
 
         self._num_workers = num_workers
         self._pool: List[Process] = []
-        self._args = args
-        self._kwargs = kwargs
+        self._args = args or ()
+        self._kwargs = kwargs or {}
         self._target = target
         self._start_time = time.time()
 

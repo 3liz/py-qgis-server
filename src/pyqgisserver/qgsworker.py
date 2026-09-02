@@ -296,7 +296,7 @@ class QgsRequestHandler(RequestHandler):
 
         preload_projects()
 
-        setattr(cls, 'qgis_server', qgsserver)
+        cls.qgis_server = qgsserver
 
     @classmethod
     def default_project_location(cls) -> Optional[str]:
@@ -349,7 +349,7 @@ class QgsRequestHandler(RequestHandler):
                 hasher.update((request.parameter('VERSION') or "").lower().encode())
                 hasher.update(uri.encode())
                 hasher.update(last_modified.isoformat().encode())
-                return '"%s"' % hasher.hexdigest()
+                return f'"{hasher.hexdigest()}"'
 
         return None
 
@@ -541,13 +541,13 @@ class QgsRequestHandler(RequestHandler):
         report = super().get_report()
 
         def _to_json(key: str, project: QgsProject, static: bool) -> Dict:
-            return dict(
-                key=key,
-                filename=project.fileName(),
-                last_modified=project.lastModified().toString(Qt.ISODate),
-                num_layers=project.count(),
-                static=static,
-            )
+            return {
+                "key": key,
+                "filename": project.fileName(),
+                "last_modified": project.lastModified().toString(Qt.ISODate),
+                "num_layers": project.count(),
+                "static": static,
+            }
 
         items = {k: (d, False) for k, d in get_cacheservice().items(CacheType.LRU)}
         items.update((k, (d, True)) for (k, d) in get_cacheservice().items(CacheType.STATIC))

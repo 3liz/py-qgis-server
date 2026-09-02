@@ -54,9 +54,10 @@ class OAPIHandler(AsyncClientHandler):
     def get_monitor_params(self):
         """ Override
         """
-        params = dict(
-            MAP=self.request.arguments.get('MAP', '__unknown__'),
-            SERVICE=self._service_name,
-            REQUEST=self.request.path,
-        )
+        params = {
+            "MAP": self.request.arguments.get('MAP', '__unknown__'),
+            "SERVICE": self._service_name,
+            "REQUEST": self.request.path,
+        }
+
         return params

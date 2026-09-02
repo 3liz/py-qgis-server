@@ -171,7 +171,7 @@ class QgsCacheManager:
         self._allowed_schemes = allowed_schemes
 
         # Set the base url for file protocol
-        self._aliases['file'] = 'file:///%s/' % cnf.get('rootdir').strip('/')
+        self._aliases['file'] = f"file:///{cnf.get('rootdir').strip('/')}/"
 
         # Show options
         self._log_cache_options()
@@ -285,7 +285,7 @@ class QgsCacheManager:
             raise PathNotAllowedError(key)
         # Retrieve the protocol-handler
         try:
-            store = componentmanager.get_service('@3liz.org/cache/protocol-handler;1?scheme=%s' % scheme)
+            store = componentmanager.get_service(f"@3liz.org/cache/protocol-handler;1?scheme={scheme}")
         except componentmanager.FactoryNotFoundError:
             # Fallback to Qgis storage handler
             store = QgisStorageHandler()
@@ -531,22 +531,22 @@ def get_project_summary(key: str, project: QgsProject) -> Dict:
     """ Return json summary for cached project
     """
     def layer_summary(layer_id: str, layer: QgsMapLayer) -> Dict:
-        return dict(
-            id=layer_id,
-            name=layer.name(),
-            source=layer.publicSource(),
-            crs=layer.crs().userFriendlyIdentifier(),
-            valid=layer.isValid(),
-            spatial=layer.isSpatial(),
-        )
+        return {
+            "id": layer_id,
+            "name": layer.name(),
+            "source": layer.publicSource(),
+            "crs": layer.crs().userFriendlyIdentifier(),
+            "valid": layer.isValid(),
+            "spatial": layer.isSpatial(),
+        }
 
     layers = [layer_summary(idstr, lyr) for (idstr, lyr) in project.mapLayers().items()]
 
-    return dict(
-        cache_key=key,
-        filename=project.fileName(),
-        bad_layers_count=sum(1 for ls in layers if not ls['valid']),
-        layers=layers,
-        crs=project.crs().userFriendlyIdentifier(),
-        last_modified=project.lastModified().toString(Qt.ISODate),
-    )
+    return {
+        "cache_key": key,
+        "filename": project.fileName(),
+        "bad_layers_count": sum(1 for ls in layers if not ls['valid']),
+        "layers": layers,
+        "crs": project.crs().userFriendlyIdentifier(),
+        "last_modified": project.lastModified().toString(Qt.ISODate),
+    }

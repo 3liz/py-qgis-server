@@ -183,7 +183,7 @@ def test_preload_projects(data: Path):
     # raster_layer.qgs (invalid layer)
 
     # Ensure  that items are in static cache
-    items = list(k for k, _ in cacheservice.items(CacheType.STATIC))
+    items = [k for k, _ in cacheservice.items(CacheType.STATIC)]
     assert "file:france_parts.qgs" in items
     assert "project_simple.qgs" in items
 

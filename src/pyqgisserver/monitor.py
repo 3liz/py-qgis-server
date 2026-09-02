@@ -24,7 +24,7 @@ class Monitor:
             from pyqgisservercontrib.core import componentmanager as cm
             try:
                 service = cm.load_entrypoint('py_qgis_server.monitors', name).initialize()
-                setattr(cls, '_instance', service)
+                cls._instance =  service
                 LOGGER.info("Using '%s' monitor service", name)
             except cm.EntryPointNotFoundError:
                 LOGGER.error("Failed to load monitor component: %s", name)

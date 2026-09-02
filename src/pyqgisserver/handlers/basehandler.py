@@ -109,9 +109,11 @@ class BaseHandler(tornado.web.RequestHandler):
         #    exception = kwargs['exc_info'][1]
 
         self.logger.error("%s", message)
-        response = dict(status="error" if status_code != 200 else "ok",
-                        httpcode=status_code,
-                        error={"message": message})
+        response = {
+            "status": "error" if status_code != 200 else "ok",
+            "httpcode": status_code,
+            "error": {"message": message},
+        }
 
         self.write_json(response)
         self.finish()

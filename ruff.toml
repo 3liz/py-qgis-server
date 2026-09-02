@@ -23,7 +23,6 @@ ignore = [
     "D419", # Docstring is empty
     "PIE790", # Unnecessary `pass` statement
     "PLR2044", # Line with empty comment
-    #"C4",
     "RET",
     "TC",
     "ARG",

@@ -97,14 +97,15 @@ class _RootHandler(BaseHandler):
                 'type': "application/json",
             }
 
-        data = dict(
-            links=[
+        data = {
+            "links": [
                 _link("/status", "Server status and configuration"),
                 _link("/plugins", "Plugins managment"),
                 _link("/cache", "Projects cache managment"),
                 _link("/pool", "Workers pool status"),
             ],
-        )
+        }
+
         self.write(data)
 
     def options(self):
@@ -129,11 +130,12 @@ class _CacheHandler(QgisHandler):
             req = self.request
 
             def _link(key, item):
-                return dict(
-                    name=key,
-                    last_modified=item.modified_time.astimezone().isoformat(),
-                    link=_get_cache_link(key, req),
-                )
+                return {
+                    "name": key,
+                    "last_modified": item.modified_time.astimezone().isoformat(),
+                    "link": _get_cache_link(key, req),
+                }
+
             cached = [_link(key, item) for key, item in cache_observer.items()]
             self.write_json({'cached': cached})
             return

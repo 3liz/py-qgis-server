@@ -85,7 +85,7 @@ class Server:
             we want to make aware of the observers situation
         """
         names = (name.strip() for name in confservice.get('projects.cache', 'observers', fallback="").split(','))
-        cls._declared_observers = list(name for name in names if name)
+        cls._declared_observers = [name for name in names if name]
 
         # XXX: Managment use cache observer for listing cached objects
         if cls._declared_observers or confservice.getboolean('management', 'enabled'):

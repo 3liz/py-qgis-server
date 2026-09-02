@@ -66,7 +66,7 @@ def run_broker(inaddr: str, outaddr: str, maxqueue: int = 100, timeout: int = 30
 
     # Try to exit gracefully
     def term_signal(signum, frames):
-        LOGGER.debug("Broker process caught signal: %s" % signum)
+        LOGGER.debug("Broker process caught signal: %s", signum)
         raise SystemExit()
 
     signal.signal(signal.SIGTERM, term_signal)

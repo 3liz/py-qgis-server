@@ -46,13 +46,13 @@ def configure_handlers(client: client.AsyncClient) -> List:
 
     monitor = Monitor.instance()
 
-    ows_kwargs = dict(
-        client=client,
-        monitor=monitor,
-        timeout=cfg.getint('timeout'),
-        allowed_hdrs=tuple(k.upper() for k in cfg.get('allow_headers').split(',')),
-        debug_request_id=cfg.get('debug_request_id'),
-    )
+    ows_kwargs = {
+        "client": client,
+        "monitor": monitor,
+        "timeout": cfg.getint('timeout'),
+        "allowed_hdrs": tuple(k.upper() for k in cfg.get('allow_headers').split(',')),
+        "debug_request_id": cfg.get('debug_request_id'),
+    }
 
     end = r"(?:\.html|\.json|/?)"
     collection_end = r"(?:\.html|\.json|\.geojson|/?)"
@@ -143,11 +143,12 @@ def create_broker_process(ipcaddr: str) -> Process:
     cfg = confservice['zmq']
 
     LOGGER.info("Starting broker process")
-    p = Process(target=broker.run_broker, kwargs=dict(
-                inaddr=ipcaddr,
-                outaddr=cfg['bindaddr'],
-                maxqueue=cfg.getint('maxqueue'),
-                timeout=cfg.getint('timeout')))
+    p = Process(target=broker.run_broker, kwargs={
+        "inaddr": ipcaddr,
+        "outaddr": cfg['bindaddr'],
+        "maxqueue": cfg.getint('maxqueue'),
+        "timeout": cfg.getint('timeout')
+    })
     p.start()
     return p
 

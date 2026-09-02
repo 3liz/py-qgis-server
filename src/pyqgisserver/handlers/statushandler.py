@@ -80,9 +80,9 @@ class StatusHandler(BaseHandler):
             QGIS_VERSION = "n/a"
             QGIS_RELEASE = "n/a"
 
-        return dict(
-            tornado_ver=tornado.version,
-            version=__version__,
-            qgis_version=QGIS_VERSION,
-            qgis_release=QGIS_RELEASE,
-        )
+        return {
+            "tornado_ver": tornado.version,
+            "version": __version__,
+            "qgis_version": QGIS_VERSION,
+            "qgis_release": QGIS_RELEASE,
+        }
