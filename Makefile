@@ -84,7 +84,7 @@ manifest: version
 
 bump-release-version:
 	@echo "Bumping to release version"
-	@ uv version --bump stable $(UV_OPTS) || true
+	@ uv version --bump stable $(UV_OPTS) --frozen || true
 
 #
 # Static analysis
