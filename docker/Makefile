@@ -45,7 +45,7 @@ build: manifest
 QGIS_IMAGE=$(REGISTRY_PREFIX)qgis-platform:$(FLAVOR)
 
 manifest:
-	{ \
+	@{ \
 	set -e; \
 	version=`docker run --rm -v $$(pwd)/scripts:/scripts $(QGIS_IMAGE)  /scripts/qgis-version.sh`; \
 	echo name=$(NAME) > $(MANIFEST) && \
@@ -54,6 +54,7 @@ manifest:
     echo release_tag=`echo $$version | cut -d- -f1 |cut -d. -f1-2` >> $(MANIFEST) && \
     echo buildid=$(BUILDID)   >> $(MANIFEST) && \
     echo commitid=$(COMMITID) >> $(MANIFEST); }
+	cat $(MANIFEST)
 
 deliver: tag push
 

@@ -11,7 +11,7 @@
     - if: $RELEASE_BRANCH == "true"
     - !reference [.release_rules]
   script:
-    - make manifest
+    - make configure
     - make -C docker build deliver FLAVOR=$QGIS_FLAVOR BUILD_TARGET=amqp
   environment:
     name: snap
@@ -38,10 +38,10 @@ build-docker:3.44:
     - docker tag ${REGISTRY_URL}/qgis-map-server:$QGIS_FLAVOR-dev  3liz/qgis-map-server:release-rc
     - docker push 3liz/qgis-map-server:release-rc
 
-build-docker:4.0:
+build-docker:4.2:
   extends: .build-docker
   variables:
-    QGIS_FLAVOR: "4.0"
+    QGIS_FLAVOR: "4.2"
   after_script:
       - !reference [.release-rc, after_script] 
 
@@ -101,12 +101,12 @@ deploy_snap:
     FACTORY_MANIFEST: "docker/factory-${QGIS_FLAVOR}.manifest"
 
 
-release:4.0:
+release:4.2:
   extends: .release
   variables:
-    QGIS_FLAVOR: "4.0"
+    QGIS_FLAVOR: "4.2"
   dependencies:
-    - build-docker:4.0
+    - build-docker:4.2
 
 
 release:3.44:

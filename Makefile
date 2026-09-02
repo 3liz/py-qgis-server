@@ -63,16 +63,22 @@ install:
 	@ uv sync --frozen $(UV_OPTS)
 
 version:
-	echo $(VERSION) > VERSION
+	@echo $(VERSION) > VERSION
 
-configure: manifest
+ifeq ($(DIST_RELEASE), true)
+configure:: bump-release-version
+endif
+
+
+configure:: manifest
 
 manifest: version
-	echo name=$(PROJECT_NAME) > $(MANIFEST) && \
-	echo version=$(VERSION) >> $(MANIFEST) && \
-	echo buildid=$(BUILDID)   >> $(MANIFEST) && \
-	echo commitid=$(COMMITID) >> $(MANIFEST)
-	@echo "=== Written manifest ==="
+	@{ \
+		echo name=$(PROJECT_NAME) > $(MANIFEST) && \
+		echo version=$(VERSION) >> $(MANIFEST) && \
+		echo buildid=$(BUILDID)   >> $(MANIFEST) && \
+		echo commitid=$(COMMITID) >> $(MANIFEST); \
+	}
 	@cat $(MANIFEST)
 #
 # Release
@@ -80,7 +86,7 @@ manifest: version
 
 bump-release-version:
 	@echo "Bumping to release version"
-	@ uv version --bump stable $(UV_OPTS)
+	@ uv version --bump stable $(UV_OPTS) || true
 
 #
 # Static analysis
@@ -117,11 +123,7 @@ test: manifest
 # Packaging
 #
 
-ifeq ($(DIST_RELEASE), true)
-dist:: bump-release-version
-endif
-
-dist:: clean
+dist:: clean configure
 	@uv build --sdist --wheel
 
 clean:
