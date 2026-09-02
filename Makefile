@@ -70,8 +70,6 @@ configure:: bump-release-version
 endif
 
 
-configure:: manifest
-
 manifest: version
 	@{ \
 		echo name=$(PROJECT_NAME) > $(MANIFEST) && \
@@ -123,7 +121,7 @@ test: manifest
 # Packaging
 #
 
-dist:: clean configure
+dist:: clean
 	@uv build --sdist --wheel
 
 clean:

@@ -69,7 +69,8 @@ build:
     - if: $RELEASE_BRANCH == "true"
     - !reference [.release_rules]
   script:
-    - make dist deliver
+    - make configure  # Run configure as stand alone command
+    - make manifest dist deliver
     - echo "WHEEL=`ls -1 dist/py_qgis_server-*.whl`" > build.env
     - cat build.env
   environment:

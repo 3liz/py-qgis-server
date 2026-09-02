@@ -12,6 +12,7 @@
     - !reference [.release_rules]
   script:
     - make configure
+    - make manifest
     - make -C docker build deliver FLAVOR=$QGIS_FLAVOR BUILD_TARGET=amqp
   environment:
     name: snap
