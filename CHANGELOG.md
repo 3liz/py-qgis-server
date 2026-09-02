@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
-### Fixed
+### 1.9.7
 
 * Support ogc api (WFS3) change in root path with QGIS4
 
