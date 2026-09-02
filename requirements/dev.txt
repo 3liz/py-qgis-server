@@ -20,6 +20,6 @@ tomli==2.4.1 ; python_full_version <= '3.11'
 types-psutil==7.2.2.20260518
 types-psycopg2==2.9.21.20260518
 types-pyyaml==6.0.12.20260518
-types-requests==2.33.0.20260518
+types-requests==2.33.0.20260712
 typing-extensions==4.16.0
 urllib3==2.7.0
