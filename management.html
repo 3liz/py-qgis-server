@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Management API (experimental) &mdash; py-qgis-server 1.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=d13700ae"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -107,8 +107,8 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – no error</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a></span> – the plugin does not exists</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – no error</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404">404 Not Found</a></span> – the plugin does not exists</p></li>
 </ul>
 </dd>
 </dl>
@@ -124,20 +124,20 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 <span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
 
 <span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">     </span><span class="nt">&quot;general&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3liz&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Test plugin&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;email&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;myplugin&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;qgisminimumversion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;3.0&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;server&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;True&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">     </span><span class="nt">"general"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3liz"</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Test plugin"</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"myplugin"</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"qgisminimumversion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3.0"</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"server"</span><span class="p">:</span><span class="w"> </span><span class="s2">"True"</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span>
 <span class="w">     </span><span class="p">},</span>
-<span class="w">     </span><span class="nt">&quot;path&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/plugins/myplugin/__init__.py&quot;</span>
+<span class="w">     </span><span class="nt">"path"</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="s2">"/plugins/myplugin/__init__.py"</span>
 <span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;myplugin&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;loaded&quot;</span>
+<span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"myplugin"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"loaded"</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -159,8 +159,8 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – no error</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a></span> – the project does not exists</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – no error</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404">404 Not Found</a></span> – the project does not exists</p></li>
 </ul>
 </dd>
 </dl>
@@ -176,16 +176,16 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 <span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
 
 <span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;bad_layers_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;cache_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;myproject&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;crs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EPSG:4326 - WGS 84&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;last_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2021-06-24T08:04:26&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;layers&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"bad_layers_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"cache_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"myproject"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"crs"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EPSG:4326 - WGS 84"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"last_modified"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021-06-24T08:04:26"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"layers"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">     </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;crs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EPSG:4326 - WGS 84&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;myproject_8d8d649f_7748_43cc_8bde_b013e17ede29&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my project layer&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/src/tests/data/myproject/myproject.shp&quot;</span>
+<span class="w">         </span><span class="nt">"crs"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EPSG:4326 - WGS 84"</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"myproject_8d8d649f_7748_43cc_8bde_b013e17ede29"</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my project layer"</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">"source"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/src/tests/data/myproject/myproject.shp"</span>
 <span class="w">     </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
@@ -210,7 +210,7 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – no error</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – no error</p></li>
 </ul>
 </dd>
 </dl>
@@ -226,28 +226,28 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 <span class="na">Content-Type</span><span class="o">:</span> <span class="l">application/json</span>
 
 <span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;num_workers&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;workers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="nt">"num_workers"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"workers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;cache&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="nt">"cache"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span>
-<span class="w">            </span><span class="s2">&quot;/tests/data/myporject.qgs&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;myproject&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;last_modified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2021-06-24T08:04:26&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;link&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://localhost:19876/cache/myproject&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;num_layers&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">            </span><span class="nt">"filename"</span><span class="p">:</span>
+<span class="w">            </span><span class="s2">"/tests/data/myporject.qgs"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"myproject"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"last_modified"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021-06-24T08:04:26"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"link"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://localhost:19876/cache/myproject"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"num_layers"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
 <span class="w">          </span><span class="p">}</span>
 <span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;mem_percent&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.4297396825334563</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;mem_usage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">143597568</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;pid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">34</span>
+<span class="w">        </span><span class="nt">"mem_percent"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.4297396825334563</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"mem_usage"</span><span class="p">:</span><span class="w"> </span><span class="mi">143597568</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"pid"</span><span class="p">:</span><span class="w"> </span><span class="mi">34</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;cache&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">        </span><span class="nt">&quot;mem_percent&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.41044564806749534</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;mem_usage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">137150464</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;pid&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">31</span>
+<span class="w">        </span><span class="nt">"cache"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">        </span><span class="nt">"mem_percent"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.41044564806749534</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"mem_usage"</span><span class="p">:</span><span class="w"> </span><span class="mi">137150464</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"pid"</span><span class="p">:</span><span class="w"> </span><span class="mi">31</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
@@ -262,7 +262,7 @@ The api will be considered as <em>stable</em> from the 1.8.0 version.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – no error</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – no error</p></li>
 </ul>
 </dd>
 </dl>
