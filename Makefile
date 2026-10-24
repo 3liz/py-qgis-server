@@ -65,6 +65,9 @@ install:
 version:
 	@echo $(VERSION) > VERSION
 
+
+configure:: version
+
 ifeq ($(DIST_RELEASE), true)
 configure:: bump-release-version
 endif
