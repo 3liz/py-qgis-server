@@ -20,33 +20,26 @@ jobs:
     - name: Get source code
       uses: actions/checkout@v7
 
-    - name: Changelog
-      id: changelog
-      uses: 3liz/changelog-release@0.4.0
-
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v7.0.0
-      with:
-        python-version: '3.13'
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.3.3
 
     - name: Fetch yapt
       run: |
         curl ${{ vars.YAPT_REPOSITORY_URL }} | tar -xzf -
 
-    - name : Get current changelog
-      run: |
-        ./yapt-pkg changelog >> release.md
-        cat release.md        
-
     - name: Build package
       run: |
         make configure
+         ./yapt-pkg changelog >> release.md
+        cat release.md        
         make manifest dist
+      env:
+        DIST_RELEASE: "true"
 
     - name: Create release on GitHub
       uses: ncipollo/release-action@v1.21.0
       with:
-        body: ${{ steps.changelog.outputs.markdown }}
+        bodyFile: release.md
         token: ${{ secrets.BOT_HUB_TOKEN }}
         allowUpdates: true
         artifacts: "dist/*.tar.gz"
