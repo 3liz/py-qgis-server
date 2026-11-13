@@ -84,6 +84,11 @@ lint = [
     "lxml-stubs",
 ]
 
+# Used only for generating release changelog
+[tool.yapt]
+# Just required by the yapt-tool pkg
+plugin_source = "src"
+
 
 [tool.uv.build-backend]
 module-name = ["pyqgisserver", "pyqgisservercontrib"]

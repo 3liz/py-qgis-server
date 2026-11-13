@@ -7,10 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## Unreleased
 
+## 1.9.8 - 2026-11-13
+
 * Fix asynchronous polling in ZMQ client
     - Fix https://github.com/3liz/lizmap-web-client/issues/7420
 
-### 1.9.7
+## 1.9.7
 
 * Support ogc api (WFS3) change in root path with QGIS4
 
