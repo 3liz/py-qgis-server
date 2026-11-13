@@ -135,14 +135,16 @@ class AsyncClient:
         self._running = False
         self._handlers: Dict[bytes, AsyncResponseHandler] = {}
         self._socket = sock
-        self._polling = False
         self._poll_task: Optional[asyncio.Task] = None
         LOGGER.info("Starting client %s", self.identity)
 
     async def _poll(self):
         """ Handle incoming messages
+
+            There must be only one poller running at a time: concurrent
+            pollers on the same socket may process messages out of order,
+            and a chunk handled before its header would be lost.
         """
-        self._polling = True
         while self._handlers:
             try:
                 correlation_id, data, *rest = await self._socket.recv_multipart()
@@ -162,7 +164,6 @@ class AsyncClient:
                 LOGGER.error("%s error:  zmq error: %s (%s)", self.identity, zmq.strerror(err.errno), err.errno)
             except Exception as err:
                 LOGGER.error("%s exception %s\n%s", self.identity, err, traceback.format_exc())
-        self._polling = False
         self._poll_task = None
 
     async def fetch(
@@ -188,7 +189,10 @@ class AsyncClient:
         handler = AsyncResponseHandler(correlation_id)
         self._handlers[correlation_id] = handler
         # Run poller if needed
-        if not self._polling:
+        # Note: test on `_poll_task` which is set synchronously, testing on a
+        # flag set from within the task would allow concurrent fetches to start
+        # multiple pollers before the first one is scheduled.
+        if self._poll_task is None:
             self._poll_task = asyncio.create_task(self._poll())
 
         # Wait for response
@@ -202,11 +206,12 @@ class AsyncClient:
         """ Request next chunk
         """
         try:
-            while True:
+            has_more = True
+            while has_more:
                 data, has_more = await response._next_chunk(timeout)
-                if not has_more:
-                    break
-                yield data
+                # The last chunk may carry data: do not discard it
+                if data or has_more:
+                    yield data
         except Exception:
             self._handlers.pop(response.correlation_id, None)
             raise
