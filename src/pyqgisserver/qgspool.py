@@ -18,7 +18,6 @@ import time
 import traceback
 
 from glob import glob
-from multiprocessing import Process
 from multiprocessing.util import Finalize
 from typing import (
     Awaitable,
@@ -36,6 +35,7 @@ from pyqgisservercontrib.core.watchfiles import Scheduler, watchfiles
 
 from .config import confservice
 from .qgsworker import QgsRequestHandler
+from .utils.process import Process
 from .zeromq.pool import Pool
 from .zeromq.supervisor import Supervisor
 

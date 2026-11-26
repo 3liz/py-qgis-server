@@ -12,7 +12,6 @@ import os
 import signal
 import sys
 
-from multiprocessing import Process
 from typing import (
     List,
     Optional,
@@ -34,6 +33,7 @@ from .monitor import Monitor
 from .qgscache.observer import declare_cache_observers, start_cache_observer
 from .qgspool import create_poolserver
 from .stats import Stats
+from .utils.process import Process
 from .zeromq import broker, client
 
 LOGGER = logging.getLogger('SRVLOG')
