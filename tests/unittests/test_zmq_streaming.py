@@ -11,10 +11,9 @@ import asyncio
 import shutil
 import tempfile
 
-from multiprocessing import Process
-
 import pytest
 
+from pyqgisserver.utils.process import Process
 from pyqgisserver.zeromq.broker import run_broker
 from pyqgisserver.zeromq.client import AsyncClient
 from pyqgisserver.zeromq.worker import RequestHandler, run_worker

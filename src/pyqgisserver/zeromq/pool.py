@@ -13,7 +13,6 @@ import os
 import signal
 import time
 
-from multiprocessing import Process
 from multiprocessing.util import Finalize
 
 from typing_extensions import (
@@ -23,6 +22,8 @@ from typing_extensions import (
     Optional,
     Sequence,
 )
+
+from ..utils.process import Process
 
 # Early failure min delay
 # If any process fail before that starting delay
